@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include <map>
+#include <memory>
 
 #include "app-framework-base/Buffers/Buffer.hh"
 #include "app-framework-base/UserModules/UserModule.hh"

@@ -6,9 +6,6 @@ namespace appframework {
 	public:
 		virtual void setup(std::list<std::string> args) = 0;
 
-		template<typename T>
-		T const& handle();
-	protected:
 		Service() {}
 	};
 }

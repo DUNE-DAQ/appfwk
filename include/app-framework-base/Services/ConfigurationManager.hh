@@ -3,14 +3,17 @@
 
 namespace appframework {
 	
-	class ConfigurationManager : public Service {
+	class ConfigurationManager {
 
 	public:
-		static ConfigurationManager& handle() { static ConfigurationManager conf; return conf; }
-		void setup(std::list<std::string>) override {}
+		static ConfigurationManager* handle() { if (!handle_) handle_ = new ConfigurationManager(); return handle_; }
+		static void setup(std::list<std::string>) {}
 
 	protected:
 		ConfigurationManager() {}
+	private:
+
+		static ConfigurationManager* handle_;
 	};
 }
 

@@ -1,14 +1,14 @@
 #ifndef app_framework_base_Services_Logger_hh
 #define app_framework_base_Services_Logger_hh
 
-#include "app-framework-base/Services/Service.hh"
+#include <list>
+#include <string>
 
 namespace appframework {
-	class Logger : public Service
+	class Logger
 	{
 	public:
-		static Logger& handle() { static Logger log; return log; }
-		void setup(std::list<std::string>) {}
+static		void setup(std::list<std::string>) {}
 	protected:
 		Logger() {}
 	};
