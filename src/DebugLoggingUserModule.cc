@@ -6,7 +6,10 @@
 #include <iostream>
 
 namespace appframework {
-void DebugLoggingUserModule::execute_transition(TransitionName cmd) { std::cout << "Executing transition: " << transitionNameToString(cmd) << std::endl; }
+std::string DebugLoggingUserModule::execute_transition(TransitionName cmd) {
+    std::cout << "Executing transition: " << transitionNameToString(cmd) << std::endl;
+    return "Success";
+}
 std::string DebugLoggingUserModule::transitionNameToString(TransitionName cmd) {
     switch (cmd) {
         case TransitionName::Start:

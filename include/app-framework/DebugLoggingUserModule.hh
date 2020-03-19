@@ -8,7 +8,7 @@
 namespace appframework {
 class DebugLoggingUserModule : public UserModule {
    public:
-    void execute_transition(TransitionName cmd) override;
+    std::string execute_transition(TransitionName cmd) override;
 
    private:
     std::string transitionNameToString(TransitionName cmd);
