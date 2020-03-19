@@ -3,10 +3,12 @@
 
 #include "app-framework-base/Core/StateMachine.hh"
 
+#include <string>
+
 namespace appframework {
 class UserModule {
    public:
-    virtual void execute_transition(TransitionName cmd) = 0;
+    virtual std::string execute_transition(TransitionName cmd) = 0;
 };
 }  // namespace appframework
 
