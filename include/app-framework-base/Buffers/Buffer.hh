@@ -6,24 +6,23 @@ using std::size_t;
 
 namespace appframework{
 
-  template <class T>
   class Buffer {
     
   public:
 
-    void Configure() = 0; ///called when configured in FSM
+    virtual void Configure() = 0; ///called when configured in FSM
     
     bool isBounded() { return fBounded; }
 
     virtual size_t size() = 0; ///elements in buffer
-    size_t sizeBytes() { return size()*sizeof(T); }
+    //virtual size_t sizeBytes() = 0; ///bytes in buffer
     
     virtual size_t capacity() = 0;
-    size_t capacityBytes() { return capacity()*sizeof(T); }
+    //virtual size_t capacityBytes() =0; ///capacity in bytes of buffer
 
     //basic element adding functions
-    virtual size_t push(const T&) = 0; ///push one on
-    virtual size_t pop(T&) = 0; ///pop one off
+    //virtual size_t push(const T&) = 0; ///push one on
+    //virtual size_t pop(T&) = 0; ///pop one off
 
 
   protected:
