@@ -1,3 +1,10 @@
+/**
+ * @file simple_test_app to show basic functionality of DAQProcess
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ */
+
 #include "app-framework/DAQProcess.hh"
 #include "app-framework/DebugLoggingUserModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
