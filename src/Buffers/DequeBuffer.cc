@@ -1,10 +1,10 @@
-#include "app-framework/DequeBuffer.hh"
+#include "app-framework/Buffers/DequeBuffer.hh"
 
 template <class T>
-dunedaq::DequeBuffer<T>::DequeBuffer(){}
+appframework::DequeBuffer<T>::DequeBuffer(){}
 
 template <class T>
-void dunedaq::DequeBuffer<T>::Configure(){
+void appframework::DequeBuffer<T>::Configure(){
   
   this->fBounded = true;
 
@@ -20,7 +20,7 @@ void dunedaq::DequeBuffer<T>::Configure(){
 }
 
 template <class T>
-int dunedaq::DequeBuffer<T>::push(const T& obj){
+int appframework::DequeBuffer<T>::push(const T& obj){
 
   if(size()+1<capacity()){
     fDeque.push_back(obj);
@@ -32,7 +32,7 @@ int dunedaq::DequeBuffer<T>::push(const T& obj){
 }
 
 template <class T>
-int dunedaq::DequeBuffer<T>::pop(T& obj){
+int appframework::DequeBuffer<T>::pop(T& obj){
 
   if(size()>0){
     obj = fDeque.front();

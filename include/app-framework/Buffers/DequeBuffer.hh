@@ -1,7 +1,7 @@
 #ifndef app_framework_Buffers_DequeBuffer_hh
 #define app_framework_Buffers_DequeBuffer_hh
 
-#include "app-framework-base/Buffer.hh"
+#include "app-framework-base/Buffers/Buffer.hh"
 
 #include <deque>
 #include <functional>
@@ -9,7 +9,7 @@
 namespace appframework{
 
   template <class T>
-  class DequeBuffer : public Buffer<T> {
+  class DequeBuffer : public Buffer {
     
   public:
 
@@ -19,6 +19,9 @@ namespace appframework{
     
     size_t size() { return fDeque.size(); }
     size_t capacity() { return fCapacity; }
+
+    size_t sizeBytes() { return fDeque.size()*sizeof(T); }
+    size_t capacityBytes() { return fCapacity*sizeof(T); }
     
     int push(const T&); ///push one on, return new size if successful, -1 if not
     int pop(T&);        ///pop one off, return new size if successful, -1 if not
