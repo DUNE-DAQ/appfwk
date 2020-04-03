@@ -15,9 +15,8 @@
 #ifndef app_framework_base_UserModules_UserModule_hh
 #define app_framework_base_UserModules_UserModule_hh
 
-#include "app-framework-base/Core/StateMachine.hh"
-
 #include <string>
+#include <future>
 
 namespace appframework {
 /**
@@ -29,16 +28,16 @@ namespace appframework {
 class UserModule {
    public:
     /**
-     * @brief Execute a transition command in this UserModule
-     * @param cmd The transition from CCM
-     * @return String with detailed status of the transition.
+     * @brief Execute a command in this UserModule
+     * @param cmd The command from CCM
+     * @return String with detailed status of the command (future).
      *
-     * execute_transition is the single entry point for DAQProcess to pass CCM commands to UserModules.
+     * execute_command is the single entry point for DAQProcess to pass CCM commands to UserModules.
      * The implementation of this function should route accepted commands to the appropriate functions
      * within the UserModule and return their result. Non-accepted commands should return a status indicating
      * this result.
      */
-    virtual std::string execute_transition(TransitionName cmd) = 0;
+    virtual std::future<std::string> execute_command(std::string cmd) = 0;
 };
 }  // namespace appframework
 

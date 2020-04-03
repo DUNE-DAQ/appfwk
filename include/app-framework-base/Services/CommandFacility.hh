@@ -37,7 +37,7 @@ class CommandFacility {
      * @param process DAQProcess to relay commands to
      * @return Return code for application
      *
-     * This function should block for the lifetime of the DAQ Application, calling DAQProcess::execute_transition as necessary
+     * This function should block for the lifetime of the DAQ Application, calling DAQProcess::execute_command as necessary
      */
     virtual int listen(DAQProcess* /*process*/) { return 0; }
 
