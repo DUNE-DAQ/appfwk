@@ -23,7 +23,7 @@ int QueryResponseCommandFacility::listen(DAQProcess* process) {
                 keepGoing = false;
                 break;
             } else {
-                process->execute_transition(stringToTransitionName(comm));
+                process->execute_command(comm);
             }
         }
     } catch (...) {
@@ -31,12 +31,5 @@ int QueryResponseCommandFacility::listen(DAQProcess* process) {
     }
 
     return 0;
-}
-
-TransitionName QueryResponseCommandFacility::stringToTransitionName(std::string string) {
-    if (string.find("stop") != std::string::npos || string.find("Stop") != std::string::npos) {
-        return TransitionName::Stop;
-    }
-    return TransitionName::Start;
 }
 }  // namespace appframework

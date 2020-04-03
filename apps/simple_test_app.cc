@@ -14,7 +14,7 @@ std::unique_ptr<CommandFacility> CommandFacility::handle_ = std::unique_ptr<Comm
 
 class simple_test_app_ModuleList : public ModuleList {
     // Inherited via ModuleList
-    virtual void ConstructGraph(BufferMap& buffer_map, UserModuleMap& user_module_map, TransitionOrderMap& transition_order_map) override {
+    virtual void ConstructGraph(BufferMap& buffer_map, UserModuleMap& user_module_map, CommandOrderMap& command_order_map) override {
         user_module_map["debugLogger"].reset(new DebugLoggingUserModule());
     }
 };

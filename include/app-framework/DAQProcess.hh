@@ -15,7 +15,6 @@
 
 #include "app-framework-base/Buffers/Buffer.hh"
 #include "app-framework-base/Core/ModuleList.hh"
-#include "app-framework-base/Core/StateMachine.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
 
 #include <map>
@@ -26,7 +25,7 @@ namespace appframework {
  * @brief The DAQProcess class is the central container for UserModules and Buffers.
  *
  * DAQProcess receives commands from CCM and distributes them to the UserModules in the order defined 
- * in the TransitionOrderMap received from the ModuleList during register_modules.
+ * in the CommandOrderMap received from the ModuleList during register_modules.
  */
 class DAQProcess {
    public:
@@ -51,26 +50,25 @@ class DAQProcess {
      * @brief Execute the specified command on the loaded UserModules
      * @param cmd Command to execute
      *
-     * This function will determine if there is an entry in the transition order map for this command, and
-     * if so, first send the transition to the UserModules in that list in the order specified. Then, any
+     * This function will determine if there is an entry in the command order map for this command, and
+     * if so, first send the command to the UserModules in that list in the order specified. Then, any
      * remaining UserModules will receive the command in an unspecified order.
      */
-    void execute_transition(TransitionName cmd);
+    void execute_command(std::string cmd);
     /**
      * @brief Start the CommandFacility listener
      * @return Return code from listener
      *
      * This function should call the loaded CommandFacility::listen method, which should block for the
-     * duration of the DAQ Application, calling execute_transition as necessary.
+     * duration of the DAQ Application, calling execute_command as necessary.
      */
     int listen();
 
    private:
-    StateMachineState myState_;
 
     BufferMap bufferMap_;                    ///< String alias for each Buffer
     UserModuleMap userModuleMap_;            ///< String alias for each UserModule
-    TransitionOrderMap transitionOrderMap_;  ///< Order UserModule transitions by alias
+    CommandOrderMap commandOrderMap_;        ///< Order UserModule commands by alias
 };
 }  // namespace appframework
 

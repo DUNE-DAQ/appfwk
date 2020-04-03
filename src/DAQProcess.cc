@@ -16,29 +16,27 @@ namespace appframework {
 ServiceManager* ServiceManager::handle_ = nullptr;
 ConfigurationManager* ConfigurationManager::handle_ = nullptr;
 
-DAQProcess::DAQProcess(std::list<std::string> args) : myState_(StateMachineState::Initial) {
+DAQProcess::DAQProcess(std::list<std::string> args) {
     Logger::setup(args);
     CommandFacility::setup(args);
     ConfigurationManager::setup(args);
     ServiceManager::setup(args);
-    myState_ = StateMachineState::Booted;
 }
 
 void DAQProcess::register_modules(std::unique_ptr<ModuleList> const& ml) {
-    ml->ConstructGraph(bufferMap_, userModuleMap_, transitionOrderMap_);
-    myState_ = StateMachineState::ModulesRegistered;
+    ml->ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_);
 }
 
-void DAQProcess::execute_transition(TransitionName cmd) {
-    if (transitionOrderMap_.count(cmd)) {
-        for (auto& moduleName : transitionOrderMap_[cmd]) {
+void DAQProcess::execute_command(std::string cmd) {
+    if (commandOrderMap_.count(cmd)) {
+        for (auto& moduleName : commandOrderMap_[cmd]) {
             if (userModuleMap_.count(moduleName)) {
-                userModuleMap_[moduleName]->execute_transition(cmd);
+                userModuleMap_[moduleName]->execute_command(cmd);
             }
         }
     } else {
         for (auto const& um : userModuleMap_) {
-            um.second->execute_transition(cmd);
+            um.second->execute_command(cmd);
         }
     }
 }

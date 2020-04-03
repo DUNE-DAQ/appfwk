@@ -3,6 +3,9 @@ project(app-framework)
 
 set(CMAKE_CXX_STANDARD 17)
 
+find_package(TRACE 3.15.0 REQUIRED)
+
+
 include_directories(${CMAKE_SOURCE_DIR}/app-framework/include)
 include_directories(${CMAKE_SOURCE_DIR}/app-framework-base/include)
 

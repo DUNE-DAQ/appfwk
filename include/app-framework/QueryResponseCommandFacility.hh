@@ -13,7 +13,6 @@
 
 #include "app-framework/DAQProcess.hh"
 
-#include "app-framework-base/Core/StateMachine.hh"
 #include "app-framework-base/Services/CommandFacility.hh"
 
 namespace appframework {
@@ -28,8 +27,6 @@ class QueryResponseCommandFacility : public CommandFacility {
      */
     virtual int listen(DAQProcess* theProcess) override;
 
-   private:
-    TransitionName stringToTransitionName(std::string string);
 };
 }  // namespace appframework
 

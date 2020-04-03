@@ -14,6 +14,7 @@
 #include "app-framework-base/UserModules/UserModule.hh"
 
 #include <string>
+#include <future>
 
 namespace appframework {
 /**
@@ -25,10 +26,8 @@ class DebugLoggingUserModule : public UserModule {
      * @brief Logs the reception of the command
      * @param cmd Command from DAQProcess
      */
-    std::string execute_transition(TransitionName cmd) override;
+    std::future<std::string> execute_command(std::string cmd) override;
 
-   private:
-    std::string transitionNameToString(TransitionName cmd);
 };
 }  // namespace appframework
 
