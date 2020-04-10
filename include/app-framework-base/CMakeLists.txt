@@ -1,0 +1,5 @@
+add_subdirectory(Buffers)
+add_subdirectory(Core)
+add_subdirectory(Plugins)
+add_subdirectory(Services)
+add_subdirectory(UserModules)
