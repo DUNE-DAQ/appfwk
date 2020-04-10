@@ -1,3 +1,10 @@
+/**
+ * @file simple_test_app to show basic functionality of DAQProcess
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ */
+
 #include "app-framework/DAQProcess.hh"
 #include "app-framework/DebugLoggingUserModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
@@ -7,7 +14,7 @@ std::unique_ptr<CommandFacility> CommandFacility::handle_ = std::unique_ptr<Comm
 
 class simple_test_app_ModuleList : public ModuleList {
     // Inherited via ModuleList
-    virtual void ConstructGraph(BufferMap& buffer_map, UserModuleMap& user_module_map, TransitionOrderMap& transition_order_map) override {
+    virtual void ConstructGraph(BufferMap& buffer_map, UserModuleMap& user_module_map, CommandOrderMap& command_order_map) override {
         user_module_map["debugLogger"].reset(new DebugLoggingUserModule());
     }
 };

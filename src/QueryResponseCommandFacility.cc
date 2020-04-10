@@ -1,3 +1,10 @@
+/**
+ * @file QueryResponseCommandFacility class Implementation
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ */
+
 #include "app-framework/QueryResponseCommandFacility.hh"
 
 #include <iostream>
@@ -16,7 +23,7 @@ int QueryResponseCommandFacility::listen(DAQProcess* process) {
                 keepGoing = false;
                 break;
             } else {
-                process->execute_transition(stringToTransitionName(comm));
+                process->execute_command(comm);
             }
         }
     } catch (...) {
@@ -24,12 +31,5 @@ int QueryResponseCommandFacility::listen(DAQProcess* process) {
     }
 
     return 0;
-}
-
-TransitionName QueryResponseCommandFacility::stringToTransitionName(std::string string) {
-    if (string.find("stop") != std::string::npos || string.find("Stop") != std::string::npos) {
-        return TransitionName::Stop;
-    }
-    return TransitionName::Start;
 }
 }  // namespace appframework
