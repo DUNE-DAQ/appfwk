@@ -8,7 +8,7 @@
 #ifndef app_framework_base_Services_Logger_hh
 #define app_framework_base_Services_Logger_hh
 
-#include <list>
+#include <vector>
 #include <string>
 
 namespace appframework {
@@ -21,7 +21,7 @@ class Logger {
      * @brief Setup the Logger service
      * @param args Command-line arguments used to setup the Logger
      */
-    static void setup(std::list<std::string> /*args*/) {}
+    static void setup(std::vector<std::string> /*args*/) {}
 };
 }  // namespace appframework
 

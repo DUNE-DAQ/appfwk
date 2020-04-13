@@ -8,7 +8,7 @@
 #ifndef app_framework_core_Services_CommandFacility_hh
 #define app_framework_core_Services_CommandFacility_hh
 
-#include <list>
+#include <vector>
 #include <memory>
 #include <string>
 #include "cetlib/BasicPluginFactory.h"
@@ -36,14 +36,15 @@ class CommandFacility {
      * @return Static handle to the CommandFacility
      */
     static std::unique_ptr<CommandFacility> const& handle() {
-        if (!handle_) handle_.reset(new CommandFacility());
+        if (!handle_) handle_.reset(nullptr);
         return handle_;
     }
+    static void setHandle(std::unique_ptr<CommandFacility>&& handle) { handle_ = std::move(handle); }
     /**
      * @brief Perform basic setup actions needed by the CommandFacility, using command-line arguments and environment variables
      * @param args Command-line arguments to the CommandFacility
      */
-    static void setup(std::list<std::string> /*args*/) {}
+    static void setup(std::vector<std::string> /*args*/) {}
     /**
      * @brief Listen for commands and relay them to the given DAQProcess
      * @param process DAQProcess to relay commands to

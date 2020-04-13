@@ -8,6 +8,9 @@
 #ifndef app_framework_base_Services_ConfigurationManager_hh
 #define app_framework_base_Services_ConfigurationManager_hh
 
+#include <vector>
+#include <string>
+
 namespace appframework {
 /**
  * @brief The ConfigurationManager is responsible for receiving configurations from CCM and making them available to UserModules
@@ -26,7 +29,7 @@ class ConfigurationManager {
      * @brief Perform basic setup actions needed by ConfigurationManager, using the provided command-line paramters
      * @param args Command-line arguments used to setup ConfigurationManager
      */
-    static void setup(std::list<std::string> /*args*/) {}
+    static void setup(std::string /*pluginName*/,std::vector<std::string> /*args*/) {}
 
    protected:
     ConfigurationManager() {} ///< Singleton pattern, protected parameterless constructor

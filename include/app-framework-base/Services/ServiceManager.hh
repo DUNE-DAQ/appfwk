@@ -10,6 +10,9 @@
 
 #include "app-framework-base/Services/Service.hh"
 
+#include <vector>
+#include <string>
+
 namespace appframework {
 /**
  * @brief The ServiceManager class manages all non-essential Service instances which may be needed by a particular DAQ Application
@@ -20,7 +23,7 @@ class ServiceManager {
      * @brief Setup the ServiceManager
      * @param args Command-line arguments, may contain list of services to load and parameters for each
      */
-    static void setup(std::list<std::string> /*args*/) {}
+    static void setup(std::vector<std::string> /*services*/,std::vector<std::string> /*args*/) {}
 
     /**
      * @brief Get a handle to the ServiceManager (Singleton pattern)
