@@ -33,3 +33,5 @@ int QueryResponseCommandFacility::listen(DAQProcess* process) {
     return 0;
 }
 }  // namespace appframework
+
+DEFINE_DUNE_COMMAND_FACILITY(appframework::QueryResponseCommandFacility)

@@ -10,7 +10,7 @@
 #include "app-framework/QueryResponseCommandFacility.hh"
 
 namespace appframework {
-std::unique_ptr<CommandFacility> CommandFacility::handle_ = std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
+std::unique_ptr<CommandFacility> CommandFacility::handle_ = makeCommandFacility("QueryResponseCommandFacility");
 
 class simple_test_app_ModuleList : public ModuleList {
     // Inherited via ModuleList
