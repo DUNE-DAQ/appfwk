@@ -5,12 +5,12 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
+#include "app-framework/CommandLineInterpreter.hh"
 #include "app-framework/DAQProcess.hh"
 #include "app-framework/DebugLoggingUserModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
 
 namespace appframework {
-std::unique_ptr<CommandFacility> CommandFacility::handle_ = makeCommandFacility("QueryResponseCommandFacility");
 
 class simple_test_app_ModuleList : public ModuleList {
     // Inherited via ModuleList
@@ -21,10 +21,8 @@ class simple_test_app_ModuleList : public ModuleList {
 }  // namespace appframework
 
 int main(int argc, char* argv[]) {
-    std::list<std::string> args;
-    for (int ii = 1; ii < argc; ++ii) {
-        args.push_back(std::string(argv[ii]));
-    }
+    
+    auto args = appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
     appframework::DAQProcess theDAQProcess(args);
 

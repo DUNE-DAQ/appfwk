@@ -26,6 +26,7 @@ class QueryResponseCommandFacility : public CommandFacility {
      * @param theProcess Pointer to the DAQProcess instance which will distribute received commands
      */
     virtual int listen(DAQProcess* theProcess) override;
+    virtual ~QueryResponseCommandFacility();
 
 };
 }  // namespace appframework

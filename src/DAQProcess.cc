@@ -20,12 +20,15 @@
 namespace appframework {
 ServiceManager* ServiceManager::handle_ = nullptr;
 ConfigurationManager* ConfigurationManager::handle_ = nullptr;
+std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
-DAQProcess::DAQProcess(std::list<std::string> args) {
-    Logger::setup(args);
-    CommandFacility::setup(args);
-    ConfigurationManager::setup(args);
-    ServiceManager::setup(args);
+
+DAQProcess::DAQProcess(CommandLineInterpreter args) {
+    CommandFacility::setHandle(makeCommandFacility(args.commandFacilityPluginName));
+    Logger::setup(args.otherOptions);
+    CommandFacility::setup(args.otherOptions);
+    ConfigurationManager::setup(args.configurationManagerPluginName, args.otherOptions);
+    ServiceManager::setup(args.servicePluginNames, args.otherOptions);
 }
 
 void DAQProcess::register_modules(std::unique_ptr<ModuleList> const& ml) { ml->ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_); }

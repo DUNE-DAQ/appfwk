@@ -17,6 +17,8 @@
 #include "app-framework-base/Core/ModuleList.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
 
+#include "app-framework/CommandLineInterpreter.hh"
+
 #include <map>
 #include <string>
 
@@ -36,7 +38,7 @@ class DAQProcess {
      * The DAQProcess constructor instantiates essential DAQ Application services. Services are passed
      * the command-line options and may also read basic configuration from the environment.
      */
-    DAQProcess(std::list<std::string> args);
+    DAQProcess(CommandLineInterpreter args);
     /**
      * @brief Using the given ModuleList, construct the graph of UserModules and Buffers
      * @param ml ModuleList to call ModuleList::ConstructGraph on
