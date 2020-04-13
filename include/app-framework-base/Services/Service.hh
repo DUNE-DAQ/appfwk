@@ -8,6 +8,20 @@
 #ifndef app_framework_base_Services_Service_hh
 #define app_framework_base_Services_Service_hh
 
+#include <memory>
+#include <string>
+#include "cetlib/BasicPluginFactory.h"
+#include "cetlib/compiler_macros.h"
+
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START extern "C" {
+#endif
+
+#define DEFINE_DUNE_SERVICE(klass)                                                                                  \
+    EXTERN_C_FUNC_DECLARE_START                                                                                     \
+    std::unique_ptr<appframework::Service> make() { return std::unique_ptr<appframework::Service>(new klass()); } \
+    }
+
 namespace appframework {
 /**
  * @brief The Service class represents a static entity which may be loaded into the ServiceManager for
@@ -21,6 +35,13 @@ class Service {
      */
     virtual void setup(std::list<std::string> args) = 0;
 };
+
+std::unique_ptr<Service> makeService(std::string const& service_name) {
+    static cet::BasicPluginFactory bpf("duneService", "make");
+
+    return bpf.makePlugin<std::unique_ptr<Service>>(service_name);
+}
+
 }  // namespace appframework
 
 #endif  // app_framework_base_Services_Service_hh

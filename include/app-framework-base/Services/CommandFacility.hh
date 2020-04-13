@@ -10,6 +10,18 @@
 
 #include <list>
 #include <memory>
+#include <string>
+#include "cetlib/BasicPluginFactory.h"
+#include "cetlib/compiler_macros.h"
+
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START extern "C" {
+#endif
+
+#define DEFINE_DUNE_COMMAND_FACILITY(klass)                                                                                  \
+    EXTERN_C_FUNC_DECLARE_START                                                                                     \
+    std::unique_ptr<appframework::CommandFacility> make() { return std::unique_ptr<appframework::CommandFacility>(new klass()); } \
+    }
 
 namespace appframework {
 class DAQProcess;  // forward declaration
@@ -50,6 +62,13 @@ class CommandFacility {
    private:
     static std::unique_ptr<CommandFacility> handle_; ///< Singleton pattern, handle to CommandFacility
 };
+
+inline std::unique_ptr<CommandFacility> makeCommandFacility(std::string const& facility_name) {
+    static cet::BasicPluginFactory bpf("duneCommandFacility", "make");
+
+    return bpf.makePlugin<std::unique_ptr<CommandFacility>>(facility_name);
+}
+
 }  // namespace appframework
 
 #endif  // app_framework_core_Services_CommandFacility_hh
