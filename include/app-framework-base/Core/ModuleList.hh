@@ -8,7 +8,7 @@
 #ifndef app_framework_base_Core_ModuleList_hh
 #define app_framework_base_Core_ModuleList_hh
 
-#include "app-framework-base/Buffers/Buffer.hh"
+#include "app-framework-base/Buffers/BufferI.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
 
 #include <list>
@@ -18,7 +18,7 @@
 
 namespace appframework {
 typedef std::map<std::string, std::unique_ptr<UserModule>> UserModuleMap; ///< UserModules indexed by name
-typedef std::map<std::string, std::unique_ptr<Buffer>> BufferMap; ///< Buffers indexed by name
+typedef std::map<std::string, std::unique_ptr<BufferI>> BufferMap; ///< Buffers indexed by name
 typedef std::map<std::string, std::list<std::string>> CommandOrderMap; ///< Defined UserModule orders for commands
 
 /**
