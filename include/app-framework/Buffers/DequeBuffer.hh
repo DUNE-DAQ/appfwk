@@ -1,15 +1,17 @@
 #ifndef app_framework_Buffers_DequeBuffer_hh
 #define app_framework_Buffers_DequeBuffer_hh
 
-#include "app-framework-base/Buffers/TemplatedBuffer.hh"
+#include "app-framework-base/Buffers/Buffer.hh"
 
+#include <unistd.h>
 #include <deque>
 #include <functional>
+#include <mutex>
 
 namespace appframework{
 
   template <class T>
-  class DequeBuffer : public TemplatedBuffer<T> {
+  class DequeBuffer : public BufferInput<T>, BufferOutput<T> {
     
   public:
 
@@ -20,17 +22,21 @@ namespace appframework{
     size_t size() { return fDeque.size(); }
     size_t capacity() { return fCapacity; }
 
+    bool empty() { return size()==0; }
+    bool full()  { return size()>=capacity(); }
+    
     int push(const T&); ///push one on, return new size if successful, -1 if not
-    int pop(T&);        ///pop one off, return new size if successful, -1 if not
-
-    //std::deque<T>::iterator findFirst(std::function<bool(const T&)> pred) const;
-    //std::deque<T>::iterator findLast(std::function<bool(const T&)> pred) const;
+    T   pop();          ///pop one off, return object
 
   private:
     
     std::deque<T> fDeque;
     size_t        fCapacity;
 
+    std::mutex fMutex;
+    int fRetryTime;
+    int fPushRetries;
+    int fPopRetries;
   };
 
 }
