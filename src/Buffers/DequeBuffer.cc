@@ -7,7 +7,6 @@ appframework::DequeBuffer<T>::DequeBuffer(){
 
 template <class T>
 void appframework::DequeBuffer<T>::Configure(){
-  
   this->fAttributes.isBounded = true;
   this->fAttributes.isSearchable = false;
   
@@ -16,8 +15,7 @@ void appframework::DequeBuffer<T>::Configure(){
 
   if(this->attributes().isBounded){
     fCapacity = 1000;
-  }
-  else{
+    } else {
     fCapacity = fDeque.max_size();
   }
 
@@ -30,8 +28,7 @@ void appframework::DequeBuffer<T>::Configure(){
 }
 
 template <class T>
-int appframework::DequeBuffer<T>::push(const T& obj){
-
+int appframework::DequeBuffer<T>::push(T&& obj) {
   int n_retries=0;
   while(full()){
     if(n_retries==fPushRetries){
@@ -43,17 +40,15 @@ int appframework::DequeBuffer<T>::push(const T& obj){
     usleep(fRetryTime_ms);
   }
   
-
   if(full()) throw std::runtime_error("Full after check? Another thread accessing?");
   std::lock_guard<std::mutex> lck(fMutex);
-  fDeque.push_back(obj);
+    fDeque.emplace_back(obj);
   fSize ++ ;
   return size();
 }
 
 template <class T>
 T appframework::DequeBuffer<T>::pop(){
-
   int n_retries=0;
   while(empty()){
     if(n_retries==fPopRetries){
@@ -64,12 +59,11 @@ T appframework::DequeBuffer<T>::pop(){
     usleep(fRetryTime_ms);
   }
 
-
   if(empty()) throw std::runtime_error("Empty after check? Another thread accessing?");
 
   std::lock_guard<std::mutex> lck(fMutex);
   T obj(std::move(fDeque.front()));
   fDeque.pop_front();
-  dSize -- ;
+    fSize--;
   return obj;
 }
