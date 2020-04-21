@@ -7,6 +7,7 @@
 #include <deque>
 #include <functional>
 #include <mutex>
+#include <atomic>
 
 namespace appframework{
 
@@ -19,24 +20,26 @@ namespace appframework{
 
     void Configure();
     
-    size_t size() { return fDeque.size(); }
+    size_t size() { return fSize.load() ; }
     size_t capacity() { return fCapacity; }
 
     bool empty() { return size()==0; }
     bool full()  { return size()>=capacity(); }
     
-    int push(const T&); ///push one on, return new size if successful, -1 if not
-    T   pop();          ///pop one off, return object
+    int push(const T&& ); ///push one on, return new size if successful, -1 if not
+    T   pop();            ///pop one off, return object
 
   private:
-    
-    std::deque<T> fDeque;
-    size_t        fCapacity;
+
+    std::deque<T>       fDeque;
+    std::atomic<size_t> fSize = 0 ;
+    size_t              fCapacity;
+
 
     std::mutex fMutex;
-    int fRetryTime;
-    int fPushRetries;
-    int fPopRetries;
+    size_t fRetryTime_ms;
+    size_t fPushRetries;
+    size_t fPopRetries;
   };
 
 }
