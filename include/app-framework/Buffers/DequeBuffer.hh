@@ -1,5 +1,14 @@
-#ifndef app_framework_Buffers_DequeBuffer_hh
-#define app_framework_Buffers_DequeBuffer_hh
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_BUFFERS_DEQUEBUFFER_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_BUFFERS_DEQUEBUFFER_HH_
+
+/**
+ *
+ * @file A deque
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ */
+
 
 #include "app-framework-base/Buffers/Buffer.hh"
 
@@ -40,4 +49,4 @@ namespace appframework{
 
 }  // namespace appframework
 
-#endif //app_framework_Buffers_Buffer_hh
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_BUFFERS_DEQUEBUFFER_HH_

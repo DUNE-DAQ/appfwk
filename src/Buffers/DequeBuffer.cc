@@ -1,3 +1,11 @@
+/**
+ * @file A deque implementation
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ */
+
+
 #include "app-framework/Buffers/DequeBuffer.hh"
 
 template <class T>
