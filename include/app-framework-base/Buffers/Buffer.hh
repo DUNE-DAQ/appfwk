@@ -25,11 +25,11 @@ namespace appframework{
   class BufferInput : virtual public Buffer<T>{
 
   public:
-    virtual int push(const T&) = 0;
-    virtual int push(T&& t) { return push( std::move(t) ); }    
+    virtual int push(const T& t) { return push( std::move(t) ); }
+    virtual int push(T&& ) = 0;
 
   protected:
-    int  fPushTimeout;
+    size_t  fPushTimeout_ms;
     
   };
 
@@ -38,10 +38,9 @@ namespace appframework{
 
   public:
     virtual T pop() = 0;
-    //virtual T&& pop() { return std::move(pop()); }
 
   protected:
-    int  fPopTimeout;
+    size_t  fPopTimeout_ms ;
   };
 
 
