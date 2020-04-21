@@ -5,8 +5,8 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef app_framework_base_Buffers_BufferI_hh
-#define app_framework_base_Buffers_BufferI_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_BUFFERS_BUFFERI_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_BUFFERS_BUFFERI_HH_
 
 #include <cstddef>
 using std::size_t;
@@ -48,4 +48,4 @@ namespace appframework {
 
 } //namespace appframework
 
-#endif  // app_framework_base_Buffers_Buffer_hh
+#endif  // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_BUFFERS_BUFFERI_HH_
