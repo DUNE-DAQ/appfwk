@@ -10,6 +10,8 @@
 #include "app-framework/DebugLoggingUserModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
 
+#include <ers/ers.h>
+
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ =
     std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
@@ -28,6 +30,8 @@ int main(int argc, char *argv[]) {
   for (int ii = 1; ii < argc; ++ii) {
     args.push_back(std::string(argv[ii]));
   }
+
+  ERS_LOG( "Hello there, I've been summoned with " << argc << " arguments" );
 
   appframework::DAQProcess theDAQProcess(args);
 

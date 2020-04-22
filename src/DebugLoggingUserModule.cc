@@ -11,14 +11,15 @@
 #include "app-framework-base/Services/Logger.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
 
-#include "TRACE/trace.h"
+// #include "TRACE/trace.h"
+#include <ers/ers.h>
 
 #include <iostream>
 
 namespace appframework {
 std::future<std::string>
 DebugLoggingUserModule::execute_command(std::string cmd) {
-  TLOG(TLVL_INFO) << "Executing command: " << cmd;
+  ERS_LOG( "Executing command: " << cmd );
   return std::async([]() { return std::string("Success"); });
 }
 } // namespace appframework
