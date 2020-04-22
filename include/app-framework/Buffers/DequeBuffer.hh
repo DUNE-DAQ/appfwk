@@ -12,7 +12,7 @@
 namespace appframework{
 
   template <class T>
-  class DequeBuffer : public BufferInput<T>, BufferOutput<T> {
+class DequeBuffer : virtual public BufferInput<T>, virtual public BufferOutput<T> {
   public:
     DequeBuffer();
 

@@ -7,24 +7,24 @@ appframework::DequeBuffer<T>::DequeBuffer(){
 
 template <class T>
 void appframework::DequeBuffer<T>::Configure(){
-  this->fAttributes.isBounded = true;
-  this->fAttributes.isSearchable = false;
+  BufferI::fAttributes.isBounded = true;
+  BufferI::fAttributes.isSearchable = false;
   
   fDeque = std::deque<T>();
   fSize = 0 ;
 
-  if(this->attributes().isBounded){
+  if(BufferI::attributes().isBounded){
     fCapacity = 1000;
     } else {
     fCapacity = fDeque.max_size();
   }
 
-  this->fPushTimeout_ms = 1e6;
-  this->fPopTimeout_ms  = 1e7;
+  BufferInput<T>::fPushTimeout_ms = 1e6;
+  BufferOutput<T>::fPopTimeout_ms  = 1e7;
   fRetryTime_ms         = 100;
 
-  fPushRetries = this->fPushTimeout_ms/fRetryTime_ms;
-  fPopRetries  = this->fPopTimout_ms/fRetryTime_ms;
+  fPushRetries = BufferInput<T>::fPushTimeout_ms/fRetryTime_ms;
+  fPopRetries  = BufferOutput<T>::fPopTimeout_ms/fRetryTime_ms;
 }
 
 template <class T>
