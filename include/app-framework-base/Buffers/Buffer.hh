@@ -32,7 +32,7 @@ namespace appframework{
 
   public:
 
-    BufferInput(size_t pt = 10) : 
+    explicit BufferInput(size_t pt = 10) : 
       fPushTimeout_ms(pt) 
     {}
 
@@ -58,7 +58,7 @@ namespace appframework{
 
   public:
 
-    BufferOutput(size_t pt = 10) :
+    explicit BufferOutput(size_t pt = 10) :
          fPopTimeout_ms(pt) 
     {}
 

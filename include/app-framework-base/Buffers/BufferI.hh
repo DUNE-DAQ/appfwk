@@ -32,7 +32,7 @@ namespace appframework {
     
   public:
 
-    BufferI(BufferAttributes attributes = {false, false}) : 
+    explicit BufferI(BufferAttributes attributes = {false, false}) : 
       fAttributes(attributes)
     {}
 
