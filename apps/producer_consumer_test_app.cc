@@ -8,12 +8,12 @@
 #include <memory>
 #include <vector>
 
-#include "app-framework/Buffers/DequeBuffer.icc"
+#include "app-framework/Buffers/DequeBuffer.hh"
 #include "app-framework/DAQProcess.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
 #include "app-framework/UserModules/FakeDataConsumerUserModule.hh"
 #include "app-framework/UserModules/FakeDataProducerUserModule.hh"
-#include "app-framework/UserModules/FanOutUserModule.icc"
+#include "app-framework/UserModules/FanOutUserModule.hh"
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ =
