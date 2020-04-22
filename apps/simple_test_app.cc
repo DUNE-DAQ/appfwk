@@ -6,7 +6,7 @@
  */
 
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/DebugLoggingUserModule.hh"
+#include "app-framework/UserModules/DebugLoggingUserModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
 
 namespace appframework {

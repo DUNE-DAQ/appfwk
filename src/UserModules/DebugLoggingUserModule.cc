@@ -5,7 +5,7 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#include "app-framework/DebugLoggingUserModule.hh"
+#include "app-framework/UserModules/DebugLoggingUserModule.hh"
 
 #include "app-framework-base/Services/Logger.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
