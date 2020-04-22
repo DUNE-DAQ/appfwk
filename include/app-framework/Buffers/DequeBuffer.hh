@@ -37,6 +37,14 @@ namespace appframework{
     int push(T&&);  /// push one on, return new size if successful, -1 if not
     T   pop();            ///pop one off, return object
 
+    // Delete the copy and move operations since member data instances
+    // of std::mutex and std::atomic aren't copyable or movable
+
+    DequeBuffer(const DequeBuffer& ) = delete;
+    DequeBuffer& operator=(const DequeBuffer& ) = delete;
+    DequeBuffer(DequeBuffer&& ) = delete;
+    DequeBuffer& operator=(DequeBuffer&& ) = delete;
+
   private:
     std::deque<T>       fDeque;
     std::atomic<size_t> fSize = 0 ;
@@ -56,6 +64,7 @@ DequeBuffer<T>::DequeBuffer(){
 
 template <class T>
 void DequeBuffer<T>::Configure(){
+
   this->fAttributes.isBounded = true;
   this->fAttributes.isSearchable = false;
   
