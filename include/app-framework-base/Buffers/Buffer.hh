@@ -7,43 +7,35 @@
 #include <utility>
 using std::size_t;
 
-namespace appframework{
+namespace appframework {
 
-  template <class T>
-  class Buffer : public BufferI {
-    
-  public:
+template <class T>
+class Buffer : virtual public BufferI {
+   public:
+    virtual size_t capacityBytes() { return this->capacity() * sizeof(T); }  /// bytes in buffer
 
-    virtual size_t capacityBytes() {return this->capacity()*sizeof(T);} ///bytes in buffer
+   protected:
+};
 
-  protected:
+template <class T>
+class BufferInput : virtual public Buffer<T> {
+   public:
+    virtual int push(const T& t) { return push(std::move(t)); }
+    virtual int push(T&&) = 0;
 
-  };
+   protected:
+    size_t fPushTimeout_ms;
+};
 
-
-  template <class T>
-  class BufferInput : virtual public Buffer<T>{
-
-  public:
-    virtual int push(const T& t) { return push( std::move(t) ); }
-    virtual int push(T&& ) = 0;
-
-  protected:
-    size_t  fPushTimeout_ms;
-    
-  };
-
-  template <class T>
-  class BufferOutput : virtual public Buffer<T>{
-
-  public:
+template <class T>
+class BufferOutput : virtual public Buffer<T> {
+   public:
     virtual T pop() = 0;
 
-  protected:
-    size_t  fPopTimeout_ms ;
-  };
+   protected:
+    size_t fPopTimeout_ms;
+};
 
-
-}
+}  // namespace appframework
 
 #endif  // app_framework_base_Buffers_Buffer_hh
