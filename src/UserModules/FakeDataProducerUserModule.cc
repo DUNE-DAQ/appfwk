@@ -7,8 +7,7 @@
 
 appframework::FakeDataProducerUserModule::FakeDataProducerUserModule(
     std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer)
-    : SourceUserModule(outputBuffer),
-      ThreadedUserModule() {}
+    : SourceUserModule(outputBuffer), ThreadedUserModule() {}
 
 std::future<std::string> appframework::FakeDataProducerUserModule::execute_command(std::string cmd) {
     if (cmd == "configure" || cmd == "Configure") {
@@ -44,7 +43,7 @@ std::string appframework::FakeDataProducerUserModule::do_stop() {
     return "Success";
 }
 
-TraceStreamer& operator<<(TraceStreamer& t, std::vector<int> ints) { 
+TraceStreamer& operator<<(TraceStreamer& t, std::vector<int> ints) {
     std::ostringstream o;
     o << "{";
     bool first = true;
@@ -54,7 +53,7 @@ TraceStreamer& operator<<(TraceStreamer& t, std::vector<int> ints) {
         o << i;
     }
     o << "}";
-   return t << o.str();
+    return t << o.str();
 }
 
 void appframework::FakeDataProducerUserModule::do_work() {
@@ -65,12 +64,11 @@ void appframework::FakeDataProducerUserModule::do_work() {
         std::vector<int> output(nIntsPerVector_);
 
         TLOG(TLVL_DEBUG) << "Start of fill loop";
-        for (auto ii = 0; ii < nIntsPerVector_;++ii) {
+        for (auto ii = 0; ii < nIntsPerVector_; ++ii) {
             output[ii] = current_int;
             if (++current_int > ending_int_) current_int = starting_int_;
         }
-        TLOG(TLVL_INFO) << "Produced vector " << counter
-                        << " with contents " << output;
+        TLOG(TLVL_INFO) << "Produced vector " << counter << " with contents " << output;
 
         TLOG(TLVL_DEBUG) << "Pushing vector into outputBuffer";
         outputBuffer_->push(std::move(output));

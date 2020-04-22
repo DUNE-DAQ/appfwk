@@ -8,9 +8,9 @@
 #include "app-framework/DAQProcess.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
 
-
 namespace appframework {
-std::unique_ptr<CommandFacility> CommandFacility::handle_ = std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
+std::unique_ptr<CommandFacility> CommandFacility::handle_ =
+    std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
 }
 
 #define BOOST_TEST_MODULE DAQProcess_test

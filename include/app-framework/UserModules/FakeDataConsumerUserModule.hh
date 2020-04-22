@@ -44,7 +44,7 @@ class FakeDataConsumerUserModule : public SinkUserModule<std::vector<int>>, publ
     int starting_int_;
     int ending_int_;
     std::string id_;
-    std::string getId() {return id_ != "" ? id_ + ": " : ""; }
+    std::string getId() { return id_ != "" ? id_ + ": " : ""; }
 };
 }  // namespace appframework
 

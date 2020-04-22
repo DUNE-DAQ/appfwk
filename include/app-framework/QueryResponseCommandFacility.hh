@@ -17,7 +17,8 @@
 
 namespace appframework {
 /**
- * @brief QueryResponseCommandFacility is a CommandFacility plugin for running a DAQ Application in an interactive session
+ * @brief QueryResponseCommandFacility is a CommandFacility plugin for running a DAQ Application in an interactive
+ * session
  */
 class QueryResponseCommandFacility : public CommandFacility {
    public:
@@ -26,7 +27,6 @@ class QueryResponseCommandFacility : public CommandFacility {
      * @param theProcess Pointer to the DAQProcess instance which will distribute received commands
      */
     virtual int listen(DAQProcess* theProcess) override;
-
 };
 }  // namespace appframework
 

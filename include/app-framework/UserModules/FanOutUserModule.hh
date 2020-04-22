@@ -16,9 +16,9 @@
 #include "app-framework-base/UserModules/ThreadedUserModule.hh"
 
 #include <future>
-#include <string>
 #include <list>
 #include <memory>
+#include <string>
 
 namespace appframework {
 /**
@@ -27,7 +27,8 @@ namespace appframework {
 template <typename DATA_TYPE>
 class FanOutUserModule : public virtual SinkUserModule<DATA_TYPE>, public virtual ThreadedUserModule {
    public:
-    FanOutUserModule(std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer, std::initializer_list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers);
+    FanOutUserModule(std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer,
+                     std::initializer_list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers);
 
     /**
      * @brief Logs the reception of the command

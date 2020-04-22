@@ -16,9 +16,9 @@
 #include "app-framework-base/UserModules/ThreadedUserModule.hh"
 
 #include <future>
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace appframework {
 /**

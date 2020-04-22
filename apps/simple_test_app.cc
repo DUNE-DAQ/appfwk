@@ -6,15 +6,17 @@
  */
 
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/UserModules/DebugLoggingUserModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
+#include "app-framework/UserModules/DebugLoggingUserModule.hh"
 
 namespace appframework {
-std::unique_ptr<CommandFacility> CommandFacility::handle_ = std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
+std::unique_ptr<CommandFacility> CommandFacility::handle_ =
+    std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
 
 class simple_test_app_ModuleList : public ModuleList {
     // Inherited via ModuleList
-    virtual void ConstructGraph(BufferMap& buffer_map, UserModuleMap& user_module_map, CommandOrderMap& command_order_map) override {
+    virtual void ConstructGraph(BufferMap& buffer_map, UserModuleMap& user_module_map,
+                                CommandOrderMap& command_order_map) override {
         user_module_map["debugLogger"].reset(new DebugLoggingUserModule());
     }
 };

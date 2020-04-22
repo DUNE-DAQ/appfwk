@@ -24,7 +24,7 @@ namespace appframework {
 /**
  * @brief The DAQProcess class is the central container for UserModules and Buffers.
  *
- * DAQProcess receives commands from CCM and distributes them to the UserModules in the order defined 
+ * DAQProcess receives commands from CCM and distributes them to the UserModules in the order defined
  * in the CommandOrderMap received from the ModuleList during register_modules.
  */
 class DAQProcess {
@@ -32,7 +32,7 @@ class DAQProcess {
     /**
      * @brief DAQProcess Constructor
      * @param args Command-line arguments to the DAQ Application
-     * 
+     *
      * The DAQProcess constructor instantiates essential DAQ Application services. Services are passed
      * the command-line options and may also read basic configuration from the environment.
      */
@@ -65,10 +65,9 @@ class DAQProcess {
     int listen();
 
    private:
-
-    BufferMap bufferMap_;                    ///< String alias for each Buffer
-    UserModuleMap userModuleMap_;            ///< String alias for each UserModule
-    CommandOrderMap commandOrderMap_;        ///< Order UserModule commands by alias
+    BufferMap bufferMap_;              ///< String alias for each Buffer
+    UserModuleMap userModuleMap_;      ///< String alias for each UserModule
+    CommandOrderMap commandOrderMap_;  ///< Order UserModule commands by alias
 };
 }  // namespace appframework
 

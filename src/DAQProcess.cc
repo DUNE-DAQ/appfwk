@@ -28,7 +28,9 @@ DAQProcess::DAQProcess(std::list<std::string> args) {
     ServiceManager::setup(args);
 }
 
-void DAQProcess::register_modules(std::unique_ptr<ModuleList> const& ml) { ml->ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_); }
+void DAQProcess::register_modules(std::unique_ptr<ModuleList> const& ml) {
+    ml->ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_);
+}
 
 void DAQProcess::execute_command(std::string cmd) {
     std::unordered_set<std::string> user_module_list;
@@ -46,7 +48,8 @@ void DAQProcess::execute_command(std::string cmd) {
         }
     } else {
         TLOG(TLVL_WARNING) << "Command " << cmd
-                           << " does not have an entry in the CommandOrderMap! UserModules will receive this command in an unspecified order!";
+                           << " does not have an entry in the CommandOrderMap! UserModules will receive this command "
+                              "in an unspecified order!";
     }
 
     TLOG(TLVL_DEBUG) << "Executing Command " << cmd << " for all remaining UserModules";
