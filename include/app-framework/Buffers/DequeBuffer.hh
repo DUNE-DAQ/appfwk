@@ -71,7 +71,7 @@ void DequeBuffer<T>::Configure(){
   fDeque = std::deque<T>();
   fSize = 0 ;
 
-  if(this->attributes().isBounded){
+  if(this->fAttributes.isBounded){
     fCapacity = 1000;
     } else {
     fCapacity = fDeque.max_size();
