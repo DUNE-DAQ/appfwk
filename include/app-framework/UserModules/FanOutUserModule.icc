@@ -52,37 +52,41 @@ void appframework::FanOutUserModule<DATA_TYPE>::do_work() {
     auto roundRobinNext = outputBuffers_.begin();
 
     while (thread_started_.load()) {
-        auto data = SinkUserModule<DATA_TYPE>::inputBuffer_->pop();
+        if (!SinkUserModule<DATA_TYPE>::inputBuffer_->empty()) {
+            auto data = SinkUserModule<DATA_TYPE>::inputBuffer_->pop();
 
-        if (mode_ == FanOutMode::Broadcast) {
-            for (auto& o : outputBuffers_) {
-                o->push(std::vector<int>(data));
-            }
-        } else if (mode_ == FanOutMode::FirstAvailable) {
-            auto sent = false;
-            while (!sent) {
+            if (mode_ == FanOutMode::Broadcast) {
                 for (auto& o : outputBuffers_) {
-                    if (!o->full()) {
-                        o->push(std::move(data));
-                        sent = true;
-                        break;
+                    o->push(std::vector<int>(data));
+                }
+            } else if (mode_ == FanOutMode::FirstAvailable) {
+                auto sent = false;
+                while (!sent) {
+                    for (auto& o : outputBuffers_) {
+                        if (!o->full()) {
+                            o->push(std::move(data));
+                            sent = true;
+                            break;
+                        }
+                    }
+                    if (!sent) {
+                        usleep(wait_interval_us_);
                     }
                 }
-                if (!sent) {
-                    usleep(wait_interval_us_);
-                }
-            }
-        } else if (mode_ == FanOutMode::RoundRobin) {
-            while (true) {
-                if (!(*roundRobinNext)->full()) {
-                    (*roundRobinNext)->push(std::move(data));
+            } else if (mode_ == FanOutMode::RoundRobin) {
+                while (true) {
+                    if (!(*roundRobinNext)->full()) {
+                        (*roundRobinNext)->push(std::move(data));
 
-                    if (++roundRobinNext == outputBuffers_.end()) roundRobinNext = outputBuffers_.begin();
-                    break;
-                } else {
-                    usleep(wait_interval_us_);
+                        if (++roundRobinNext == outputBuffers_.end()) roundRobinNext = outputBuffers_.begin();
+                        break;
+                    } else {
+                        usleep(wait_interval_us_);
+                    }
                 }
             }
+        } else {
+            usleep(wait_interval_us_);
         }
     }
 }

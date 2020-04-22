@@ -35,6 +35,9 @@ class producer_consumer_test_app_ModuleList : public ModuleList {
             new FanOutUserModule<std::vector<int>>(producerToFanOut, {fanOutToConsumer1, fanOutToConsumer2}));
         user_module_map["consumer1"].reset(new FakeDataConsumerUserModule(fanOutToConsumer1, "C1"));
         user_module_map["consumer2"].reset(new FakeDataConsumerUserModule(fanOutToConsumer2, "C2"));
+
+        command_order_map["start"] =  {"consumer1", "consumer2", "fanOut", "producer"};
+        command_order_map["stop"] = {"producer"};
     }
 };
 }  // namespace appframework
