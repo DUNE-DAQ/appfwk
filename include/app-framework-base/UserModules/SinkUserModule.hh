@@ -33,7 +33,7 @@ class SinkUserModule : virtual public UserModule {
     SinkUserModule(std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer) : inputBuffer_(inputBuffer) {}
 
    protected:
-    std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer_; ///< Pointer to the Buffer endpoint
+    std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer_;  ///< Pointer to the Buffer endpoint
 };
 }  // namespace appframework
 

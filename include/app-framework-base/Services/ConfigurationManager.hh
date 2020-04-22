@@ -10,7 +10,8 @@
 
 namespace appframework {
 /**
- * @brief The ConfigurationManager is responsible for receiving configurations from CCM and making them available to UserModules
+ * @brief The ConfigurationManager is responsible for receiving configurations from CCM and making them available to
+ * UserModules
  */
 class ConfigurationManager {
    public:
@@ -29,10 +30,10 @@ class ConfigurationManager {
     static void setup(std::list<std::string> /*args*/) {}
 
    protected:
-    ConfigurationManager() {} ///< Singleton pattern, protected parameterless constructor
+    ConfigurationManager() {}  ///< Singleton pattern, protected parameterless constructor
 
    private:
-    static ConfigurationManager* handle_; ///< Singleton pattern, static handle_ member
+    static ConfigurationManager* handle_;  ///< Singleton pattern, static handle_ member
 };
 }  // namespace appframework
 

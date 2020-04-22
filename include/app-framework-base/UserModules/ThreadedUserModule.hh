@@ -65,10 +65,10 @@ class ThreadedUserModule : virtual public UserModule {
      */
     virtual void do_work() = 0;
 
-    std::atomic<bool> thread_started_; ///< Variable which indicates whether the thread has been started and not stopped
+    std::atomic<bool>
+        thread_started_;  ///< Variable which indicates whether the thread has been started and not stopped
 
-    private:
-
+   private:
     std::unique_ptr<std::thread> working_thread_;
 };
 }  // namespace appframework

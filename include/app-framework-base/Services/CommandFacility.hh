@@ -28,7 +28,8 @@ class CommandFacility {
         return handle_;
     }
     /**
-     * @brief Perform basic setup actions needed by the CommandFacility, using command-line arguments and environment variables
+     * @brief Perform basic setup actions needed by the CommandFacility, using command-line arguments and environment
+     * variables
      * @param args Command-line arguments to the CommandFacility
      */
     static void setup(std::list<std::string> /*args*/) {}
@@ -37,7 +38,8 @@ class CommandFacility {
      * @param process DAQProcess to relay commands to
      * @return Return code for application
      *
-     * This function should block for the lifetime of the DAQ Application, calling DAQProcess::execute_command as necessary
+     * This function should block for the lifetime of the DAQ Application, calling DAQProcess::execute_command as
+     * necessary
      */
     virtual int listen(DAQProcess* /*process*/) { return 0; }
 
@@ -48,7 +50,7 @@ class CommandFacility {
     CommandFacility() {}
 
    private:
-    static std::unique_ptr<CommandFacility> handle_; ///< Singleton pattern, handle to CommandFacility
+    static std::unique_ptr<CommandFacility> handle_;  ///< Singleton pattern, handle to CommandFacility
 };
 }  // namespace appframework
 

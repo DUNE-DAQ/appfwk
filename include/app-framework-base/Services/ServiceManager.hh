@@ -12,7 +12,8 @@
 
 namespace appframework {
 /**
- * @brief The ServiceManager class manages all non-essential Service instances which may be needed by a particular DAQ Application
+ * @brief The ServiceManager class manages all non-essential Service instances which may be needed by a particular DAQ
+ * Application
  */
 class ServiceManager {
    public:
@@ -42,7 +43,9 @@ class ServiceManager {
      * @param name Name used to identify this Service instance
      * @param service Service instance
      */
-    void register_service(std::string name, std::unique_ptr<Service>&& service) { service_map_[name] = std::move(service); }
+    void register_service(std::string name, std::unique_ptr<Service>&& service) {
+        service_map_[name] = std::move(service);
+    }
 
    private:
     /**
@@ -51,8 +54,8 @@ class ServiceManager {
     ServiceManager() {}
 
    private:
-    std::map<std::string, std::unique_ptr<Service>> service_map_; ///< Registers Service instances
-    static ServiceManager* handle_; ///< Singleton pattern, static handle
+    std::map<std::string, std::unique_ptr<Service>> service_map_;  ///< Registers Service instances
+    static ServiceManager* handle_;                                ///< Singleton pattern, static handle
 };
 }  // namespace appframework
 

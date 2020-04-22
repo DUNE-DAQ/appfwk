@@ -5,8 +5,8 @@
  * UserModules are defined as "a set of code which performs a specific task". They are connected to one another within
  * a DAQ Application by Buffer instances, in a graph defined by a ModuleList.
  *
- * This interface is intended to define only absolutely necessary methods to be able to support the many different tasks that
- * UserModules will be asked to perform.
+ * This interface is intended to define only absolutely necessary methods to be able to support the many different tasks
+ * that UserModules will be asked to perform.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
@@ -15,8 +15,8 @@
 #ifndef app_framework_base_UserModules_UserModule_hh
 #define app_framework_base_UserModules_UserModule_hh
 
-#include <string>
 #include <future>
+#include <string>
 
 namespace appframework {
 /**
