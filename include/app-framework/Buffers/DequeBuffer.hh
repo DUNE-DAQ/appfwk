@@ -21,7 +21,7 @@
 namespace appframework{
 
   template <class T>
-  class DequeBuffer : public BufferInput<T>, BufferOutput<T> {
+  class DequeBuffer : public BufferInput<T>, public BufferOutput<T> {
   public:
     DequeBuffer();
 
@@ -67,12 +67,12 @@ void DequeBuffer<T>::Configure(){
     fCapacity = fDeque.max_size();
   }
 
-  this->fPushTimeout_ms = 1e6;
-  this->fPopTimeout_ms  = 1e7;
+  this->set_push_timeout( 1e6 );
+  this->set_pop_timeout( 1e7 );
   fRetryTime_ms         = 100;
 
-  fPushRetries = this->fPushTimeout_ms/fRetryTime_ms;
-  fPopRetries  = this->fPopTimeout_ms/fRetryTime_ms;
+  fPushRetries = this->get_push_timeout()/fRetryTime_ms;
+  fPopRetries  = this->get_pop_timeout()/fRetryTime_ms;
 }
 
 template <class T>
