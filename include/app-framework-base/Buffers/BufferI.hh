@@ -38,9 +38,9 @@ namespace appframework {
 
     virtual void Configure() = 0; ///<called when configured in FSM
     
-    virtual bool   empty() = 0;    ///<is there any available data?
-    virtual bool   full()  = 0;    ///<is there any room for more data?
-    virtual size_t capacity() = 0; ///<what is the available capacity?
+    virtual bool   empty() const noexcept = 0;    ///<is there any available data?
+    virtual bool   full() const noexcept = 0;    ///<is there any room for more data?
+    virtual size_t capacity() const noexcept = 0; ///<what is the available capacity?
 
     BufferI(const BufferI& ) = default;
     BufferI& operator=(const BufferI& ) = default;

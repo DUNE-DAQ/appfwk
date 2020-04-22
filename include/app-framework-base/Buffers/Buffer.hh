@@ -22,7 +22,7 @@ namespace appframework{
     
   public:
 
-    virtual size_t capacityBytes() {return this->capacity()*sizeof(T);} ///bytes in buffer
+    virtual size_t capacityBytes() const noexcept {return this->capacity()*sizeof(T);} ///bytes in buffer
 
   };
 
