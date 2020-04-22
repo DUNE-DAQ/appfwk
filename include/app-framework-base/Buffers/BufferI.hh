@@ -38,8 +38,6 @@ namespace appframework {
 
     virtual void Configure() = 0; ///<called when configured in FSM
     
-    BufferAttributes attributes() { return fAttributes; }
-
     virtual bool   empty() = 0;    ///<is there any available data?
     virtual bool   full()  = 0;    ///<is there any room for more data?
     virtual size_t capacity() = 0; ///<what is the available capacity?
