@@ -24,8 +24,6 @@ namespace appframework{
 
     virtual size_t capacityBytes() {return this->capacity()*sizeof(T);} ///bytes in buffer
 
-  protected:
-
   };
 
 
@@ -36,7 +34,10 @@ namespace appframework{
     virtual int push(const T& t) { return push( std::move(t) ); }
     virtual int push(T&& ) = 0;
 
-  protected:
+    size_t get_push_timeout() const { return fPushTimeout_ms; }
+    void set_push_timeout(size_t sz) { fPushTimeout_ms = sz; }
+
+  private:
     size_t  fPushTimeout_ms;
     
   };
@@ -47,7 +48,10 @@ namespace appframework{
   public:
     virtual T pop() = 0;
 
-  protected:
+    size_t get_pop_timeout() const { return fPopTimeout_ms; }
+    void set_pop_timeout(size_t sz) { fPopTimeout_ms = sz; }
+
+  private:
     size_t  fPopTimeout_ms ;
   };
 
