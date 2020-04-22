@@ -28,11 +28,11 @@ namespace appframework{
 
     void Configure();
     
-    size_t size() { return fSize.load() ; }
-    size_t capacity() { return fCapacity; }
+    size_t size() const noexcept { return fSize.load() ; }
+    size_t capacity() const noexcept override { return fCapacity; }
 
-    bool empty() { return size()==0; }
-    bool full()  { return size()>=capacity(); }
+    bool empty() const noexcept override { return size()==0; }
+    bool full() const noexcept override { return size()>=capacity(); }
     
     int push(T&&);  /// push one on, return new size if successful, -1 if not
     T   pop();            ///pop one off, return object
