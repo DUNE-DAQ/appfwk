@@ -8,6 +8,7 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
 
+#include <iostream>
 #include <list>
 #include <memory>
 #include <string>
@@ -22,11 +23,11 @@ class CommandFacility {
    public:
     /**
      * @brief Singleton pattern; get a handle to the CommandFacility
-     * @return Static handle to the CommandFacility
+     * @return Reference to the CommandFacility
      */
-    static std::unique_ptr<CommandFacility> const& handle() {
+    static CommandFacility& handle() {
         if (!handle_) handle_.reset(new CommandFacility());
-        return handle_;
+        return *handle_;
     }
     /**
      * @brief Perform basic setup actions needed by the CommandFacility, using command-line arguments and environment variables

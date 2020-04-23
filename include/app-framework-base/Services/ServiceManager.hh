@@ -30,11 +30,11 @@ class ServiceManager {
 
     /**
      * @brief Get a handle to the ServiceManager (Singleton pattern)
-     * @return Pointer to the ServiceManager
+     * @return Reference to the ServiceManager
      */
-    static ServiceManager* handle() {
-        if (!handle_) handle_ = new ServiceManager();
-        return handle_;
+    static ServiceManager& handle() {
+      if (!handle_) handle_.reset( new ServiceManager() );
+        return *handle_;
     }
 
     /**
@@ -57,7 +57,7 @@ class ServiceManager {
     ServiceManager() {}
 
     std::map<std::string, std::unique_ptr<Service>> service_map_; ///< Registers Service instances
-    static ServiceManager* handle_; ///< Singleton pattern, static handle
+    static std::unique_ptr<ServiceManager> handle_; ///< Singleton pattern, static handle
 };
 }  // namespace appframework
 

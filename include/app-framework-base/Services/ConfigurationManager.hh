@@ -19,11 +19,11 @@ class ConfigurationManager {
    public:
     /**
      * @brief Singleton pattern, get a handle to the ConfigurationManager
-     * @return Pointer to the ConfigurationManager
+     * @return Reference to the ConfigurationManager
      */
-    static ConfigurationManager* handle() {
-        if (!handle_) handle_ = new ConfigurationManager();
-        return handle_;
+    static ConfigurationManager& handle() {
+        if (!handle_) handle_.reset( new ConfigurationManager() );
+        return *handle_;
     }
     /**
      * @brief Perform basic setup actions needed by ConfigurationManager, using the provided command-line paramters
@@ -35,7 +35,7 @@ class ConfigurationManager {
     ConfigurationManager() {} ///< Singleton pattern, protected parameterless constructor
 
    private:
-    static ConfigurationManager* handle_; ///< Singleton pattern, static handle_ member
+     static std::unique_ptr<ConfigurationManager> handle_; ///< Singleton pattern, static handle_ member
 };
 }  // namespace appframework
 
