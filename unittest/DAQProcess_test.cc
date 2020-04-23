@@ -8,14 +8,15 @@
 #include "app-framework/DAQProcess.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
 
+#define BOOST_TEST_MODULE DAQProcess_test  
+
+#include <boost/test/auto_unit_test.hpp>
+
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
-}
+} // namespace appframework
 
-#define BOOST_TEST_MODULE DAQProcess_test
-
-#include <boost/test/auto_unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(DAQProcess_test)
 

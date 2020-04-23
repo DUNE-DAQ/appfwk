@@ -10,14 +10,16 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef app_framework_DAQProcess_hh
-#define app_framework_DAQProcess_hh
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 
 #include "app-framework-base/Buffers/Buffer.hh"
 #include "app-framework-base/Core/ModuleList.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
 
+#include <list>
 #include <map>
+#include <memory>
 #include <string>
 
 namespace appframework {
@@ -36,7 +38,7 @@ class DAQProcess {
      * The DAQProcess constructor instantiates essential DAQ Application services. Services are passed
      * the command-line options and may also read basic configuration from the environment.
      */
-    DAQProcess(std::list<std::string> args);
+    explicit DAQProcess(std::list<std::string> args);
     /**
      * @brief Using the given ModuleList, construct the graph of UserModules and Buffers
      * @param ml ModuleList to call ModuleList::ConstructGraph on
@@ -63,6 +65,11 @@ class DAQProcess {
      * duration of the DAQ Application, calling execute_command as necessary.
      */
     int listen();
+  
+    DAQProcess(const DAQProcess& ) = delete;
+    DAQProcess& operator=(const DAQProcess& ) = delete;
+    DAQProcess(DAQProcess&& ) = delete;
+    DAQProcess& operator=(DAQProcess&& ) = delete;
 
    private:
 
@@ -72,4 +79,4 @@ class DAQProcess {
 };
 }  // namespace appframework
 
-#endif  // app_framework_DAQProcess_hh
+#endif  // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_

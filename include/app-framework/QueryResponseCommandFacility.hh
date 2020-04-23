@@ -8,8 +8,8 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH
-#define APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH_
 
 #include "app-framework/DAQProcess.hh"
 
@@ -25,9 +25,9 @@ class QueryResponseCommandFacility : public CommandFacility {
      * @brief Listen for commands from stdin, and pass them to the attached DAQProcess
      * @param theProcess Pointer to the DAQProcess instance which will distribute received commands
      */
-    virtual int listen(DAQProcess* theProcess) override;
+    int listen(DAQProcess* theProcess) override;
 
 };
 }  // namespace appframework
 
-#endif  // APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH
+#endif  // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH_
