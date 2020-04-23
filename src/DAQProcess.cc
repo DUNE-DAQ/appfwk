@@ -40,8 +40,9 @@ void DAQProcess::execute_command(std::string cmd) {
     if (commandOrderMap_.count(cmd)) {
         for (auto& moduleName : commandOrderMap_[cmd]) {
             if (userModuleMap_.count(moduleName)) {
-                userModuleMap_[moduleName]->execute_command(cmd);
-                user_module_list.erase(moduleName);
+	        auto cmd_result = userModuleMap_[moduleName]->execute_command(cmd);
+		TLOG(TLVL_DEBUG) << moduleName << " processed \"" << cmd << "\" with result: " << cmd_result.get() ;
+	        user_module_list.erase(moduleName);
             }
         }
     } else {
@@ -51,7 +52,9 @@ void DAQProcess::execute_command(std::string cmd) {
 
     TLOG(TLVL_DEBUG) << "Executing Command " << cmd << " for all remaining UserModules";
     for (auto const& moduleName : user_module_list) {
-        userModuleMap_[moduleName]->execute_command(cmd);
+        auto cmd_result = userModuleMap_[moduleName]->execute_command(cmd);
+	TLOG(TLVL_DEBUG) << moduleName << " processed \"" << cmd << "\" with result: " << cmd_result.get() ;
+	user_module_list.erase(moduleName);
     }
 }
 
