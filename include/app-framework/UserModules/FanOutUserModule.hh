@@ -15,11 +15,12 @@
 #include "app-framework-base/UserModules/SinkUserModule.hh"
 #include "app-framework-base/UserModules/ThreadedUserModule.hh"
 
+#include <unistd.h>
 #include <future>
 #include <list>
 #include <memory>
 #include <string>
-#include <unistd.h>
+#include <type_traits>
 
 namespace appframework {
 /**
@@ -52,6 +53,18 @@ class FanOutUserModule : public virtual SinkUserModule<DATA_TYPE>, public virtua
     FanOutMode mode_;
     std::list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers_;
     size_t wait_interval_us_;
+
+    // Type traits handling
+    template <typename... Dummy, typename U = DATA_TYPE>
+    typename std::enable_if<!std::is_copy_constructible<U>::value>::type do_broadcast(DATA_TYPE&) {
+        throw std::runtime_error("Broadcast mode cannot be used for non-copy-constructible types!");
+    }
+    template <typename... Dummy, typename U = DATA_TYPE>
+    typename std::enable_if<std::is_copy_constructible<U>::value>::type do_broadcast(DATA_TYPE& data) {
+        for (auto& o : outputBuffers_) {
+            o->push(DATA_TYPE(data));
+        }
+    }
 };
 }  // namespace appframework
 
@@ -82,7 +95,7 @@ std::future<std::string> appframework::FanOutUserModule<DATA_TYPE>::execute_comm
 template <typename DATA_TYPE>
 std::string appframework::FanOutUserModule<DATA_TYPE>::do_configure() {
     // TODO: Get configuration from ConfigurationManager!
-    mode_ = FanOutMode::RoundRobin;
+    mode_ = FanOutMode::Broadcast;
     wait_interval_us_ = 1000000;
 
     return "Success";
@@ -109,9 +122,7 @@ void appframework::FanOutUserModule<DATA_TYPE>::do_work() {
             auto data = SinkUserModule<DATA_TYPE>::inputBuffer_->pop();
 
             if (mode_ == FanOutMode::Broadcast) {
-                for (auto& o : outputBuffers_) {
-                    o->push(std::vector<int>(data));
-                }
+                do_broadcast(data);
             } else if (mode_ == FanOutMode::FirstAvailable) {
                 auto sent = false;
                 while (!sent) {

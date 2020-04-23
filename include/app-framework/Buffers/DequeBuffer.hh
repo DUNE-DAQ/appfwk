@@ -86,7 +86,7 @@ int appframework::DequeBuffer<T>::push(T&& obj) {
 
     if (full()) throw std::runtime_error("Full after check? Another thread accessing?");
     std::lock_guard<std::mutex> lck(fMutex);
-    fDeque.emplace_back(obj);
+    fDeque.push_back(std::move(obj));
     fSize++;
     return size();
 }
