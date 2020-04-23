@@ -5,8 +5,11 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef app_framework_base_Services_Service_hh
-#define app_framework_base_Services_Service_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_SERVICE_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_SERVICE_HH_
+
+#include <list>
+#include <string>
 
 namespace appframework {
 /**
@@ -23,4 +26,4 @@ class Service {
 };
 }  // namespace appframework
 
-#endif  // app_framework_base_Services_Service_hh
+#endif  // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_SERVICE_HH_

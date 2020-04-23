@@ -12,8 +12,8 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef app_framework_base_UserModules_UserModule_hh
-#define app_framework_base_UserModules_UserModule_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULE_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULE_HH_
 
 #include <string>
 #include <future>
@@ -41,4 +41,4 @@ class UserModule {
 };
 }  // namespace appframework
 
-#endif  // app_framework_base_UserModules_UserModule_hh
+#endif  // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULE_HH_

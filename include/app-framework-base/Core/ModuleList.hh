@@ -5,8 +5,8 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef app_framework_base_Core_ModuleList_hh
-#define app_framework_base_Core_ModuleList_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
 
 #include "app-framework-base/Buffers/BufferI.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
@@ -42,4 +42,4 @@ class ModuleList {
 };
 }  // namespace appframework
 
-#endif  // app_framework_base_Core_ModuleList_hh
+#endif  // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_

@@ -5,8 +5,11 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef app_framework_base_Services_ConfigurationManager_hh
-#define app_framework_base_Services_ConfigurationManager_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_CONFIGURATIONMANAGER_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_CONFIGURATIONMANAGER_HH_
+
+#include <list>
+#include <string>
 
 namespace appframework {
 /**
@@ -26,7 +29,7 @@ class ConfigurationManager {
      * @brief Perform basic setup actions needed by ConfigurationManager, using the provided command-line paramters
      * @param args Command-line arguments used to setup ConfigurationManager
      */
-    static void setup(std::list<std::string> /*args*/) {}
+    static void setup(std::list<std::string> args) {}
 
    protected:
     ConfigurationManager() {} ///< Singleton pattern, protected parameterless constructor
@@ -36,4 +39,4 @@ class ConfigurationManager {
 };
 }  // namespace appframework
 
-#endif  // app_framework_base_Services_ConfigurationManager_hh
+#endif  // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_CONFIGURATIONMANAGER_HH_

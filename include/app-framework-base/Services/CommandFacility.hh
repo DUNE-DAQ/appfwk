@@ -5,11 +5,12 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef app_framework_core_Services_CommandFacility_hh
-#define app_framework_core_Services_CommandFacility_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
 
 #include <list>
 #include <memory>
+#include <string>
 
 namespace appframework {
 class DAQProcess;  // forward declaration
@@ -31,7 +32,7 @@ class CommandFacility {
      * @brief Perform basic setup actions needed by the CommandFacility, using command-line arguments and environment variables
      * @param args Command-line arguments to the CommandFacility
      */
-    static void setup(std::list<std::string> /*args*/) {}
+    static void setup(std::list<std::string> args) {}
     /**
      * @brief Listen for commands and relay them to the given DAQProcess
      * @param process DAQProcess to relay commands to
@@ -39,7 +40,7 @@ class CommandFacility {
      *
      * This function should block for the lifetime of the DAQ Application, calling DAQProcess::execute_command as necessary
      */
-    virtual int listen(DAQProcess* /*process*/) { return 0; }
+    virtual int listen(DAQProcess* process) { return 0; }
 
    protected:
     /**
@@ -52,4 +53,4 @@ class CommandFacility {
 };
 }  // namespace appframework
 
-#endif  // app_framework_core_Services_CommandFacility_hh
+#endif  // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_

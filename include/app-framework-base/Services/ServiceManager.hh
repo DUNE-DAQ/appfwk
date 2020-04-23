@@ -5,10 +5,16 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef app_framework_base_Services_ServiceManager_hh
-#define app_framework_base_Services_ServiceManager_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_SERVICEMANAGER_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_SERVICEMANAGER_HH_
 
 #include "app-framework-base/Services/Service.hh"
+
+#include <list>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace appframework {
 /**
@@ -20,7 +26,7 @@ class ServiceManager {
      * @brief Setup the ServiceManager
      * @param args Command-line arguments, may contain list of services to load and parameters for each
      */
-    static void setup(std::list<std::string> /*args*/) {}
+    static void setup(std::list<std::string> args) {}
 
     /**
      * @brief Get a handle to the ServiceManager (Singleton pattern)
@@ -50,10 +56,9 @@ class ServiceManager {
      */
     ServiceManager() {}
 
-   private:
     std::map<std::string, std::unique_ptr<Service>> service_map_; ///< Registers Service instances
     static ServiceManager* handle_; ///< Singleton pattern, static handle
 };
 }  // namespace appframework
 
-#endif  // app_framework_base_Services_ServiceManager_hh
+#endif  // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_SERVICEMANAGER_HH_
