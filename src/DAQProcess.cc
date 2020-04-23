@@ -15,11 +15,12 @@
 #include "TRACE/trace.h"
 #define TRACE_NAME "DAQProcess"
 
+#include <memory>
 #include <unordered_set>
 
 namespace appframework {
-ServiceManager* ServiceManager::handle_ = nullptr;
-ConfigurationManager* ConfigurationManager::handle_ = nullptr;
+  std::unique_ptr<ServiceManager> ServiceManager::handle_ = nullptr;
+  std::unique_ptr<ConfigurationManager> ConfigurationManager::handle_ = nullptr;
 
 DAQProcess::DAQProcess(std::list<std::string> args) {
     Logger::setup(args);
@@ -55,5 +56,5 @@ void DAQProcess::execute_command(std::string cmd) {
     }
 }
 
-int DAQProcess::listen() { return CommandFacility::handle()->listen(this); }
+int DAQProcess::listen() { return CommandFacility::handle().listen(this); }
 }  // namespace appframework
