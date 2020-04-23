@@ -8,8 +8,8 @@
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH
-#define APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH_
 
 #include "app-framework-base/UserModules/UserModule.hh"
 
@@ -31,4 +31,4 @@ class DebugLoggingUserModule : public UserModule {
 };
 }  // namespace appframework
 
-#endif  // APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH
+#endif  // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH_
