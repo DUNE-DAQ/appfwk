@@ -54,7 +54,7 @@ class DAQProcess {
      * if so, first send the command to the UserModules in that list in the order specified. Then, any
      * remaining UserModules will receive the command in an unspecified order.
      */
-    void execute_command(std::string cmd);
+    void execute_command( const std::string & cmd );
     /**
      * @brief Start the CommandFacility listener
      * @return Return code from listener

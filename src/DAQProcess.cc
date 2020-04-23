@@ -16,6 +16,7 @@
 #define TRACE_NAME "DAQProcess"
 
 #include <unordered_set>
+#include <vector>
 
 namespace appframework {
 ServiceManager* ServiceManager::handle_ = nullptr;
@@ -30,18 +31,20 @@ DAQProcess::DAQProcess(std::list<std::string> args) {
 
 void DAQProcess::register_modules(std::unique_ptr<ModuleList> const& ml) { ml->ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_); }
 
-void DAQProcess::execute_command(std::string cmd) {
+void DAQProcess::execute_command(const std::string & cmd) {
     std::unordered_set<std::string> user_module_list;
     for (auto const& um : userModuleMap_) {
         user_module_list.insert(um.first);
     }
 
+    std::vector< std::pair<std::string, std::future<std::string> > > cmd_results ;
+
     TLOG(TLVL_DEBUG) << "Executing Command " << cmd << " for UserModules defined in the CommandOrderMap";
     if (commandOrderMap_.count(cmd)) {
         for (auto& moduleName : commandOrderMap_[cmd]) {
             if (userModuleMap_.count(moduleName)) {
-	        auto cmd_result = userModuleMap_[moduleName]->execute_command(cmd);
-		TLOG(TLVL_DEBUG) << moduleName << " processed \"" << cmd << "\" with result: " << cmd_result.get() ;
+	        cmd_results.push_back( std::make_pair( moduleName, userModuleMap_[moduleName]->execute_command(cmd) ) ) ; 
+	        cmd_results.back().second.wait() ; 
 	        user_module_list.erase(moduleName);
             }
         }
@@ -52,10 +55,15 @@ void DAQProcess::execute_command(std::string cmd) {
 
     TLOG(TLVL_DEBUG) << "Executing Command " << cmd << " for all remaining UserModules";
     for (auto const& moduleName : user_module_list) {
-        auto cmd_result = userModuleMap_[moduleName]->execute_command(cmd);
-	TLOG(TLVL_DEBUG) << moduleName << " processed \"" << cmd << "\" with result: " << cmd_result.get() ;
+        cmd_results.push_back( std::make_pair( moduleName, userModuleMap_[moduleName]->execute_command(cmd) ) ) ; 
+	cmd_results.back().second.wait() ; 
 	user_module_list.erase(moduleName);
     }
+
+    for ( auto & res : cmd_results ) {
+        TLOG(TLVL_DEBUG) << res.first << " processed \"" << cmd << "\" with result: " << res.second.get() ;
+    }
+
 }
 
 int DAQProcess::listen() { return CommandFacility::handle()->listen(this); }
