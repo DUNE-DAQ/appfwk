@@ -95,7 +95,7 @@ std::future<std::string> appframework::FanOutUserModule<DATA_TYPE>::execute_comm
 template <typename DATA_TYPE>
 std::string appframework::FanOutUserModule<DATA_TYPE>::do_configure() {
     // TODO: Get configuration from ConfigurationManager!
-    mode_ = FanOutMode::Broadcast;
+    mode_ = FanOutMode::RoundRobin;
     wait_interval_us_ = 1000000;
 
     return "Success";

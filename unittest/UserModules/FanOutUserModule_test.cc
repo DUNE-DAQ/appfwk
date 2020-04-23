@@ -43,23 +43,34 @@ BOOST_AUTO_TEST_CASE(Configure) {
 }
 
 BOOST_AUTO_TEST_CASE(NonCopyableTypeTest) {
-    auto buf = std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
-    appframework::FanOutUserModule<NonCopyableType> foum(buf, {buf, buf});
+    auto inputbuf = std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
+    auto outputbuf1 = std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
+    auto outputbuf2 = std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
+    appframework::FanOutUserModule<NonCopyableType> foum(inputbuf, {outputbuf1, outputbuf2});
+    
+    // This test assumes RoundRobin mode. Once configurability is implemented, we'll have to configure it appropriately.
     foum.execute_command("configure");
     foum.execute_command("start");
 
-    NonCopyableType nct(1);
-    buf->push(std::move(nct));
+    NonCopyableType nct1(1);
+    inputbuf->push(std::move(nct1));
+    NonCopyableType nct2(2);
+    inputbuf->push(std::move(nct2));
+
+    while (!inputbuf->empty())
+    usleep(10000);
 
     foum.execute_command("stop");
 
-    while (!buf->empty()) {
-        auto out = buf->pop();
-        if (out.data != 1) {
-            throw std::runtime_error("Unexpected output from test!");
-        }
-    }
+    BOOST_REQUIRE_EQUAL(inputbuf->empty(), true);
+    
+    BOOST_REQUIRE_EQUAL(outputbuf1->empty(), false);
+    auto res = outputbuf1->pop();
+    BOOST_REQUIRE_EQUAL(res.data, 1);
 
+    BOOST_REQUIRE_EQUAL(outputbuf2->empty(), false);
+    res = outputbuf2->pop();
+    BOOST_REQUIRE_EQUAL(res.data, 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
