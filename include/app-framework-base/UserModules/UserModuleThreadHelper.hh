@@ -1,38 +1,37 @@
 /**
- * @file The ThreadedUserModule class interface
+ * @file The UserModuleThreadHelper class interface
  *
- * ThreadedUserModule builds upon the UserModule interface by defining a std::thread which runs the do_work() function
+ * UserModuleThreadHelper defines a std::thread which runs the do_work() function
  * as well as methods to start and stop that thread.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_USERMODULES_THREADEDUSERMODULE_HH
-#define APP_FRAMEWORK_BASE_USERMODULES_THREADEDUSERMODULE_HH
+#ifndef APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH
+#define APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH
 
 #include "app-framework-base/Buffers/Buffer.hh"
-#include "app-framework-base/UserModules/UserModule.hh"
 
 #include <future>
 #include <list>
 #include <memory>
 #include <string>
+#include <functional>
 
 namespace appframework {
 /**
- * @brief ThreadedUserModule contains a thread which runs the do_work() function
+ * @brief UserModuleThreadHelper contains a thread which runs the do_work() function
  */
-class ThreadedUserModule : virtual public UserModule {
+class UserModuleThreadHelper {
    public:
     /**
-     * @brief ThreadedUserModule Constructor
+     * @brief UserModuleThreadHelper Constructor
      *
      * This constructor sets the defaults for the thread control variables
      */
-    ThreadedUserModule() : thread_started_(false), working_thread_(nullptr) {}
+    UserModuleThreadHelper(std::function<void()> do_work) : thread_started_(false), working_thread_(nullptr), do_work_(do_work) {}
 
-   protected:
     /**
      * @brief Start the working thread (which executes the do_work() function)
      * @throws std::runtime_error if the thread is already running
@@ -42,7 +41,7 @@ class ThreadedUserModule : virtual public UserModule {
             throw std::runtime_error("Attempted to start UserModule working thread when it is already running!");
         }
         thread_started_ = true;
-        working_thread_.reset(new std::thread([&] { do_work(); }));
+        working_thread_.reset(new std::thread([&] { do_work_(); }));
     }
     /**
      * @brief Stop the working thread
@@ -60,17 +59,13 @@ class ThreadedUserModule : virtual public UserModule {
         throw std::runtime_error("Thread not in joinable state during UserModule working thread stop!");
     }
 
-    /**
-     * @brief This method defines the work that should be performed on the ThreadedUserModule working thread
-     */
-    virtual void do_work() = 0;
-
-    std::atomic<bool>
-        thread_started_;  ///< Variable which indicates whether the thread has been started and not stopped
+    bool thread_running() { return thread_started_.load(); }
 
    private:
+    std::atomic<bool>        thread_started_;
     std::unique_ptr<std::thread> working_thread_;
+    std::function<void()> do_work_;
 };
 }  // namespace appframework
 
-#endif  // APP_FRAMEWORK_BASE_USERMODULES_THREADEDUSERMODULE_HH
+#endif  // APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH
