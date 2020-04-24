@@ -16,9 +16,8 @@
 #include <deque>
 #include <functional>
 #include <mutex>
-#include <utility>
 #include <unistd.h>
-
+#include <utility>
 
 namespace appframework {
 
