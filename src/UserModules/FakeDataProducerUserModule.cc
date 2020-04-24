@@ -7,7 +7,7 @@
 
 appframework::FakeDataProducerUserModule::FakeDataProducerUserModule(
     std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer)
-    : SourceUserModule(outputBuffer), ThreadedUserModule() {}
+    : outputBuffer_(outputBuffer), thread_(std::bind(&FakeDataProducerUserModule::do_work, this)) {}
 
 std::future<std::string> appframework::FakeDataProducerUserModule::execute_command(std::string cmd) {
     if (cmd == "configure" || cmd == "Configure") {
@@ -34,12 +34,12 @@ std::string appframework::FakeDataProducerUserModule::do_configure() {
 }
 
 std::string appframework::FakeDataProducerUserModule::do_start() {
-    start_working_thread_();
+    thread_.start_working_thread_();
     return "Success";
 }
 
 std::string appframework::FakeDataProducerUserModule::do_stop() {
-    stop_working_thread_();
+    thread_.stop_working_thread_();
     return "Success";
 }
 
@@ -59,7 +59,7 @@ TraceStreamer& operator<<(TraceStreamer& t, std::vector<int> ints) {
 void appframework::FakeDataProducerUserModule::do_work() {
     int current_int = starting_int_;
     size_t counter = 0;
-    while (thread_started_.load()) {
+    while (thread_.thread_running()) {
         TLOG(TLVL_DEBUG) << "Creating output vector";
         std::vector<int> output(nIntsPerVector_);
 

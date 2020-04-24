@@ -12,8 +12,8 @@
 #define APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH
 
 #include "app-framework-base/Buffers/Buffer.hh"
-#include "app-framework-base/UserModules/SinkUserModule.hh"
-#include "app-framework-base/UserModules/ThreadedUserModule.hh"
+#include "app-framework-base/UserModules/UserModule.hh"
+#include "app-framework-base/UserModules/UserModuleThreadHelper.hh"
 
 #include <future>
 #include <memory>
@@ -24,7 +24,7 @@ namespace appframework {
 /**
  * @brief FakeDataConsumerUserModule creates vectors of ints and sends them downstream
  */
-class FakeDataConsumerUserModule : public SinkUserModule<std::vector<int>>, public ThreadedUserModule {
+class FakeDataConsumerUserModule : public UserModule {
    public:
     FakeDataConsumerUserModule(std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer, std::string id = "");
 
@@ -37,7 +37,8 @@ class FakeDataConsumerUserModule : public SinkUserModule<std::vector<int>>, publ
     std::string do_stop();
 
     // Threading
-    void do_work() final;
+    void do_work() ;
+    UserModuleThreadHelper thread_;
 
     // Configuration (for validation)
     size_t nIntsPerVector_;
@@ -45,6 +46,7 @@ class FakeDataConsumerUserModule : public SinkUserModule<std::vector<int>>, publ
     int ending_int_;
     std::string id_;
     std::string getId() { return id_ != "" ? id_ + ": " : ""; }
+    std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer_;
 };
 }  // namespace appframework
 

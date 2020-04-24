@@ -1,13 +1,14 @@
 #include "app-framework/UserModules/FakeDataConsumerUserModule.hh"
 
 #include <unistd.h>
+#include <functional>
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "FakeDataConsumer"
 
 appframework::FakeDataConsumerUserModule::FakeDataConsumerUserModule(
     std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer, std::string id)
-    : SinkUserModule(inputBuffer), ThreadedUserModule(), id_(id) {}
+    : thread_(std::bind(&FakeDataConsumerUserModule::do_work, this)), id_(id), inputBuffer_(inputBuffer_) {}
 
 std::future<std::string> appframework::FakeDataConsumerUserModule::execute_command(std::string cmd) {
     if (cmd == "configure" || cmd == "Configure") {
@@ -33,12 +34,12 @@ std::string appframework::FakeDataConsumerUserModule::do_configure() {
 }
 
 std::string appframework::FakeDataConsumerUserModule::do_start() {
-    start_working_thread_();
+    thread_.start_working_thread_();
     return "Success";
 }
 
 std::string appframework::FakeDataConsumerUserModule::do_stop() {
-    stop_working_thread_();
+    thread_.stop_working_thread_();
     return "Success";
 }
 
@@ -59,7 +60,7 @@ void appframework::FakeDataConsumerUserModule::do_work() {
     int current_int = starting_int_;
     int counter = 0;
     int fail_count = 0;
-    while (thread_started_.load()) {
+    while (thread_.thread_running()) {
         if (!inputBuffer_->empty()) {
             TLOG(TLVL_DEBUG) << getId() << "Going to receive data from inputBuffer";
             auto vec = inputBuffer_->pop();

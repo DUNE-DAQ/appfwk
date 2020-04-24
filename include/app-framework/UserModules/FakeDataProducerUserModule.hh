@@ -12,8 +12,8 @@
 #define APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH
 
 #include "app-framework-base/Buffers/Buffer.hh"
-#include "app-framework-base/UserModules/SourceUserModule.hh"
-#include "app-framework-base/UserModules/ThreadedUserModule.hh"
+#include "app-framework-base/UserModules/UserModule.hh"
+#include "app-framework-base/UserModules/UserModuleThreadHelper.hh"
 
 #include <future>
 #include <memory>
@@ -24,7 +24,7 @@ namespace appframework {
 /**
  * @brief FakeDataProducerUserModule creates vectors of ints and sends them downstream
  */
-class FakeDataProducerUserModule : public SourceUserModule<std::vector<int>>, public ThreadedUserModule {
+class FakeDataProducerUserModule : public UserModule {
    public:
     FakeDataProducerUserModule(std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer);
 
@@ -37,9 +37,12 @@ class FakeDataProducerUserModule : public SourceUserModule<std::vector<int>>, pu
     std::string do_stop();
 
     // Threading
-    void do_work() final;
+    UserModuleThreadHelper thread_;
+    void do_work() ;
+
 
     // Configuration
+    std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer_;
     size_t nIntsPerVector_;
     int starting_int_;
     int ending_int_;
