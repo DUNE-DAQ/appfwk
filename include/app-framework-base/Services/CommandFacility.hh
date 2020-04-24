@@ -33,7 +33,7 @@ class CommandFacility {
      * @brief Perform basic setup actions needed by the CommandFacility, using command-line arguments and environment variables
      * @param args Command-line arguments to the CommandFacility
      */
-    static void setup(std::list<std::string> args) {}
+    static void setup(std::list<std::string> /*args*/) {}
     /**
      * @brief Listen for commands and relay them to the given DAQProcess
      * @param process DAQProcess to relay commands to
@@ -41,7 +41,7 @@ class CommandFacility {
      *
      * This function should block for the lifetime of the DAQ Application, calling DAQProcess::execute_command as necessary
      */
-    virtual int listen(DAQProcess* process) { return 0; }
+    virtual int listen(DAQProcess* /*process*/) { return 0; }
 
    protected:
     /**

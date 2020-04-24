@@ -21,7 +21,7 @@ class Logger {
      * @brief Setup the Logger service
      * @param args Command-line arguments used to setup the Logger
      */
-    static void setup(std::list<std::string> args) {}
+    static void setup(std::list<std::string> /*args*/) {}
 };
 }  // namespace appframework
 

@@ -29,7 +29,7 @@ class ConfigurationManager {
      * @brief Perform basic setup actions needed by ConfigurationManager, using the provided command-line paramters
      * @param args Command-line arguments used to setup ConfigurationManager
      */
-    static void setup(std::list<std::string> args) {}
+    static void setup(std::list<std::string> /*args*/) {}
 
    protected:
     ConfigurationManager() {} ///< Singleton pattern, protected parameterless constructor
