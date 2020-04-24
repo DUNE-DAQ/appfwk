@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 
     appframework::DAQProcess theDAQProcess(args);
 
-    auto ml = std::unique_ptr<appframework::ModuleList>(new appframework::simple_test_app_ModuleList());
+    appframework::simple_test_app_ModuleList ml;
     theDAQProcess.register_modules(ml);
 
     return theDAQProcess.listen();

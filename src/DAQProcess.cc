@@ -29,7 +29,7 @@ DAQProcess::DAQProcess(std::list<std::string> args) {
     ServiceManager::setup(args);
 }
 
-void DAQProcess::register_modules(std::unique_ptr<ModuleList> const& ml) { ml->ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_); }
+void DAQProcess::register_modules(ModuleList& ml) { ml.ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_); }
 
 void DAQProcess::execute_command(std::string cmd) {
     std::unordered_set<std::string> user_module_list;

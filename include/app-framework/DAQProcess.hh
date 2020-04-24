@@ -47,7 +47,7 @@ class DAQProcess {
      * links together the UserModules and Buffers needed by this DAQ Application. ConstructGraph also defines
      * any ordering of commands for UserModules.
      */
-    void register_modules(std::unique_ptr<ModuleList> const& ml);
+    void register_modules(ModuleList& ml);
     /**
      * @brief Execute the specified command on the loaded UserModules
      * @param cmd Command to execute
