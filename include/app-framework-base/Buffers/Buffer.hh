@@ -12,7 +12,9 @@
 
 #include "BufferI.hh"
 
+#include <chrono>
 #include <cstddef>
+#include <iostream>
 #include <utility>
 using std::size_t;
 
@@ -26,43 +28,27 @@ public:
   } /// bytes in buffer
 };
 
-template <class T> class BufferInput : virtual public Buffer<T> {
+template <class T, class DurationType = std::chrono::milliseconds>
+class BufferInput : virtual public Buffer<T> {
 
 public:
-  explicit BufferInput(size_t pt = 10) : fPushTimeout_ms(pt) {}
+  template <typename U> void push(U &&t) {
+    push_wait_for(std::forward<U>(t), DurationType(0));
+  }
 
-  virtual int push(const T &t) { return push(std::move(t)); }
-  virtual int push(T &&) = 0;
+  virtual void push_wait_for(T &&, const DurationType &) = 0;
 
-  size_t get_push_timeout() const { return fPushTimeout_ms; }
-  void set_push_timeout(size_t sz) { fPushTimeout_ms = sz; }
-
-  BufferInput(const BufferInput &) = default;
-  BufferInput &operator=(const BufferInput &) = default;
-  BufferInput(BufferInput &&) = default;
-  BufferInput &operator=(BufferInput &&) = default;
-
-private:
-  size_t fPushTimeout_ms;
+  void push_wait_for(const T &val, const DurationType &timeout) {
+    push_wait_for(T(val), timeout);
+  }
 };
 
-template <class T> class BufferOutput : virtual public Buffer<T> {
+template <class T, class DurationType = std::chrono::milliseconds>
+class BufferOutput : virtual public Buffer<T> {
 
 public:
-  explicit BufferOutput(size_t pt = 10) : fPopTimeout_ms(pt) {}
-
-  virtual T pop() = 0;
-
-  size_t get_pop_timeout() const { return fPopTimeout_ms; }
-  void set_pop_timeout(size_t sz) { fPopTimeout_ms = sz; }
-
-  BufferOutput(const BufferOutput &) = default;
-  BufferOutput &operator=(const BufferOutput &) = default;
-  BufferOutput(BufferOutput &&) = default;
-  BufferOutput &operator=(BufferOutput &&) = default;
-
-private:
-  size_t fPopTimeout_ms;
+  T pop() { return pop_wait_for(DurationType(0)); }
+  virtual T pop_wait_for(const DurationType &) = 0;
 };
 
 } // namespace appframework
