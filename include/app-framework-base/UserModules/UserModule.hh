@@ -30,7 +30,8 @@ namespace appframework {
  * Developers implementing UserModules should feel free to use whatever Plugins
  * and Services are necessary to accomplish their needed functionality.
  */
-class UserModule {
+class UserModule
+{
 public:
   /**
    * @brief Execute a command in this UserModule

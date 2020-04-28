@@ -19,11 +19,11 @@
 
 namespace appframework {
 typedef std::map<std::string, std::unique_ptr<UserModule>>
-    UserModuleMap; ///< UserModules indexed by name
+  UserModuleMap; ///< UserModules indexed by name
 typedef std::map<std::string, std::shared_ptr<BufferI>>
-    BufferMap; ///< Buffers indexed by name
+  BufferMap; ///< Buffers indexed by name
 typedef std::map<std::string, std::list<std::string>>
-    CommandOrderMap; ///< Defined UserModule orders for commands
+  CommandOrderMap; ///< Defined UserModule orders for commands
 
 /**
  * @brief The ModuleList class is the representation of a UserModule and Buffer
@@ -33,25 +33,26 @@ typedef std::map<std::string, std::list<std::string>>
  * UserModules for a DAQ Application, as well as linking them together.
  * UserModules define their Buffer endpoints by requiring Buffer instances
  */
-class ModuleList {
-   public:
-    /**
-     * @brief Construct the graph of UserModules and Buffers.
+class ModuleList
+{
+public:
+  /**
+   * @brief Construct the graph of UserModules and Buffers.
    * @param[out] buffer_map A BufferMap that will contain pointers to all of the
    * Buffer instances, indexed by name
    * @param[out] user_module_map A UserModuleMap that will contain pointers to
    * all of the UserModule instances, indexed by name
    * @param[out] command_order_map A map relating commands to an ordering of
    * UserModules (by name)
-     *
+   *
    * Brief This method is responsible for instantiating and linking all of the
    * Buffer and UserModule instances in a DAQ Application. Additionally, any
    * requirements on command order for UserModules should be defined here.
-     */
-  virtual void ConstructGraph(BufferMap &buffer_map,
-                              UserModuleMap &user_module_map,
-                              CommandOrderMap &command_order_map) = 0;
+   */
+  virtual void ConstructGraph(BufferMap& buffer_map,
+                              UserModuleMap& user_module_map,
+                              CommandOrderMap& command_order_map) = 0;
 };
-}  // namespace appframework
+} // namespace appframework
 
 #endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
