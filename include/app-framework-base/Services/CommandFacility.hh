@@ -15,48 +15,50 @@
 #include <string>
 
 namespace appframework {
-class DAQProcess;  // forward declaration
+class DAQProcess; // forward declaration
 
 /**
  * @brief Interface needed by Application Framework for CCM command handling
  */
-class CommandFacility {
-   public:
-    /**
-     * @brief Singleton pattern; get a handle to the CommandFacility
+class CommandFacility
+{
+public:
+  /**
+   * @brief Singleton pattern; get a handle to the CommandFacility
    * @return Reference to the CommandFacility
-     */
-  static CommandFacility &handle() {
+   */
+  static CommandFacility& handle()
+  {
     if (!handle_)
       handle_.reset(new CommandFacility());
     return *handle_;
-    }
-    /**
+  }
+  /**
    * @brief Perform basic setup actions needed by the CommandFacility, using
    * command-line arguments and environment variables
-     * @param args Command-line arguments to the CommandFacility
-     */
-    static void setup(std::list<std::string> /*args*/) {}
-    /**
-     * @brief Listen for commands and relay them to the given DAQProcess
-     * @param process DAQProcess to relay commands to
-     * @return Return code for application
-     *
+   * @param args Command-line arguments to the CommandFacility
+   */
+  static void setup(std::list<std::string> /*args*/) {}
+  /**
+   * @brief Listen for commands and relay them to the given DAQProcess
+   * @param process DAQProcess to relay commands to
+   * @return Return code for application
+   *
    * This function should block for the lifetime of the DAQ Application, calling
    * DAQProcess::execute_command as necessary
-     */
-    virtual int listen(DAQProcess* /*process*/) { return 0; }
+   */
+  virtual int listen(DAQProcess* /*process*/) { return 0; }
 
-   protected:
-    /**
-     * Singleton pattern; protected parameterless constructor
-     */
-    CommandFacility() {}
+protected:
+  /**
+   * Singleton pattern; protected parameterless constructor
+   */
+  CommandFacility() {}
 
-   private:
+private:
   static std::unique_ptr<CommandFacility>
-      handle_; ///< Singleton pattern, handle to CommandFacility
+    handle_; ///< Singleton pattern, handle to CommandFacility
 };
-}  // namespace appframework
+} // namespace appframework
 
 #endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
