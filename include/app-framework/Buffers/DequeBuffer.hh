@@ -21,12 +21,15 @@
 
 namespace appframework {
 
-template <class T>
-class DequeBuffer : public BufferInput<T>, public BufferOutput<T> {
-   public:
-    DequeBuffer();
+template<class T>
+class DequeBuffer
+  : public BufferInput<T>
+  , public BufferOutput<T>
+{
+public:
+  DequeBuffer();
 
-    void Configure();
+  void Configure();
 
   size_t size() const noexcept { return fSize.load(); }
   size_t capacity() const noexcept override { return fCapacity; }
@@ -34,30 +37,30 @@ class DequeBuffer : public BufferInput<T>, public BufferOutput<T> {
   bool empty() const noexcept override { return size() == 0; }
   bool full() const noexcept override { return size() >= capacity(); }
 
-    int push(T&&);  /// push one on, return new size if successful, -1 if not
-    T pop();        /// pop one off, return object
+  int push(T&&); /// push one on, return new size if successful, -1 if not
+  T pop();       /// pop one off, return object
 
   // Delete the copy and move operations since member data instances
   // of std::mutex and std::atomic aren't copyable or movable
 
-  DequeBuffer(const DequeBuffer &) = delete;
-  DequeBuffer &operator=(const DequeBuffer &) = delete;
-  DequeBuffer(DequeBuffer &&) = delete;
-  DequeBuffer &operator=(DequeBuffer &&) = delete;
+  DequeBuffer(const DequeBuffer&) = delete;
+  DequeBuffer& operator=(const DequeBuffer&) = delete;
+  DequeBuffer(DequeBuffer&&) = delete;
+  DequeBuffer& operator=(DequeBuffer&&) = delete;
 
-   private:
-    std::deque<T> fDeque;
-    std::atomic<size_t> fSize = 0;
-    size_t fCapacity;
+private:
+  std::deque<T> fDeque;
+  std::atomic<size_t> fSize = 0;
+  size_t fCapacity;
 
-    std::mutex fMutex;
-    size_t fRetryTime_ms;
-    size_t fPushRetries;
-    size_t fPopRetries;
+  std::mutex fMutex;
+  size_t fRetryTime_ms;
+  size_t fPushRetries;
+  size_t fPopRetries;
 };
 
 #include "detail/DequeBuffer.icc"
 
-}  // namespace appframework
+} // namespace appframework
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_BUFFERS_DEQUEBUFFER_HH_

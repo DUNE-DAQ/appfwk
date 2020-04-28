@@ -1,11 +1,12 @@
 /**
  * @file The FakeDataConsumerUserModule class interface
  *
- * FakeDataConsumerUserModule is a simple UserModule implementation that simply logs the fact that
- * it received a command from DAQProcess.
+ * FakeDataConsumerUserModule is a simple UserModule implementation that simply
+ * logs the fact that it received a command from DAQProcess.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
- * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
  */
 
 #ifndef APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH
@@ -22,32 +23,36 @@
 
 namespace appframework {
 /**
- * @brief FakeDataConsumerUserModule creates vectors of ints and sends them downstream
+ * @brief FakeDataConsumerUserModule creates vectors of ints and sends them
+ * downstream
  */
-class FakeDataConsumerUserModule : public UserModule {
-   public:
-    FakeDataConsumerUserModule(std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer, std::string id = "");
+class FakeDataConsumerUserModule : public UserModule
+{
+public:
+  FakeDataConsumerUserModule(
+    std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer,
+    std::string id = "");
 
-    std::future<std::string> execute_command(std::string cmd) override;
+  std::future<std::string> execute_command(std::string cmd) override;
 
-   private:
-    // Commands
-    std::string do_configure();
-    std::string do_start();
-    std::string do_stop();
+private:
+  // Commands
+  std::string do_configure();
+  std::string do_start();
+  std::string do_stop();
 
-    // Threading
-    void do_work() ;
-    UserModuleThreadHelper thread_;
+  // Threading
+  void do_work();
+  UserModuleThreadHelper thread_;
 
-    // Configuration (for validation)
-    size_t nIntsPerVector_;
-    int starting_int_;
-    int ending_int_;
-    std::string id_;
-    std::string getId() { return id_ != "" ? id_ + ": " : ""; }
-    std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer_;
+  // Configuration (for validation)
+  size_t nIntsPerVector_;
+  int starting_int_;
+  int ending_int_;
+  std::string id_;
+  std::string getId() { return id_ != "" ? id_ + ": " : ""; }
+  std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer_;
 };
-}  // namespace appframework
+} // namespace appframework
 
-#endif  // APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH
+#endif // APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH
