@@ -43,7 +43,12 @@ void DAQProcess::execute_command(const std::string & cmd) {
     if (commandOrderMap_.count(cmd)) {
         for (auto& moduleName : commandOrderMap_[cmd]) {
             if (userModuleMap_.count(moduleName)) {
-	        cmd_results.push_back( std::make_pair( moduleName, userModuleMap_[moduleName]->execute_command(cmd) ) ) ; 
+	        try { 
+	            cmd_results.push_back( std::make_pair( moduleName, userModuleMap_[moduleName]->execute_command(cmd) ) ) ; 
+	        }
+	        catch ( ... ) {
+		  TLOG(TLVL_WARNING) << moduleName << " throw an exception while receiving command " << cmd ;
+		}
 	        cmd_results.back().second.wait() ; 
 	        user_module_list.erase(moduleName);
             }
@@ -60,8 +65,17 @@ void DAQProcess::execute_command(const std::string & cmd) {
 	user_module_list.erase(moduleName);
     }
 
+    
+    // The command has been dispatched to all the modules
+    //  we need to check the result of the command
+    // that includes checking for possible exceptions
     for ( auto & res : cmd_results ) {
-        TLOG(TLVL_DEBUG) << res.first << " processed \"" << cmd << "\" with result: " << res.second.get() ;
+        try {
+            TLOG(TLVL_DEBUG) << res.first << " processed \"" << cmd << "\" with result: " << res.second.get() ;
+	}
+	catch ( ... ) {
+	  TLOG(TLVL_WARNING) << res.first << " throw an exception while processing command " << cmd ;
+	}
     }
 
 }
