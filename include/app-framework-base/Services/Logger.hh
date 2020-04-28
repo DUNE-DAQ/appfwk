@@ -2,18 +2,20 @@
  * @file Logger interface definition
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
- * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
  */
 
-#ifndef app_framework_base_Services_Logger_hh
-#define app_framework_base_Services_Logger_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_LOGGER_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_LOGGER_HH_
 
 #include <vector>
 #include <string>
 
 namespace appframework {
 /**
- * @brief The Logger class defines the interface necessary to configure central logging within a DAQ Application.
+ * @brief The Logger class defines the interface necessary to configure central
+ * logging within a DAQ Application.
  */
 class Logger {
    public:
@@ -25,4 +27,4 @@ class Logger {
 };
 }  // namespace appframework
 
-#endif  // app_framework_base_Services_Logger_hh
+#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_LOGGER_HH_

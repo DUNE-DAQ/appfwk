@@ -2,12 +2,15 @@
  * @file CommandFacility interface
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
- * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
  */
 
-#ifndef app_framework_core_Services_CommandFacility_hh
-#define app_framework_core_Services_CommandFacility_hh
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
 
+#include <iostream>
+#include <list>
 #include <vector>
 #include <memory>
 #include <string>
@@ -33,15 +36,17 @@ class CommandFacility {
    public:
     /**
      * @brief Singleton pattern; get a handle to the CommandFacility
-     * @return Static handle to the CommandFacility
+   * @return Reference to the CommandFacility
      */
-    static std::unique_ptr<CommandFacility> const& handle() {
-        if (!handle_) handle_.reset(nullptr);
-        return handle_;
+  static CommandFacility &handle() {
+    if (!handle_)
+      handle_.reset(new CommandFacility());
+    return *handle_;
     }
     static void setHandle(std::unique_ptr<CommandFacility>&& handle) { handle_ = std::move(handle); }
     /**
-     * @brief Perform basic setup actions needed by the CommandFacility, using command-line arguments and environment variables
+   * @brief Perform basic setup actions needed by the CommandFacility, using
+   * command-line arguments and environment variables
      * @param args Command-line arguments to the CommandFacility
      */
     static void setup(std::vector<std::string> /*args*/) {}
@@ -50,7 +55,8 @@ class CommandFacility {
      * @param process DAQProcess to relay commands to
      * @return Return code for application
      *
-     * This function should block for the lifetime of the DAQ Application, calling DAQProcess::execute_command as necessary
+   * This function should block for the lifetime of the DAQ Application, calling
+   * DAQProcess::execute_command as necessary
      */
     virtual int listen(DAQProcess* /*process*/) { return 0; }
 
@@ -61,7 +67,8 @@ class CommandFacility {
     CommandFacility() {}
 
    private:
-    static std::unique_ptr<CommandFacility> handle_; ///< Singleton pattern, handle to CommandFacility
+  static std::unique_ptr<CommandFacility>
+      handle_; ///< Singleton pattern, handle to CommandFacility
 };
 
 inline std::unique_ptr<CommandFacility> makeCommandFacility(std::string const& facility_name) {
@@ -72,4 +79,4 @@ inline std::unique_ptr<CommandFacility> makeCommandFacility(std::string const& f
 
 }  // namespace appframework
 
-#endif  // app_framework_core_Services_CommandFacility_hh
+#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
