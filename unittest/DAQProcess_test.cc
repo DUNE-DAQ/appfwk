@@ -2,7 +2,8 @@
  * @file DAQProcess class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
- * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
  */
 
 #include "app-framework/DAQProcess.hh"

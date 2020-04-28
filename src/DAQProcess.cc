@@ -2,7 +2,8 @@
  * @file DAQProcess class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
- * Licensing/copyright details are in the COPYING file that you should have received with this code.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
  */
 
 #include "app-framework/DAQProcess.hh"
@@ -15,11 +16,12 @@
 #include "TRACE/trace.h"
 #define TRACE_NAME "DAQProcess"
 
+#include <memory>
 #include <unordered_set>
 
 namespace appframework {
-ServiceManager* ServiceManager::handle_ = nullptr;
-ConfigurationManager* ConfigurationManager::handle_ = nullptr;
+std::unique_ptr<ServiceManager> ServiceManager::handle_ = nullptr;
+std::unique_ptr<ConfigurationManager> ConfigurationManager::handle_ = nullptr;
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
 
@@ -31,7 +33,9 @@ DAQProcess::DAQProcess(CommandLineInterpreter args) {
     ServiceManager::setup(args.servicePluginNames, args.otherOptions);
 }
 
-void DAQProcess::register_modules(std::unique_ptr<ModuleList> const& ml) { ml->ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_); }
+void DAQProcess::register_modules(ModuleList &ml) {
+  ml.ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_);
+}
 
 void DAQProcess::execute_command(std::string cmd) {
     std::unordered_set<std::string> user_module_list;
@@ -39,7 +43,8 @@ void DAQProcess::execute_command(std::string cmd) {
         user_module_list.insert(um.first);
     }
 
-    TLOG(TLVL_DEBUG) << "Executing Command " << cmd << " for UserModules defined in the CommandOrderMap";
+  TLOG(TLVL_DEBUG) << "Executing Command " << cmd
+                   << " for UserModules defined in the CommandOrderMap";
     if (commandOrderMap_.count(cmd)) {
         for (auto& moduleName : commandOrderMap_[cmd]) {
             if (userModuleMap_.count(moduleName)) {
@@ -48,15 +53,18 @@ void DAQProcess::execute_command(std::string cmd) {
             }
         }
     } else {
-        TLOG(TLVL_WARNING) << "Command " << cmd
-                           << " does not have an entry in the CommandOrderMap! UserModules will receive this command in an unspecified order!";
+    TLOG(TLVL_WARNING)
+        << "Command " << cmd
+        << " does not have an entry in the CommandOrderMap! UserModules will "
+           "receive this command in an unspecified order!";
     }
 
-    TLOG(TLVL_DEBUG) << "Executing Command " << cmd << " for all remaining UserModules";
+  TLOG(TLVL_DEBUG) << "Executing Command " << cmd
+                   << " for all remaining UserModules";
     for (auto const& moduleName : user_module_list) {
         userModuleMap_[moduleName]->execute_command(cmd);
     }
 }
 
-int DAQProcess::listen() { return CommandFacility::handle()->listen(this); }
+int DAQProcess::listen() { return CommandFacility::handle().listen(this); }
 }  // namespace appframework
