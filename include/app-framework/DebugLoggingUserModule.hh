@@ -22,7 +22,8 @@ namespace appframework {
  * @brief DebugLoggingUserModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingUserModule : public UserModule {
+class DebugLoggingUserModule : public UserModule
+{
 public:
   /**
    * @brief Logs the reception of the command

@@ -12,29 +12,31 @@
 
 namespace appframework {
 
-int QueryResponseCommandFacility::listen(DAQProcess* process) {
-    try {
-        bool keepGoing = true;
-        while (keepGoing) {
-            std::cout << "Enter a command" << std::endl;
-            std::string comm;
-            std::getline(std::cin, comm);
+int
+QueryResponseCommandFacility::listen(DAQProcess* process)
+{
+  try {
+    bool keepGoing = true;
+    while (keepGoing) {
+      std::cout << "Enter a command" << std::endl;
+      std::string comm;
+      std::getline(std::cin, comm);
 
-            if (comm == "quit") {
-                keepGoing = false;
-                break;
-            } else {
-                process->execute_command(comm);
-            }
-        }
-    } catch (...) {
-        return -1;
+      if (comm == "quit") {
+        keepGoing = false;
+        break;
+      } else {
+        process->execute_command(comm);
+      }
     }
+  } catch (...) {
+    return -1;
+  }
 
-    return 0;
+  return 0;
 }
 
 QueryResponseCommandFacility::~QueryResponseCommandFacility() = default;
-}  // namespace appframework
+} // namespace appframework
 
 DEFINE_DUNE_COMMAND_FACILITY(appframework::QueryResponseCommandFacility)

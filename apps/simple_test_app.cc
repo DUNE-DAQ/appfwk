@@ -13,23 +13,29 @@
 
 namespace appframework {
 
-class simple_test_app_ModuleList : public ModuleList {
-    // Inherited via ModuleList
-  void ConstructGraph(BufferMap &buffer_map, UserModuleMap &user_module_map,
-                      CommandOrderMap &command_order_map) override {
-        user_module_map["debugLogger"].reset(new DebugLoggingUserModule());
-    }
+class simple_test_app_ModuleList : public ModuleList
+{
+  // Inherited via ModuleList
+  void ConstructGraph(BufferMap& buffer_map,
+                      UserModuleMap& user_module_map,
+                      CommandOrderMap& command_order_map) override
+  {
+    user_module_map["debugLogger"].reset(new DebugLoggingUserModule());
+  }
 };
-}  // namespace appframework
+} // namespace appframework
 
-int main(int argc, char* argv[]) {
-    
-    auto args = appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+int
+main(int argc, char* argv[])
+{
 
-    appframework::DAQProcess theDAQProcess(args);
+  auto args =
+    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+
+  appframework::DAQProcess theDAQProcess(args);
 
   appframework::simple_test_app_ModuleList ml;
-    theDAQProcess.register_modules(ml);
+  theDAQProcess.register_modules(ml);
 
-    return theDAQProcess.listen();
+  return theDAQProcess.listen();
 }

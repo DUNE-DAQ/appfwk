@@ -17,7 +17,8 @@
 
 namespace appframework {
 std::future<std::string>
-DebugLoggingUserModule::execute_command(std::string cmd) {
+DebugLoggingUserModule::execute_command(std::string cmd)
+{
   TLOG(TLVL_INFO) << "Executing command: " << cmd;
   return std::async([]() { return std::string("Success"); });
 }

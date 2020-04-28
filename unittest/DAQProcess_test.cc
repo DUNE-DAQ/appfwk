@@ -14,9 +14,10 @@
 
 BOOST_AUTO_TEST_SUITE(DAQProcess_test)
 
-BOOST_AUTO_TEST_CASE(Construct) {
-    appframework::CommandLineInterpreter args;
-    appframework::DAQProcess dp(args);
+BOOST_AUTO_TEST_CASE(Construct)
+{
+  appframework::CommandLineInterpreter args;
+  appframework::DAQProcess dp(args);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
