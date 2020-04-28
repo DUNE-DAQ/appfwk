@@ -14,7 +14,6 @@
 
 #include <chrono>
 #include <cstddef>
-#include <iostream>
 #include <utility>
 using std::size_t;
 
