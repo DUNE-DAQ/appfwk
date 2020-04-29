@@ -27,27 +27,44 @@ public:
   } /// bytes in buffer
 };
 
-template <class T, class DurationType = std::chrono::milliseconds>
-class BufferInput : virtual public Buffer<T> {
+template <class ValueType, class DurationType = std::chrono::milliseconds>
+class BufferInput : virtual public Buffer<ValueType> {
 
 public:
   template <typename U> void push(U &&t) {
     push_wait_for(std::forward<U>(t), DurationType(0));
   }
 
-  virtual void push_wait_for(T &&, const DurationType &) = 0;
+  virtual void push_wait_for(ValueType &&, const DurationType &) = 0;
 
-  void push_wait_for(const T &val, const DurationType &timeout) {
-    push_wait_for(T(val), timeout);
+  // To use the non-virtual push_wait_for which leaves its value
+  // argument unchanged, make sure to add 
+
+  // using BufferInput<ValueType,DurationType>::push_wait_for 
+
+  // in your derived class declaration (line above assumes you're
+  // using the same template parameter labels)
+
+  void push_wait_for(const ValueType &val, const DurationType &timeout) {
+    push_wait_for(ValueType(val), timeout);
   }
 };
 
-template <class T, class DurationType = std::chrono::milliseconds>
-class BufferOutput : virtual public Buffer<T> {
+template <class ValueType, class DurationType = std::chrono::milliseconds>
+class BufferOutput : virtual public Buffer<ValueType> {
 
 public:
-  T pop() { return pop_wait_for(DurationType(0)); }
-  virtual T pop_wait_for(const DurationType &) = 0;
+  ValueType pop() { return pop_wait_for(DurationType(0)); }
+
+  // To use the non-virtual pop_wait_for which leaves its value
+  // argument unchanged, make sure to add 
+
+  // using BufferOutput<ValueType,DurationType>::pop_wait_for;
+
+  // in your derived class declaration (line above assumes you're
+  // using the same template parameter labels)
+
+  virtual ValueType pop_wait_for(const DurationType &) = 0;
 };
 
 } // namespace appframework
