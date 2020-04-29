@@ -13,17 +13,35 @@
 #include "app-framework-base/Buffers/Buffer.hh"
 
 #include <atomic>
+#include <chrono>
+#include <condition_variable>
 #include <deque>
 #include <functional>
+#include <iostream>
 #include <mutex>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <type_traits>
 #include <unistd.h>
 #include <utility>
 
 namespace appframework {
 
-template <class T>
-class DequeBuffer : public BufferInput<T>, public BufferOutput<T> {
+template <class ValueType, class DurationType = std::chrono::milliseconds>
+class DequeBuffer : public BufferInput<ValueType, DurationType>,
+                    public BufferOutput<ValueType, DurationType> {
 public:
+  using value_type = ValueType;
+  using duration_type = DurationType;
+
+  // This is needed in order for all signatures of the functions of
+  // this name in the base class to be accessible here, given that a
+  // subset are overridden
+
+  using BufferOutput<ValueType, DurationType>::pop_wait_for;
+  using BufferInput<ValueType, DurationType>::push_wait_for;
+
   DequeBuffer();
 
   void Configure();
@@ -34,11 +52,13 @@ public:
   bool empty() const noexcept override { return size() == 0; }
   bool full() const noexcept override { return size() >= capacity(); }
 
-  int push(T &&); /// push one on, return new size if successful, -1 if not
-  T pop();        /// pop one off, return object
+  value_type pop_wait_for(const duration_type &)
+      override; // Throws std::runtime_error if a timeout occurs
+  void push_wait_for(value_type &&, const duration_type &)
+      override; // Throws std::runtime_error if a timeout occurs
 
-  // Delete the copy and move operations since member data instances
-  // of std::mutex and std::atomic aren't copyable or movable
+  // Delete the copy and move operations since various member data instances
+  // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
 
   DequeBuffer(const DequeBuffer &) = delete;
   DequeBuffer &operator=(const DequeBuffer &) = delete;
@@ -46,14 +66,13 @@ public:
   DequeBuffer &operator=(DequeBuffer &&) = delete;
 
 private:
-  std::deque<T> fDeque;
+  std::deque<value_type> fDeque;
   std::atomic<size_t> fSize = 0;
   size_t fCapacity;
 
   std::mutex fMutex;
-  size_t fRetryTime_ms;
-  size_t fPushRetries;
-  size_t fPopRetries;
+  std::condition_variable fNoLongerFull;
+  std::condition_variable fNoLongerEmpty;
 };
 
 #include "detail/DequeBuffer.icc"
