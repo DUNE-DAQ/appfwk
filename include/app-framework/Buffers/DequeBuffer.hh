@@ -13,6 +13,7 @@
 #include "app-framework-base/Buffers/Buffer.hh"
 
 #include <atomic>
+#include <cassert>
 #include <chrono>
 #include <condition_variable>
 #include <deque>
@@ -66,6 +67,8 @@ public:
   DequeBuffer &operator=(DequeBuffer &&) = delete;
 
 private:
+  void try_lock_for(std::unique_lock<std::mutex> &, const duration_type &);
+
   std::deque<value_type> fDeque;
   std::atomic<size_t> fSize = 0;
   size_t fCapacity;
