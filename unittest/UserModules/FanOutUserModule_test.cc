@@ -39,13 +39,13 @@ BOOST_AUTO_TEST_SUITE(FanOutUserModule_test)
 BOOST_AUTO_TEST_CASE(Construct)
 {
   auto buf = std::make_shared<appframework::DequeBuffer<int>>();
-  appframework::FanOutUserModule<int> foum(buf, { buf });
+  appframework::FanOutUserModule<int> foum("test", { buf }, { buf });
 }
 
 BOOST_AUTO_TEST_CASE(Configure)
 {
   auto buf = std::make_shared<appframework::DequeBuffer<int>>();
-  appframework::FanOutUserModule<int> foum(buf, { buf });
+  appframework::FanOutUserModule<int> foum("test", { buf }, { buf });
   foum.execute_command("configure");
 }
 
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   auto outputbuf2 =
     std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
   appframework::FanOutUserModule<NonCopyableType> foum(
-    inputbuf, { outputbuf1, outputbuf2 });
+    "test", { inputbuf }, { outputbuf1, outputbuf2 });
 
   // This test assumes RoundRobin mode. Once configurability is implemented,
   // we'll have to configure it appropriately.

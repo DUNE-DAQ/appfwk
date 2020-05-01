@@ -4,6 +4,7 @@ project(app-framework)
 set(CMAKE_CXX_STANDARD 17)
 
 find_package(TRACE 3.15.0 REQUIRED)
+find_package(nlohmann_json 3.2.0 REQUIRED)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_NO_BOOST_CMAKE ON)

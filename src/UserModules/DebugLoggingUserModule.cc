@@ -23,3 +23,5 @@ DebugLoggingUserModule::execute_command(std::string cmd)
   return std::async([]() { return std::string("Success"); });
 }
 } // namespace appframework
+
+DEFINE_DUNE_USER_MODULE(appframework::DebugLoggingUserModule)

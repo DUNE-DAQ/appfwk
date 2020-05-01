@@ -11,14 +11,11 @@
 
 #include "app-framework/Buffers/DequeBuffer.hh"
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/QueryResponseCommandFacility.hh"
 #include "app-framework/UserModules/FakeDataConsumerUserModule.hh"
 #include "app-framework/UserModules/FakeDataProducerUserModule.hh"
 #include "app-framework/UserModules/FanOutUserModule.hh"
 
 namespace appframework {
-std::unique_ptr<CommandFacility> CommandFacility::handle_ =
-  std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
 
 class producer_consumer_test_app_ModuleList : public ModuleList
 {
@@ -38,13 +35,15 @@ class producer_consumer_test_app_ModuleList : public ModuleList
     buffer_map["fanOutToConsumer2"] = fanOutToConsumer2;
 
     user_module_map["producer"].reset(
-      new FakeDataProducerUserModule(producerToFanOut));
+      new FakeDataProducerUserModule("prod", {}, { producerToFanOut }));
     user_module_map["fanOut"].reset(new FanOutUserModule<std::vector<int>>(
-      producerToFanOut, { fanOutToConsumer1, fanOutToConsumer2 }));
+      "fanOut",
+      { producerToFanOut },
+      { fanOutToConsumer1, fanOutToConsumer2 }));
     user_module_map["consumer1"].reset(
-      new FakeDataConsumerUserModule(fanOutToConsumer1, "C1"));
+      new FakeDataConsumerUserModule("C1", { fanOutToConsumer1 }, {}));
     user_module_map["consumer2"].reset(
-      new FakeDataConsumerUserModule(fanOutToConsumer2, "C2"));
+      new FakeDataConsumerUserModule("C2", { fanOutToConsumer2 }, {}));
 
     command_order_map["start"] = {
       "consumer1", "consumer2", "fanOut", "producer"
@@ -57,10 +56,9 @@ class producer_consumer_test_app_ModuleList : public ModuleList
 int
 main(int argc, char* argv[])
 {
-  std::list<std::string> args;
-  for (int ii = 1; ii < argc; ++ii) {
-    args.push_back(std::string(argv[ii]));
-  }
+
+  auto args =
+    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
   appframework::DAQProcess theDAQProcess(args);
 

@@ -31,10 +31,9 @@ template<typename DATA_TYPE>
 class FanOutUserModule : public UserModule
 {
 public:
-  FanOutUserModule(
-    std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer,
-    std::initializer_list<std::shared_ptr<BufferInput<DATA_TYPE>>>
-      outputBuffers);
+  FanOutUserModule(std::string name,
+                   std::vector<std::shared_ptr<BufferI>> inputs,
+                   std::vector<std::shared_ptr<BufferI>> outputs);
 
   /**
    * @brief Logs the reception of the command
@@ -85,6 +84,6 @@ private:
 };
 } // namespace appframework
 
-#include "impl/FanOutUserModule.icc"
+#include "detail/FanOutUserModule.icc"
 
 #endif // APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH

@@ -29,8 +29,9 @@ namespace appframework {
 class FakeDataProducerUserModule : public UserModule
 {
 public:
-  FakeDataProducerUserModule(
-    std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer);
+  FakeDataProducerUserModule(std::string name,
+                             std::vector<std::shared_ptr<BufferI>> inputs,
+                             std::vector<std::shared_ptr<BufferI>> outputs);
 
   std::future<std::string> execute_command(std::string cmd) override;
 

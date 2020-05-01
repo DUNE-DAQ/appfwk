@@ -25,6 +25,12 @@ namespace appframework {
 class DebugLoggingUserModule : public UserModule
 {
 public:
+  DebugLoggingUserModule(std::string name,
+                         std::vector<std::shared_ptr<BufferI>> inputs,
+                         std::vector<std::shared_ptr<BufferI>> outputs)
+    : UserModule(name, inputs, outputs)
+  {}
+
   /**
    * @brief Logs the reception of the command
    * @param cmd Command from DAQProcess

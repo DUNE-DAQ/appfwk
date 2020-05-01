@@ -6,10 +6,26 @@
 #define TRACE_NAME "FakeDataProducer"
 
 appframework::FakeDataProducerUserModule::FakeDataProducerUserModule(
-  std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer)
-  : outputBuffer_(outputBuffer)
+  std::string name,
+  std::vector<std::shared_ptr<BufferI>> inputs,
+  std::vector<std::shared_ptr<BufferI>> outputs)
+  : UserModule(name, inputs,outputs)
   , thread_(std::bind(&FakeDataProducerUserModule::do_work, this))
-{}
+{
+  if (inputs.size()) {
+    throw std::runtime_error(
+      "Invalid Configuration for FakeDataProducerUserModule: Input buffer "
+      "provided!");
+  }
+  if (outputs.size() > 1) {
+    throw std::runtime_error("Invalid Configuration for "
+                             "FakeDataProducerUserModule: More than one Output "
+                             "provided!");
+  }
+
+  outputBuffer_.reset(
+    dynamic_cast<BufferInput<std::vector<int>>*>(&*outputs_[0]));
+}
 
 std::future<std::string>
 appframework::FakeDataProducerUserModule::execute_command(std::string cmd)
@@ -97,3 +113,5 @@ appframework::FakeDataProducerUserModule::do_work()
     counter++;
   }
 }
+
+DEFINE_DUNE_USER_MODULE(appframework::FakeDataProducerUserModule)

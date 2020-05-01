@@ -7,12 +7,26 @@
 #define TRACE_NAME "FakeDataConsumer"
 
 appframework::FakeDataConsumerUserModule::FakeDataConsumerUserModule(
-  std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer,
-  std::string id)
-  : thread_(std::bind(&FakeDataConsumerUserModule::do_work, this))
-  , id_(id)
-  , inputBuffer_(inputBuffer_)
-{}
+  std::string name,
+  std::vector<std::shared_ptr<BufferI>> inputs,
+  std::vector<std::shared_ptr<BufferI>> outputs)
+  : UserModule(name, inputs,outputs)
+    ,thread_(std::bind(&FakeDataConsumerUserModule::do_work, this))
+{ 
+if (outputs.size()) {
+    throw std::runtime_error(
+      "Invalid Configuration for FakeDataConsumerUserModule: Output buffer "
+      "provided!");
+}
+if (inputs.size() > 1) {
+  throw std::runtime_error(
+    "Invalid Configuration for FakeDataConsumerUserModule: More than one Input "
+    "provided!");
+}
+
+inputBuffer_.reset( dynamic_cast<BufferOutput<std::vector<int>>*>(&*inputs_[0]));
+
+}
 
 std::future<std::string>
 appframework::FakeDataConsumerUserModule::execute_command(std::string cmd)
@@ -80,26 +94,26 @@ appframework::FakeDataConsumerUserModule::do_work()
   int fail_count = 0;
   while (thread_.thread_running()) {
     if (!inputBuffer_->empty()) {
-      TLOG(TLVL_DEBUG) << getId() << "Going to receive data from inputBuffer";
+      TLOG(TLVL_DEBUG) << instance_name_ << "Going to receive data from inputBuffer";
       auto vec = inputBuffer_->pop();
-      TLOG(TLVL_DEBUG) << getId() << "Received vector of size " << vec.size();
+      TLOG(TLVL_DEBUG) << instance_name_ << "Received vector of size " << vec.size();
 
       bool failed = false;
 
-      TLOG(TLVL_DEBUG) << getId() << "Starting processing loop";
-      TLOG(TLVL_INFO) << getId() << "Received vector " << counter << ": "
+      TLOG(TLVL_DEBUG) << instance_name_ << "Starting processing loop";
+      TLOG(TLVL_INFO) << instance_name_ << "Received vector " << counter << ": "
                       << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
           if (ii != 0) {
             TLOG(TLVL_WARNING)
-              << getId() << "Error in received vector " << counter
+              << instance_name_ << "Error in received vector " << counter
               << ", position " << ii << ": Expected " << current_int
               << ", received " << point;
             failed = true;
           } else {
-            TLOG(TLVL_INFO) << getId() << "Jump detected!";
+            TLOG(TLVL_INFO) << instance_name_ << "Jump detected!";
           }
           current_int = point;
         }
@@ -107,7 +121,7 @@ appframework::FakeDataConsumerUserModule::do_work()
           current_int = starting_int_;
         ++ii;
       }
-      TLOG(TLVL_DEBUG) << getId()
+      TLOG(TLVL_DEBUG) << instance_name_
                        << "Done with processing loop, failed=" << failed;
       if (failed)
         fail_count++;
@@ -118,6 +132,8 @@ appframework::FakeDataConsumerUserModule::do_work()
     }
   }
 
-  TLOG(TLVL_INFO) << getId() << "Processed " << counter << " vectors with "
+  TLOG(TLVL_INFO) << instance_name_ << "Processed " << counter << " vectors with "
                   << fail_count << " failures.";
 }
+
+DEFINE_DUNE_USER_MODULE(appframework::FakeDataConsumerUserModule)

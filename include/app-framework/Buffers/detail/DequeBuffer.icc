@@ -1,7 +1,14 @@
 
-template <class T> DequeBuffer<T>::DequeBuffer() { Configure(); }
+template<class T>
+DequeBuffer<T>::DequeBuffer()
+{
+  Configure();
+}
 
-template <class T> void DequeBuffer<T>::Configure() {
+template<class T>
+void
+DequeBuffer<T>::Configure()
+{
 
   this->fAttributes.isBounded = true;
   this->fAttributes.isSearchable = false;
@@ -23,7 +30,10 @@ template <class T> void DequeBuffer<T>::Configure() {
   fPopRetries = this->get_pop_timeout() / fRetryTime_ms;
 }
 
-template <class T> int DequeBuffer<T>::push(T &&obj) {
+template<class T>
+int
+DequeBuffer<T>::push(T&& obj)
+{
   int n_retries = 0;
   while (full()) {
     if (n_retries == fPushRetries) {
@@ -38,17 +48,20 @@ template <class T> int DequeBuffer<T>::push(T &&obj) {
   if (full())
     throw std::runtime_error("Full after check? Another thread accessing?");
   std::lock_guard<std::mutex> lck(fMutex);
-  fDeque.emplace_back(obj);
+  fDeque.push_back(std::move(obj));
   fSize++;
   return size();
 }
 
-template <class T> T DequeBuffer<T>::pop() {
+template<class T>
+T
+DequeBuffer<T>::pop()
+{
   int n_retries = 0;
   while (empty()) {
     if (n_retries == fPopRetries) {
       throw std::runtime_error(
-          "No Data: Reached Max Pop Retries in DequeBuffer");
+        "No Data: Reached Max Pop Retries in DequeBuffer");
       // return -1;
     }
     ++n_retries;

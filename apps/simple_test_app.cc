@@ -20,7 +20,8 @@ class simple_test_app_ModuleList : public ModuleList
                       UserModuleMap& user_module_map,
                       CommandOrderMap& command_order_map) override
   {
-    user_module_map["debugLogger"].reset(new DebugLoggingUserModule());
+    user_module_map["debugLogger"].reset(
+      new DebugLoggingUserModule("debugLogger", {}, {}));
   }
 };
 } // namespace appframework

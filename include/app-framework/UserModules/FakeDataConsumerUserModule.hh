@@ -29,9 +29,9 @@ namespace appframework {
 class FakeDataConsumerUserModule : public UserModule
 {
 public:
-  FakeDataConsumerUserModule(
-    std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer,
-    std::string id = "");
+  FakeDataConsumerUserModule(std::string name,
+             std::vector<std::shared_ptr<BufferI>> inputs,
+             std::vector<std::shared_ptr<BufferI>> outputs);
 
   std::future<std::string> execute_command(std::string cmd) override;
 
@@ -49,8 +49,6 @@ private:
   size_t nIntsPerVector_;
   int starting_int_;
   int ending_int_;
-  std::string id_;
-  std::string getId() { return id_ != "" ? id_ + ": " : ""; }
   std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer_;
 };
 } // namespace appframework
