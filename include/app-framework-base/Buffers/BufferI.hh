@@ -9,8 +9,26 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_BUFFERS_BUFFERI_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_BUFFERS_BUFFERI_HH_
 
+#include <memory>
 #include <cstddef>
-using std::size_t;
+
+#include "cetlib/BasicPluginFactory.h"
+#include "cetlib/compiler_macros.h"
+
+
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START                                            \
+  extern "C"                                                                   \
+  {
+#endif
+
+#define DEFINE_DUNE_BUFFER(klass)                                    \
+  EXTERN_C_FUNC_DECLARE_START                                                  \
+  std::shared_ptr<appframework::BufferI> make()                        \
+  {                                                                            \
+    return std::shared_ptr<appframework::BufferI>(new klass());        \
+  }                                                                            \
+  }
 
 namespace appframework {
 /**
@@ -54,6 +72,14 @@ public:
 protected:
   BufferAttributes fAttributes; /// buffer attributes
 };
+
+inline std::shared_ptr<BufferI>
+makeBuffer(std::string const& buffer_name)
+{
+  static cet::BasicPluginFactory bpf("duneBuffer", "make");
+
+  return bpf.makePlugin<std::shared_ptr<BufferI>>(buffer_name);
+}
 
 } // namespace appframework
 

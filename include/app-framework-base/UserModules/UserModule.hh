@@ -22,6 +22,28 @@
 #include <future>
 #include <string>
 
+#include "cetlib/BasicPluginFactory.h"
+#include "cetlib/compiler_macros.h"
+
+#include "app-framework-base/Buffers/Buffer.hh"
+
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START                                            \
+  extern "C"                                                                   \
+  {
+#endif
+
+#define DEFINE_DUNE_USER_MODULE(klass)                                         \
+  EXTERN_C_FUNC_DECLARE_START                                                  \
+  std::unique_ptr<appframework::UserModule> make(                              \
+    std::string n,                                                             \
+    std::vector<std::shared_ptr<appframework::BufferI>> i,                     \
+    std::vector<std::shared_ptr<appframework::BufferI>> o)                     \
+  {                                                                            \
+    return std::unique_ptr<appframework::UserModule>(new klass(n, i, o));      \
+  }                                                                            \
+  }
+
 namespace appframework {
 /**
  * @brief The UserModule class is a set of code which performs a specific task.
@@ -33,6 +55,14 @@ namespace appframework {
 class UserModule
 {
 public:
+  UserModule(std::string name,
+             std::vector<std::shared_ptr<BufferI>> inputs,
+             std::vector<std::shared_ptr<BufferI>> outputs)
+    : instance_name_(name)
+    , inputs_(inputs)
+    , outputs_(outputs)
+  {}
+
   /**
    * @brief Execute a command in this UserModule
    * @param cmd The command from CCM
@@ -45,7 +75,24 @@ public:
    * indicating this result.
    */
   virtual std::future<std::string> execute_command(std::string cmd) = 0;
+
+protected:
+  std::string instance_name_;
+  std::vector<std::shared_ptr<BufferI>> inputs_;
+  std::vector<std::shared_ptr<BufferI>> outputs_;
 };
+
+inline std::unique_ptr<UserModule>
+makeModule(std::string const& module_name,
+           std::string const& instance_name,
+           std::vector<std::shared_ptr<BufferI>> inputs,
+           std::vector<std::shared_ptr<BufferI>> outputs)
+{
+  static cet::BasicPluginFactory bpf("duneUserModule", "make");
+
+  return bpf.makePlugin<std::unique_ptr<UserModule>>(
+    module_name, instance_name, inputs, outputs);
+}
 } // namespace appframework
 
 #endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULE_HH_
