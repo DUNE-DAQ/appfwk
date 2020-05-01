@@ -6,7 +6,7 @@
  * received with this code.
  */
 
-#include "app-framework/DebugLoggingUserModule.hh"
+#include "app-framework/UserModules/DebugLoggingUserModule.hh"
 
 #include "app-framework-base/Services/Logger.hh"
 #include "app-framework-base/UserModules/UserModule.hh"

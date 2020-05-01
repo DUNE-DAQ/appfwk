@@ -6,5 +6,7 @@ if(Boost_FOUND)
 target_compile_definitions(DAQProcess_test PRIVATE "BOOST_TEST_DYN_LINK=1")
     target_include_directories(DAQProcess_test PRIVATE ${Boost_INCLUDE_DIRS})
     add_test(NAME DAQProcess_test COMMAND DAQProcess_test)
+
+    add_subdirectory(UserModules)
 endif()
 
