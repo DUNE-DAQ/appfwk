@@ -10,7 +10,7 @@
  * received with this code.
  */
 
-#include "app-framework-base/Buffers/Buffer.hh"
+#include "app-framework-base/Buffers/Queue.hh"
 
 #include <atomic>
 #include <cassert>
@@ -30,8 +30,8 @@
 namespace appframework {
 
 template <class ValueType, class DurationType = std::chrono::milliseconds>
-class DequeBuffer : public BufferInput<ValueType, DurationType>,
-                    public BufferOutput<ValueType, DurationType> {
+class DequeBuffer : public QueueSink<ValueType, DurationType>,
+                    public QueueSource<ValueType, DurationType> {
 public:
   using value_type = ValueType;
   using duration_type = DurationType;
@@ -40,8 +40,8 @@ public:
   // this name in the base class to be accessible here, given that a
   // subset are overridden
 
-  using BufferOutput<ValueType, DurationType>::pop_wait_for;
-  using BufferInput<ValueType, DurationType>::push_wait_for;
+  using QueueSource<ValueType, DurationType>::pop_wait_for;
+  using QueueSink<ValueType, DurationType>::push_wait_for;
 
   DequeBuffer();
 
