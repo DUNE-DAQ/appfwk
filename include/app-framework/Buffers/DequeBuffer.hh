@@ -40,8 +40,7 @@ public:
   // this name in the base class to be accessible here, given that a
   // subset are overridden
 
-  using BufferOutput<ValueType, DurationType>::pop_wait_for;
-  using BufferInput<ValueType, DurationType>::push_wait_for;
+  using BufferInput<ValueType, DurationType>::push;
 
   DequeBuffer();
 
@@ -53,9 +52,9 @@ public:
   bool empty() const noexcept override { return size() == 0; }
   bool full() const noexcept override { return size() >= capacity(); }
 
-  value_type pop_wait_for(const duration_type &)
+  value_type pop(const duration_type & timeout)
       override; // Throws std::runtime_error if a timeout occurs
-  void push_wait_for(value_type &&, const duration_type &)
+  void push(value_type && val, const duration_type & timeout)
       override; // Throws std::runtime_error if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
