@@ -1,3 +1,11 @@
+/**
+ *
+ * @file DequeBuffer class Unit Tests
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
+ */
 
 #include "app-framework/Buffers/DequeBuffer.hh"
 
@@ -11,26 +19,29 @@
 // cases
 
 namespace {
-  appframework::DequeBuffer<int> buffer;
+appframework::DequeBuffer<int> buffer;
 
-  constexpr int max_testable_capacity = 1000000000;
-  constexpr double fractional_timeout_tolerance = 0.1;
+constexpr int max_testable_capacity = 1000000000;
+constexpr double fractional_timeout_tolerance = 0.1;
 
 // See
 // https://www.boost.org/doc/libs/1_73_0/libs/test/doc/html/boost_test/tests_organization/enabling.html
-// to better understand CapacityChecker
+// to better understand CapacityChecker.
 
 struct CapacityChecker {
 
-  boost::test_tools::assertion_result operator()(boost::unit_test::test_unit_id) {
+  boost::test_tools::assertion_result
+  operator()(boost::unit_test::test_unit_id) {
     if (buffer.capacity() <= max_testable_capacity) {
       return true;
     } else {
       boost::test_tools::assertion_result result(false);
-      result.message() << "Capacity of DequeBuffer (" << buffer.capacity() << ") larger than max value this suite tests (" << max_testable_capacity << ")";
+      result.message() << "Capacity of DequeBuffer (" << buffer.capacity()
+                       << ") larger than max value this suite tests ("
+                       << max_testable_capacity << ")";
       return result;
     }
-}
+  }
 };
 
 } // namespace ""
@@ -45,35 +56,48 @@ BOOST_AUTO_TEST_CASE(sanity_checks) {
 
   auto popped_value = buffer.pop();
   BOOST_REQUIRE_EQUAL(popped_value, 999);
-
 }
 
-BOOST_AUTO_TEST_CASE(capacity_checks, * boost::unit_test::precondition(CapacityChecker()))
-{
- 
-  // TODO, May-6-2020, John Freeman (jcfree@fnal.gov)
-  // In the next week, figure out if it makes sense beyond this test to create an insert() function which takes iterators
+BOOST_AUTO_TEST_CASE(capacity_checks,
+                     *boost::unit_test::precondition(CapacityChecker()) *
+                         boost::unit_test::depends_on("sanity_checks")) {
 
-  while (buffer.size() < buffer.capacity()) {
-    buffer.push(-1);
+  // TODO, May-6-2020, John Freeman (jcfree@fnal.gov)
+  // In the next week, figure out if it makes sense beyond this test to create
+  // an insert() function which takes iterators
+
+  try {
+    while (buffer.size() < buffer.capacity()) {
+      buffer.push(-1);
+    }
+  } catch (const std::runtime_error &err) {
+    BOOST_WARN_MESSAGE(true, err.what());
+    BOOST_TEST(false, "Exception thrown in call to DequeBuffer::push(); unable "
+                      "to fill the buffer to its alleged capacity of "
+                          << buffer.capacity() << " elements");
   }
 
-  BOOST_REQUIRE( buffer.full() );
+  BOOST_REQUIRE(buffer.full());
 
+  // Push onto an already-full buffer
   auto starttime = std::chrono::steady_clock::now();
   try {
     buffer.push(-1);
-  } catch (...) { // NO LINT (We legitimately don't care about any exceptions since we're testing)
+  } catch (...) { // NOLINT (for this test, we legitimately don't care about any
+                  // thrown exceptions)
   }
   auto push_duration = std::chrono::steady_clock::now() - starttime;
 
-  // Trying to push an element onto a buffer at capacity shouldn't change its size
+  // Trying to push an element onto a buffer at capacity shouldn't change its
+  // size
   BOOST_REQUIRE_EQUAL(buffer.size(), buffer.capacity());
 
   const double push_timeout_in_milliseconds = 1000;
-  const double fraction_of_timeout_used = std::chrono::duration_cast<std::chrono::milliseconds>(push_duration).count() / push_timeout_in_milliseconds;
+  const double fraction_of_timeout_used =
+      std::chrono::duration_cast<std::chrono::milliseconds>(push_duration)
+          .count() /
+      push_timeout_in_milliseconds;
 
   BOOST_REQUIRE_GT(fraction_of_timeout_used, 1 - fractional_timeout_tolerance);
   BOOST_REQUIRE_LT(fraction_of_timeout_used, 1 + fractional_timeout_tolerance);
-
 }
