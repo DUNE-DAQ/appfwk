@@ -1,5 +1,4 @@
 
-add_executable(DequeBuffer_t DequeBuffer_t.cc)
 
 add_executable(DequeBuffer_concurrency_check DequeBuffer_concurrency_check.cc)
 target_link_libraries(DequeBuffer_concurrency_check -lpthread)
