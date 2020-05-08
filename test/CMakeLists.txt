@@ -1,4 +1,5 @@
 
 
-add_executable(DequeBuffer_concurrency_check DequeBuffer_concurrency_check.cc)
-target_link_libraries(DequeBuffer_concurrency_check -lpthread)
+add_executable(buffer_concurrency_check buffer_concurrency_check.cc)
+target_link_libraries(buffer_concurrency_check pthread ${Boost_PROGRAM_OPTIONS_LIBRARY} )
+

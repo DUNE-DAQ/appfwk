@@ -1,8 +1,9 @@
 /**
  *
- * @file A low-level DequeBuffer test in which we use multiple threads
- * to try reading elements from a DequeBuffer while writing elements
- * with another thread
+ * @file A low-level test of buffer classes which inherit both from
+ * BufferOutput and BufferInput in which we use multiple threads to
+ * try reading elements from a buffer while writing elements with
+ * another thread
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -13,8 +14,12 @@
 
 #include "TRACE/trace.h"
 
+#include <boost/program_options.hpp>
+namespace bpo = boost::program_options;
+
 #include <chrono>
 #include <future>
+#include <iostream>
 #include <random>
 #include <sstream>
 #include <stdexcept>
@@ -22,7 +27,13 @@
 
 namespace {
 
-appframework::DequeBuffer<int> buffer;
+  // TODO John Freeman, May-8-2020 (jcfree@fnal.gov)
+
+  // Will replace use of DequeBuffer in the unique_ptr with a base
+  // class which supports both push and pop operations if and when one
+  // becomes available
+
+  std::unique_ptr<appframework::DequeBuffer<int>> buffer = nullptr;
 
 constexpr int nelements = 100;
 constexpr int n_removing_threads = 5;
@@ -44,16 +55,16 @@ void add_things() {
 
   for (int i = 0; i < nelements; ++i) {
     pause();
-    if (!buffer.full()) {
+    if (!buffer->full()) {
       try {
-        buffer.push(int(i)); // NOLINT, we're in-place-constructing an rvalue
+        buffer->push(int(i)); // NOLINT, we're in-place-constructing an rvalue
                              // here, not casting
       } catch (const std::runtime_error &err) {
         TLOG(TLVL_WARNING) << "Exception thrown during push attempt: "
                            << err.what();
       }
 
-      int size = buffer.size();
+      int size = buffer->size();
 
       if (size > max_buffer_size) {
         max_buffer_size = size;
@@ -67,12 +78,12 @@ void remove_things() {
   for (int i = 0; i < nelements / n_removing_threads; ++i) {
     int val = -999;
     try {
-      val = buffer.pop();
+      val = buffer->pop();
     } catch (const std::runtime_error &e) {
       TLOG(TLVL_WARNING) << "Exception thrown during pop attempt: " << e.what();
     }
 
-    int size = buffer.size();
+    int size = buffer->size();
 
     if (size > max_buffer_size) {
       max_buffer_size = size;
@@ -84,7 +95,37 @@ void remove_things() {
 
 } // namespace ""
 
-int main() {
+int main(int argc, char* argv[]) {
+
+  if (argc == 1) {
+    TLOG(TLVL_WARNING) << "Call this program with the --help option to see how to use it";
+    return 1;
+  }
+
+  std::ostringstream descstr;
+  descstr << argv[0] << " known arguments ";
+
+  bpo::options_description desc(descstr.str());
+  desc.add_options()("bufferType,b", bpo::value<std::string>(), "Type of buffer instance you want to test (supported types are: DequeBuffer)")
+    ("help,h", "produce help message");
+
+  bpo::variables_map vm;
+  bpo::store(bpo::parse_command_line(argc, argv, desc), vm);
+  bpo::notify(vm);    
+  
+  if (vm.count("help")) {
+    std::cout << desc << "\n";  // NOLINT (TRACE prints an unnecessary warning suggesting that a streamer be implemented for boost::program_options::options_description)
+    return 0;
+  }
+
+  const std::string buffer_type = vm["bufferType"].as<std::string>();
+  if (buffer_type == "DequeBuffer") {
+    buffer.reset(new appframework::DequeBuffer<int>);
+  } else {
+    TLOG(TLVL_ERROR) << "Unknown buffer type \"" << buffer_type << "\" requested for testing";
+    return 1;
+  }
+
 
   TLOG(TLVL_INFO)
       << "Will try pushing " << nelements
@@ -107,7 +148,7 @@ int main() {
 
   TLOG(TLVL_INFO) << "Max buffer size during running was " << max_buffer_size;
   TLOG(TLVL_INFO) << "Final buffer size at the end of running is "
-                  << buffer.size();
+                  << buffer->size();
 
   return 0;
 }
