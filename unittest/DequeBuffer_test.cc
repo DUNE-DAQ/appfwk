@@ -58,6 +58,39 @@ BOOST_AUTO_TEST_CASE(sanity_checks) {
   BOOST_REQUIRE_EQUAL(popped_value, 999);
 }
 
+BOOST_AUTO_TEST_CASE(empty_checks,
+                     *boost::unit_test::depends_on("sanity_checks")) {
+
+  try {
+    while (!buffer.empty()) {
+      buffer.pop();
+    }
+  } catch (const std::runtime_error &err) {
+    BOOST_WARN_MESSAGE(true, err.what());
+    BOOST_TEST(false, "Exception thrown in call to DequeBuffer::pop(); unable "
+                      "to empty the buffer");
+  }
+
+  BOOST_REQUIRE(buffer.empty());
+
+  // pop off of an empty buffer
+
+  const size_t pop_timeout_in_milliseconds = 100;
+  buffer.set_pop_timeout(pop_timeout_in_milliseconds);
+
+  auto starttime = std::chrono::steady_clock::now();
+  BOOST_REQUIRE_THROW(buffer.pop(), std::runtime_error);
+  auto pop_duration = std::chrono::steady_clock::now() - starttime;
+
+  const double fraction_of_timeout_used =
+      std::chrono::duration_cast<std::chrono::milliseconds>(pop_duration)
+          .count() /
+      static_cast<double>(pop_timeout_in_milliseconds);
+
+  BOOST_REQUIRE_GT(fraction_of_timeout_used, 1 - fractional_timeout_tolerance);
+  BOOST_REQUIRE_LT(fraction_of_timeout_used, 1 + fractional_timeout_tolerance);
+}
+
 BOOST_AUTO_TEST_CASE(capacity_checks,
                      *boost::unit_test::precondition(CapacityChecker()) *
                          boost::unit_test::depends_on("sanity_checks")) {
@@ -80,6 +113,10 @@ BOOST_AUTO_TEST_CASE(capacity_checks,
   BOOST_REQUIRE(buffer.full());
 
   // Push onto an already-full buffer
+
+  const size_t push_timeout_in_milliseconds = 1000;
+  buffer.set_push_timeout(push_timeout_in_milliseconds);
+
   auto starttime = std::chrono::steady_clock::now();
   try {
     buffer.push(-1);
@@ -90,13 +127,13 @@ BOOST_AUTO_TEST_CASE(capacity_checks,
 
   // Trying to push an element onto a buffer at capacity shouldn't change its
   // size
+
   BOOST_REQUIRE_EQUAL(buffer.size(), buffer.capacity());
 
-  const double push_timeout_in_milliseconds = 1000;
   const double fraction_of_timeout_used =
       std::chrono::duration_cast<std::chrono::milliseconds>(push_duration)
           .count() /
-      push_timeout_in_milliseconds;
+      static_cast<double>(push_timeout_in_milliseconds);
 
   BOOST_REQUIRE_GT(fraction_of_timeout_used, 1 - fractional_timeout_tolerance);
   BOOST_REQUIRE_LT(fraction_of_timeout_used, 1 + fractional_timeout_tolerance);
