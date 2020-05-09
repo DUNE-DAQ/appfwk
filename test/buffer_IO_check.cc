@@ -5,7 +5,7 @@
  * of threads writing elements to a buffer while a user-settable
  * number of threads reads from the buffer
  *
- * Run "buffer_concurrency_check --help" to see options
+ * Run "buffer_IO_check --help" to see options
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -45,6 +45,10 @@ int avg_milliseconds_between_pushes = 5;
 int avg_milliseconds_between_pops = 5;
 
 std::atomic<size_t> max_buffer_size = 0;
+std::atomic<int> successful_pushes = 0;
+std::atomic<int> successful_pops = 0;
+
+double initial_capacity_used = 0;
 
 std::default_random_engine generator;
 std::unique_ptr<std::uniform_int_distribution<int>> push_distribution = nullptr;
@@ -61,6 +65,7 @@ void add_things() {
       try {
         buffer->push(int(i)); // NOLINT, we're in-place-constructing an rvalue
                               // here, not casting
+        successful_pushes++;
       } catch (const std::runtime_error &err) {
         TLOG(TLVL_WARNING) << "Exception thrown during push attempt: "
                            << err.what();
@@ -84,6 +89,7 @@ void remove_things() {
     int val = -999;
     try {
       val = buffer->pop();
+      successful_pops++;
     } catch (const std::runtime_error &e) {
       TLOG(TLVL_WARNING) << "Exception thrown during pop attempt: " << e.what();
     }
@@ -96,7 +102,7 @@ void remove_things() {
   }
 }
 
-} // namespace
+} // namespace ""
 
 int main(int argc, char *argv[]) {
 
@@ -109,19 +115,41 @@ int main(int argc, char *argv[]) {
   std::ostringstream descstr;
   descstr << argv[0] << " known arguments ";
 
+  std::ostringstream push_threads_desc;
+  push_threads_desc
+      << "# of threads you want pushing elements onto the buffer (default is "
+      << n_adding_threads << ")";
+
+  std::ostringstream pop_threads_desc;
+  pop_threads_desc
+      << "# of threads you want popping elements off the buffer (default is "
+      << n_removing_threads << ")";
+
+  std::ostringstream push_pause_desc;
+  push_pause_desc
+      << "average time in milliseconds between a thread's pushes (default is "
+      << avg_milliseconds_between_pushes << ")";
+
+  std::ostringstream pop_pause_desc;
+  pop_pause_desc
+      << "average time in milliseconds between a thread's pops (default is "
+      << avg_milliseconds_between_pops << ")";
+
+  std::ostringstream capacity_used_desc;
+  capacity_used_desc
+      << "fraction of the buffer's capacity filled at start (default is "
+      << initial_capacity_used << ")";
+
   bpo::options_description desc(descstr.str());
-  desc.add_options()("bufferType,b", bpo::value<std::string>(),
+  desc.add_options()("buffer_type", bpo::value<std::string>(),
                      "Type of buffer instance you want to test (supported "
                      "types are: DequeBuffer)")(
-      "push_threads", bpo::value<int>(),
-      "# of threads you want pushing elements onto the buffer")(
-      "pop_threads", bpo::value<int>(),
-      "# of threads you want popping elements off the buffer")(
-      "pause_between_pushes", bpo::value<int>(),
-      "average time in milliseconds between a thread's pushes")(
-      "pause_between_pops", bpo::value<int>(),
-      "average time in milliseconds between a thread's pops")(
-      "help,h", "produce help message");
+      "push_threads", bpo::value<int>(), push_threads_desc.str().c_str())(
+      "pop_threads", bpo::value<int>(), pop_threads_desc.str().c_str())(
+      "pause_between_pushes", bpo::value<int>(), push_pause_desc.str().c_str())(
+      "pause_between_pops", bpo::value<int>(), pop_pause_desc.str().c_str())(
+      "initial_capacity_used", bpo::value<double>(),
+      capacity_used_desc.str().c_str())("help,h", "produce help message");
 
   bpo::variables_map vm;
   bpo::store(bpo::parse_command_line(argc, argv, desc), vm);
@@ -134,7 +162,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  const std::string buffer_type = vm["bufferType"].as<std::string>();
+  const std::string buffer_type = vm["buffer_type"].as<std::string>();
   if (buffer_type == "DequeBuffer") {
     buffer.reset(new appframework::DequeBuffer<int>);
   } else {
@@ -159,6 +187,10 @@ int main(int argc, char *argv[]) {
     avg_milliseconds_between_pops = vm["pause_between_pops"].as<int>();
   }
 
+  if (vm.count("initial_capacity_used")) {
+    initial_capacity_used = vm["initial_capacity_used"].as<double>();
+  }
+
   push_distribution.reset(new std::uniform_int_distribution<int>(
       0, 2 * avg_milliseconds_between_pushes));
   pop_distribution.reset(new std::uniform_int_distribution<int>(
@@ -172,6 +204,23 @@ int main(int argc, char *argv[]) {
       << n_removing_threads
       << " thread(s) popping elements, each thread has an average time of "
       << avg_milliseconds_between_pops << " milliseconds between pops";
+
+  if (initial_capacity_used > 0) {
+    int max_capacity = 1000000;
+
+    if (buffer->capacity() <= max_capacity) {
+      int elements_to_begin_with =
+          static_cast<int>(initial_capacity_used * buffer->capacity());
+      for (int i_e = 0; i_e < elements_to_begin_with; ++i_e) {
+        buffer->push(-1);
+      }
+    } else {
+      std::ostringstream msg;
+      msg << "Since capacity of buffer exceeds " << max_capacity
+          << ", the initial fractional used capacity of the buffer must be 0";
+      throw std::domain_error(msg.str());
+    }
+  }
 
   std::vector<std::thread> adders;
   std::vector<std::thread> removers;
@@ -195,6 +244,8 @@ int main(int argc, char *argv[]) {
   TLOG(TLVL_INFO) << "Max buffer size during running was " << max_buffer_size;
   TLOG(TLVL_INFO) << "Final buffer size at the end of running is "
                   << buffer->size();
+  TLOG(TLVL_INFO) << "# of successful pushes: " << successful_pushes;
+  TLOG(TLVL_INFO) << "# of successful pops: " << successful_pops;
 
   return 0;
-}
+} // NOLINT
