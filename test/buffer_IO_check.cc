@@ -35,6 +35,7 @@ namespace {
 // class which supports both push and pop operations if and when one
 // becomes available
 
+std::string buffer_type = "DequeBuffer";
 std::unique_ptr<appframework::DequeBuffer<int>> buffer = nullptr;
 
 constexpr int nelements = 100;
@@ -45,8 +46,15 @@ int avg_milliseconds_between_pushes = 5;
 int avg_milliseconds_between_pops = 5;
 
 std::atomic<size_t> max_buffer_size = 0;
+
+std::atomic<int> push_attempts = 0;
+std::atomic<int> pop_attempts = 0;
 std::atomic<int> successful_pushes = 0;
 std::atomic<int> successful_pops = 0;
+std::atomic<int> timeout_pushes = 0;
+std::atomic<int> timeout_pops = 0;
+std::atomic<int> throw_pushes = 0;
+std::atomic<int> throw_pops = 0;
 
 double initial_capacity_used = 0;
 
@@ -59,39 +67,39 @@ void add_things() {
   for (int i = 0; i < nelements / n_adding_threads; ++i) {
 
     std::this_thread::sleep_for(
-        std::chrono::milliseconds((*push_distribution)(generator)));
+        std::chrono::microseconds((*push_distribution)(generator)));
 
-    if (!buffer->full()) {
-      try {
-        buffer->push(int(i)); // NOLINT, we're in-place-constructing an rvalue
-                              // here, not casting
-        successful_pushes++;
-      } catch (const std::runtime_error &err) {
-        TLOG(TLVL_WARNING) << "Exception thrown during push attempt: "
-                           << err.what();
-      }
-
-      int size = buffer->size();
-
-      if (size > max_buffer_size) {
-        max_buffer_size = size;
-      }
+    while (buffer->full()) {
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
-  }
-}
 
-void remove_things() {
+    push_attempts++;
 
-  std::this_thread::sleep_for(
-      std::chrono::milliseconds((*pop_distribution)(generator)));
-
-  for (int i = 0; i < nelements / n_removing_threads; ++i) {
-    int val = -999;
     try {
-      val = buffer->pop();
-      successful_pops++;
-    } catch (const std::runtime_error &e) {
-      TLOG(TLVL_WARNING) << "Exception thrown during pop attempt: " << e.what();
+      std::ostringstream msg;
+      msg << "Thread #" << std::this_thread::get_id()
+          << ": about to push value " << i << " onto buffer of size "
+          << buffer->size();
+      TLOG(TLVL_DEBUG) << msg.str();
+
+      auto starttime = std::chrono::steady_clock::now();
+      buffer->push(int(i)); // NOLINT, we're in-place-constructing an rvalue
+                            // here, not casting
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(
+              std::chrono::steady_clock::now() - starttime)
+              .count() < buffer->get_push_timeout()) {
+        successful_pushes++;
+      } else {
+        timeout_pushes++;
+      }
+      msg.str(std::string());
+      msg << "Thread #" << std::this_thread::get_id() << ": completed push";
+      TLOG(TLVL_DEBUG) << msg.str();
+
+    } catch (const std::runtime_error &err) {
+      TLOG(TLVL_WARNING) << "Exception thrown during push attempt: "
+                         << err.what();
+      throw_pushes++;
     }
 
     int size = buffer->size();
@@ -102,7 +110,54 @@ void remove_things() {
   }
 }
 
-} // namespace ""
+void remove_things() {
+
+  for (int i = 0; i < nelements / n_removing_threads; ++i) {
+
+    int size = buffer->size();
+
+    if (size > max_buffer_size) {
+      max_buffer_size = size;
+    }
+
+    std::this_thread::sleep_for(
+        std::chrono::microseconds((*pop_distribution)(generator)));
+
+    while (buffer->empty()) {
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
+    }
+
+    pop_attempts++;
+    int val = -999;
+    try {
+      std::ostringstream msg;
+      msg << "Thread #" << std::this_thread::get_id()
+          << ": about to pop from buffer of size " << buffer->size();
+      TLOG(TLVL_DEBUG) << msg.str();
+
+      auto starttime = std::chrono::steady_clock::now();
+      val = buffer->pop();
+
+      msg.str(std::string());
+      msg << "Thread #" << std::this_thread::get_id()
+          << ": completed pop, value is " << val;
+      TLOG(TLVL_DEBUG) << msg.str();
+
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(
+              std::chrono::steady_clock::now() - starttime)
+              .count() < buffer->get_pop_timeout()) {
+        successful_pops++;
+      } else {
+        timeout_pops++;
+      }
+    } catch (const std::runtime_error &e) {
+      TLOG(TLVL_WARNING) << "Exception thrown during pop attempt: " << e.what();
+      throw_pops++;
+    }
+  }
+}
+
+} // namespace
 
 int main(int argc, char *argv[]) {
 
@@ -142,7 +197,8 @@ int main(int argc, char *argv[]) {
 
   bpo::options_description desc(descstr.str());
   desc.add_options()("buffer_type", bpo::value<std::string>(),
-                     "Type of buffer instance you want to test (supported "
+                     "Type of buffer instance you want to test (default is "
+                     "DequeBuffer) (supported "
                      "types are: DequeBuffer)")(
       "push_threads", bpo::value<int>(), push_threads_desc.str().c_str())(
       "pop_threads", bpo::value<int>(), pop_threads_desc.str().c_str())(
@@ -162,7 +218,10 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  const std::string buffer_type = vm["buffer_type"].as<std::string>();
+  if (vm.count("buffer_type")) {
+    buffer_type = vm["buffer_type"].as<std::string>();
+  }
+
   if (buffer_type == "DequeBuffer") {
     buffer.reset(new appframework::DequeBuffer<int>);
   } else {
@@ -192,9 +251,9 @@ int main(int argc, char *argv[]) {
   }
 
   push_distribution.reset(new std::uniform_int_distribution<int>(
-      0, 2 * avg_milliseconds_between_pushes));
+      0, 2 * 1000 * avg_milliseconds_between_pushes));
   pop_distribution.reset(new std::uniform_int_distribution<int>(
-      0, 2 * avg_milliseconds_between_pops));
+      0, 2 * 1000 * avg_milliseconds_between_pops));
 
   TLOG(TLVL_INFO)
       << n_adding_threads
@@ -244,8 +303,13 @@ int main(int argc, char *argv[]) {
   TLOG(TLVL_INFO) << "Max buffer size during running was " << max_buffer_size;
   TLOG(TLVL_INFO) << "Final buffer size at the end of running is "
                   << buffer->size();
-  TLOG(TLVL_INFO) << "# of successful pushes: " << successful_pushes;
-  TLOG(TLVL_INFO) << "# of successful pops: " << successful_pops;
+  TLOG(TLVL_INFO) << push_attempts
+                  << " push attempts made: " << successful_pushes
+                  << " successful, " << timeout_pushes << " timeouts, "
+                  << throw_pushes << " exception throws";
+  TLOG(TLVL_INFO) << pop_attempts << " pop attempts made: " << successful_pops
+                  << " successful, " << timeout_pops << " timeouts, "
+                  << throw_pops << " exception throws";
 
   return 0;
 } // NOLINT
