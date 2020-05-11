@@ -53,8 +53,6 @@ BOOST_AUTO_TEST_CASE(sanity_checks) {
   BOOST_REQUIRE_EQUAL(buffer.size(), 0);
   BOOST_REQUIRE(buffer.empty());
 
-  BOOST_REQUIRE_THROW(buffer.pop(), std::runtime_error);
-
   auto starttime = std::chrono::steady_clock::now();
   buffer.push(999);
   auto push_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - starttime).count();
@@ -94,11 +92,11 @@ BOOST_AUTO_TEST_CASE(empty_checks,
   // pop off of an empty buffer
 
   const size_t pop_timeout_in_milliseconds = 100;
-  BOOST_TEST_MESSAGE("Setting the pop timeout on the buffer to " << pop_timeout_in_milliseconds << " ms");
+  BOOST_TEST_MESSAGE("Setting the pop timeout on the empty buffer to " << pop_timeout_in_milliseconds << " ms before attempting expected-to-fail pop");
   buffer.set_pop_timeout(pop_timeout_in_milliseconds);
 
   auto starttime = std::chrono::steady_clock::now();
-  BOOST_REQUIRE_THROW(buffer.pop(), std::runtime_error);
+  BOOST_CHECK_THROW(buffer.pop(), std::runtime_error);
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
 
   const double fraction_of_timeout_used =
@@ -106,8 +104,8 @@ BOOST_AUTO_TEST_CASE(empty_checks,
           .count() /
       static_cast<double>(pop_timeout_in_milliseconds);
 
-  BOOST_REQUIRE_GT(fraction_of_timeout_used, 1 - fractional_timeout_tolerance);
-  BOOST_REQUIRE_LT(fraction_of_timeout_used, 1 + fractional_timeout_tolerance);
+  BOOST_CHECK_GT(fraction_of_timeout_used, 1 - fractional_timeout_tolerance);
+  BOOST_CHECK_LT(fraction_of_timeout_used, 1 + fractional_timeout_tolerance);
 }
 
 BOOST_AUTO_TEST_CASE(capacity_checks,
@@ -134,26 +132,28 @@ BOOST_AUTO_TEST_CASE(capacity_checks,
   // Push onto an already-full buffer
 
   const size_t push_timeout_in_milliseconds = 1000;
+  BOOST_TEST_MESSAGE("Setting the push timeout on the at-capacity buffer to " << push_timeout_in_milliseconds << " ms before attempting expected-to-fail push");
   buffer.set_push_timeout(push_timeout_in_milliseconds);
 
   auto starttime = std::chrono::steady_clock::now();
   try {
     buffer.push(-1);
-  } catch (...) { // NOLINT (for this test, we legitimately don't care about any
-                  // thrown exceptions)
+  } catch (...) { // NOLINT (don't care whether or not a failed push results in an exception)
   }
   auto push_duration = std::chrono::steady_clock::now() - starttime;
 
   // Trying to push an element onto a buffer at capacity shouldn't change its
   // size
 
-  BOOST_REQUIRE_EQUAL(buffer.size(), buffer.capacity());
+  BOOST_CHECK_EQUAL(buffer.size(), buffer.capacity());
 
   const double fraction_of_timeout_used =
       std::chrono::duration_cast<std::chrono::milliseconds>(push_duration)
           .count() /
       static_cast<double>(push_timeout_in_milliseconds);
 
-  BOOST_REQUIRE_GT(fraction_of_timeout_used, 1 - fractional_timeout_tolerance);
-  BOOST_REQUIRE_LT(fraction_of_timeout_used, 1 + fractional_timeout_tolerance);
+  BOOST_CHECK_GT(fraction_of_timeout_used, 1 - fractional_timeout_tolerance);
+  BOOST_CHECK_LT(fraction_of_timeout_used, 1 + fractional_timeout_tolerance);
 }
+
+
