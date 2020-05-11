@@ -39,8 +39,8 @@ std::string buffer_type = "DequeBuffer";
 std::unique_ptr<appframework::DequeBuffer<int>> buffer = nullptr;
 
 constexpr int nelements = 100;
-int n_adding_threads = 2;
-int n_removing_threads = 2;
+int n_adding_threads = 1;
+int n_removing_threads = 1;
 
 int avg_milliseconds_between_pushes = 5;
 int avg_milliseconds_between_pops = 5;
@@ -161,12 +161,6 @@ void remove_things() {
 
 int main(int argc, char *argv[]) {
 
-  if (argc == 1) {
-    TLOG(TLVL_WARNING)
-        << "Call this program with the --help option to see how to use it";
-    return 1;
-  }
-
   std::ostringstream descstr;
   descstr << argv[0] << " known arguments ";
 
@@ -232,22 +226,42 @@ int main(int argc, char *argv[]) {
 
   if (vm.count("push_threads")) {
     n_adding_threads = vm["push_threads"].as<int>();
+
+    if (n_adding_threads <= 0) {
+      throw std::domain_error("# of pushing threads must be a positive integer");
+    }
   }
 
   if (vm.count("pop_threads")) {
     n_removing_threads = vm["pop_threads"].as<int>();
+
+    if (n_removing_threads <= 0) {
+      throw std::domain_error("# of popping threads must be a positive integer");
+    }
   }
 
   if (vm.count("pause_between_pushes")) {
     avg_milliseconds_between_pushes = vm["pause_between_pushes"].as<int>();
+
+    if (avg_milliseconds_between_pushes < 0) {
+      throw std::domain_error("Average # of milliseconds between pushes must not be a negative number");
+    }
   }
 
   if (vm.count("pause_between_pops")) {
     avg_milliseconds_between_pops = vm["pause_between_pops"].as<int>();
+
+    if (avg_milliseconds_between_pops < 0) {
+      throw std::domain_error("Average # of milliseconds between pops must not be a negative number");
+    }
   }
 
   if (vm.count("initial_capacity_used")) {
     initial_capacity_used = vm["initial_capacity_used"].as<double>();
+
+    if (initial_capacity_used < 0 || initial_capacity_used > 1) {
+      throw std::domain_error("Initial fractional capacity of buffer which is used must lie in the range [0, 1]");
+    }
   }
 
   push_distribution.reset(new std::uniform_int_distribution<int>(
@@ -257,14 +271,15 @@ int main(int argc, char *argv[]) {
 
   TLOG(TLVL_INFO)
       << n_adding_threads
-      << " thread(s) pushing elements, each thread has an average time of "
+      << " thread(s) pushing " << nelements << " elements between them, each thread has an average time of "
       << avg_milliseconds_between_pushes << " milliseconds between pushes";
   TLOG(TLVL_INFO)
       << n_removing_threads
-      << " thread(s) popping elements, each thread has an average time of "
+      << " thread(s) popping " << nelements << " elements between them, each thread has an average time of "
       << avg_milliseconds_between_pops << " milliseconds between pops";
 
   if (initial_capacity_used > 0) {
+    
     int max_capacity = 1000000;
 
     if (buffer->capacity() <= max_capacity) {

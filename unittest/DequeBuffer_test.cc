@@ -9,7 +9,7 @@
 
 #include "app-framework/Buffers/DequeBuffer.hh"
 
-#define BOOST_TEST_MODULE DequeBuffer_t
+#define BOOST_TEST_MODULE DequeBuffer_test
 #include <boost/test/included/unit_test.hpp>
 
 #include <chrono>
@@ -46,15 +46,33 @@ struct CapacityChecker {
 
 } // namespace ""
 
+// This test case should run first. Make sure all other test cases depend on this. 
+
 BOOST_AUTO_TEST_CASE(sanity_checks) {
 
   BOOST_REQUIRE_EQUAL(buffer.size(), 0);
   BOOST_REQUIRE(buffer.empty());
 
+  BOOST_REQUIRE_THROW(buffer.pop(), std::runtime_error);
+
+  auto starttime = std::chrono::steady_clock::now();
   buffer.push(999);
+  auto push_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - starttime).count();
+
+  if ( push_time_in_us > buffer.get_push_timeout() * (1 - fractional_timeout_tolerance)) {
+    BOOST_TEST_REQUIRE(false, "Test failure: pushing element onto empty buffer resulted in a timeout (" << push_time_in_us << " us taken)");
+  }
+
   BOOST_REQUIRE_EQUAL(buffer.size(), 1);
 
+  starttime = std::chrono::steady_clock::now();
   auto popped_value = buffer.pop();
+  auto pop_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - starttime).count();
+
+  if ( pop_time_in_us > buffer.get_pop_timeout() * (1 - fractional_timeout_tolerance)) {
+    BOOST_TEST_REQUIRE(false, "Test failure: popping element off buffer resulted in a timeout (" << pop_time_in_us << "us taken");
+  }
+
   BOOST_REQUIRE_EQUAL(popped_value, 999);
 }
 
@@ -76,6 +94,7 @@ BOOST_AUTO_TEST_CASE(empty_checks,
   // pop off of an empty buffer
 
   const size_t pop_timeout_in_milliseconds = 100;
+  BOOST_TEST_MESSAGE("Setting the pop timeout on the buffer to " << pop_timeout_in_milliseconds << " ms");
   buffer.set_pop_timeout(pop_timeout_in_milliseconds);
 
   auto starttime = std::chrono::steady_clock::now();
