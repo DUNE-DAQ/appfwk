@@ -3,7 +3,7 @@ template <typename DATA_TYPE>
 appframework::FanOutUserModule<DATA_TYPE>::FanOutUserModule(
     std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer,
     std::initializer_list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers)
-    : inputBuffer_(inputBuffer), mode_(FanOutMode::NotConfigured), outputBuffers_(outputBuffers), thread_(std::bind(&FanOutUserModule<DATA_TYPE>::do_work, this)) {}
+    : inputBuffer_(inputBuffer), mode_(FanOutMode::NotConfigured), bufferTimeout_(100), outputBuffers_(outputBuffers), thread_(std::bind(&FanOutUserModule<DATA_TYPE>::do_work, this)) {}
 
 template <typename DATA_TYPE>
 std::future<std::string> appframework::FanOutUserModule<DATA_TYPE>::execute_command(std::string cmd) {
@@ -47,7 +47,7 @@ void appframework::FanOutUserModule<DATA_TYPE>::do_work() {
 
     while (thread_.thread_running()) {
         if (!inputBuffer_->empty()) {
-            auto data = inputBuffer_->pop();
+            auto data = inputBuffer_->pop(bufferTimeout_);
 
             if (mode_ == FanOutMode::Broadcast) {
                 do_broadcast(data);
@@ -56,7 +56,7 @@ void appframework::FanOutUserModule<DATA_TYPE>::do_work() {
                 while (!sent) {
                     for (auto& o : outputBuffers_) {
                         if (!o->full()) {
-                            o->push(std::move(data));
+                            o->push(std::move(data), bufferTimeout_);
                             sent = true;
                             break;
                         }
@@ -68,7 +68,7 @@ void appframework::FanOutUserModule<DATA_TYPE>::do_work() {
             } else if (mode_ == FanOutMode::RoundRobin) {
                 while (true) {
                     if (!(*roundRobinNext)->full()) {
-                        (*roundRobinNext)->push(std::move(data));
+                        (*roundRobinNext)->push(std::move(data), bufferTimeout_);
 
                         if (++roundRobinNext == outputBuffers_.end()) roundRobinNext = outputBuffers_.begin();
                         break;

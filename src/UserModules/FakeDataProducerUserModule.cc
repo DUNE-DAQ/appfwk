@@ -8,6 +8,7 @@
 appframework::FakeDataProducerUserModule::FakeDataProducerUserModule(
   std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer)
   : outputBuffer_(outputBuffer)
+  , bufferTimeout_(100)
   , thread_(std::bind(&FakeDataProducerUserModule::do_work, this))
 {}
 
@@ -89,7 +90,7 @@ appframework::FakeDataProducerUserModule::do_work()
                     << output;
 
     TLOG(TLVL_DEBUG) << "Pushing vector into outputBuffer";
-    outputBuffer_->push(std::move(output));
+    outputBuffer_->push(std::move(output), bufferTimeout_);
 
     TLOG(TLVL_DEBUG) << "Start of sleep between sends";
     usleep(wait_between_sends_ms_ * 1000);

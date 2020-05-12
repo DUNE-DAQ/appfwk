@@ -46,9 +46,11 @@ private:
 
   // Configuration
   std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer_;
+  std::chrono::milliseconds bufferTimeout_;
   size_t nIntsPerVector_;
   int starting_int_;
   int ending_int_;
+
 
   size_t wait_between_sends_ms_;
 };

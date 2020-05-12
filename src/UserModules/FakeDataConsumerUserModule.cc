@@ -11,6 +11,7 @@ appframework::FakeDataConsumerUserModule::FakeDataConsumerUserModule(
   std::string id)
   : thread_(std::bind(&FakeDataConsumerUserModule::do_work, this))
   , id_(id)
+  , bufferTimeout_(100)
   , inputBuffer_(inputBuffer_)
 {}
 
@@ -81,7 +82,7 @@ appframework::FakeDataConsumerUserModule::do_work()
   while (thread_.thread_running()) {
     if (!inputBuffer_->empty()) {
       TLOG(TLVL_DEBUG) << getId() << "Going to receive data from inputBuffer";
-      auto vec = inputBuffer_->pop();
+      auto vec = inputBuffer_->pop(bufferTimeout_);
       TLOG(TLVL_DEBUG) << getId() << "Received vector of size " << vec.size();
 
       bool failed = false;

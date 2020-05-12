@@ -62,6 +62,7 @@ private:
 
   // Configuration
   FanOutMode mode_;
+  const std::chrono::milliseconds bufferTimeout_;  
   std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer_;
   std::list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers_;
   size_t wait_interval_us_;
@@ -79,7 +80,7 @@ private:
   do_broadcast(DATA_TYPE& data)
   {
     for (auto& o : outputBuffers_) {
-      o->push(DATA_TYPE(data));
+      o->push(DATA_TYPE(data), bufferTimeout_);
     }
   }
 };
