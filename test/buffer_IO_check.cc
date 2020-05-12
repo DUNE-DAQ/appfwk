@@ -36,7 +36,12 @@ namespace {
 // becomes available
 
 std::string buffer_type = "DequeBuffer";
-std::unique_ptr<appframework::DequeBuffer<int>> buffer = nullptr;
+auto timeout = std::chrono::microseconds(100);
+
+// The decltype means "Have the buffer's push/pop functions expect a duration of
+// the same type as the timeout we defined"
+std::unique_ptr<appframework::DequeBuffer<int, decltype(timeout)>> buffer =
+    nullptr;
 
 constexpr int nelements = 100;
 int n_adding_threads = 1;
@@ -58,7 +63,12 @@ std::atomic<int> throw_pops = 0;
 
 double initial_capacity_used = 0;
 
-std::default_random_engine generator;
+auto relatively_random_seed =
+    std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::system_clock::now().time_since_epoch())
+        .count() %
+    1000000;
+std::default_random_engine generator(relatively_random_seed);
 std::unique_ptr<std::uniform_int_distribution<int>> push_distribution = nullptr;
 std::unique_ptr<std::uniform_int_distribution<int>> pop_distribution = nullptr;
 
@@ -83,11 +93,9 @@ void add_things() {
       TLOG(TLVL_DEBUG) << msg.str();
 
       auto starttime = std::chrono::steady_clock::now();
-      buffer->push(int(i)); // NOLINT, we're in-place-constructing an rvalue
-                            // here, not casting
+      buffer->push(i, timeout);
       if (std::chrono::duration_cast<std::chrono::milliseconds>(
-              std::chrono::steady_clock::now() - starttime)
-              .count() < buffer->get_push_timeout()) {
+              std::chrono::steady_clock::now() - starttime) < timeout) {
         successful_pushes++;
       } else {
         timeout_pushes++;
@@ -136,7 +144,7 @@ void remove_things() {
       TLOG(TLVL_DEBUG) << msg.str();
 
       auto starttime = std::chrono::steady_clock::now();
-      val = buffer->pop();
+      val = buffer->pop(timeout);
 
       msg.str(std::string());
       msg << "Thread #" << std::this_thread::get_id()
@@ -144,8 +152,7 @@ void remove_things() {
       TLOG(TLVL_DEBUG) << msg.str();
 
       if (std::chrono::duration_cast<std::chrono::milliseconds>(
-              std::chrono::steady_clock::now() - starttime)
-              .count() < buffer->get_pop_timeout()) {
+              std::chrono::steady_clock::now() - starttime) < timeout) {
         successful_pops++;
       } else {
         timeout_pops++;
@@ -157,7 +164,7 @@ void remove_things() {
   }
 }
 
-} // namespace
+} // namespace ""
 
 int main(int argc, char *argv[]) {
 
@@ -217,7 +224,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (buffer_type == "DequeBuffer") {
-    buffer.reset(new appframework::DequeBuffer<int>);
+    buffer.reset(new appframework::DequeBuffer<int, decltype(timeout)>);
   } else {
     TLOG(TLVL_ERROR) << "Unknown buffer type \"" << buffer_type
                      << "\" requested for testing";
@@ -228,7 +235,8 @@ int main(int argc, char *argv[]) {
     n_adding_threads = vm["push_threads"].as<int>();
 
     if (n_adding_threads <= 0) {
-      throw std::domain_error("# of pushing threads must be a positive integer");
+      throw std::domain_error(
+          "# of pushing threads must be a positive integer");
     }
   }
 
@@ -236,7 +244,8 @@ int main(int argc, char *argv[]) {
     n_removing_threads = vm["pop_threads"].as<int>();
 
     if (n_removing_threads <= 0) {
-      throw std::domain_error("# of popping threads must be a positive integer");
+      throw std::domain_error(
+          "# of popping threads must be a positive integer");
     }
   }
 
@@ -244,7 +253,8 @@ int main(int argc, char *argv[]) {
     avg_milliseconds_between_pushes = vm["pause_between_pushes"].as<int>();
 
     if (avg_milliseconds_between_pushes < 0) {
-      throw std::domain_error("Average # of milliseconds between pushes must not be a negative number");
+      throw std::domain_error("Average # of milliseconds between pushes must "
+                              "not be a negative number");
     }
   }
 
@@ -252,7 +262,8 @@ int main(int argc, char *argv[]) {
     avg_milliseconds_between_pops = vm["pause_between_pops"].as<int>();
 
     if (avg_milliseconds_between_pops < 0) {
-      throw std::domain_error("Average # of milliseconds between pops must not be a negative number");
+      throw std::domain_error("Average # of milliseconds between pops must not "
+                              "be a negative number");
     }
   }
 
@@ -260,7 +271,8 @@ int main(int argc, char *argv[]) {
     initial_capacity_used = vm["initial_capacity_used"].as<double>();
 
     if (initial_capacity_used < 0 || initial_capacity_used > 1) {
-      throw std::domain_error("Initial fractional capacity of buffer which is used must lie in the range [0, 1]");
+      throw std::domain_error("Initial fractional capacity of buffer which is "
+                              "used must lie in the range [0, 1]");
     }
   }
 
@@ -270,23 +282,23 @@ int main(int argc, char *argv[]) {
       0, 2 * 1000 * avg_milliseconds_between_pops));
 
   TLOG(TLVL_INFO)
-      << n_adding_threads
-      << " thread(s) pushing " << nelements << " elements between them, each thread has an average time of "
+      << n_adding_threads << " thread(s) pushing " << nelements
+      << " elements between them, each thread has an average time of "
       << avg_milliseconds_between_pushes << " milliseconds between pushes";
   TLOG(TLVL_INFO)
-      << n_removing_threads
-      << " thread(s) popping " << nelements << " elements between them, each thread has an average time of "
+      << n_removing_threads << " thread(s) popping " << nelements
+      << " elements between them, each thread has an average time of "
       << avg_milliseconds_between_pops << " milliseconds between pops";
 
   if (initial_capacity_used > 0) {
-    
+
     int max_capacity = 1000000;
 
     if (buffer->capacity() <= max_capacity) {
       int elements_to_begin_with =
           static_cast<int>(initial_capacity_used * buffer->capacity());
       for (int i_e = 0; i_e < elements_to_begin_with; ++i_e) {
-        buffer->push(-1);
+        buffer->push(-1, timeout);
       }
     } else {
       std::ostringstream msg;
