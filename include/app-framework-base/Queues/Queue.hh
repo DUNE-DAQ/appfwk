@@ -29,7 +29,7 @@ public:
   // To use the non-virtual push which leaves its value
   // argument unchanged, make sure to add
 
-  // using QueueInput<ValueType,DurationType>::push
+  // using QueueSink<ValueType,DurationType>::push
 
   // in your derived class declaration (line above assumes you're
   // using the same template parameter labels)
@@ -37,6 +37,9 @@ public:
   void push(const ValueType &val, const DurationType &timeout) {
     push(ValueType(val), timeout);
   }
+
+  virtual bool can_push() const noexcept = 0 ;
+
 };
 
 template <class ValueType, class DurationType = std::chrono::milliseconds>
@@ -44,6 +47,8 @@ class QueueSource : virtual public Queue<ValueType> {
 
 public:
   virtual ValueType pop(const DurationType &timeout) = 0;
+
+  virtual bool can_pop() const noexcept = 0 ; 
 };
 
 } // namespace appframework
