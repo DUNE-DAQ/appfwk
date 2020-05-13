@@ -7,7 +7,7 @@
  */
 
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/DebugLoggingUserModule.hh"
+#include "app-framework/DebugLoggingDAQModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
 
 namespace appframework {
@@ -16,9 +16,9 @@ std::unique_ptr<CommandFacility> CommandFacility::handle_ =
 
 class simple_test_app_ModuleList : public ModuleList {
   // Inherited via ModuleList
-  void ConstructGraph(BufferMap &buffer_map, UserModuleMap &user_module_map,
+  void ConstructGraph(QueueMap &buffer_map, DAQModuleMap &user_module_map,
                       CommandOrderMap &command_order_map) override {
-    user_module_map["debugLogger"].reset(new DebugLoggingUserModule());
+    user_module_map["debugLogger"].reset(new DebugLoggingDAQModule());
   }
 };
 } // namespace appframework

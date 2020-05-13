@@ -31,35 +31,35 @@ DAQProcess::DAQProcess(std::list<std::string> args) {
 }
 
 void DAQProcess::register_modules(ModuleList &ml) {
-  ml.ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_);
+  ml.ConstructGraph(queueMap_, daqModuleMap_, commandOrderMap_);
 }
 
 void DAQProcess::execute_command(std::string cmd) {
-  std::unordered_set<std::string> user_module_list;
-  for (auto const &um : userModuleMap_) {
-    user_module_list.insert(um.first);
+  std::unordered_set<std::string> daq_module_list;
+  for (auto const &dm : daqModuleMap_) {
+    daq_module_list.insert(dm.first);
   }
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
-                   << " for UserModules defined in the CommandOrderMap";
+                   << " for DAQModules defined in the CommandOrderMap";
   if (commandOrderMap_.count(cmd)) {
     for (auto &moduleName : commandOrderMap_[cmd]) {
-      if (userModuleMap_.count(moduleName)) {
-        userModuleMap_[moduleName]->execute_command(cmd);
-        user_module_list.erase(moduleName);
+      if (daqModuleMap_.count(moduleName)) {
+        daqModuleMap_[moduleName]->execute_command(cmd);
+        daq_module_list.erase(moduleName);
       }
     }
   } else {
     TLOG(TLVL_WARNING)
         << "Command " << cmd
-        << " does not have an entry in the CommandOrderMap! UserModules will "
+        << " does not have an entry in the CommandOrderMap! DAQModules will "
            "receive this command in an unspecified order!";
   }
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
-                   << " for all remaining UserModules";
-  for (auto const &moduleName : user_module_list) {
-    userModuleMap_[moduleName]->execute_command(cmd);
+                   << " for all remaining DAQModules";
+  for (auto const &moduleName : daq_module_list) {
+    daqModuleMap_[moduleName]->execute_command(cmd);
   }
 }
 

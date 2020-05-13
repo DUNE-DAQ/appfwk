@@ -1,10 +1,10 @@
 /**
  * @file DAQProcess class interface
  *
- * DAQProcess is the central container for instantiated UserModules and Buffers
+ * DAQProcess is the central container for instantiated DAQModules and Queues
  * within a DAQ Application. It loads a ModuleList which defines the graph of
- * UserModules and Buffers and any command ordering. DAQProcess is responsible
- * for distributing commands recieved from CCM to the UserModules in the order
+ * DAQModules and Queues and any command ordering. DAQProcess is responsible
+ * for distributing commands recieved from CCM to the DAQModules in the order
  * defined.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -15,9 +15,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 
-#include "app-framework-base/Buffers/Buffer.hh"
+#include "app-framework-base/Queues/QueueI.hh"
 #include "app-framework-base/Core/ModuleList.hh"
-#include "app-framework-base/UserModules/UserModule.hh"
+#include "app-framework-base/DAQModules/DAQModule.hh"
 
 #include <list>
 #include <map>
@@ -26,10 +26,10 @@
 
 namespace appframework {
 /**
- * @brief The DAQProcess class is the central container for UserModules and
- * Buffers.
+ * @brief The DAQProcess class is the central container for DAQModules and
+ * Queues.
  *
- * DAQProcess receives commands from CCM and distributes them to the UserModules
+ * DAQProcess receives commands from CCM and distributes them to the DAQModules
  * in the order defined in the CommandOrderMap received from the ModuleList
  * during register_modules.
  */
@@ -45,23 +45,23 @@ public:
    */
   explicit DAQProcess(std::list<std::string> args);
   /**
-   * @brief Using the given ModuleList, construct the graph of UserModules and
-   * Buffers
+   * @brief Using the given ModuleList, construct the graph of DAQModules and
+   * Queues
    * @param ml ModuleList to call ModuleList::ConstructGraph on
    *
    * The register_modules function calls the ModuleList's ConstructGraph
-   * function, which instantiates and links together the UserModules and Buffers
+   * function, which instantiates and links together the DAQModules and Queues
    * needed by this DAQ Application. ConstructGraph also defines any ordering of
-   * commands for UserModules.
+   * commands for DAQModules.
    */
   void register_modules(ModuleList &ml);
   /**
-   * @brief Execute the specified command on the loaded UserModules
+   * @brief Execute the specified command on the loaded DAQModules
    * @param cmd Command to execute
    *
    * This function will determine if there is an entry in the command order map
-   * for this command, and if so, first send the command to the UserModules in
-   * that list in the order specified. Then, any remaining UserModules will
+   * for this command, and if so, first send the command to the DAQModules in
+   * that list in the order specified. Then, any remaining DAQModules will
    * receive the command in an unspecified order.
    */
   void execute_command(std::string cmd);
@@ -81,9 +81,9 @@ public:
   DAQProcess &operator=(DAQProcess &&) = delete;
 
 private:
-  BufferMap bufferMap_;             ///< String alias for each Buffer
-  UserModuleMap userModuleMap_;     ///< String alias for each UserModule
-  CommandOrderMap commandOrderMap_; ///< Order UserModule commands by alias
+  QueueMap queueMap_;             ///< String alias for each Queue
+  DAQModuleMap daqModuleMap_;     ///< String alias for each DAQModule
+  CommandOrderMap commandOrderMap_; ///< Order DAQModule commands by alias
 };
 } // namespace appframework
 

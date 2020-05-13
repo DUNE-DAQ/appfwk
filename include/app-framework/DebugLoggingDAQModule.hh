@@ -1,7 +1,7 @@
 /**
- * @file The DebugLoggingUserModule class interface
+ * @file The DebugLoggingDAQModule class interface
  *
- * DebugLoggingUserModule is a simple UserModule implementation that simply logs
+ * DebugLoggingDAQModule is a simple DAQModule implementation that simply logs
  * the fact that it received a command from DAQProcess.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -12,23 +12,20 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH_
 
-#include "app-framework-base/UserModules/UserModule.hh"
-
-#include <future>
-#include <string>
+#include "app-framework-base/DAQModules/DAQModule.hh"
 
 namespace appframework {
 /**
- * @brief DebugLoggingUserModule logs that it has received a command from
+ * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingUserModule : public UserModule {
+class DebugLoggingDAQModule : public DAQModule {
 public:
   /**
    * @brief Logs the reception of the command
    * @param cmd Command from DAQProcess
    */
-  std::future<std::string> execute_command(std::string cmd) override;
+  void execute_command(const std::string & cmd, const std::vector<std::string> & args = {} ) override;
 };
 } // namespace appframework
 
