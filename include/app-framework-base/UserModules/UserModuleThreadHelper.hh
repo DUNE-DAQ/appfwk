@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH
-#define APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
 
 #include "app-framework-base/Buffers/Buffer.hh"
 
@@ -25,8 +25,7 @@ namespace appframework {
  * @brief UserModuleThreadHelper contains a thread which runs the do_work()
  * function
  */
-class UserModuleThreadHelper
-{
+class UserModuleThreadHelper {
 public:
   /**
    * @brief UserModuleThreadHelper Constructor
@@ -34,17 +33,13 @@ public:
    * This constructor sets the defaults for the thread control variables
    */
   UserModuleThreadHelper(std::function<void()> do_work)
-    : thread_started_(false)
-    , working_thread_(nullptr)
-    , do_work_(do_work)
-  {}
+      : thread_started_(false), working_thread_(nullptr), do_work_(do_work) {}
 
   /**
    * @brief Start the working thread (which executes the do_work() function)
    * @throws std::runtime_error if the thread is already running
    */
-  void start_working_thread_()
-  {
+  void start_working_thread_() {
     if (thread_started_ || working_thread_ != nullptr) {
       throw std::runtime_error("Attempted to start UserModule working thread "
                                "when it is already running!");
@@ -57,18 +52,17 @@ public:
    * @throws std::runtime_error If the thread has not yet been started
    * @throws std::runtime_error If the thread is not in the joinable state
    */
-  void stop_working_thread_()
-  {
+  void stop_working_thread_() {
     if (!thread_started_ || working_thread_ == nullptr) {
-      throw std::runtime_error(
-        "Attempted to stop UserModule working thread when it is not running!");
+      throw std::runtime_error("Attempted to stop UserModule working thread "
+                               "when it is not running!");
     }
     thread_started_ = false;
     if (working_thread_->joinable()) {
       working_thread_->join();
     }
     throw std::runtime_error(
-      "Thread not in joinable state during UserModule working thread stop!");
+        "Thread not in joinable state during UserModule working thread stop!");
   }
 
   bool thread_running() { return thread_started_.load(); }
