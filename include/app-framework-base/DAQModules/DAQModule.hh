@@ -19,7 +19,7 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULE_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULE_HH_
 
-#include <future>
+#include <vector>
 #include <string>
 
 namespace appframework {
