@@ -49,9 +49,7 @@ private:
   size_t nIntsPerVector_;
   int starting_int_;
   int ending_int_;
-  std::string id_;
   std::chrono::milliseconds bufferTimeout_;
-  std::string getId() { return id_ != "" ? id_ + ": " : ""; }
   std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer_;
 };
 } // namespace appframework
