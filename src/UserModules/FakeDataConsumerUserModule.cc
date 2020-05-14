@@ -94,27 +94,27 @@ appframework::FakeDataConsumerUserModule::do_work()
   while (thread_.thread_running()) {
     if (!inputBuffer_->empty()) {
       TLOG(TLVL_DEBUG) << instance_name_
-                       << "Going to receive data from inputBuffer";
+                       << " Going to receive data from inputBuffer";
       auto vec = inputBuffer_->pop(bufferTimeout_);
-      TLOG(TLVL_DEBUG) << instance_name_ << "Received vector of size "
+      TLOG(TLVL_DEBUG) << instance_name_ << " Received vector of size "
                        << vec.size();
 
       bool failed = false;
 
-      TLOG(TLVL_DEBUG) << instance_name_ << "Starting processing loop";
-      TLOG(TLVL_INFO) << instance_name_ << "Received vector " << counter << ": "
+      TLOG(TLVL_DEBUG) << instance_name_ << " Starting processing loop";
+      TLOG(TLVL_INFO) << instance_name_ << " Received vector " << counter << ": "
                       << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
           if (ii != 0) {
             TLOG(TLVL_WARNING)
-              << instance_name_ << "Error in received vector " << counter
+              << instance_name_ << " Error in received vector " << counter
               << ", position " << ii << ": Expected " << current_int
               << ", received " << point;
             failed = true;
           } else {
-            TLOG(TLVL_INFO) << instance_name_ << "Jump detected!";
+            TLOG(TLVL_INFO) << instance_name_ << " Jump detected!";
           }
           current_int = point;
         }
@@ -123,7 +123,7 @@ appframework::FakeDataConsumerUserModule::do_work()
         ++ii;
       }
       TLOG(TLVL_DEBUG) << instance_name_
-                       << "Done with processing loop, failed=" << failed;
+                       << " Done with processing loop, failed=" << failed;
       if (failed)
         fail_count++;
 
@@ -133,7 +133,7 @@ appframework::FakeDataConsumerUserModule::do_work()
     }
   }
 
-  TLOG(TLVL_INFO) << instance_name_ << "Processed " << counter << " vectors with "
+  TLOG(TLVL_INFO) << instance_name_ << " Processed " << counter << " vectors with "
                   << fail_count << " failures.";
 }
 
