@@ -12,7 +12,7 @@ appframework::FakeDataConsumerUserModule::FakeDataConsumerUserModule(
   : thread_(std::bind(&FakeDataConsumerUserModule::do_work, this))
   , id_(id)
   , bufferTimeout_(100)
-  , inputBuffer_(inputBuffer_)
+  , inputBuffer_(inputBuffer)
 {}
 
 std::future<std::string>
