@@ -88,13 +88,13 @@ BOOST_AUTO_TEST_CASE(
       "UserModuleThreadHelper without having start_working_thread_() thread "
       "called destructs without aborting the program, as expected");
 
-  BOOST_TEST_MESSAGE(
-      "You should *expect* the program to abort in a moment, since we're "
-      "destructing a UserModuleThreadHelper instance after calling "
-      "start_working_thread_() but before calling stop_working_thread_()");
+  // BOOST_TEST_MESSAGE(
+  //     "You should *expect* the program to abort in a moment, since we're "
+  //     "destructing a UserModuleThreadHelper instance after calling "
+  //     "start_working_thread_() but before calling stop_working_thread_()");
 
-  {
-    appframework::UserModuleThreadHelper umth(DoSomething);
-    umth.start_working_thread_();
-  }
+  // {
+  //   appframework::UserModuleThreadHelper umth(DoSomething);
+  //   umth.start_working_thread_();
+  // }
 }
