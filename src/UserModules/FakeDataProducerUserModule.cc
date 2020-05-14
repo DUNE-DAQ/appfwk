@@ -58,17 +58,15 @@ appframework::FakeDataProducerUserModule::do_stop()
 TraceStreamer&
 operator<<(TraceStreamer& t, std::vector<int> ints)
 {
-  std::ostringstream o;
-  o << "{";
+  t << "{";
   bool first = true;
   for (auto& i : ints) {
     if (!first)
-      o << ", ";
+      t << ", ";
     first = false;
-    o << i;
+    t << i;
   }
-  o << "}";
-  return t << o.str();
+  return t << "}";
 }
 
 void
