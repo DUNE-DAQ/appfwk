@@ -10,7 +10,8 @@ appframework::FakeDataConsumerUserModule::FakeDataConsumerUserModule(
   std::string name,
   std::vector<std::shared_ptr<BufferI>> inputs,
   std::vector<std::shared_ptr<BufferI>> outputs)
-  : UserModule(name, inputs,outputs)
+  : UserModule(name, inputs, outputs)
+  , bufferTimeout_(100)
     ,thread_(std::bind(&FakeDataConsumerUserModule::do_work, this))
 { 
 if (outputs.size()) {
@@ -73,17 +74,15 @@ appframework::FakeDataConsumerUserModule::do_stop()
 TraceStreamer&
 operator<<(TraceStreamer& t, std::vector<int> ints)
 {
-  std::ostringstream o;
-  o << "{";
+  t << "{";
   bool first = true;
   for (auto& i : ints) {
     if (!first)
-      o << ", ";
+      t << ", ";
     first = false;
-    o << i;
+    t << i;
   }
-  o << "}";
-  return t << o.str();
+  return t << "}";
 }
 
 void
@@ -94,9 +93,11 @@ appframework::FakeDataConsumerUserModule::do_work()
   int fail_count = 0;
   while (thread_.thread_running()) {
     if (!inputBuffer_->empty()) {
-      TLOG(TLVL_DEBUG) << instance_name_ << "Going to receive data from inputBuffer";
-      auto vec = inputBuffer_->pop();
-      TLOG(TLVL_DEBUG) << instance_name_ << "Received vector of size " << vec.size();
+      TLOG(TLVL_DEBUG) << instance_name_
+                       << "Going to receive data from inputBuffer";
+      auto vec = inputBuffer_->pop(bufferTimeout_);
+      TLOG(TLVL_DEBUG) << instance_name_ << "Received vector of size "
+                       << vec.size();
 
       bool failed = false;
 

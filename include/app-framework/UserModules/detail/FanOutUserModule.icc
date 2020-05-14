@@ -6,6 +6,7 @@ appframework::FanOutUserModule<DATA_TYPE>::FanOutUserModule(
   std::vector<std::shared_ptr<BufferI>> outputs)
   : UserModule(name, inputs, outputs)
   , mode_(FanOutMode::NotConfigured)
+  , bufferTimeout_(100)
   , thread_(std::bind(&FanOutUserModule<DATA_TYPE>::do_work, this))
 {
   if (inputs.size() > 1) {
@@ -75,7 +76,7 @@ appframework::FanOutUserModule<DATA_TYPE>::do_work()
 
   while (thread_.thread_running()) {
     if (!inputBuffer_->empty()) {
-      auto data = inputBuffer_->pop();
+      auto data = inputBuffer_->pop(bufferTimeout_);
 
       if (mode_ == FanOutMode::Broadcast) {
         do_broadcast(data);
@@ -84,7 +85,7 @@ appframework::FanOutUserModule<DATA_TYPE>::do_work()
         while (!sent) {
           for (auto& o : outputBuffers_) {
             if (!o->full()) {
-              o->push(std::move(data));
+              o->push(std::move(data), bufferTimeout_);
               sent = true;
               break;
             }
@@ -96,7 +97,7 @@ appframework::FanOutUserModule<DATA_TYPE>::do_work()
       } else if (mode_ == FanOutMode::RoundRobin) {
         while (true) {
           if (!(*roundRobinNext)->full()) {
-            (*roundRobinNext)->push(std::move(data));
+            (*roundRobinNext)->push(std::move(data), bufferTimeout_);
 
             if (++roundRobinNext == outputBuffers_.end())
               roundRobinNext = outputBuffers_.begin();

@@ -10,6 +10,7 @@ appframework::FakeDataProducerUserModule::FakeDataProducerUserModule(
   std::vector<std::shared_ptr<BufferI>> inputs,
   std::vector<std::shared_ptr<BufferI>> outputs)
   : UserModule(name, inputs,outputs)
+  , bufferTimeout_(100)
   , thread_(std::bind(&FakeDataProducerUserModule::do_work, this))
 {
   if (inputs.size()) {
@@ -73,17 +74,15 @@ appframework::FakeDataProducerUserModule::do_stop()
 TraceStreamer&
 operator<<(TraceStreamer& t, std::vector<int> ints)
 {
-  std::ostringstream o;
-  o << "{";
+  t << "{";
   bool first = true;
   for (auto& i : ints) {
     if (!first)
-      o << ", ";
+      t << ", ";
     first = false;
-    o << i;
+    t << i;
   }
-  o << "}";
-  return t << o.str();
+  return t << "}";
 }
 
 void
@@ -105,7 +104,7 @@ appframework::FakeDataProducerUserModule::do_work()
                     << output;
 
     TLOG(TLVL_DEBUG) << "Pushing vector into outputBuffer";
-    outputBuffer_->push(std::move(output));
+    outputBuffer_->push(std::move(output), bufferTimeout_);
 
     TLOG(TLVL_DEBUG) << "Start of sleep between sends";
     usleep(wait_between_sends_ms_ * 1000);

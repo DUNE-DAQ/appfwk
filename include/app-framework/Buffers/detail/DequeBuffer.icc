@@ -1,19 +1,13 @@
 
-template<class T>
-DequeBuffer<T>::DequeBuffer()
-{
-  Configure();
-}
 
-template<class T>
-void
-DequeBuffer<T>::Configure()
-{
+template <class T, class U> DequeBuffer<T, U>::DequeBuffer() { Configure(); }
+
+template <class T, class U> void DequeBuffer<T, U>::Configure() {
 
   this->fAttributes.isBounded = true;
   this->fAttributes.isSearchable = false;
 
-  fDeque = std::deque<T>();
+  fDeque = std::deque<value_type>();
   fSize = 0;
 
   if (this->fAttributes.isBounded) {
@@ -21,59 +15,109 @@ DequeBuffer<T>::Configure()
   } else {
     fCapacity = fDeque.max_size();
   }
-
-  this->set_push_timeout(1e6);
-  this->set_pop_timeout(1e7);
-  fRetryTime_ms = 100;
-
-  fPushRetries = this->get_push_timeout() / fRetryTime_ms;
-  fPopRetries = this->get_pop_timeout() / fRetryTime_ms;
 }
 
-template<class T>
-int
-DequeBuffer<T>::push(T&& obj)
-{
-  int n_retries = 0;
-  while (full()) {
-    if (n_retries == fPushRetries) {
-      // could throw, but here choose to return -1
-      // throw std::runtime_error("Reached Max Push Retries in DequeBuffer");
-      return -1;
-    }
-    ++n_retries;
-    usleep(fRetryTime_ms);
+template <class T, class U>
+void DequeBuffer<T, U>::push(value_type &&val,
+                                      const duration_type &timeout) {
+
+  auto starttime = std::chrono::steady_clock::now();
+  std::unique_lock<std::mutex> lk(fMutex, std::defer_lock);
+
+  this->try_lock_for(lk, timeout);
+
+  auto time_to_wait_for_space =
+      (starttime + timeout) - std::chrono::steady_clock::now();
+
+  if (time_to_wait_for_space.count() > 0) {
+    fNoLongerFull.wait_for(lk, time_to_wait_for_space,
+                           [&]() { return !this->full(); });
   }
 
-  if (full())
-    throw std::runtime_error("Full after check? Another thread accessing?");
-  std::lock_guard<std::mutex> lck(fMutex);
-  fDeque.push_back(std::move(obj));
-  fSize++;
-  return size();
+  if (!this->full()) {
+    fDeque.push_back(std::move(val));
+    fSize++;
+    fNoLongerEmpty.notify_one();
+  } else {
+    std::stringstream errmsg;
+    errmsg
+        << "In DequeBuffer::push: unable to push since queue is full ("
+        << this->size() << " elements) (timeout period was "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
+               .count()
+        << " milliseconds)";
+    throw std::runtime_error(errmsg.str());
+  }
 }
 
-template<class T>
-T
-DequeBuffer<T>::pop()
-{
-  int n_retries = 0;
-  while (empty()) {
-    if (n_retries == fPopRetries) {
-      throw std::runtime_error(
-        "No Data: Reached Max Pop Retries in DequeBuffer");
-      // return -1;
-    }
-    ++n_retries;
-    usleep(fRetryTime_ms);
+template <class T, class U>
+T DequeBuffer<T, U>::pop(const duration_type &timeout) {
+
+  auto starttime = std::chrono::steady_clock::now();
+  std::unique_lock<std::mutex> lk(fMutex, std::defer_lock);
+
+  this->try_lock_for(lk, timeout);
+
+  auto time_to_wait_for_data =
+      (starttime + timeout) - std::chrono::steady_clock::now();
+
+  if (time_to_wait_for_data.count() > 0) {
+    fNoLongerEmpty.wait_for(lk, time_to_wait_for_data,
+                            [&]() { return !this->empty(); });
   }
 
-  if (empty())
-    throw std::runtime_error("Empty after check? Another thread accessing?");
+  if (!this->empty()) {
+    T obj(std::move(fDeque.front()));
+    fDeque.pop_front();
+    fSize--;
+    fNoLongerFull.notify_one();
+    return obj;
+  } else {
+    std::stringstream errmsg;
+    errmsg << "In DequeBuffer::pop: unable to pop since queue is "
+              "empty (timeout period was "
+           << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
+                  .count()
+           << " milliseconds)";
+    throw std::runtime_error(errmsg.str());
+  }
+}
 
-  std::lock_guard<std::mutex> lck(fMutex);
-  T obj(std::move(fDeque.front()));
-  fDeque.pop_front();
-  fSize--;
-  return obj;
+// This try_lock_for() function was written because while objects of
+// type std::timed_mutex have their own try_lock_for functions, the
+// std::condition_variable::wait_for functions used in this class's push
+// and pop operations require an std::mutex
+
+template <class T, class U>
+void DequeBuffer<T, U>::try_lock_for(std::unique_lock<std::mutex> &lk,
+                                     const duration_type &timeout) {
+  assert(!lk.owns_lock());
+
+  auto starttime = std::chrono::steady_clock::now();
+  lk.try_lock();
+
+  if (!lk.owns_lock() && timeout.count() > 0) {
+
+    int approximate_number_of_retries = 5;
+    duration_type pause_between_tries =
+        duration_type(timeout.count() / approximate_number_of_retries);
+
+    while (std::chrono::steady_clock::now() < starttime + timeout) {
+      std::this_thread::sleep_for(pause_between_tries);
+      lk.try_lock();
+      if (lk.owns_lock()) {
+        break;
+      }
+    }
+  }
+
+  if (!lk.owns_lock()) {
+    std::ostringstream errmsg;
+    errmsg << "Unable to lock the DequeBuffer's mutex "
+              "within the timeout period of "
+           << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
+                  .count()
+           << " milliseconds";
+    throw std::runtime_error(errmsg.str());
+  }
 }

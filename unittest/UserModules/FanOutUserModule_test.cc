@@ -14,6 +14,10 @@
 
 #include <boost/test/unit_test.hpp>
 
+namespace {
+
+constexpr auto buffer_timeout = std::chrono::milliseconds(10);
+
 struct NonCopyableType
 {
   int data;
@@ -29,6 +33,8 @@ struct NonCopyableType
     return *this;
   }
 };
+
+}
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
@@ -66,9 +72,9 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   foum.execute_command("start");
 
   NonCopyableType nct1(1);
-  inputbuf->push(std::move(nct1));
+  inputbuf->push(std::move(nct1), buffer_timeout);
   NonCopyableType nct2(2);
-  inputbuf->push(std::move(nct2));
+  inputbuf->push(std::move(nct2), buffer_timeout);
 
   while (!inputbuf->empty())
     usleep(10000);
@@ -78,11 +84,11 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   BOOST_REQUIRE_EQUAL(inputbuf->empty(), true);
 
   BOOST_REQUIRE_EQUAL(outputbuf1->empty(), false);
-  auto res = outputbuf1->pop();
+  auto res = outputbuf1->pop(buffer_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 1);
 
   BOOST_REQUIRE_EQUAL(outputbuf2->empty(), false);
-  res = outputbuf2->pop();
+  res = outputbuf2->pop(buffer_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 2);
 }
 
