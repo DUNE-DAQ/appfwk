@@ -12,23 +12,18 @@
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ =
-  std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
+    std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
 
-class simple_test_app_ModuleList : public ModuleList
-{
+class simple_test_app_ModuleList : public ModuleList {
   // Inherited via ModuleList
-  void ConstructGraph(BufferMap& buffer_map,
-                      UserModuleMap& user_module_map,
-                      CommandOrderMap& command_order_map) override
-  {
+  void ConstructGraph(BufferMap &buffer_map, UserModuleMap &user_module_map,
+                      CommandOrderMap &command_order_map) override {
     user_module_map["debugLogger"].reset(new DebugLoggingUserModule());
   }
 };
 } // namespace appframework
 
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   std::list<std::string> args;
   for (int ii = 1; ii < argc; ++ii) {
     args.push_back(std::string(argv[ii]));

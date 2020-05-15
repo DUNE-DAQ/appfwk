@@ -26,16 +26,16 @@ namespace appframework {
  * @brief FakeDataProducerUserModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataProducerUserModule : public UserModule
-{
+class FakeDataProducerUserModule : public UserModule {
 public:
   explicit FakeDataProducerUserModule(
-    std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer);
+      std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer);
 
   std::future<std::string> execute_command(std::string cmd) override;
 
   FakeDataProducerUserModule(const FakeDataProducerUserModule &) = delete;
-  FakeDataProducerUserModule &operator=(const FakeDataProducerUserModule &) = delete;
+  FakeDataProducerUserModule &
+  operator=(const FakeDataProducerUserModule &) = delete;
   FakeDataProducerUserModule(FakeDataProducerUserModule &&) = delete;
   FakeDataProducerUserModule &operator=(FakeDataProducerUserModule &&) = delete;
 
@@ -55,7 +55,6 @@ private:
   size_t nIntsPerVector_;
   int starting_int_;
   int ending_int_;
-
 
   size_t wait_between_sends_ms_;
 };

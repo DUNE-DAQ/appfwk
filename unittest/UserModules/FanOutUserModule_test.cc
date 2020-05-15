@@ -18,17 +18,13 @@ namespace {
 
 constexpr auto buffer_timeout = std::chrono::milliseconds(10);
 
-struct NonCopyableType
-{
+struct NonCopyableType {
   int data;
-  explicit NonCopyableType(int d)
-    : data(d)
-  {}
-  NonCopyableType(NonCopyableType const&) = delete;
-  NonCopyableType(NonCopyableType&& i) { data = i.data; }
-  NonCopyableType& operator=(NonCopyableType const&) = delete;
-  NonCopyableType& operator=(NonCopyableType&& i)
-  {
+  explicit NonCopyableType(int d) : data(d) {}
+  NonCopyableType(NonCopyableType const &) = delete;
+  NonCopyableType(NonCopyableType &&i) { data = i.data; }
+  NonCopyableType &operator=(NonCopyableType const &) = delete;
+  NonCopyableType &operator=(NonCopyableType &&i) {
     data = i.data;
     return *this;
   }
@@ -42,29 +38,26 @@ std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
 BOOST_AUTO_TEST_SUITE(FanOutUserModule_test)
 
-BOOST_AUTO_TEST_CASE(Construct)
-{
+BOOST_AUTO_TEST_CASE(Construct) {
   auto buf = std::make_shared<appframework::DequeBuffer<int>>();
-  appframework::FanOutUserModule<int> foum(buf, { buf });
+  appframework::FanOutUserModule<int> foum(buf, {buf});
 }
 
-BOOST_AUTO_TEST_CASE(Configure)
-{
+BOOST_AUTO_TEST_CASE(Configure) {
   auto buf = std::make_shared<appframework::DequeBuffer<int>>();
-  appframework::FanOutUserModule<int> foum(buf, { buf });
+  appframework::FanOutUserModule<int> foum(buf, {buf});
   foum.execute_command("configure");
 }
 
-BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
-{
+BOOST_AUTO_TEST_CASE(NonCopyableTypeTest) {
   auto inputbuf =
-    std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
+      std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
   auto outputbuf1 =
-    std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
+      std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
   auto outputbuf2 =
-    std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
+      std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
   appframework::FanOutUserModule<NonCopyableType> foum(
-    inputbuf, { outputbuf1, outputbuf2 });
+      inputbuf, {outputbuf1, outputbuf2});
 
   // This test assumes RoundRobin mode. Once configurability is implemented,
   // we'll have to configure it appropriately.

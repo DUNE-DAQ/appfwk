@@ -18,16 +18,13 @@
 
 namespace appframework {
 
-  std::unique_ptr<CommandFacility> CommandFacility::handle_ =
+std::unique_ptr<CommandFacility> CommandFacility::handle_ =
     std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
 
-class producer_consumer_test_app_ModuleList : public ModuleList
-{
+class producer_consumer_test_app_ModuleList : public ModuleList {
   // Inherited via ModuleList
-  void ConstructGraph(BufferMap& buffer_map,
-                              UserModuleMap& user_module_map,
-                              CommandOrderMap& command_order_map) override
-  {
+  void ConstructGraph(BufferMap &buffer_map, UserModuleMap &user_module_map,
+                      CommandOrderMap &command_order_map) override {
     auto producerToFanOut = std::make_shared<DequeBuffer<std::vector<int>>>();
     auto fanOutToConsumer1 = std::make_shared<DequeBuffer<std::vector<int>>>();
     auto fanOutToConsumer2 = std::make_shared<DequeBuffer<std::vector<int>>>();
@@ -37,25 +34,22 @@ class producer_consumer_test_app_ModuleList : public ModuleList
     buffer_map["fanOutToConsumer2"] = fanOutToConsumer2;
 
     user_module_map["producer"].reset(
-      new FakeDataProducerUserModule(producerToFanOut));
+        new FakeDataProducerUserModule(producerToFanOut));
     user_module_map["fanOut"].reset(new FanOutUserModule<std::vector<int>>(
-      producerToFanOut, { fanOutToConsumer1, fanOutToConsumer2 }));
+        producerToFanOut, {fanOutToConsumer1, fanOutToConsumer2}));
     user_module_map["consumer1"].reset(
-      new FakeDataConsumerUserModule(fanOutToConsumer1, "C1"));
+        new FakeDataConsumerUserModule(fanOutToConsumer1, "C1"));
     user_module_map["consumer2"].reset(
-      new FakeDataConsumerUserModule(fanOutToConsumer2, "C2"));
+        new FakeDataConsumerUserModule(fanOutToConsumer2, "C2"));
 
-    command_order_map["start"] = {
-      "consumer1", "consumer2", "fanOut", "producer"
-    };
-    command_order_map["stop"] = { "producer" };
+    command_order_map["start"] = {"consumer1", "consumer2", "fanOut",
+                                  "producer"};
+    command_order_map["stop"] = {"producer"};
   }
 };
 } // namespace appframework
 
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   std::list<std::string> args;
   for (int ii = 1; ii < argc; ++ii) {
     args.push_back(std::string(argv[ii]));

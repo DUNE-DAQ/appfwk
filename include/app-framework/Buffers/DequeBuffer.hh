@@ -51,18 +51,18 @@ public:
   bool empty() const noexcept override { return size() == 0; }
   bool full() const noexcept override { return size() >= capacity(); }
 
-  value_type pop(const duration_type & timeout)
+  value_type pop(const duration_type &timeout)
       override; // Throws std::runtime_error if a timeout occurs
-  void push(value_type && val, const duration_type & timeout)
+  void push(value_type &&val, const duration_type &timeout)
       override; // Throws std::runtime_error if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
 
-  DequeBuffer(const DequeBuffer&) = delete;
-  DequeBuffer& operator=(const DequeBuffer&) = delete;
-  DequeBuffer(DequeBuffer&&) = delete;
-  DequeBuffer& operator=(DequeBuffer&&) = delete;
+  DequeBuffer(const DequeBuffer &) = delete;
+  DequeBuffer &operator=(const DequeBuffer &) = delete;
+  DequeBuffer(DequeBuffer &&) = delete;
+  DequeBuffer &operator=(DequeBuffer &&) = delete;
 
 private:
   void try_lock_for(std::unique_lock<std::mutex> &, const duration_type &);

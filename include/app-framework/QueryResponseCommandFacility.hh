@@ -21,8 +21,7 @@ namespace appframework {
  * @brief QueryResponseCommandFacility is a CommandFacility plugin for running a
  * DAQ Application in an interactive session
  */
-class QueryResponseCommandFacility : public CommandFacility
-{
+class QueryResponseCommandFacility : public CommandFacility {
 public:
   /**
    * @brief Listen for commands from stdin, and pass them to the attached
@@ -30,7 +29,7 @@ public:
    * @param theProcess Pointer to the DAQProcess instance which will distribute
    * received commands
    */
-  int listen(DAQProcess* theProcess) override;
+  int listen(DAQProcess *theProcess) override;
 };
 } // namespace appframework
 

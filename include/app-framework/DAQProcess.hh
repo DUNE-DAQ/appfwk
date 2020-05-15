@@ -33,8 +33,7 @@ namespace appframework {
  * in the order defined in the CommandOrderMap received from the ModuleList
  * during register_modules.
  */
-class DAQProcess
-{
+class DAQProcess {
 public:
   /**
    * @brief DAQProcess Constructor
@@ -55,7 +54,7 @@ public:
    * needed by this DAQ Application. ConstructGraph also defines any ordering of
    * commands for UserModules.
    */
-  void register_modules(ModuleList& ml);
+  void register_modules(ModuleList &ml);
   /**
    * @brief Execute the specified command on the loaded UserModules
    * @param cmd Command to execute
@@ -76,10 +75,10 @@ public:
    */
   int listen();
 
-  DAQProcess(const DAQProcess&) = delete;
-  DAQProcess& operator=(const DAQProcess&) = delete;
-  DAQProcess(DAQProcess&&) = delete;
-  DAQProcess& operator=(DAQProcess&&) = delete;
+  DAQProcess(const DAQProcess &) = delete;
+  DAQProcess &operator=(const DAQProcess &) = delete;
+  DAQProcess(DAQProcess &&) = delete;
+  DAQProcess &operator=(DAQProcess &&) = delete;
 
 private:
   BufferMap bufferMap_;             ///< String alias for each Buffer

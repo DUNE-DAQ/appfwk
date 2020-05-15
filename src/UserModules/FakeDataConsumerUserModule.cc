@@ -6,7 +6,6 @@
  * received with this code.
  */
 
-
 #include "app-framework/UserModules/FakeDataConsumerUserModule.hh"
 
 #include "TRACE/trace.h"
@@ -17,17 +16,12 @@
 #include <thread>
 
 appframework::FakeDataConsumerUserModule::FakeDataConsumerUserModule(
-  std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer,
-  std::string id)
-  : thread_(std::bind(&FakeDataConsumerUserModule::do_work, this))
-  , id_(id)
-  , bufferTimeout_(100)
-  , inputBuffer_(inputBuffer)
-{}
+    std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer, std::string id)
+    : thread_(std::bind(&FakeDataConsumerUserModule::do_work, this)), id_(id),
+      bufferTimeout_(100), inputBuffer_(inputBuffer) {}
 
 std::future<std::string>
-appframework::FakeDataConsumerUserModule::execute_command(std::string cmd)
-{
+appframework::FakeDataConsumerUserModule::execute_command(std::string cmd) {
   if (cmd == "configure" || cmd == "Configure") {
     return std::async(std::launch::async, [&] { return do_configure(); });
   }
@@ -42,9 +36,7 @@ appframework::FakeDataConsumerUserModule::execute_command(std::string cmd)
                     [] { return std::string("Unrecognized Command"); });
 }
 
-std::string
-appframework::FakeDataConsumerUserModule::do_configure()
-{
+std::string appframework::FakeDataConsumerUserModule::do_configure() {
   nIntsPerVector_ = 10;
   starting_int_ = -4;
   ending_int_ = 14;
@@ -52,26 +44,20 @@ appframework::FakeDataConsumerUserModule::do_configure()
   return "Success";
 }
 
-std::string
-appframework::FakeDataConsumerUserModule::do_start()
-{
+std::string appframework::FakeDataConsumerUserModule::do_start() {
   thread_.start_working_thread_();
   return "Success";
 }
 
-std::string
-appframework::FakeDataConsumerUserModule::do_stop()
-{
+std::string appframework::FakeDataConsumerUserModule::do_stop() {
   thread_.stop_working_thread_();
   return "Success";
 }
 
-TraceStreamer&
-operator<<(TraceStreamer& t, std::vector<int> ints)
-{
+TraceStreamer &operator<<(TraceStreamer &t, std::vector<int> ints) {
   t << "{";
   bool first = true;
-  for (auto& i : ints) {
+  for (auto &i : ints) {
     if (!first)
       t << ", ";
     first = false;
@@ -80,9 +66,7 @@ operator<<(TraceStreamer& t, std::vector<int> ints)
   return t << "}";
 }
 
-void
-appframework::FakeDataConsumerUserModule::do_work()
-{
+void appframework::FakeDataConsumerUserModule::do_work() {
   int current_int = starting_int_;
   int counter = 0;
   int fail_count = 0;
@@ -94,10 +78,12 @@ appframework::FakeDataConsumerUserModule::do_work()
       TLOG(TLVL_DEBUG) << getId() << "Going to receive data from inputBuffer";
 
       try {
-	vec = inputBuffer_->pop(bufferTimeout_);
-      } catch(const std::runtime_error& err) {
-	TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an inputBuffer (exception is \"" << err.what() << "\"";
-	continue;
+        vec = inputBuffer_->pop(bufferTimeout_);
+      } catch (const std::runtime_error &err) {
+        TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
+                              "inputBuffer (exception is \""
+                           << err.what() << "\"";
+        continue;
       }
 
       TLOG(TLVL_DEBUG) << getId() << "Received vector of size " << vec.size();
@@ -108,20 +94,20 @@ appframework::FakeDataConsumerUserModule::do_work()
       TLOG(TLVL_INFO) << getId() << "Received vector " << counter << ": "
                       << vec;
       size_t ii = 0;
-      for (auto& point : vec) {
+      for (auto &point : vec) {
         if (point != current_int) {
           if (ii != 0) {
             TLOG(TLVL_WARNING)
-              << getId() << "Error in received vector " << counter
-              << ", position " << ii << ": Expected " << current_int
-              << ", received " << point;
+                << getId() << "Error in received vector " << counter
+                << ", position " << ii << ": Expected " << current_int
+                << ", received " << point;
             failed = true;
           } else {
             TLOG(TLVL_INFO) << getId() << "Jump detected!";
           }
           current_int = point;
         }
-	++current_int;
+        ++current_int;
         if (current_int > ending_int_)
           current_int = starting_int_;
         ++ii;

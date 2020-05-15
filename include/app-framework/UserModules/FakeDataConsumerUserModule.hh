@@ -26,17 +26,17 @@ namespace appframework {
  * @brief FakeDataConsumerUserModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataConsumerUserModule : public UserModule
-{
+class FakeDataConsumerUserModule : public UserModule {
 public:
   explicit FakeDataConsumerUserModule(
-    std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer,
-    std::string id = "");
+      std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer,
+      std::string id = "");
 
   std::future<std::string> execute_command(std::string cmd) override;
 
   FakeDataConsumerUserModule(const FakeDataConsumerUserModule &) = delete;
-  FakeDataConsumerUserModule &operator=(const FakeDataConsumerUserModule &) = delete;
+  FakeDataConsumerUserModule &
+  operator=(const FakeDataConsumerUserModule &) = delete;
   FakeDataConsumerUserModule(FakeDataConsumerUserModule &&) = delete;
   FakeDataConsumerUserModule &operator=(FakeDataConsumerUserModule &&) = delete;
 

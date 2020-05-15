@@ -30,13 +30,9 @@ namespace appframework {
 /**
  * @brief FanOutUserModule sends data to multiple Buffers
  */
-template<typename DATA_TYPE>
-class FanOutUserModule : public UserModule
-{
+template <typename DATA_TYPE> class FanOutUserModule : public UserModule {
 public:
-
-  enum class FanOutMode
-  {
+  enum class FanOutMode {
     NotConfigured,
     Broadcast,
     RoundRobin,
@@ -44,9 +40,9 @@ public:
   };
 
   FanOutUserModule(
-    std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer,
-    std::initializer_list<std::shared_ptr<BufferInput<DATA_TYPE>>>
-      outputBuffers);
+      std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer,
+      std::initializer_list<std::shared_ptr<BufferInput<DATA_TYPE>>>
+          outputBuffers);
 
   /**
    * @brief Logs the reception of the command
@@ -69,23 +65,24 @@ private:
   // necessary, even though it's just an alias to this user module's
   // data type.
 
-  template<typename U = DATA_TYPE>
+  template <typename U = DATA_TYPE>
   typename std::enable_if_t<!std::is_copy_constructible_v<U>>
-    do_broadcast(DATA_TYPE&) const
-  {
+  do_broadcast(DATA_TYPE &) const {
     throw std::runtime_error(
-      "Broadcast mode cannot be used for non-copy-constructible types!");
+        "Broadcast mode cannot be used for non-copy-constructible types!");
   }
-  template<typename U = DATA_TYPE>
-   typename std::enable_if_t<std::is_copy_constructible_v<U>>
-    do_broadcast(DATA_TYPE& data) const
-  {
-    for (auto& o : outputBuffers_) {
+  template <typename U = DATA_TYPE>
+  typename std::enable_if_t<std::is_copy_constructible_v<U>>
+  do_broadcast(DATA_TYPE &data) const {
+    for (auto &o : outputBuffers_) {
       auto starttime = std::chrono::steady_clock::now();
       o->push(data, bufferTimeout_);
       auto endtime = std::chrono::steady_clock::now();
-      if (std::chrono::duration_cast<decltype(bufferTimeout_)>(endtime - starttime) > bufferTimeout_) {
-	TLOG(TLVL_WARNING) << "Timeout occurred trying to broadcast data to output buffer; data may be lost if it doesn't make it into any other output buffers, either";
+      if (std::chrono::duration_cast<decltype(bufferTimeout_)>(
+              endtime - starttime) > bufferTimeout_) {
+        TLOG(TLVL_WARNING) << "Timeout occurred trying to broadcast data to "
+                              "output buffer; data may be lost if it doesn't "
+                              "make it into any other output buffers, either";
       }
     }
   }
@@ -96,12 +93,11 @@ private:
 
   // Configuration
   FanOutMode mode_;
-  std::chrono::milliseconds bufferTimeout_;  
+  std::chrono::milliseconds bufferTimeout_;
 
   std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer_;
   std::list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers_;
   size_t wait_interval_us_;
-
 };
 } // namespace appframework
 

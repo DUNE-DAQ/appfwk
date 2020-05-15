@@ -19,8 +19,7 @@ std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
 BOOST_AUTO_TEST_SUITE(DAQProcess_test)
 
-BOOST_AUTO_TEST_CASE(Construct)
-{
+BOOST_AUTO_TEST_CASE(Construct) {
   std::list<std::string> args;
   appframework::DAQProcess dp(args);
 }
