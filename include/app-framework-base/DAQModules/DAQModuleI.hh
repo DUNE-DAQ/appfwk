@@ -16,8 +16,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULE_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULE_HH_
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
 
 #include <vector>
 #include <string>
@@ -30,7 +30,7 @@ namespace appframework {
  * Developers implementing DAQModules should feel free to use whatever Plugins
  * and Services are necessary to accomplish their needed functionality.
  */
-class DAQModule {
+class DAQModuleI {
 public:
   /**
    * @brief Execute a command in this DAQModule
@@ -47,4 +47,4 @@ public:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULE_HH_
+#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
