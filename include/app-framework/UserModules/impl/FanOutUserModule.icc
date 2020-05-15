@@ -3,7 +3,7 @@ template <typename DATA_TYPE>
 appframework::FanOutUserModule<DATA_TYPE>::FanOutUserModule(
     std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer,
     std::initializer_list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers)
-    : inputBuffer_(inputBuffer), mode_(FanOutMode::NotConfigured), bufferTimeout_(100), outputBuffers_(outputBuffers), thread_(std::bind(&FanOutUserModule<DATA_TYPE>::do_work, this)) {}
+  : thread_(std::bind(&FanOutUserModule<DATA_TYPE>::do_work, this)), mode_(FanOutMode::NotConfigured), bufferTimeout_(100), inputBuffer_(inputBuffer), outputBuffers_(outputBuffers), wait_interval_us_(std::numeric_limits<size_t>::max()) {}
 
 template <typename DATA_TYPE>
 std::future<std::string> appframework::FanOutUserModule<DATA_TYPE>::execute_command(std::string cmd) {
@@ -22,7 +22,6 @@ std::future<std::string> appframework::FanOutUserModule<DATA_TYPE>::execute_comm
 
 template <typename DATA_TYPE>
 std::string appframework::FanOutUserModule<DATA_TYPE>::do_configure() {
-    // TODO: Get configuration from ConfigurationManager!
     mode_ = FanOutMode::RoundRobin;
     wait_interval_us_ = 1000000;
 
@@ -45,40 +44,65 @@ template <typename DATA_TYPE>
 void appframework::FanOutUserModule<DATA_TYPE>::do_work() {
     auto roundRobinNext = outputBuffers_.begin();
 
+    // unique_ptr needed since there's no guarantee DATA_TYPE has a no-argument constructor
+    std::unique_ptr<DATA_TYPE> data_ptr = nullptr;
+
     while (thread_.thread_running()) {
         if (!inputBuffer_->empty()) {
-            auto data = inputBuffer_->pop(bufferTimeout_);
+	  
+	  try {
+	    data_ptr = std::make_unique<DATA_TYPE>( inputBuffer_->pop(bufferTimeout_) );
+	  } catch (const std::runtime_error& err) {
+	    TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an inputBuffer (exception is \"" << err.what() << "\")";
+	    continue;
+	  }
 
+	  
             if (mode_ == FanOutMode::Broadcast) {
-                do_broadcast(data);
+                do_broadcast(*data_ptr);
             } else if (mode_ == FanOutMode::FirstAvailable) {
-                auto sent = false;
+	      auto sent = false;
                 while (!sent) {
                     for (auto& o : outputBuffers_) {
                         if (!o->full()) {
-                            o->push(std::move(data), bufferTimeout_);
-                            sent = true;
-                            break;
+			  auto starttime = std::chrono::steady_clock::now();
+                            o->push(std::move(*data_ptr), bufferTimeout_);
+			    auto endtime = std::chrono::steady_clock::now();
+
+			    if ( std::chrono::duration_cast<decltype(bufferTimeout_)>(endtime - starttime) < bufferTimeout_) {
+			      sent = true;
+			      break;
+			    } else {
+			      TLOG(TLVL_WARNING) << "A timeout occurred trying to push data onto an outputBuffer; data has been lost";
+			    }
                         }
                     }
                     if (!sent) {
-                        usleep(wait_interval_us_);
+		      std::this_thread::sleep_for(std::chrono::microseconds(wait_interval_us_));
                     }
                 }
             } else if (mode_ == FanOutMode::RoundRobin) {
                 while (true) {
                     if (!(*roundRobinNext)->full()) {
-                        (*roundRobinNext)->push(std::move(data), bufferTimeout_);
 
-                        if (++roundRobinNext == outputBuffers_.end()) roundRobinNext = outputBuffers_.begin();
+		      auto starttime = std::chrono::steady_clock::now();
+                        (*roundRobinNext)->push(std::move(*data_ptr), bufferTimeout_);
+			auto endtime = std::chrono::steady_clock::now();
+
+			if ( std::chrono::duration_cast<decltype(bufferTimeout_)>(endtime - starttime) >= bufferTimeout_) {
+			  TLOG(TLVL_WARNING) << "A timeout occurred trying to push data onto an outputBuffer; data has been lost";
+			}
+
+			++roundRobinNext;
+                        if (roundRobinNext == outputBuffers_.end()) roundRobinNext = outputBuffers_.begin();
                         break;
                     } else {
-                        usleep(wait_interval_us_);
+		      std::this_thread::sleep_for(std::chrono::microseconds(wait_interval_us_));
                     }
                 }
             }
-        } else {
-            usleep(wait_interval_us_);
+        } else {  // inputBuffer_ is empty
+	  std::this_thread::sleep_for(std::chrono::microseconds(wait_interval_us_));
         }
     }
 }

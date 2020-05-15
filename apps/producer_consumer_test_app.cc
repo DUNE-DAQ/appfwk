@@ -6,9 +6,6 @@
  * received with this code.
  */
 
-#include <memory>
-#include <vector>
-
 #include "app-framework/Buffers/DequeBuffer.hh"
 #include "app-framework/DAQProcess.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
@@ -16,23 +13,25 @@
 #include "app-framework/UserModules/FakeDataProducerUserModule.hh"
 #include "app-framework/UserModules/FanOutUserModule.hh"
 
+#include <memory>
+#include <vector>
+
 namespace appframework {
-std::unique_ptr<CommandFacility> CommandFacility::handle_ =
-  std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
+
+  std::unique_ptr<CommandFacility> CommandFacility::handle_ =
+    std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
 
 class producer_consumer_test_app_ModuleList : public ModuleList
 {
   // Inherited via ModuleList
-  virtual void ConstructGraph(BufferMap& buffer_map,
+  void ConstructGraph(BufferMap& buffer_map,
                               UserModuleMap& user_module_map,
                               CommandOrderMap& command_order_map) override
   {
-    std::shared_ptr<DequeBuffer<std::vector<int>>> producerToFanOut(
-      new DequeBuffer<std::vector<int>>());
-    std::shared_ptr<DequeBuffer<std::vector<int>>> fanOutToConsumer1(
-      new DequeBuffer<std::vector<int>>());
-    std::shared_ptr<DequeBuffer<std::vector<int>>> fanOutToConsumer2(
-      new DequeBuffer<std::vector<int>>());
+    auto producerToFanOut = std::make_shared<DequeBuffer<std::vector<int>>>();
+    auto fanOutToConsumer1 = std::make_shared<DequeBuffer<std::vector<int>>>();
+    auto fanOutToConsumer2 = std::make_shared<DequeBuffer<std::vector<int>>>();
+
     buffer_map["producerToFanOut"] = producerToFanOut;
     buffer_map["fanOutToConsumer1"] = fanOutToConsumer1;
     buffer_map["fanOutToConsumer2"] = fanOutToConsumer2;

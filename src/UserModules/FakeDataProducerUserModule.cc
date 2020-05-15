@@ -1,6 +1,16 @@
+/**
+ * @file The FakeDataProducerUserModule class implementation
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
+ */
+
+
 #include "app-framework/UserModules/FakeDataProducerUserModule.hh"
 
-#include <unistd.h>
+#include <chrono>
+#include <thread>
 
 #include <TRACE/trace.h>
 #define TRACE_NAME "FakeDataProducer"
@@ -32,7 +42,6 @@ appframework::FakeDataProducerUserModule::execute_command(std::string cmd)
 std::string
 appframework::FakeDataProducerUserModule::do_configure()
 {
-  // TODO: Get configuration from ConfigurationManager!
   nIntsPerVector_ = 10;
   starting_int_ = -4;
   ending_int_ = 14;
@@ -83,17 +92,23 @@ appframework::FakeDataProducerUserModule::do_work()
     TLOG(TLVL_DEBUG) << "Start of fill loop";
     for (auto ii = 0; ii < nIntsPerVector_; ++ii) {
       output[ii] = current_int;
-      if (++current_int > ending_int_)
+      ++current_int;
+      if (current_int > ending_int_)
         current_int = starting_int_;
     }
     TLOG(TLVL_INFO) << "Produced vector " << counter << " with contents "
-                    << output;
+                    << output << " and size " << output.size();
 
     TLOG(TLVL_DEBUG) << "Pushing vector into outputBuffer";
+    auto starttime = std::chrono::steady_clock::now();
     outputBuffer_->push(std::move(output), bufferTimeout_);
+    auto endtime = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<decltype(bufferTimeout_)>(endtime - starttime) > bufferTimeout_) {
+      TLOG(TLVL_WARNING) << "Timeout attempting to push vector onto outputBuffer";
+    }
 
     TLOG(TLVL_DEBUG) << "Start of sleep between sends";
-    usleep(wait_between_sends_ms_ * 1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(wait_between_sends_ms_));
     TLOG(TLVL_DEBUG) << "End of do_work loop";
     counter++;
   }

@@ -24,7 +24,6 @@
 #include <string>
 #include <thread>
 #include <type_traits>
-#include <unistd.h>
 #include <utility>
 
 namespace appframework {

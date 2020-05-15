@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH
-#define APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH_
 
 #include "app-framework-base/Buffers/Buffer.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
@@ -29,10 +29,15 @@ namespace appframework {
 class FakeDataProducerUserModule : public UserModule
 {
 public:
-  FakeDataProducerUserModule(
+  explicit FakeDataProducerUserModule(
     std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer);
 
   std::future<std::string> execute_command(std::string cmd) override;
+
+  FakeDataProducerUserModule(const FakeDataProducerUserModule &) = delete;
+  FakeDataProducerUserModule &operator=(const FakeDataProducerUserModule &) = delete;
+  FakeDataProducerUserModule(FakeDataProducerUserModule &&) = delete;
+  FakeDataProducerUserModule &operator=(FakeDataProducerUserModule &&) = delete;
 
 private:
   // Commands
@@ -56,4 +61,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH_

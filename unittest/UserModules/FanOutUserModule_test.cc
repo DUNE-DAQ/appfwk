@@ -21,7 +21,7 @@ constexpr auto buffer_timeout = std::chrono::milliseconds(10);
 struct NonCopyableType
 {
   int data;
-  NonCopyableType(int d)
+  explicit NonCopyableType(int d)
     : data(d)
   {}
   NonCopyableType(NonCopyableType const&) = delete;
@@ -34,11 +34,11 @@ struct NonCopyableType
   }
 };
 
-}
+} // namespace ""
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
-}
+} // namespace appframework
 
 BOOST_AUTO_TEST_SUITE(FanOutUserModule_test)
 
@@ -71,13 +71,11 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   foum.execute_command("configure");
   foum.execute_command("start");
 
-  NonCopyableType nct1(1);
-  inputbuf->push(std::move(nct1), buffer_timeout);
-  NonCopyableType nct2(2);
-  inputbuf->push(std::move(nct2), buffer_timeout);
+  inputbuf->push(NonCopyableType(1), buffer_timeout);
+  inputbuf->push(NonCopyableType(2), buffer_timeout);
 
   while (!inputbuf->empty())
-    usleep(10000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   foum.execute_command("stop");
 
