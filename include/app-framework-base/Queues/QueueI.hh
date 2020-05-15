@@ -25,7 +25,7 @@ class QueueI {
 public:
   explicit QueueI() {}
 
-  virtual void Configure() {;}  ///< called to specify particular configuration
+  virtual void Configure( const std::vector<std::string> & args = {} ) {;}  ///< called to specify particular configuration
 
   QueueI(const QueueI &) = delete;
   QueueI &operator=(const QueueI &) = delete ;
