@@ -17,7 +17,7 @@
 
 #include "app-framework-base/Queues/QueueI.hh"
 #include "app-framework-base/Core/ModuleList.hh"
-#include "app-framework-base/DAQModules/DAQModule.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
 
 #include <list>
 #include <map>

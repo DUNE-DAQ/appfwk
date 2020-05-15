@@ -12,14 +12,14 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DEBUGLOGGINGUSERMODULE_HH_
 
-#include "app-framework-base/DAQModules/DAQModule.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
 
 namespace appframework {
 /**
  * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingDAQModule : public DAQModule {
+class DebugLoggingDAQModule : public DAQModuleI {
 public:
   /**
    * @brief Logs the reception of the command
