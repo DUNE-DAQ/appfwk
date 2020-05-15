@@ -10,7 +10,7 @@
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
 
 #include "app-framework-base/Queues/QueueI.hh"
-#include "app-framework-base/DAQModules/DAQModule.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
 
 #include <list>
 #include <map>
@@ -18,7 +18,7 @@
 #include <string>
 
 namespace appframework {
-typedef std::map<std::string, std::unique_ptr<DAQModule>>
+typedef std::map<std::string, std::unique_ptr<DAQModuleI>>
     DAQModuleMap; ///< DAQModules indexed by name
 typedef std::map<std::string, std::unique_ptr<QueueI>>
     QueueMap; ///< Queues indexed by name
