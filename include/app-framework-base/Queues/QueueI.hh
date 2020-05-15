@@ -9,6 +9,8 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_QUEUES_QUEUEI_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_QUEUES_QUEUEI_HH_
 
+#include <vector>
+#include <string>
 #include <cstddef>
 
 namespace appframework {
