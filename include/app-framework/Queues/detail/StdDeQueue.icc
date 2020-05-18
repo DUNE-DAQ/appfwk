@@ -4,7 +4,6 @@ template <class T, class U> StdDeQueue<T, U>::StdDeQueue() : fDeque(), fSize(0) 
 
 
 template <class T, class U>
-<<<<<<< HEAD:include/app-framework/Queues/detail/StdDeQueue.icc
 void StdDeQueue<T, U>::push(value_type &&object_to_push,
 		            const duration_type &timeout) {
 
