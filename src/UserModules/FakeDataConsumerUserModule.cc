@@ -93,7 +93,8 @@ void appframework::FakeDataConsumerUserModule::do_work() {
   while (thread_.thread_running()) {
     if (!inputBuffer_->empty()) {
 
-      TLOG(TLVL_DEBUG) << getId() << "Going to receive data from inputBuffer";
+      TLOG(TLVL_DEBUG) << instance_name_
+                       << " Going to receive data from inputBuffer";
 
       try {
         vec = inputBuffer_->pop(bufferTimeout_);
@@ -104,7 +105,8 @@ void appframework::FakeDataConsumerUserModule::do_work() {
         continue;
       }
 
-      TLOG(TLVL_DEBUG) << getId() << "Received vector of size " << vec.size();
+      TLOG(TLVL_DEBUG) << instance_name_ << " Received vector of size "
+                       << vec.size();
 
       bool failed = false;
 
