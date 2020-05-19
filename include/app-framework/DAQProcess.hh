@@ -15,9 +15,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 
-#include "app-framework-base/Queues/QueueI.hh"
 #include "app-framework-base/Core/ModuleList.hh"
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework-base/Queues/QueueI.hh"
 
 #include <list>
 #include <map>
@@ -33,7 +33,8 @@ namespace appframework {
  * in the order defined in the CommandOrderMap received from the ModuleList
  * during register_modules.
  */
-class DAQProcess {
+class DAQProcess
+{
 public:
   /**
    * @brief DAQProcess Constructor
@@ -54,7 +55,7 @@ public:
    * needed by this DAQ Application. ConstructGraph also defines any ordering of
    * commands for DAQModules.
    */
-  void register_modules(ModuleList &ml);
+  void register_modules(ModuleList& ml);
   /**
    * @brief Execute the specified command on the loaded DAQModules
    * @param cmd Command to execute
@@ -75,14 +76,14 @@ public:
    */
   int listen();
 
-  DAQProcess(const DAQProcess &) = delete;
-  DAQProcess &operator=(const DAQProcess &) = delete;
-  DAQProcess(DAQProcess &&) = delete;
-  DAQProcess &operator=(DAQProcess &&) = delete;
+  DAQProcess(const DAQProcess&) = delete;
+  DAQProcess& operator=(const DAQProcess&) = delete;
+  DAQProcess(DAQProcess&&) = delete;
+  DAQProcess& operator=(DAQProcess&&) = delete;
 
 private:
-  QueueMap queueMap_;             ///< String alias for each Queue
-  DAQModuleMap daqModuleMap_;     ///< String alias for each DAQModule
+  QueueMap queueMap_;               ///< String alias for each Queue
+  DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule
   CommandOrderMap commandOrderMap_; ///< Order DAQModule commands by alias
 };
 } // namespace appframework

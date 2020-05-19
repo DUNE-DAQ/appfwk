@@ -28,9 +28,11 @@
 
 namespace appframework {
 
-template <class ValueType, class DurationType = std::chrono::milliseconds>
-class StdDeQueue : public QueueSink<ValueType, DurationType>,
-                    public QueueSource<ValueType, DurationType> {
+template<class ValueType, class DurationType = std::chrono::milliseconds>
+class StdDeQueue
+  : public QueueSink<ValueType, DurationType>
+  , public QueueSource<ValueType, DurationType>
+{
 public:
   using value_type = ValueType;
   using duration_type = DurationType;
@@ -41,26 +43,31 @@ public:
 
   using QueueSink<ValueType, DurationType>::push;
 
-  using QueueI::Configure() ; 
+  using QueueI::Configure; //(const std::vector<std::string> & args = {}) ;
 
   StdDeQueue();
-  
-  bool can_pop() const noexcept override { return fSize.load() > 0 ; }  
-  value_type pop(const duration_type &) override; // Throws std::runtime_error if a timeout occurs
 
-  bool can_push() const noexcept override { return fSize.load() < fDeque.max_size() ; }
-  void push(value_type &&, const duration_type &) override; // Throws std::runtime_error if a timeout occurs
+  bool can_pop() const noexcept override { return fSize.load() > 0; }
+  value_type pop(const duration_type&)
+    override; // Throws std::runtime_error if a timeout occurs
+
+  bool can_push() const noexcept override
+  {
+    return fSize.load() < fDeque.max_size();
+  }
+  void push(value_type&&, const duration_type&)
+    override; // Throws std::runtime_error if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
 
-  StdDeQueue(const StdDeQueue &) = delete;
-  StdDeQueue &operator=(const StdDeQueue &) = delete;
-  StdDeQueue(StdDeQueue &&) = delete;
-  StdDeQueue &operator=(StdDeQueue &&) = delete;
+  StdDeQueue(const StdDeQueue&) = delete;
+  StdDeQueue& operator=(const StdDeQueue&) = delete;
+  StdDeQueue(StdDeQueue&&) = delete;
+  StdDeQueue& operator=(StdDeQueue&&) = delete;
 
 private:
-  void try_lock_for(std::unique_lock<std::mutex> &, const duration_type &);
+  void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
 
   std::deque<value_type> fDeque;
   std::atomic<size_t> fSize = 0;

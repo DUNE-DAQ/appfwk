@@ -9,24 +9,29 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQModule_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQModule_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
 
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
+
+#include <string>
+#include <vector>
 
 namespace appframework {
 /**
  * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingDAQModule : public DAQModuleI {
+class DebugLoggingDAQModule : public DAQModuleI
+{
 public:
   /**
    * @brief Logs the reception of the command
    * @param cmd Command from DAQProcess
    */
-  void execute_command(const std::string & cmd, const std::vector<std::string> & args = {} ) override;
+  void execute_command(const std::string& cmd,
+                       const std::vector<std::string>& args = {}) override;
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQModule_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_

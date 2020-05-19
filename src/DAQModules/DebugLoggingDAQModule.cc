@@ -6,7 +6,7 @@
  * received with this code.
  */
 
-#include "app-framework/DebugLoggingDAQModule.hh"
+#include "app-framework/DAQModules/DebugLoggingDAQModule.hh"
 
 #include "app-framework-base/Services/Logger.hh"
 
@@ -16,11 +16,15 @@
 
 namespace appframework {
 
-  void DebugLoggingDAQModule::execute_command(const std::string & cmd, const std::vector<std::string> & args ) {
-      TLOG(TLVL_INFO) << "Executing command: " << cmd << " with " << args.size() << " args" ;
-         for ( auto & a : args ) {
-             TLOG(TLVL_INFO) << a ; 
-	 }
-      return ;
+void
+DebugLoggingDAQModule::execute_command(const std::string& cmd,
+                                       const std::vector<std::string>& args)
+{
+  TLOG(TLVL_INFO) << "Executing command: " << cmd << " with " << args.size()
+                  << " args";
+  for (auto& a : args) {
+    TLOG(TLVL_INFO) << a;
   }
+  return;
+}
 } // namespace appframework

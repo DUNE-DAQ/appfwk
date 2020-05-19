@@ -9,12 +9,12 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQModuleS_FAKEDATAPRODUCERDAQModule_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQModuleS_FAKEDATAPRODUCERDAQModule_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
 
-#include "app-framework-base/Buffers/Buffer.hh"
-#include "app-framework-base/DAQModules/DAQModule.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
 #include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
+#include "app-framework-base/Queues/Queue.hh"
 
 #include <future>
 #include <memory>
@@ -26,18 +26,20 @@ namespace appframework {
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataProducerDAQModule : public DAQModule {
+class FakeDataProducerDAQModule : public DAQModuleI
+{
 public:
   explicit FakeDataProducerDAQModule(
-      std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer);
+    std::shared_ptr<QueueSink<std::vector<int>>> outputQueue);
 
-  std::future<std::string> execute_command(std::string cmd) override;
+  void execute_command(const std::string& cmd,
+                       const std::vector<std::string>& args = {}) override;
 
-  FakeDataProducerDAQModule(const FakeDataProducerDAQModule &) = delete;
-  FakeDataProducerDAQModule &
-  operator=(const FakeDataProducerDAQModule &) = delete;
-  FakeDataProducerDAQModule(FakeDataProducerDAQModule &&) = delete;
-  FakeDataProducerDAQModule &operator=(FakeDataProducerDAQModule &&) = delete;
+  FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) = delete;
+  FakeDataProducerDAQModule& operator=(const FakeDataProducerDAQModule&) =
+    delete;
+  FakeDataProducerDAQModule(FakeDataProducerDAQModule&&) = delete;
+  FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) = delete;
 
 private:
   // Commands
@@ -50,8 +52,8 @@ private:
   void do_work();
 
   // Configuration
-  std::shared_ptr<BufferInput<std::vector<int>>> outputBuffer_;
-  std::chrono::milliseconds bufferTimeout_;
+  std::shared_ptr<QueueSink<std::vector<int>>> outputQueue_;
+  std::chrono::milliseconds queueTimeout_;
   size_t nIntsPerVector_;
   int starting_int_;
   int ending_int_;
@@ -60,4 +62,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQModuleS_FAKEDATAPRODUCERDAQModule_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_

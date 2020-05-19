@@ -52,7 +52,7 @@ T StdDeQueue<T, U>::pop(const duration_type &timeout) {
                             [&]() { return this->can_pop() ; });
   }
 
-  if (!this->empty()) {
+  if (this->can_pop()) {
     T obj(std::move(fDeque.front()));
     fDeque.pop_front();
     fSize--;
