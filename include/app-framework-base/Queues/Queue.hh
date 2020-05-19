@@ -20,7 +20,7 @@ using std::size_t;
 namespace appframework {
 
 template<class ValueType, class DurationType = std::chrono::milliseconds>
-class QueueSink : virtual public QueueI
+class QueueSink : virtual public QueueI // NOLINT
 {
 
 public:
@@ -43,7 +43,7 @@ public:
 };
 
 template<class ValueType, class DurationType = std::chrono::milliseconds>
-class QueueSource : virtual public QueueI
+class QueueSource : virtual public QueueI // NOLINT
 {
 
 public:
