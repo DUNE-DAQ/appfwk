@@ -9,31 +9,40 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH
-#define APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
 
 #include "app-framework-base/Buffers/Buffer.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
 #include "app-framework-base/UserModules/UserModuleThreadHelper.hh"
 
+#include "TRACE/trace.h"
+
 #include <future>
+#include <limits>
 #include <list>
 #include <memory>
 #include <string>
 #include <type_traits>
-#include <unistd.h>
+#include <utility>
 
 namespace appframework {
 /**
  * @brief FanOutUserModule sends data to multiple Buffers
  */
-template<typename DATA_TYPE>
-class FanOutUserModule : public UserModule
-{
+template <typename DATA_TYPE> class FanOutUserModule : public UserModule {
 public:
   FanOutUserModule(std::string name,
                    std::vector<std::shared_ptr<BufferI>> inputs,
                    std::vector<std::shared_ptr<BufferI>> outputs);
+
+  enum class FanOutMode {
+    NotConfigured,
+    Broadcast,
+    RoundRobin,
+    FirstAvailable
+  };
+
 
   /**
    * @brief Logs the reception of the command
@@ -41,13 +50,10 @@ public:
    */
   std::future<std::string> execute_command(std::string cmd) override;
 
-  enum class FanOutMode
-  {
-    NotConfigured,
-    Broadcast,
-    RoundRobin,
-    FirstAvailable
-  };
+  FanOutUserModule(const FanOutUserModule &) = delete;
+  FanOutUserModule &operator=(const FanOutUserModule &) = delete;
+  FanOutUserModule(FanOutUserModule &&) = delete;
+  FanOutUserModule &operator=(FanOutUserModule &&) = delete;
 
 private:
   // Commands
@@ -55,36 +61,46 @@ private:
   std::string do_start();
   std::string do_stop();
 
+  // Type traits handling. Yes, the "U" template parameter is actually
+  // necessary, even though it's just an alias to this user module's
+  // data type.
+
+  template <typename U = DATA_TYPE>
+  typename std::enable_if_t<!std::is_copy_constructible_v<U>>
+  do_broadcast(DATA_TYPE &) const {
+    throw std::runtime_error(
+        "Broadcast mode cannot be used for non-copy-constructible types!");
+  }
+  template <typename U = DATA_TYPE>
+  typename std::enable_if_t<std::is_copy_constructible_v<U>>
+  do_broadcast(DATA_TYPE &data) const {
+    for (auto &o : outputBuffers_) {
+      auto starttime = std::chrono::steady_clock::now();
+      o->push(data, bufferTimeout_);
+      auto endtime = std::chrono::steady_clock::now();
+      if (std::chrono::duration_cast<decltype(bufferTimeout_)>(
+              endtime - starttime) > bufferTimeout_) {
+        TLOG(TLVL_WARNING) << "Timeout occurred trying to broadcast data to "
+                              "output buffer; data may be lost if it doesn't "
+                              "make it into any other output buffers, either";
+      }
+    }
+  }
+
   // Threading
-  UserModuleThreadHelper thread_;
   void do_work();
+  UserModuleThreadHelper thread_;
 
   // Configuration
   FanOutMode mode_;
-  const std::chrono::milliseconds bufferTimeout_;  
+  std::chrono::milliseconds bufferTimeout_;
+
   std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer_;
   std::list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers_;
   size_t wait_interval_us_;
-
-  // Type traits handling
-  template<typename... Dummy, typename U = DATA_TYPE>
-  typename std::enable_if<!std::is_copy_constructible<U>::value>::type
-  do_broadcast(DATA_TYPE&)
-  {
-    throw std::runtime_error(
-      "Broadcast mode cannot be used for non-copy-constructible types!");
-  }
-  template<typename... Dummy, typename U = DATA_TYPE>
-  typename std::enable_if<std::is_copy_constructible<U>::value>::type
-  do_broadcast(DATA_TYPE& data)
-  {
-    for (auto& o : outputBuffers_) {
-      o->push(DATA_TYPE(data), bufferTimeout_);
-    }
-  }
 };
 } // namespace appframework
 
 #include "detail/FanOutUserModule.icc"
 
-#endif // APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_

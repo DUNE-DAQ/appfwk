@@ -18,45 +18,38 @@ namespace {
 
 constexpr auto buffer_timeout = std::chrono::milliseconds(10);
 
-struct NonCopyableType
-{
+struct NonCopyableType {
   int data;
-  NonCopyableType(int d)
-    : data(d)
-  {}
+  explicit NonCopyableType(int d) : data(d) {}
   NonCopyableType(NonCopyableType const&) = delete;
   NonCopyableType(NonCopyableType&& i) { data = i.data; }
   NonCopyableType& operator=(NonCopyableType const&) = delete;
-  NonCopyableType& operator=(NonCopyableType&& i)
-  {
+  NonCopyableType &operator=(NonCopyableType &&i) {
     data = i.data;
     return *this;
   }
 };
 
-}
+} // namespace ""
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
-}
+} // namespace appframework
 
 BOOST_AUTO_TEST_SUITE(FanOutUserModule_test)
 
-BOOST_AUTO_TEST_CASE(Construct)
-{
+BOOST_AUTO_TEST_CASE(Construct) {
   auto buf = std::make_shared<appframework::DequeBuffer<int>>();
   appframework::FanOutUserModule<int> foum("test", { buf }, { buf });
 }
 
-BOOST_AUTO_TEST_CASE(Configure)
-{
+BOOST_AUTO_TEST_CASE(Configure) {
   auto buf = std::make_shared<appframework::DequeBuffer<int>>();
   appframework::FanOutUserModule<int> foum("test", { buf }, { buf });
   foum.execute_command("configure");
 }
 
-BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
-{
+BOOST_AUTO_TEST_CASE(NonCopyableTypeTest) {
   auto inputbuf =
     std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
   auto outputbuf1 =
@@ -71,13 +64,11 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   foum.execute_command("configure");
   foum.execute_command("start");
 
-  NonCopyableType nct1(1);
-  inputbuf->push(std::move(nct1), buffer_timeout);
-  NonCopyableType nct2(2);
-  inputbuf->push(std::move(nct2), buffer_timeout);
+  inputbuf->push(NonCopyableType(1), buffer_timeout);
+  inputbuf->push(NonCopyableType(2), buffer_timeout);
 
   while (!inputbuf->empty())
-    usleep(10000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   foum.execute_command("stop");
 

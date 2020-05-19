@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH
-#define APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH_
 
 #include "app-framework-base/Buffers/Buffer.hh"
 #include "app-framework-base/UserModules/UserModule.hh"
@@ -26,14 +26,19 @@ namespace appframework {
  * @brief FakeDataConsumerUserModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataConsumerUserModule : public UserModule
-{
+class FakeDataConsumerUserModule : public UserModule {
 public:
   FakeDataConsumerUserModule(std::string name,
              std::vector<std::shared_ptr<BufferI>> inputs,
              std::vector<std::shared_ptr<BufferI>> outputs);
 
   std::future<std::string> execute_command(std::string cmd) override;
+
+  FakeDataConsumerUserModule(const FakeDataConsumerUserModule &) = delete;
+  FakeDataConsumerUserModule &
+  operator=(const FakeDataConsumerUserModule &) = delete;
+  FakeDataConsumerUserModule(FakeDataConsumerUserModule &&) = delete;
+  FakeDataConsumerUserModule &operator=(FakeDataConsumerUserModule &&) = delete;
 
 private:
   // Commands
@@ -54,4 +59,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH_

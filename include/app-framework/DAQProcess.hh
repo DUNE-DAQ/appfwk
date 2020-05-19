@@ -31,8 +31,7 @@ namespace appframework {
  * in the order defined in the CommandOrderMap received from the ModuleList
  * during register_modules.
  */
-class DAQProcess
-{
+class DAQProcess {
 public:
   /**
    * @brief DAQProcess Constructor
