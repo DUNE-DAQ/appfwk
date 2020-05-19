@@ -31,7 +31,6 @@ struct BufferAttributes {
  * it can be included in generic containers), all implementations should be.
  */
 class BufferI {
-
 public:
   explicit BufferI(BufferAttributes attributes = {false, false})
       : fAttributes(attributes) {}
