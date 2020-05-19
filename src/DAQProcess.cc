@@ -72,9 +72,5 @@ DAQProcess::execute_command(std::string cmd)
   }
 }
 
-int
-DAQProcess::listen()
-{
-  return CommandFacility::handle().listen(this);
-}
+int DAQProcess::listen() { return CommandFacility::handle().listen(this); }
 } // namespace appframework
