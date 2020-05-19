@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH
-#define APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
 
 #include "app-framework-base/Buffers/Buffer.hh"
 
@@ -25,31 +25,26 @@ namespace appframework {
  * @brief UserModuleThreadHelper contains a thread which runs the do_work()
  * function
  */
-class UserModuleThreadHelper
-{
+class UserModuleThreadHelper {
 public:
   /**
    * @brief UserModuleThreadHelper Constructor
    *
    * This constructor sets the defaults for the thread control variables
    */
-  UserModuleThreadHelper(std::function<void()> do_work)
-    : thread_started_(false)
-    , working_thread_(nullptr)
-    , do_work_(do_work)
-  {}
+  explicit UserModuleThreadHelper(std::function<void()> do_work)
+      : thread_running_(false), working_thread_(nullptr), do_work_(do_work) {}
 
   /**
    * @brief Start the working thread (which executes the do_work() function)
    * @throws std::runtime_error if the thread is already running
    */
-  void start_working_thread_()
-  {
-    if (thread_started_ || working_thread_ != nullptr) {
+  void start_working_thread_() {
+    if (thread_running()) {
       throw std::runtime_error("Attempted to start UserModule working thread "
                                "when it is already running!");
     }
-    thread_started_ = true;
+    thread_running_ = true;
     working_thread_.reset(new std::thread([&] { do_work_(); }));
   }
   /**
@@ -57,27 +52,33 @@ public:
    * @throws std::runtime_error If the thread has not yet been started
    * @throws std::runtime_error If the thread is not in the joinable state
    */
-  void stop_working_thread_()
-  {
-    if (!thread_started_ || working_thread_ == nullptr) {
-      throw std::runtime_error(
-        "Attempted to stop UserModule working thread when it is not running!");
+  void stop_working_thread_() {
+    if (!thread_running()) {
+      throw std::runtime_error("Attempted to stop UserModule working thread "
+                               "when it is not running!");
     }
-    thread_started_ = false;
+    thread_running_ = false;
+
     if (working_thread_->joinable()) {
       working_thread_->join();
+    } else {
+      throw std::runtime_error("Thread not in joinable state during UserModule "
+                               "working thread stop!");
     }
-    throw std::runtime_error(
-      "Thread not in joinable state during UserModule working thread stop!");
   }
 
-  bool thread_running() { return thread_started_.load(); }
+  bool thread_running() const { return thread_running_.load(); }
+
+  UserModuleThreadHelper(const UserModuleThreadHelper &) = delete;
+  UserModuleThreadHelper &operator=(const UserModuleThreadHelper &) = delete;
+  UserModuleThreadHelper(UserModuleThreadHelper &&) = delete;
+  UserModuleThreadHelper &operator=(UserModuleThreadHelper &&) = delete;
 
 private:
-  std::atomic<bool> thread_started_;
+  std::atomic<bool> thread_running_;
   std::unique_ptr<std::thread> working_thread_;
   std::function<void()> do_work_;
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH
+#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_

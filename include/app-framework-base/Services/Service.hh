@@ -36,8 +36,7 @@ namespace appframework {
  * @brief The Service class represents a static entity which may be loaded into
  * the ServiceManager for use by multiple UserModules and/or Buffers
  */
-class Service
-{
+class Service {
 public:
   /**
    * @brief Configure the Service instance with command-line-like arguments

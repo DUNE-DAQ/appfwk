@@ -19,11 +19,11 @@
 
 namespace appframework {
 typedef std::map<std::string, std::unique_ptr<UserModule>>
-  UserModuleMap; ///< UserModules indexed by name
+    UserModuleMap; ///< UserModules indexed by name
 typedef std::map<std::string, std::shared_ptr<BufferI>>
-  BufferMap; ///< Buffers indexed by name
+    BufferMap; ///< Buffers indexed by name
 typedef std::map<std::string, std::list<std::string>>
-  CommandOrderMap; ///< Defined UserModule orders for commands
+    CommandOrderMap; ///< Defined UserModule orders for commands
 
 /**
  * @brief The ModuleList class is the representation of a UserModule and Buffer
@@ -33,8 +33,7 @@ typedef std::map<std::string, std::list<std::string>>
  * UserModules for a DAQ Application, as well as linking them together.
  * UserModules define their Buffer endpoints by requiring Buffer instances
  */
-class ModuleList
-{
+class ModuleList {
 public:
   /**
    * @brief Construct the graph of UserModules and Buffers.
@@ -49,9 +48,9 @@ public:
    * Buffer and UserModule instances in a DAQ Application. Additionally, any
    * requirements on command order for UserModules should be defined here.
    */
-  virtual void ConstructGraph(BufferMap& buffer_map,
-                              UserModuleMap& user_module_map,
-                              CommandOrderMap& command_order_map) = 0;
+  virtual void ConstructGraph(BufferMap &buffer_map,
+                              UserModuleMap &user_module_map,
+                              CommandOrderMap &command_order_map) = 0;
 };
 } // namespace appframework
 

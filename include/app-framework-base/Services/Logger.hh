@@ -17,8 +17,7 @@ namespace appframework {
  * @brief The Logger class defines the interface necessary to configure central
  * logging within a DAQ Application.
  */
-class Logger
-{
+class Logger {
 public:
   /**
    * @brief Setup the Logger service

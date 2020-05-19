@@ -36,8 +36,7 @@ namespace appframework {
  * DAQProcess configuration and testing.
  *
  */
-struct BufferAttributes
-{
+struct BufferAttributes {
   bool isBounded;    ///< can size increase dynamically?
   bool isSearchable; ///< is the data in the buffer searchable?
 };
@@ -49,25 +48,22 @@ struct BufferAttributes
  * Note that while the Buffer class itself is not templated on a data type (so
  * it can be included in generic containers), all implementations should be.
  */
-class BufferI
-{
-
+class BufferI {
 public:
-  explicit BufferI(BufferAttributes attributes = { false, false })
-    : fAttributes(attributes)
-  {}
+  explicit BufferI(BufferAttributes attributes = {false, false})
+      : fAttributes(attributes) {}
 
   virtual void Configure() = 0; ///< called when configured in FSM
 
   virtual bool empty() const noexcept = 0; ///< is there any available data?
   virtual bool full() const noexcept = 0;  ///< is there any room for more data?
   virtual size_t capacity() const
-    noexcept = 0; ///< what is the available capacity?
+      noexcept = 0; ///< what is the available capacity?
 
-  BufferI(const BufferI&) = default;
-  BufferI& operator=(const BufferI&) = default;
-  BufferI(BufferI&&) = default;
-  BufferI& operator=(BufferI&&) = default;
+  BufferI(const BufferI &) = default;
+  BufferI &operator=(const BufferI &) = default;
+  BufferI(BufferI &&) = default;
+  BufferI &operator=(BufferI &&) = default;
 
 protected:
   BufferAttributes fAttributes; /// buffer attributes

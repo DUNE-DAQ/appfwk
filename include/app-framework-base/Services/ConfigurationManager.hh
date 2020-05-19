@@ -10,6 +10,7 @@
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_CONFIGURATIONMANAGER_HH_
 
 #include <list>
+#include <memory>
 #include <string>
 
 #include <string>
@@ -20,15 +21,13 @@ namespace appframework {
  * @brief The ConfigurationManager is responsible for receiving configurations
  * from CCM and making them available to UserModules
  */
-class ConfigurationManager
-{
+class ConfigurationManager {
 public:
   /**
    * @brief Singleton pattern, get a handle to the ConfigurationManager
    * @return Reference to the ConfigurationManager
    */
-  static ConfigurationManager& handle()
-  {
+  static ConfigurationManager &handle() {
     if (!handle_)
       handle_.reset(new ConfigurationManager());
     return *handle_;
@@ -48,7 +47,7 @@ protected:
 
 private:
   static std::unique_ptr<ConfigurationManager>
-    handle_; ///< Singleton pattern, static handle_ member
+      handle_; ///< Singleton pattern, static handle_ member
 };
 } // namespace appframework
 

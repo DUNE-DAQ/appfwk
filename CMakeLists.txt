@@ -6,3 +6,4 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(cetlib REQUIRED)
 
 add_subdirectory(doc)
+add_subdirectory(unittest)
