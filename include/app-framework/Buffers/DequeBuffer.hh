@@ -24,7 +24,6 @@
 #include <string>
 #include <thread>
 #include <type_traits>
-#include <unistd.h>
 #include <utility>
 
 namespace appframework {
@@ -52,9 +51,9 @@ public:
   bool empty() const noexcept override { return size() == 0; }
   bool full() const noexcept override { return size() >= capacity(); }
 
-  value_type pop(const duration_type & timeout)
+  value_type pop(const duration_type &timeout)
       override; // Throws std::runtime_error if a timeout occurs
-  void push(value_type && val, const duration_type & timeout)
+  void push(value_type &&val, const duration_type &timeout)
       override; // Throws std::runtime_error if a timeout occurs
 
   // Delete the copy and move operations since various member data instances

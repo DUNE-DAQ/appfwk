@@ -7,8 +7,8 @@
  */
 
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/DebugLoggingUserModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
+#include "app-framework/UserModules/DebugLoggingUserModule.hh"
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ =
