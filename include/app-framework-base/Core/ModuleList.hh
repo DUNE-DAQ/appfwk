@@ -19,9 +19,9 @@
 
 namespace appframework {
 typedef std::map<std::string, std::unique_ptr<UserModule>>
-  UserModuleMap; ///< UserModules indexed by name
+    UserModuleMap; ///< UserModules indexed by name
 typedef std::map<std::string, std::shared_ptr<BufferI>>
-  BufferMap; ///< Buffers indexed by name
+    BufferMap; ///< Buffers indexed by name
 typedef std::map<std::string, std::list<std::string>>
   CommandOrderMap; ///< Defined UserModule orders for commands
 

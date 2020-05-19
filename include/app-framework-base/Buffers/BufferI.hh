@@ -31,9 +31,7 @@ struct BufferAttributes
  * Note that while the Buffer class itself is not templated on a data type (so
  * it can be included in generic containers), all implementations should be.
  */
-class BufferI
-{
-
+class BufferI {
 public:
   explicit BufferI(BufferAttributes attributes = { false, false })
     : fAttributes(attributes)

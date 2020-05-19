@@ -10,6 +10,7 @@
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_CONFIGURATIONMANAGER_HH_
 
 #include <list>
+#include <memory>
 #include <string>
 
 #include <string>
