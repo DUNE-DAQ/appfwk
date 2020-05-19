@@ -9,8 +9,8 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
 
-#include "app-framework-base/Queues/QueueI.hh"
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework-base/Queues/QueueI.hh"
 
 #include <list>
 #include <map>
@@ -19,11 +19,11 @@
 
 namespace appframework {
 typedef std::map<std::string, std::unique_ptr<DAQModuleI>>
-    DAQModuleMap; ///< DAQModules indexed by name
-typedef std::map<std::string, std::unique_ptr<QueueI>>
-    QueueMap; ///< Queues indexed by name
+  DAQModuleMap; ///< DAQModules indexed by name
+typedef std::map<std::string, std::shared_ptr<QueueI>>
+  QueueMap; ///< Queues indexed by name
 typedef std::map<std::string, std::list<std::string>>
-    CommandOrderMap; ///< Defined DAQModule orders for commands
+  CommandOrderMap; ///< Defined DAQModule orders for commands
 
 /**
  * @brief The ModuleList class is the representation of a DAQModule and Queue
@@ -33,7 +33,8 @@ typedef std::map<std::string, std::list<std::string>>
  * DAQModules for a DAQ Application, as well as linking them together.
  * DAQModules define their Queue endpoints by requiring Queue instances
  */
-class ModuleList {
+class ModuleList
+{
 public:
   /**
    * @brief Construct the graph of DAQModules and Queues.
@@ -48,9 +49,9 @@ public:
    * Queue and DAQModule instances in a DAQ Application. Additionally, any
    * requirements on command order for DAQModules should be defined here.
    */
-  virtual void ConstructGraph(QueueMap &queue_map,
-                              DAQModuleMap &daq_module_map,
-                              CommandOrderMap &command_order_map) = 0;
+  virtual void ConstructGraph(QueueMap& queue_map,
+                              DAQModuleMap& daq_module_map,
+                              CommandOrderMap& command_order_map) = 0;
 };
 } // namespace appframework
 

@@ -1,5 +1,0 @@
-add_subdirectory(Core)
-add_subdirectory(DAQModules)
-add_subdirectory(Plugins)
-add_subdirectory(Queues)
-add_subdirectory(Services)

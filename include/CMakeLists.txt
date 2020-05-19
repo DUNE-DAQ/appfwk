@@ -1,1 +1,1 @@
-add_subdirectory(app-framework-base)
+install(DIRECTORY . DESTINATION include)

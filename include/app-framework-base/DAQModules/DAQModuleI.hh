@@ -19,8 +19,8 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace appframework {
 /**
@@ -30,7 +30,8 @@ namespace appframework {
  * Developers implementing DAQModules should feel free to use whatever Plugins
  * and Services are necessary to accomplish their needed functionality.
  */
-class DAQModuleI {
+class DAQModuleI
+{
 public:
   /**
    * @brief Execute a command in this DAQModule
@@ -40,10 +41,11 @@ public:
    * execute_command is the single entry point for DAQProcess to pass CCM
    * commands to DAQModules. The implementation of this function should route
    * accepted commands to the appropriate functions within the DAQModule.
-   *  Non-accepted commands or failure should return an std::exception 
+   *  Non-accepted commands or failure should return an std::exception
    * indicating this result.
    */
-  virtual void execute_command( const std::string & cmd, const std::vector<std::string> & args = {} ) = 0;
+  virtual void execute_command(const std::string& cmd,
+                               const std::vector<std::string>& args = {}) = 0;
 };
 } // namespace appframework
 
