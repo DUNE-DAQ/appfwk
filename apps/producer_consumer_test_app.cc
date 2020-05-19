@@ -8,7 +8,6 @@
 
 #include "app-framework/Buffers/DequeBuffer.hh"
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/QueryResponseCommandFacility.hh"
 #include "app-framework/UserModules/FakeDataConsumerUserModule.hh"
 #include "app-framework/UserModules/FakeDataProducerUserModule.hh"
 #include "app-framework/UserModules/FanOutUserModule.hh"
@@ -17,9 +16,6 @@
 #include <vector>
 
 namespace appframework {
-
-std::unique_ptr<CommandFacility> CommandFacility::handle_ =
-    std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
 
 class producer_consumer_test_app_ModuleList : public ModuleList {
   // Inherited via ModuleList
@@ -49,11 +45,11 @@ class producer_consumer_test_app_ModuleList : public ModuleList {
 };
 } // namespace appframework
 
-int main(int argc, char *argv[]) {
-  std::list<std::string> args;
-  for (int ii = 1; ii < argc; ++ii) {
-    args.push_back(std::string(argv[ii]));
-  }
+int
+main(int argc, char* argv[])
+{
+  auto args =
+    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
   appframework::DAQProcess theDAQProcess(args);
 
