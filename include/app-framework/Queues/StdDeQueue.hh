@@ -24,7 +24,6 @@
 #include <string>
 #include <thread>
 #include <type_traits>
-#include <unistd.h>
 #include <utility>
 
 namespace appframework {
@@ -51,7 +50,6 @@ public:
 
   bool can_push() const noexcept override { return fSize.load() < fDeque.max_size() ; }
   void push(value_type &&, const duration_type &) override; // Throws std::runtime_error if a timeout occurs
-
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
