@@ -34,10 +34,16 @@ namespace appframework {
         }
 
 
+        // TODO: Check ZMQ_POLLOUT to see if we can push
         bool can_push() const noexcept override { return true; }
+
         void push(value_type && val, const duration_type &timeout) override
         {
-            m_sender.send_to_socket(m_socket, std::move(val));
+            value_type* p=new value_type(std::move(val));
+            if(!m_socket.send(zmq::buffer(&p, sizeof(p)))){
+                delete p;
+                throw std::runtime_error("ZeroMQueueSink::push failed");
+            }
         }
 
         ZeroMQueueSink(const ZeroMQueueSink &) = delete;
@@ -46,46 +52,6 @@ namespace appframework {
         ZeroMQueueSink &operator=(ZeroMQueueSink &&) = delete;
 
     private:
-        //==============================================================================
-
-        // A class to hold the implementation of recv_from_socket for
-        // general types. Specialized for std::unique_ptr<T>
-        // below. There's probably a nicer way to do this (with
-        // std::enable_if perhaps?), but I can't work out how to spell it
-        template <class T>
-        class SocketSender
-        {
-        public:
-            void send_to_socket(zmq::socket_t& socket, T&& val)
-            {
-                value_type* p=new value_type(std::move(val));
-                if(!socket.send(zmq::buffer(&p, sizeof(p)))){
-                    delete p;
-                    throw std::runtime_error("ZeroMQueueSink::push failed");
-                }
-
-            }
-        };
-
-        // Specialization of recv_from_socket for std::unique_ptr<T>
-        // which saves a little bit of work
-        template<class T>
-        class SocketSender<std::unique_ptr<T>>
-        {
-        public:
-            using ptr_type = std::unique_ptr<T>;
-            using pointee_type = T;
-
-            void send_to_socket(zmq::socket_t& socket, ptr_type&& val)
-            {
-                auto raw_pointer=val.release();
-                if(!socket.send(zmq::buffer(&raw_pointer, sizeof(raw_pointer)))){
-                    throw std::runtime_error("ZeroMQueueSink::push failed");
-                }
-            }
-        };
-
-        SocketSender<value_type> m_sender;
         zmq::socket_t m_socket;
     };
 
@@ -110,7 +76,7 @@ namespace appframework {
             // If there's a message already available on the queue,
             // get it straight away to avoid the slow path of polling
             if(can_pop()){
-                return m_receiver.recv_from_socket(m_socket);
+                return recv_from_socket(m_socket);
             }
 
             // There wasn't a message available immediately, so we
@@ -118,8 +84,7 @@ namespace appframework {
             zmq::poll(&m_pollitem, 1, timeout);
 
             if(m_pollitem.revents & ZMQ_POLLIN) {
-                // A message was available: go get it!
-                return m_receiver.recv_from_socket(m_socket);
+                return recv_from_socket(m_socket);
             }
             else{
                 // We timed out
@@ -134,53 +99,20 @@ namespace appframework {
 
     private:
 
-        //==============================================================================
-
-        // A class to hold the implementation of recv_from_socket for
-        // general types. Specialized for std::unique_ptr<T>
-        // below. There's probably a nicer way to do this (with
-        // std::enable_if perhaps?), but I can't work out how to spell it
-        template <class T>
-        class SocketReceiver
+        value_type recv_from_socket(zmq::socket_t& socket)
         {
-        public:
-
-            T recv_from_socket(zmq::socket_t& socket)
-            {
-                zmq::message_t msg;
-                zmq::recv_result_t result=socket.recv(msg);
-                if(!result){
-                    throw std::runtime_error("No bytes from socket");
-                }
-                // The message data is a pointer to the object being passed
-                T* val_p=*msg.data<T*>();
-                T val(std::move(*val_p));
-                delete val_p;
-                return val;
+            // A message was available: go get it!
+            zmq::message_t msg;
+            zmq::recv_result_t result=m_socket.recv(msg);
+            if(!result){
+                throw std::runtime_error("No bytes from socket");
             }
-        };
-
-        // Specialization of recv_from_socket for std::unique_ptr<T>
-        // which saves a little bit of work
-        template<class T>
-        class SocketReceiver<std::unique_ptr<T>>
-        {
-        public:
-            using ptr_type = std::unique_ptr<T>;
-            using pointee_type = T;
-
-            ptr_type recv_from_socket(zmq::socket_t& socket)
-            {
-                zmq::message_t msg;
-                zmq::recv_result_t result=socket.recv(msg);
-                if(!result){
-                    throw std::runtime_error("No bytes from socket");
-                }
-                return ptr_type(*msg.data<T*>());
-            }
-        };
-
-        SocketReceiver<value_type> m_receiver;
+            // The message data is a pointer to the object being passed
+            value_type* val_p=*msg.data<value_type*>();
+            value_type val(std::move(*val_p));
+            delete val_p;
+            return val;
+        }
 
         zmq::socket_t m_socket;
         zmq::pollitem_t m_pollitem;
