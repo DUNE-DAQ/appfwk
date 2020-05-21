@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   }
 
   //ERS_LOG( "Hello there, I've been summoned with " << argc << " arguments" );
-  TLOG(TLVL_LOG) << "Hello there, I've been summoned with " << argc << " arguments";
+  ERS_LOG() << "Hello there, I've been summoned with " << argc << " arguments";
 
   appframework::DAQProcess theDAQProcess(args);
 
