@@ -7,10 +7,9 @@
  */
 
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/DebugLoggingUserModule.hh"
 #include "app-framework/QueryResponseCommandFacility.hh"
-
-#include <ers/ers.h>
+#include "app-framework/UserModules/DebugLoggingUserModule.hh"
+#include "app-framework-base/Services/Logger.hh" // ers/trace logging TLOG_ERROR(), etc.
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ =
@@ -31,7 +30,8 @@ int main(int argc, char *argv[]) {
     args.push_back(std::string(argv[ii]));
   }
 
-  ERS_LOG( "Hello there, I've been summoned with " << argc << " arguments" );
+  //ERS_LOG( "Hello there, I've been summoned with " << argc << " arguments" );
+  TLOG(TLVL_LOG) << "Hello there, I've been summoned with " << argc << " arguments";
 
   appframework::DAQProcess theDAQProcess(args);
 
