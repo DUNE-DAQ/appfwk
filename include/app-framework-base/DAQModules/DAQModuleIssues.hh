@@ -24,6 +24,7 @@ ERS_DECLARE_ISSUE( appframework,
 
 ERS_DECLARE_ISSUE_BASE( appframework, 
 			UnknownCommand,
+			DAQModuleIssue,
 			"Command " << cmd << " is not recognised", 
 			( const std::string & ) cmd 
 			)
