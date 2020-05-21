@@ -44,7 +44,7 @@ void DAQProcess::execute_command(std::string cmd) {
 
   //ERS_LOG("Executing Command " << cmd 
   //        << " for UserModules defined in the CommandOrderMap");
-  TLOG(TLVL_LOG) << "Executing Command " << cmd 
+  ERS_LOG() << "Executing Command " << cmd 
           << " for UserModules defined in the CommandOrderMap";
 
   if (commandOrderMap_.count(cmd)) {
