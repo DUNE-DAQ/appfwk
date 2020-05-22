@@ -71,29 +71,13 @@ namespace appframework {
             : m_socket(appframework::zmq_context(), zmq::socket_type::pull)
         {
             m_socket.connect(std::string("inproc://")+name);
-            m_pollitem=zmq::pollitem_t{m_socket.handle(), 0, ZMQ_POLLIN, 0};
         }
 
         bool can_pop() const noexcept override { return m_socket.get(zmq::sockopt::events) & ZMQ_POLLIN; }
         value_type pop(const duration_type &timeout) override
         {
-            // If there's a message already available on the queue,
-            // get it straight away to avoid the slow path of polling
-            if(can_pop()){
-                return recv_from_socket(m_socket);
-            }
-
-            // There wasn't a message available immediately, so we
-            // have to wait up to `timeout` via poll()
-            zmq::poll(&m_pollitem, 1, timeout);
-
-            if(m_pollitem.revents & ZMQ_POLLIN) {
-                return recv_from_socket(m_socket);
-            }
-            else{
-                // We timed out
-                throw std::runtime_error("ZeroMQueue::pop timed out");
-            }
+            m_socket.set(zmq::sockopt::rcvtimeo, (int)timeout.count());
+            return recv_from_socket(m_socket);
         }
 
         ZeroMQueueSource(const ZeroMQueueSource &) = delete;
@@ -105,7 +89,6 @@ namespace appframework {
 
         value_type recv_from_socket(zmq::socket_t& socket)
         {
-            // A message was available: go get it!
             zmq::message_t msg;
             zmq::recv_result_t result=m_socket.recv(msg);
             if(!result){
@@ -119,7 +102,6 @@ namespace appframework {
         }
 
         zmq::socket_t m_socket;
-        zmq::pollitem_t m_pollitem;
     };
 } // namespace appframework
 
