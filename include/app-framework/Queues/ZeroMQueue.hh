@@ -35,7 +35,7 @@ namespace appframework {
 
 
         // TODO: Check ZMQ_POLLOUT to see if we can push
-        bool can_push() const noexcept override { return true; }
+        bool can_push() const noexcept override { return m_socket.get(zmq::sockopt::events) & ZMQ_POLLOUT; }
 
         void push(value_type && val, const duration_type &timeout) override
         {
