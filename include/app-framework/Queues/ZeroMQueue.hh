@@ -39,11 +39,15 @@ namespace appframework {
 
         void push(value_type && val, const duration_type &timeout) override
         {
+            m_socket.set(zmq::sockopt::sndtimeo, (int)timeout.count());
+
             value_type* p=new value_type(std::move(val));
             if(!m_socket.send(zmq::buffer(&p, sizeof(p)))){
                 delete p;
                 throw std::runtime_error("ZeroMQueueSink::push failed");
             }
+            // We intentionally don't delete p: the object has to last
+            // until it's received, after which the receiver owns it
         }
 
         ZeroMQueueSink(const ZeroMQueueSink &) = delete;
