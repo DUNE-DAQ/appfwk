@@ -12,8 +12,6 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
 
-#include "app-framework-base/Queues/Queue.hh"
-
 #include <functional>
 #include <future>
 #include <list>

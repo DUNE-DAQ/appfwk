@@ -6,11 +6,13 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_BUFFERS_BUFFERI_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_BUFFERS_BUFFERI_HH_
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_QUEUES_QUEUEI_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_QUEUES_QUEUEI_HH_
 
 #include <cstddef>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "cetlib/BasicPluginFactory.h"
 #include "cetlib/compiler_macros.h"
@@ -30,16 +32,6 @@
   }
 
 namespace appframework {
-/**
- * @brief Attributes of Queues that can be communicated to framework for
- * DAQProcess configuration and testing.
- *
- */
-struct QueueAttributes
-{
-  bool isBounded;    ///< can size increase dynamically?
-  bool isSearchable; ///< is the data in the buffer searchable?
-};
 
 /**
  * @brief Implementations of the Queue class are responsible for relaying data
@@ -50,25 +42,17 @@ struct QueueAttributes
  */
 class QueueI
 {
+
 public:
-  explicit QueueI(QueueAttributes attributes = { false, false })
-    : fAttributes(attributes)
-  {}
+  QueueI() {}
 
-  virtual void Configure() = 0; ///< called when configured in FSM
+  virtual void Configure(const std::vector<std::string>& args = {}) {
+  } ///< called to specify particular configuration
 
-  virtual bool empty() const noexcept = 0; ///< is there any available data?
-  virtual bool full() const noexcept = 0;  ///< is there any room for more data?
-  virtual size_t capacity() const
-    noexcept = 0; ///< what is the available capacity?
-
-  QueueI(const QueueI&) = default;
-  QueueI& operator=(const QueueI&) = default;
+  QueueI(const QueueI&) = delete;
+  QueueI& operator=(const QueueI&) = delete;
   QueueI(QueueI&&) = default;
   QueueI& operator=(QueueI&&) = default;
-
-protected:
-  QueueAttributes fAttributes; /// buffer attributes
 };
 
 inline std::shared_ptr<QueueI>
@@ -81,4 +65,4 @@ makeQueue(std::string const& buffer_name)
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_BUFFERS_BUFFERI_HH_
+#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_QUEUES_QUEUEI_HH_

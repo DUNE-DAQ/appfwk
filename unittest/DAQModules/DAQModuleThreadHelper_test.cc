@@ -9,7 +9,7 @@
 
 #include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
 
-#define BOOST_TEST_MODULE DAQModuleThreadHelper_test
+#define BOOST_TEST_MODULE DAQModuleThreadHelper_test // NOLINT
 #include <boost/test/unit_test.hpp>
 
 #include <boost/asio/signal_set.hpp>

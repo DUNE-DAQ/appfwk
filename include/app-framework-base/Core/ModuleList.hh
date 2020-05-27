@@ -18,7 +18,7 @@
 #include <string>
 
 namespace appframework {
-typedef std::map<std::string, std::unique_ptr<DAQModule>>
+typedef std::map<std::string, std::unique_ptr<DAQModuleI>>
   DAQModuleMap; ///< DAQModules indexed by name
 typedef std::map<std::string, std::shared_ptr<QueueI>>
   QueueMap; ///< Queues indexed by name
@@ -38,9 +38,9 @@ class ModuleList
 public:
   /**
    * @brief Construct the graph of DAQModules and Queues.
-   * @param[out] buffer_map A QueueMap that will contain pointers to all of the
+   * @param[out] queue_map A QueueMap that will contain pointers to all of the
    * Queue instances, indexed by name
-   * @param[out] user_module_map A DAQModuleMap that will contain pointers to
+   * @param[out] daq_module_map A DAQModuleMap that will contain pointers to
    * all of the DAQModule instances, indexed by name
    * @param[out] command_order_map A map relating commands to an ordering of
    * DAQModules (by name)
@@ -49,8 +49,8 @@ public:
    * Queue and DAQModule instances in a DAQ Application. Additionally, any
    * requirements on command order for DAQModules should be defined here.
    */
-  virtual void ConstructGraph(QueueMap& buffer_map,
-                              DAQModuleMap& user_module_map,
+  virtual void ConstructGraph(QueueMap& queue_map,
+                              DAQModuleMap& daq_module_map,
                               CommandOrderMap& command_order_map) = 0;
 };
 } // namespace appframework

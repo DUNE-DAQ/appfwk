@@ -16,10 +16,10 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULE_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULE_HH_
-
-#include <future>
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
+    
+#include <vector>
 #include <string>
 
 #include "cetlib/BasicPluginFactory.h"
@@ -70,11 +70,12 @@ public:
    *
    * execute_command is the single entry point for DAQProcess to pass CCM
    * commands to DAQModules. The implementation of this function should route
-   * accepted commands to the appropriate functions within the DAQModule and
-   * return their result. Non-accepted commands should return a status
+   * accepted commands to the appropriate functions within the DAQModule.
+   *  Non-accepted commands or failure should return an std::exception
    * indicating this result.
    */
-  virtual std::future<std::string> execute_command(std::string cmd) = 0;
+  virtual void execute_command(const std::string& cmd,
+                               const std::vector<std::string>& args = {}) = 0;
 
 protected:
   std::string instance_name_;
@@ -95,4 +96,4 @@ makeModule(std::string const& module_name,
 }
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULE_HH_
+#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
