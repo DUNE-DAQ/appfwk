@@ -25,13 +25,15 @@
 #include "cetlib/BasicPluginFactory.h"
 #include "cetlib/compiler_macros.h"
 
+#include "app-framework-base/Queues/QueueI.hh"
+
 #ifndef EXTERN_C_FUNC_DECLARE_START
 #define EXTERN_C_FUNC_DECLARE_START                                            \
   extern "C"                                                                   \
   {
 #endif
 
-#define DEFINE_DUNE_USER_MODULE(klass)                                         \
+#define DEFINE_DUNE_DAQ_MODULE(klass)                                         \
   EXTERN_C_FUNC_DECLARE_START                                                  \
   std::unique_ptr<appframework::DAQModuleI> make(                               \
     std::string n,                                                             \
