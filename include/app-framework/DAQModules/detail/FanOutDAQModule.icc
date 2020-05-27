@@ -1,31 +1,31 @@
 
 template<typename DATA_TYPE>
-appframework::FanOutUserModule<DATA_TYPE>::FanOutUserModule(
+appframework::FanOutDAQModule<DATA_TYPE>::FanOutDAQModule(
   std::string name,
-  std::vector<std::shared_ptr<BufferI>> inputs,
-  std::vector<std::shared_ptr<BufferI>> outputs)
-  : UserModule(name, inputs, outputs)
+  std::vector<std::shared_ptr<QueueI>> inputs,
+  std::vector<std::shared_ptr<QueueI>> outputs)
+  : DAQModule(name, inputs, outputs)
   , mode_(FanOutMode::NotConfigured)
   , bufferTimeout_(100)
-  , thread_(std::bind(&FanOutUserModule<DATA_TYPE>::do_work, this))
+  , thread_(std::bind(&FanOutDAQModule<DATA_TYPE>::do_work, this))
 {
   if (inputs.size() > 1) {
     throw std::runtime_error("Invalid Configuration for "
-                             "FanOutUserModule: More than one Input "
+                             "FanOutDAQModule: More than one Input "
                              "provided!");
   }
 
-  inputBuffer_.reset(dynamic_cast<BufferOutput<DATA_TYPE>*>(&*inputs_[0]));
+  inputQueue_.reset(dynamic_cast<QueueOutput<DATA_TYPE>*>(&*inputs_[0]));
 
   for (auto& output : outputs) {
-    outputBuffers_.push_back(std::shared_ptr<BufferInput<DATA_TYPE>>(
-      dynamic_cast<BufferInput<DATA_TYPE>*>(&*output)));
+    outputQueues_.push_back(std::shared_ptr<QueueInput<DATA_TYPE>>(
+      dynamic_cast<QueueInput<DATA_TYPE>*>(&*output)));
   }
 }
 
 template<typename DATA_TYPE>
 std::future<std::string>
-appframework::FanOutUserModule<DATA_TYPE>::execute_command(std::string cmd)
+appframework::FanOutDAQModule<DATA_TYPE>::execute_command(std::string cmd)
 {
   if (cmd == "configure" || cmd == "Configure") {
     return std::async(std::launch::async, [&] { return do_configure(); });
@@ -43,7 +43,7 @@ appframework::FanOutUserModule<DATA_TYPE>::execute_command(std::string cmd)
 
 template<typename DATA_TYPE>
 std::string
-appframework::FanOutUserModule<DATA_TYPE>::do_configure()
+appframework::FanOutDAQModule<DATA_TYPE>::do_configure()
 {
   // TODO: Get configuration from ConfigurationManager!
   mode_ = FanOutMode::RoundRobin;
@@ -54,7 +54,7 @@ appframework::FanOutUserModule<DATA_TYPE>::do_configure()
 
 template<typename DATA_TYPE>
 std::string
-appframework::FanOutUserModule<DATA_TYPE>::do_start()
+appframework::FanOutDAQModule<DATA_TYPE>::do_start()
 {
   thread_.start_working_thread_();
   return "Success";
@@ -62,7 +62,7 @@ appframework::FanOutUserModule<DATA_TYPE>::do_start()
 
 template<typename DATA_TYPE>
 std::string
-appframework::FanOutUserModule<DATA_TYPE>::do_stop()
+appframework::FanOutDAQModule<DATA_TYPE>::do_stop()
 {
   thread_.stop_working_thread_();
   return "Success";
@@ -70,20 +70,20 @@ appframework::FanOutUserModule<DATA_TYPE>::do_stop()
 
 template<typename DATA_TYPE>
 void
-appframework::FanOutUserModule<DATA_TYPE>::do_work()
+appframework::FanOutDAQModule<DATA_TYPE>::do_work()
 {
-  auto roundRobinNext = outputBuffers_.begin();
+  auto roundRobinNext = outputQueues_.begin();
 
   while (thread_.thread_running()) {
-    if (!inputBuffer_->empty()) {
-      auto data = inputBuffer_->pop(bufferTimeout_);
+    if (!inputQueue_->empty()) {
+      auto data = inputQueue_->pop(bufferTimeout_);
 
       if (mode_ == FanOutMode::Broadcast) {
         do_broadcast(data);
       } else if (mode_ == FanOutMode::FirstAvailable) {
         auto sent = false;
         while (!sent) {
-          for (auto& o : outputBuffers_) {
+          for (auto& o : outputQueues_) {
             if (!o->full()) {
               o->push(std::move(data), bufferTimeout_);
               sent = true;
@@ -99,8 +99,8 @@ appframework::FanOutUserModule<DATA_TYPE>::do_work()
           if (!(*roundRobinNext)->full()) {
             (*roundRobinNext)->push(std::move(data), bufferTimeout_);
 
-            if (++roundRobinNext == outputBuffers_.end())
-              roundRobinNext = outputBuffers_.begin();
+            if (++roundRobinNext == outputQueues_.end())
+              roundRobinNext = outputQueues_.begin();
             break;
           } else {
             usleep(wait_interval_us_);

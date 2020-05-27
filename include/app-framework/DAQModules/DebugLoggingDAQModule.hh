@@ -1,7 +1,7 @@
 /**
- * @file The DebugLoggingUserModule class interface
+ * @file The DebugLoggingDAQModule class interface
  *
- * DebugLoggingUserModule is a simple UserModule implementation that simply logs
+ * DebugLoggingDAQModule is a simple DAQModule implementation that simply logs
  * the fact that it received a command from DAQProcess.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -12,22 +12,22 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_DEBUGLOGGINGUSERMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_DEBUGLOGGINGUSERMODULE_HH_
 
-#include "app-framework-base/UserModules/UserModule.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
 
 #include <future>
 #include <string>
 
 namespace appframework {
 /**
- * @brief DebugLoggingUserModule logs that it has received a command from
+ * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingUserModule : public UserModule {
+class DebugLoggingDAQModule : public DAQModule {
 public:
-  DebugLoggingUserModule(std::string name,
-                         std::vector<std::shared_ptr<BufferI>> inputs,
-                         std::vector<std::shared_ptr<BufferI>> outputs)
-    : UserModule(name, inputs, outputs)
+  DebugLoggingDAQModule(std::string name,
+                         std::vector<std::shared_ptr<QueueI>> inputs,
+                         std::vector<std::shared_ptr<QueueI>> outputs)
+    : DAQModule(name, inputs, outputs)
   {}
 
   /**

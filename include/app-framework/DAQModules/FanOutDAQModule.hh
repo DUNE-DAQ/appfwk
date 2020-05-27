@@ -1,7 +1,7 @@
 /**
- * @file The FanOutUserModule class interface
+ * @file The FanOutDAQModule class interface
  *
- * FanOutUserModule is a simple UserModule implementation that simply logs the
+ * FanOutDAQModule is a simple DAQModule implementation that simply logs the
  * fact that it received a command from DAQProcess.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -12,9 +12,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
 
-#include "app-framework-base/Buffers/Buffer.hh"
-#include "app-framework-base/UserModules/UserModule.hh"
-#include "app-framework-base/UserModules/UserModuleThreadHelper.hh"
+#include "app-framework-base/Queues/Queue.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
 
 #include "TRACE/trace.h"
 
@@ -28,13 +28,13 @@
 
 namespace appframework {
 /**
- * @brief FanOutUserModule sends data to multiple Buffers
+ * @brief FanOutDAQModule sends data to multiple Queues
  */
-template <typename DATA_TYPE> class FanOutUserModule : public UserModule {
+template <typename DATA_TYPE> class FanOutDAQModule : public DAQModule {
 public:
-  FanOutUserModule(std::string name,
-                   std::vector<std::shared_ptr<BufferI>> inputs,
-                   std::vector<std::shared_ptr<BufferI>> outputs);
+  FanOutDAQModule(std::string name,
+                   std::vector<std::shared_ptr<QueueI>> inputs,
+                   std::vector<std::shared_ptr<QueueI>> outputs);
 
   enum class FanOutMode {
     NotConfigured,
@@ -50,10 +50,10 @@ public:
    */
   std::future<std::string> execute_command(std::string cmd) override;
 
-  FanOutUserModule(const FanOutUserModule &) = delete;
-  FanOutUserModule &operator=(const FanOutUserModule &) = delete;
-  FanOutUserModule(FanOutUserModule &&) = delete;
-  FanOutUserModule &operator=(FanOutUserModule &&) = delete;
+  FanOutDAQModule(const FanOutDAQModule &) = delete;
+  FanOutDAQModule &operator=(const FanOutDAQModule &) = delete;
+  FanOutDAQModule(FanOutDAQModule &&) = delete;
+  FanOutDAQModule &operator=(FanOutDAQModule &&) = delete;
 
 private:
   // Commands
@@ -74,7 +74,7 @@ private:
   template <typename U = DATA_TYPE>
   typename std::enable_if_t<std::is_copy_constructible_v<U>>
   do_broadcast(DATA_TYPE &data) const {
-    for (auto &o : outputBuffers_) {
+    for (auto &o : outputQueues_) {
       auto starttime = std::chrono::steady_clock::now();
       o->push(data, bufferTimeout_);
       auto endtime = std::chrono::steady_clock::now();
@@ -89,18 +89,18 @@ private:
 
   // Threading
   void do_work();
-  UserModuleThreadHelper thread_;
+  DAQModuleThreadHelper thread_;
 
   // Configuration
   FanOutMode mode_;
   std::chrono::milliseconds bufferTimeout_;
 
-  std::shared_ptr<BufferOutput<DATA_TYPE>> inputBuffer_;
-  std::list<std::shared_ptr<BufferInput<DATA_TYPE>>> outputBuffers_;
+  std::shared_ptr<QueueOutput<DATA_TYPE>> inputQueue_;
+  std::list<std::shared_ptr<QueueInput<DATA_TYPE>>> outputQueues_;
   size_t wait_interval_us_;
 };
 } // namespace appframework
 
-#include "detail/FanOutUserModule.icc"
+#include "detail/FanOutDAQModule.icc"
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_

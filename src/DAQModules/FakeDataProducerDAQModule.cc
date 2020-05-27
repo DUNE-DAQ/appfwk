@@ -1,12 +1,12 @@
 /**
- * @file The FakeDataProducerUserModule class implementation
+ * @file The FakeDataProducerDAQModule class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/UserModules/FakeDataProducerUserModule.hh"
+#include "app-framework/DAQModules/FakeDataProducerDAQModule.hh"
 
 #include <chrono>
 #include <thread>
@@ -14,31 +14,31 @@
 #include <TRACE/trace.h>
 #define TRACE_NAME "FakeDataProducer"
 
-appframework::FakeDataProducerUserModule::FakeDataProducerUserModule(
+appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   std::string name,
-  std::vector<std::shared_ptr<BufferI>> inputs,
-  std::vector<std::shared_ptr<BufferI>> outputs)
-  : UserModule(name, inputs,outputs)
+  std::vector<std::shared_ptr<QueueI>> inputs,
+  std::vector<std::shared_ptr<QueueI>> outputs)
+  : DAQModule(name, inputs,outputs)
   , bufferTimeout_(100)
-  , thread_(std::bind(&FakeDataProducerUserModule::do_work, this))
+  , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
 {
   if (inputs.size()) {
     throw std::runtime_error(
-      "Invalid Configuration for FakeDataProducerUserModule: Input buffer "
+      "Invalid Configuration for FakeDataProducerDAQModule: Input buffer "
       "provided!");
   }
   if (outputs.size() > 1) {
     throw std::runtime_error("Invalid Configuration for "
-                             "FakeDataProducerUserModule: More than one Output "
+                             "FakeDataProducerDAQModule: More than one Output "
                              "provided!");
   }
 
-  outputBuffer_.reset(
-    dynamic_cast<BufferInput<std::vector<int>>*>(&*outputs_[0]));
+  outputQueue_.reset(
+    dynamic_cast<QueueInput<std::vector<int>>*>(&*outputs_[0]));
 }
 
 std::future<std::string>
-appframework::FakeDataProducerUserModule::execute_command(std::string cmd) {
+appframework::FakeDataProducerDAQModule::execute_command(std::string cmd) {
   if (cmd == "configure" || cmd == "Configure") {
     return std::async(std::launch::async, [&] { return do_configure(); });
   }
@@ -53,7 +53,7 @@ appframework::FakeDataProducerUserModule::execute_command(std::string cmd) {
                     [] { return std::string("Unrecognized Command"); });
 }
 
-std::string appframework::FakeDataProducerUserModule::do_configure() {
+std::string appframework::FakeDataProducerDAQModule::do_configure() {
   nIntsPerVector_ = 10;
   starting_int_ = -4;
   ending_int_ = 14;
@@ -62,12 +62,12 @@ std::string appframework::FakeDataProducerUserModule::do_configure() {
   return "Success";
 }
 
-std::string appframework::FakeDataProducerUserModule::do_start() {
+std::string appframework::FakeDataProducerDAQModule::do_start() {
   thread_.start_working_thread_();
   return "Success";
 }
 
-std::string appframework::FakeDataProducerUserModule::do_stop() {
+std::string appframework::FakeDataProducerDAQModule::do_stop() {
   thread_.stop_working_thread_();
   return "Success";
 }
@@ -84,7 +84,7 @@ TraceStreamer &operator<<(TraceStreamer &t, std::vector<int> ints) {
   return t << "}";
 }
 
-void appframework::FakeDataProducerUserModule::do_work() {
+void appframework::FakeDataProducerDAQModule::do_work() {
   int current_int = starting_int_;
   size_t counter = 0;
   while (thread_.thread_running()) {
@@ -101,14 +101,14 @@ void appframework::FakeDataProducerUserModule::do_work() {
     TLOG(TLVL_INFO) << "Produced vector " << counter << " with contents "
                     << output << " and size " << output.size();
 
-    TLOG(TLVL_DEBUG) << "Pushing vector into outputBuffer";
+    TLOG(TLVL_DEBUG) << "Pushing vector into outputQueue";
     auto starttime = std::chrono::steady_clock::now();
-    outputBuffer_->push(std::move(output), bufferTimeout_);
+    outputQueue_->push(std::move(output), bufferTimeout_);
     auto endtime = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<decltype(bufferTimeout_)>(
             endtime - starttime) > bufferTimeout_) {
       TLOG(TLVL_WARNING)
-          << "Timeout attempting to push vector onto outputBuffer";
+          << "Timeout attempting to push vector onto outputQueue";
     }
 
     TLOG(TLVL_DEBUG) << "Start of sleep between sends";
@@ -119,4 +119,4 @@ void appframework::FakeDataProducerUserModule::do_work() {
   }
 }
 
-DEFINE_DUNE_USER_MODULE(appframework::FakeDataProducerUserModule)
+DEFINE_DUNE_USER_MODULE(appframework::FakeDataProducerDAQModule)

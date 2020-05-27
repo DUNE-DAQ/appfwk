@@ -1,7 +1,7 @@
 /**
  *
  * @file A low-level test of buffer classes which inherit both from
- * BufferOutput and BufferInput where we have a user-settable number
+ * QueueOutput and QueueInput where we have a user-settable number
  * of threads writing elements to a buffer while a user-settable
  * number of threads reads from the buffer
  *
@@ -12,7 +12,7 @@
  * received with this code.
  */
 
-#include "app-framework/Buffers/DequeBuffer.hh"
+#include "app-framework/Queues/StdDeQueue.hh"
 
 #include "TRACE/trace.h"
 
@@ -31,16 +31,16 @@ namespace {
 
 // TODO John Freeman, May-8-2020 (jcfree@fnal.gov)
 
-// Will replace use of DequeBuffer in the unique_ptr with a base
+// Will replace use of StdDeQueue in the unique_ptr with a base
 // class which supports both push and pop operations if and when one
 // becomes available
 
-std::string buffer_type = "DequeBuffer";
+std::string buffer_type = "StdDeQueue";
 auto timeout = std::chrono::microseconds(100);
 
 // The decltype means "Have the buffer's push/pop functions expect a duration of
 // the same type as the timeout we defined"
-std::unique_ptr<appframework::DequeBuffer<int, decltype(timeout)>> buffer =
+std::unique_ptr<appframework::StdDeQueue<int, decltype(timeout)>> buffer =
     nullptr;
 
 constexpr int nelements = 100;
@@ -199,8 +199,8 @@ int main(int argc, char *argv[]) {
   bpo::options_description desc(descstr.str());
   desc.add_options()("buffer_type", bpo::value<std::string>(),
                      "Type of buffer instance you want to test (default is "
-                     "DequeBuffer) (supported "
-                     "types are: DequeBuffer)")(
+                     "StdDeQueue) (supported "
+                     "types are: StdDeQueue)")(
       "push_threads", bpo::value<int>(), push_threads_desc.str().c_str())(
       "pop_threads", bpo::value<int>(), pop_threads_desc.str().c_str())(
       "pause_between_pushes", bpo::value<int>(), push_pause_desc.str().c_str())(
@@ -223,8 +223,8 @@ int main(int argc, char *argv[]) {
     buffer_type = vm["buffer_type"].as<std::string>();
   }
 
-  if (buffer_type == "DequeBuffer") {
-    buffer.reset(new appframework::DequeBuffer<int, decltype(timeout)>);
+  if (buffer_type == "StdDeQueue") {
+    buffer.reset(new appframework::StdDeQueue<int, decltype(timeout)>);
   } else {
     TLOG(TLVL_ERROR) << "Unknown buffer type \"" << buffer_type
                      << "\" requested for testing";

@@ -2,11 +2,11 @@
 file(GLOB source_files *.cc)
 
 list(FILTER source_files EXCLUDE REGEX "QueryResponseCommandFacility.cc")
-list(FILTER source_files EXCLUDE REGEX "VectorIntDequeBuffer.cc")
+list(FILTER source_files EXCLUDE REGEX "VectorIntStdDeQueue.cc")
 add_library(app-framework SHARED ${source_files})
 target_link_libraries(app-framework cetlib cetlib_except)
 
-add_subdirectory(UserModules)
+add_subdirectory(DAQModules)
 
 add_library(app-framework_QueryResponseCommandFacility_duneCommandFacility QueryResponseCommandFacility.cc)
-add_library(app-framework_VectorIntDequeBuffer_duneBuffer VectorIntDequeBuffer.cc)
+add_library(app-framework_VectorIntStdDeQueue_duneQueue VectorIntStdDeQueue.cc)

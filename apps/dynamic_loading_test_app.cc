@@ -1,5 +1,5 @@
 /**
- * @file dynamic_loading_test_app to demonstrate loading Buffers and UserModules
+ * @file dynamic_loading_test_app to demonstrate loading Queues and DAQModules
  * from a configuration file
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -13,8 +13,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "app-framework-base/UserModules/UserModule.hh"
-#include "app-framework-base/Buffers/BufferI.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework-base/Queues/QueueI.hh"
 #include "app-framework/DAQProcess.hh"
 
 // for convenience
@@ -30,21 +30,21 @@ public:
   {}
 
   // Inherited via ModuleList
-  virtual void ConstructGraph(BufferMap& buffer_map,
-                              UserModuleMap& user_module_map,
+  virtual void ConstructGraph(QueueMap& buffer_map,
+                              DAQModuleMap& user_module_map,
                               CommandOrderMap& command_order_map) override
   {
     for (auto& buffer : config_["buffers"].items()) {
-      buffer_map[buffer.key()] = makeBuffer(buffer.value());
+      buffer_map[buffer.key()] = makeQueue(buffer.value());
     }
 
     for (auto& module : config_["modules"].items()) {
-      std::vector<std::shared_ptr<BufferI>> inputs;
+      std::vector<std::shared_ptr<QueueI>> inputs;
       for (auto& input : module.value()["inputs"]) {
         inputs.push_back(buffer_map[input]);
       }
 
-      std::vector<std::shared_ptr<BufferI>> outputs;
+      std::vector<std::shared_ptr<QueueI>> outputs;
       for (auto& output : module.value()["outputs"]) {
         outputs.push_back(buffer_map[output]);
       }
@@ -84,28 +84,28 @@ main(int argc, char* argv[])
     json_config = R"(
         {
             "buffers": {
-                "producerToFanOut": "VectorIntDequeBuffer",
-                "fanOutToConsumer1": "VectorIntDequeBuffer",
-                "fanOutToConsumer2": "VectorIntDequeBuffer"
+                "producerToFanOut": "VectorIntStdDeQueue",
+                "fanOutToConsumer1": "VectorIntStdDeQueue",
+                "fanOutToConsumer2": "VectorIntStdDeQueue"
             },
             "modules": {
                 "producer": {
-                    "user_module_type": "FakeDataProducerUserModule",
+                    "user_module_type": "FakeDataProducerDAQModule",
                     "inputs": [],
                     "outputs": ["producerToFanOut"]
                 },
                 "fanOut": {
-                    "user_module_type": "VectorIntFanOutUserModule",
+                    "user_module_type": "VectorIntFanOutDAQModule",
                     "inputs": ["producerToFanOut"],
                     "outputs": ["fanOutToConsumer1", "fanOutToConsumer2" ]
                 },
                 "consumer1": {
-                    "user_module_type": "FakeDataConsumerUserModule",
+                    "user_module_type": "FakeDataConsumerDAQModule",
                     "inputs": ["fanOutToConsumer1"],
                     "outputs": []
                 },
                 "consumer2": {
-                    "user_module_type": "FakeDataConsumerUserModule",
+                    "user_module_type": "FakeDataConsumerDAQModule",
                     "inputs": ["fanOutToConsumer2"],
                     "outputs": []
                 }

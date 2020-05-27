@@ -8,19 +8,19 @@
 
 #include "app-framework/CommandLineInterpreter.hh"
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/UserModules/DebugLoggingUserModule.hh"
+#include "app-framework/DAQModules/DebugLoggingDAQModule.hh"
 
 namespace appframework {
 
 class simple_test_app_ModuleList : public ModuleList
 {
   // Inherited via ModuleList
-  void ConstructGraph(BufferMap& buffer_map,
-                      UserModuleMap& user_module_map,
+  void ConstructGraph(QueueMap& buffer_map,
+                      DAQModuleMap& user_module_map,
                       CommandOrderMap& command_order_map) override
   {
     user_module_map["debugLogger"].reset(
-      new DebugLoggingUserModule("debugLogger", {}, {}));
+      new DebugLoggingDAQModule("debugLogger", {}, {}));
   }
 };
 } // namespace appframework

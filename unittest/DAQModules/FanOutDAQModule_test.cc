@@ -1,5 +1,5 @@
 /**
- * @file FanOutUserModule class Unit Tests
+ * @file FanOutDAQModule class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -7,10 +7,10 @@
  */
 
 #include "app-framework-base/Services/CommandFacility.hh"
-#include "app-framework/Buffers/DequeBuffer.hh"
-#include "app-framework/UserModules/FanOutUserModule.hh"
+#include "app-framework/Queues/StdDeQueue.hh"
+#include "app-framework/DAQModules/FanOutDAQModule.hh"
 
-#define BOOST_TEST_MODULE FanOutUserModule_test
+#define BOOST_TEST_MODULE FanOutDAQModule_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -36,27 +36,27 @@ namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 } // namespace appframework
 
-BOOST_AUTO_TEST_SUITE(FanOutUserModule_test)
+BOOST_AUTO_TEST_SUITE(FanOutDAQModule_test)
 
 BOOST_AUTO_TEST_CASE(Construct) {
-  auto buf = std::make_shared<appframework::DequeBuffer<int>>();
-  appframework::FanOutUserModule<int> foum("test", { buf }, { buf });
+  auto buf = std::make_shared<appframework::StdDeQueue<int>>();
+  appframework::FanOutDAQModule<int> foum("test", { buf }, { buf });
 }
 
 BOOST_AUTO_TEST_CASE(Configure) {
-  auto buf = std::make_shared<appframework::DequeBuffer<int>>();
-  appframework::FanOutUserModule<int> foum("test", { buf }, { buf });
+  auto buf = std::make_shared<appframework::StdDeQueue<int>>();
+  appframework::FanOutDAQModule<int> foum("test", { buf }, { buf });
   foum.execute_command("configure");
 }
 
 BOOST_AUTO_TEST_CASE(NonCopyableTypeTest) {
   auto inputbuf =
-    std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
+    std::make_shared<appframework::StdDeQueue<NonCopyableType>>();
   auto outputbuf1 =
-    std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
+    std::make_shared<appframework::StdDeQueue<NonCopyableType>>();
   auto outputbuf2 =
-    std::make_shared<appframework::DequeBuffer<NonCopyableType>>();
-  appframework::FanOutUserModule<NonCopyableType> foum(
+    std::make_shared<appframework::StdDeQueue<NonCopyableType>>();
+  appframework::FanOutDAQModule<NonCopyableType> foum(
     "test", { inputbuf }, { outputbuf1, outputbuf2 });
 
   // This test assumes RoundRobin mode. Once configurability is implemented,

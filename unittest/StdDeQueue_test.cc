@@ -1,15 +1,15 @@
 /**
  *
- * @file DequeBuffer class Unit Tests
+ * @file StdDeQueue class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/Buffers/DequeBuffer.hh"
+#include "app-framework/Queues/StdDeQueue.hh"
 
-#define BOOST_TEST_MODULE DequeBuffer_test
+#define BOOST_TEST_MODULE StdDeQueue_test
 #include <boost/test/included/unit_test.hpp>
 
 #include <chrono>
@@ -31,7 +31,7 @@ constexpr auto timeout_in_us =
 
 // The decltype means "Have the buffer's push/pop functions expect a duration of
 // the same type as the timeout we defined"
-appframework::DequeBuffer<int, decltype(timeout)> buffer;
+appframework::StdDeQueue<int, decltype(timeout)> buffer;
 
 // See
 // https://www.boost.org/doc/libs/1_73_0/libs/test/doc/html/boost_test/tests_organization/enabling.html
@@ -45,7 +45,7 @@ struct CapacityChecker {
       return true;
     } else {
       boost::test_tools::assertion_result result(false);
-      result.message() << "Capacity of DequeBuffer (" << buffer.capacity()
+      result.message() << "Capacity of StdDeQueue (" << buffer.capacity()
                        << ") larger than max value this suite tests ("
                        << max_testable_capacity << ")";
       return result;
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(empty_checks,
     }
   } catch (const std::runtime_error &err) {
     BOOST_WARN_MESSAGE(true, err.what());
-    BOOST_TEST(false, "Exception thrown in call to DequeBuffer::pop(); unable "
+    BOOST_TEST(false, "Exception thrown in call to StdDeQueue::pop(); unable "
                       "to empty the buffer");
   }
 
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(capacity_checks,
     }
   } catch (const std::runtime_error &err) {
     BOOST_WARN_MESSAGE(true, err.what());
-    BOOST_TEST(false, "Exception thrown in call to DequeBuffer::push(); unable "
+    BOOST_TEST(false, "Exception thrown in call to StdDeQueue::push(); unable "
                       "to fill the buffer to its alleged capacity of "
                           << buffer.capacity() << " elements");
   }

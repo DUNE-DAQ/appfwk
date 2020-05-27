@@ -10,7 +10,7 @@
  * received with this code.
  */
 
-#include "app-framework-base/Buffers/Buffer.hh"
+#include "app-framework-base/Queues/Queue.hh"
 
 #include <atomic>
 #include <cassert>
@@ -29,8 +29,8 @@
 namespace appframework {
 
 template <class ValueType, class DurationType = std::chrono::milliseconds>
-class DequeBuffer : public BufferInput<ValueType, DurationType>,
-                    public BufferOutput<ValueType, DurationType> {
+class StdDeQueue : public QueueInput<ValueType, DurationType>,
+                    public QueueOutput<ValueType, DurationType> {
 public:
   using value_type = ValueType;
   using duration_type = DurationType;
@@ -39,9 +39,9 @@ public:
   // this name in the base class to be accessible here, given that a
   // subset are overridden
 
-  using BufferInput<ValueType, DurationType>::push;
+  using QueueInput<ValueType, DurationType>::push;
 
-  DequeBuffer();
+  StdDeQueue();
 
   void Configure();
 
@@ -59,10 +59,10 @@ public:
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
 
-  DequeBuffer(const DequeBuffer &) = delete;
-  DequeBuffer &operator=(const DequeBuffer &) = delete;
-  DequeBuffer(DequeBuffer &&) = delete;
-  DequeBuffer &operator=(DequeBuffer &&) = delete;
+  StdDeQueue(const StdDeQueue &) = delete;
+  StdDeQueue &operator=(const StdDeQueue &) = delete;
+  StdDeQueue(StdDeQueue &&) = delete;
+  StdDeQueue &operator=(StdDeQueue &&) = delete;
 
 private:
   void try_lock_for(std::unique_lock<std::mutex> &, const duration_type &);
@@ -76,7 +76,7 @@ private:
   std::condition_variable fNoLongerEmpty;
 };
 
-#include "detail/DequeBuffer.icc"
+#include "detail/StdDeQueue.icc"
 
 } // namespace appframework
 

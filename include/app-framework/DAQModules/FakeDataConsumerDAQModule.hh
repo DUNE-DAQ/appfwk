@@ -1,7 +1,7 @@
 /**
- * @file The FakeDataConsumerUserModule class interface
+ * @file The FakeDataConsumerDAQModule class interface
  *
- * FakeDataConsumerUserModule is a simple UserModule implementation that simply
+ * FakeDataConsumerDAQModule is a simple DAQModule implementation that simply
  * logs the fact that it received a command from DAQProcess.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -12,9 +12,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATACONSUMERUSERMODULE_HH_
 
-#include "app-framework-base/Buffers/Buffer.hh"
-#include "app-framework-base/UserModules/UserModule.hh"
-#include "app-framework-base/UserModules/UserModuleThreadHelper.hh"
+#include "app-framework-base/Queues/Queue.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
 
 #include <future>
 #include <memory>
@@ -23,22 +23,22 @@
 
 namespace appframework {
 /**
- * @brief FakeDataConsumerUserModule creates vectors of ints and sends them
+ * @brief FakeDataConsumerDAQModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataConsumerUserModule : public UserModule {
+class FakeDataConsumerDAQModule : public DAQModule {
 public:
-  FakeDataConsumerUserModule(std::string name,
-             std::vector<std::shared_ptr<BufferI>> inputs,
-             std::vector<std::shared_ptr<BufferI>> outputs);
+  FakeDataConsumerDAQModule(std::string name,
+             std::vector<std::shared_ptr<QueueI>> inputs,
+             std::vector<std::shared_ptr<QueueI>> outputs);
 
   std::future<std::string> execute_command(std::string cmd) override;
 
-  FakeDataConsumerUserModule(const FakeDataConsumerUserModule &) = delete;
-  FakeDataConsumerUserModule &
-  operator=(const FakeDataConsumerUserModule &) = delete;
-  FakeDataConsumerUserModule(FakeDataConsumerUserModule &&) = delete;
-  FakeDataConsumerUserModule &operator=(FakeDataConsumerUserModule &&) = delete;
+  FakeDataConsumerDAQModule(const FakeDataConsumerDAQModule &) = delete;
+  FakeDataConsumerDAQModule &
+  operator=(const FakeDataConsumerDAQModule &) = delete;
+  FakeDataConsumerDAQModule(FakeDataConsumerDAQModule &&) = delete;
+  FakeDataConsumerDAQModule &operator=(FakeDataConsumerDAQModule &&) = delete;
 
 private:
   // Commands
@@ -48,14 +48,14 @@ private:
 
   // Threading
   void do_work();
-  UserModuleThreadHelper thread_;
+  DAQModuleThreadHelper thread_;
 
   // Configuration (for validation)
   size_t nIntsPerVector_;
   int starting_int_;
   int ending_int_;
   std::chrono::milliseconds bufferTimeout_;
-  std::shared_ptr<BufferOutput<std::vector<int>>> inputBuffer_;
+  std::shared_ptr<QueueOutput<std::vector<int>>> inputQueue_;
 };
 } // namespace appframework
 

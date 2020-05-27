@@ -1,12 +1,12 @@
 /**
- * @file The FakeDataConsumerUserModule class implementation
+ * @file The FakeDataConsumerDAQModule class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/UserModules/FakeDataConsumerUserModule.hh"
+#include "app-framework/DAQModules/FakeDataConsumerDAQModule.hh"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "FakeDataConsumer"
@@ -15,31 +15,31 @@
 #include <functional>
 #include <thread>
 
-appframework::FakeDataConsumerUserModule::FakeDataConsumerUserModule(
+appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
   std::string name,
-  std::vector<std::shared_ptr<BufferI>> inputs,
-  std::vector<std::shared_ptr<BufferI>> outputs)
-  : UserModule(name, inputs, outputs)
+  std::vector<std::shared_ptr<QueueI>> inputs,
+  std::vector<std::shared_ptr<QueueI>> outputs)
+  : DAQModule(name, inputs, outputs)
   , bufferTimeout_(100)
-    ,thread_(std::bind(&FakeDataConsumerUserModule::do_work, this))
+    ,thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
 { 
 if (outputs.size()) {
     throw std::runtime_error(
-      "Invalid Configuration for FakeDataConsumerUserModule: Output buffer "
+      "Invalid Configuration for FakeDataConsumerDAQModule: Output buffer "
       "provided!");
 }
 if (inputs.size() > 1) {
   throw std::runtime_error(
-    "Invalid Configuration for FakeDataConsumerUserModule: More than one Input "
+    "Invalid Configuration for FakeDataConsumerDAQModule: More than one Input "
     "provided!");
 }
 
-inputBuffer_.reset( dynamic_cast<BufferOutput<std::vector<int>>*>(&*inputs_[0]));
+inputQueue_.reset( dynamic_cast<QueueOutput<std::vector<int>>*>(&*inputs_[0]));
 
 }
 
 std::future<std::string>
-appframework::FakeDataConsumerUserModule::execute_command(std::string cmd) {
+appframework::FakeDataConsumerDAQModule::execute_command(std::string cmd) {
   if (cmd == "configure" || cmd == "Configure") {
     return std::async(std::launch::async, [&] { return do_configure(); });
   }
@@ -54,7 +54,7 @@ appframework::FakeDataConsumerUserModule::execute_command(std::string cmd) {
                     [] { return std::string("Unrecognized Command"); });
 }
 
-std::string appframework::FakeDataConsumerUserModule::do_configure() {
+std::string appframework::FakeDataConsumerDAQModule::do_configure() {
   nIntsPerVector_ = 10;
   starting_int_ = -4;
   ending_int_ = 14;
@@ -62,12 +62,12 @@ std::string appframework::FakeDataConsumerUserModule::do_configure() {
   return "Success";
 }
 
-std::string appframework::FakeDataConsumerUserModule::do_start() {
+std::string appframework::FakeDataConsumerDAQModule::do_start() {
   thread_.start_working_thread_();
   return "Success";
 }
 
-std::string appframework::FakeDataConsumerUserModule::do_stop() {
+std::string appframework::FakeDataConsumerDAQModule::do_stop() {
   thread_.stop_working_thread_();
   return "Success";
 }
@@ -84,23 +84,23 @@ TraceStreamer &operator<<(TraceStreamer &t, std::vector<int> ints) {
   return t << "}";
 }
 
-void appframework::FakeDataConsumerUserModule::do_work() {
+void appframework::FakeDataConsumerDAQModule::do_work() {
   int current_int = starting_int_;
   int counter = 0;
   int fail_count = 0;
   std::vector<int> vec;
 
   while (thread_.thread_running()) {
-    if (!inputBuffer_->empty()) {
+    if (!inputQueue_->empty()) {
 
       TLOG(TLVL_DEBUG) << instance_name_
-                       << " Going to receive data from inputBuffer";
+                       << " Going to receive data from inputQueue";
 
       try {
-        vec = inputBuffer_->pop(bufferTimeout_);
+        vec = inputQueue_->pop(bufferTimeout_);
       } catch (const std::runtime_error &err) {
         TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
-                              "inputBuffer (exception is \""
+                              "inputQueue (exception is \""
                            << err.what() << "\"";
         continue;
       }
@@ -147,4 +147,4 @@ void appframework::FakeDataConsumerUserModule::do_work() {
                   << fail_count << " failures.";
 }
 
-DEFINE_DUNE_USER_MODULE(appframework::FakeDataConsumerUserModule)
+DEFINE_DUNE_USER_MODULE(appframework::FakeDataConsumerDAQModule)

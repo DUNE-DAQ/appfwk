@@ -1,8 +1,0 @@
-
-#file(GLOB source_files *.cc)
-#add_library(app-framework_UserModules SHARED ${source_files} )
-
-add_library(app-framework_DebugLoggingUserModule_duneUserModule DebugLoggingUserModule.cc)
-add_library(app-framework_FakeDataConsumerUserModule_duneUserModule FakeDataConsumerUserModule.cc)
-add_library(app-framework_FakeDataProducerUserModule_duneUserModule FakeDataProducerUserModule.cc)
-add_library(app-framework_VectorIntFanOutUserModule_duneUserModule VectorIntFanOutUserModule.cc)

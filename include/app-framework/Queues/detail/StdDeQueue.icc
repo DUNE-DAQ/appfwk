@@ -1,8 +1,8 @@
 
 
-template <class T, class U> DequeBuffer<T, U>::DequeBuffer() { Configure(); }
+template <class T, class U> StdDeQueue<T, U>::StdDeQueue() { Configure(); }
 
-template <class T, class U> void DequeBuffer<T, U>::Configure() {
+template <class T, class U> void StdDeQueue<T, U>::Configure() {
 
   this->fAttributes.isBounded = true;
   this->fAttributes.isSearchable = false;
@@ -18,7 +18,7 @@ template <class T, class U> void DequeBuffer<T, U>::Configure() {
 }
 
 template <class T, class U>
-void DequeBuffer<T, U>::push(value_type &&val,
+void StdDeQueue<T, U>::push(value_type &&val,
                                       const duration_type &timeout) {
 
   auto starttime = std::chrono::steady_clock::now();
@@ -41,7 +41,7 @@ void DequeBuffer<T, U>::push(value_type &&val,
   } else {
     std::stringstream errmsg;
     errmsg
-        << "In DequeBuffer::push: unable to push since queue is full ("
+        << "In StdDeQueue::push: unable to push since queue is full ("
         << this->size() << " elements) (timeout period was "
         << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
                .count()
@@ -51,7 +51,7 @@ void DequeBuffer<T, U>::push(value_type &&val,
 }
 
 template <class T, class U>
-T DequeBuffer<T, U>::pop(const duration_type &timeout) {
+T StdDeQueue<T, U>::pop(const duration_type &timeout) {
 
   auto starttime = std::chrono::steady_clock::now();
   std::unique_lock<std::mutex> lk(fMutex, std::defer_lock);
@@ -74,7 +74,7 @@ T DequeBuffer<T, U>::pop(const duration_type &timeout) {
     return obj;
   } else {
     std::stringstream errmsg;
-    errmsg << "In DequeBuffer::pop: unable to pop since queue is "
+    errmsg << "In StdDeQueue::pop: unable to pop since queue is "
               "empty (timeout period was "
            << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
                   .count()
@@ -89,7 +89,7 @@ T DequeBuffer<T, U>::pop(const duration_type &timeout) {
 // and pop operations require an std::mutex
 
 template <class T, class U>
-void DequeBuffer<T, U>::try_lock_for(std::unique_lock<std::mutex> &lk,
+void StdDeQueue<T, U>::try_lock_for(std::unique_lock<std::mutex> &lk,
                                      const duration_type &timeout) {
   assert(!lk.owns_lock());
 
@@ -113,7 +113,7 @@ void DequeBuffer<T, U>::try_lock_for(std::unique_lock<std::mutex> &lk,
 
   if (!lk.owns_lock()) {
     std::ostringstream errmsg;
-    errmsg << "Unable to lock the DequeBuffer's mutex "
+    errmsg << "Unable to lock the StdDeQueue's mutex "
               "within the timeout period of "
            << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
                   .count()
