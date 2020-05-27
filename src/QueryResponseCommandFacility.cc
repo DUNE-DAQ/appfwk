@@ -12,7 +12,9 @@
 
 namespace appframework {
 
-int QueryResponseCommandFacility::listen(DAQProcess *process) {
+int
+QueryResponseCommandFacility::listen(DAQProcess* process)
+{
   try {
     bool keepGoing = true;
     while (keepGoing) {
