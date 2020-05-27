@@ -4,7 +4,7 @@ appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(
   std::string name,
   std::vector<std::shared_ptr<QueueI>> inputs,
   std::vector<std::shared_ptr<QueueI>> outputs)
-  : DAQModule(name, inputs, outputs)
+  : DAQModuleI(name, inputs, outputs)
   , mode_(FanOutMode::NotConfigured)
   , queueTimeout_(100)
   , thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this))
@@ -16,11 +16,11 @@ appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(
                              "provided!");
   }
 
-  inputQueue_.reset(dynamic_cast<QueueOutput<ValueType>*>(&*inputs_[0]));
+  inputQueue_.reset(dynamic_cast<QueueSource<ValueType>*>(&*inputs_[0]));
 
   for (auto& output : outputs) {
-    outputQueues_.push_back(std::shared_ptr<QueueInput<ValueType>>(
-      dynamic_cast<QueueInput<ValueType>*>(&*output)));
+    outputQueues_.push_back(std::shared_ptr<QueueSink<ValueType>>(
+      dynamic_cast<QueueSink<ValueType>*>(&*output)));
   }
 }
 
@@ -84,7 +84,8 @@ appframework::FanOutDAQModule<ValueType>::do_work()
       try {
         data_ptr = std::make_unique<ValueType>(inputQueue_->pop(queueTimeout_));
       } catch (const std::runtime_error& err) {
-        TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
+        TLOG(TLVL_WARNING) << instance_name_
+                           << ": Tried but failed to pop a value from an "
                               "inputQueue (exception is \""
                            << err.what() << "\")";
         continue;
@@ -106,7 +107,9 @@ appframework::FanOutDAQModule<ValueType>::do_work()
                 sent = true;
                 break;
               } else {
-                TLOG(TLVL_WARNING) << "A timeout occurred trying to push data "
+                TLOG(TLVL_WARNING)
+                  << instance_name_
+                  << ": A timeout occurred trying to push data "
                                       "onto an outputqueue; data has been lost";
               }
             }
@@ -126,7 +129,8 @@ appframework::FanOutDAQModule<ValueType>::do_work()
 
             if (std::chrono::duration_cast<decltype(queueTimeout_)>(
                   endtime - starttime) >= queueTimeout_) {
-              TLOG(TLVL_WARNING) << "A timeout occurred trying to push data "
+              TLOG(TLVL_WARNING) << instance_name_
+                                 << ": A timeout occurred trying to push data "
                                     "onto an outputqueue; data has been lost";
             }
 

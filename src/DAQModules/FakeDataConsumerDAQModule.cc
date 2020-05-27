@@ -16,12 +16,12 @@
 #include <thread>
 
 appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
-  std::shared_ptr<QueueSource<std::vector<int>>> inputQueue,
-  std::string id)
-  : thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
-  , id_(id)
+  std::string name,
+  std::vector<std::shared_ptr<QueueI>> inputs,
+  std::vector<std::shared_ptr<QueueI>> outputs)
+  : DAQModuleI(name, inputs, outputs)
   , queueTimeout_(100)
-  , inputQueue_(inputQueue)
+  , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
 {}
 
 void
@@ -89,35 +89,39 @@ appframework::FakeDataConsumerDAQModule::do_work()
   while (thread_.thread_running()) {
     if (inputQueue_->can_pop()) {
 
-      TLOG(TLVL_DEBUG) << getId() << "Going to receive data from inputQueue";
+      TLOG(TLVL_DEBUG) << instance_name_
+                       << ": Going to receive data from inputQueue";
 
       try {
         vec = inputQueue_->pop(queueTimeout_);
       } catch (const std::runtime_error& err) {
-        TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
+        TLOG(TLVL_WARNING) << instance_name_
+                           << ": Tried but failed to pop a value from an "
                               "inputQueue (exception is \""
                            << err.what() << "\"";
         continue;
       }
 
-      TLOG(TLVL_DEBUG) << getId() << "Received vector of size " << vec.size();
+      TLOG(TLVL_DEBUG) << instance_name_ << ": Received vector of size "
+                       << vec.size();
 
       bool failed = false;
 
-      TLOG(TLVL_DEBUG) << getId() << "Starting processing loop";
-      TLOG(TLVL_INFO) << getId() << "Received vector " << counter << ": "
+      TLOG(TLVL_DEBUG) << instance_name_ << ": Starting processing loop";
+      TLOG(TLVL_INFO) << instance_name_ << ": Received vector " << counter
+                      << ": "
                       << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
           if (ii != 0) {
             TLOG(TLVL_WARNING)
-              << getId() << "Error in received vector " << counter
+              << instance_name_ << ": Error in received vector " << counter
               << ", position " << ii << ": Expected " << current_int
               << ", received " << point;
             failed = true;
           } else {
-            TLOG(TLVL_INFO) << getId() << "Jump detected!";
+            TLOG(TLVL_INFO) << instance_name_ << ": Jump detected!";
           }
           current_int = point;
         }
@@ -126,8 +130,8 @@ appframework::FakeDataConsumerDAQModule::do_work()
           current_int = starting_int_;
         ++ii;
       }
-      TLOG(TLVL_DEBUG) << getId()
-                       << "Done with processing loop, failed=" << failed;
+      TLOG(TLVL_DEBUG) << instance_name_
+                       << ": Done with processing loop, failed=" << failed;
       if (failed)
         fail_count++;
 
@@ -137,6 +141,7 @@ appframework::FakeDataConsumerDAQModule::do_work()
     }
   }
 
-  TLOG(TLVL_INFO) << getId() << "Processed " << counter << " vectors with "
+  TLOG(TLVL_INFO) << instance_name_ << ": Processed " << counter
+                  << " vectors with "
                   << fail_count << " failures.";
 }

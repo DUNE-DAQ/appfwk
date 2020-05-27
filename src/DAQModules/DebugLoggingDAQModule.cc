@@ -8,7 +8,6 @@
 
 #include "app-framework/DAQModules/DebugLoggingDAQModule.hh"
 
-#include "app-framework-base/DAQModules/DAQModuleI.hh"
 #include "app-framework-base/Services/Logger.hh"
 
 #include "TRACE/trace.h"
@@ -16,12 +15,18 @@
 #include <iostream>
 
 namespace appframework {
-std::future<std::string>
-DebugLoggingDAQModule::execute_command(std::string cmd)
+void
+DebugLoggingDAQModule::execute_command(const std::string& cmd,
+                                       const std::vector<std::string>& args)
 {
-  TLOG(TLVL_INFO) << "Executing command: " << cmd;
-  return std::async([]() { return std::string("Success"); });
+  TLOG(TLVL_INFO) << instance_name_  << ": Executing command: " << cmd << " with "
+                  << args.size()
+                  << " args";
+  for (auto& a : args) {
+    TLOG(TLVL_INFO) << a;
+  }
+  return;
 }
 } // namespace appframework
 
-DEFINE_DUNE_USER_MODULE(appframework::DebugLoggingDAQModule)
+DEFINE_DUNE_DAQ_MODULE(appframework::DebugLoggingDAQModule)

@@ -10,7 +10,7 @@
 #include "app-framework/DAQModules/FanOutDAQModule.hh"
 #include "app-framework/Queues/StdDeQueue.hh"
 
-#define BOOST_TEST_MODULE FanOutDAQModule_test
+#define BOOST_TEST_MODULE FanOutDAQModule_test // NOLINT
 
 #include <boost/test/unit_test.hpp>
 
@@ -73,18 +73,18 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   inputbuf->push(NonCopyableType(1), buffer_timeout);
   inputbuf->push(NonCopyableType(2), buffer_timeout);
 
-  while (!inputbuf->empty())
+  while (inputbuf->can_pop())
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   foum.execute_command("stop");
 
-  BOOST_REQUIRE_EQUAL(inputbuf->empty(), true);
+  BOOST_REQUIRE_EQUAL(inputbuf->can_pop(), false);
 
-  BOOST_REQUIRE_EQUAL(outputbuf1->empty(), false);
+  BOOST_REQUIRE_EQUAL(outputbuf1->can_pop(), true);
   auto res = outputbuf1->pop(buffer_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 1);
 
-  BOOST_REQUIRE_EQUAL(outputbuf2->empty(), false);
+  BOOST_REQUIRE_EQUAL(outputbuf2->can_pop(), true);
   res = outputbuf2->pop(buffer_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 2);
 }

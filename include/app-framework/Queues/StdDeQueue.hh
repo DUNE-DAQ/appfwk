@@ -1,5 +1,5 @@
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_BUFFERS_DEQUEBUFFER_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_BUFFERS_DEQUEBUFFER_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_STDDEQUEUE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_STDDEQUEUE_HH_
 
 /**
  *
@@ -30,8 +30,8 @@ namespace appframework {
 
 template<class ValueType, class DurationType = std::chrono::milliseconds>
 class StdDeQueue
-  : public QueueInput<ValueType, DurationType>
-  , public QueueOutput<ValueType, DurationType>
+  : public QueueSink<ValueType, DurationType>
+  , public QueueSource<ValueType, DurationType>
 {
 public:
   using value_type = ValueType;
@@ -41,21 +41,21 @@ public:
   // this name in the base class to be accessible here, given that a
   // subset are overridden
 
-  using QueueInput<ValueType, DurationType>::push;
+  using QueueSink<ValueType, DurationType>::push;
+
+  using QueueI::Configure; //(const std::vector<std::string> & args = {}) ;
 
   StdDeQueue();
 
-  void Configure();
-
-  size_t size() const noexcept { return fSize.load(); }
-  size_t capacity() const noexcept override { return fCapacity; }
-
-  bool empty() const noexcept override { return size() == 0; }
-  bool full() const noexcept override { return size() >= capacity(); }
-
-  value_type pop(const duration_type& timeout)
+  bool can_pop() const noexcept override { return fSize.load() > 0; }
+  value_type pop(const duration_type&)
     override; // Throws std::runtime_error if a timeout occurs
-  void push(value_type&& val, const duration_type& timeout)
+
+  bool can_push() const noexcept override
+  {
+    return fSize.load() < fDeque.max_size();
+  }
+  void push(value_type&&, const duration_type&)
     override; // Throws std::runtime_error if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
@@ -71,7 +71,6 @@ private:
 
   std::deque<value_type> fDeque;
   std::atomic<size_t> fSize = 0;
-  size_t fCapacity;
 
   std::mutex fMutex;
   std::condition_variable fNoLongerFull;
@@ -82,4 +81,4 @@ private:
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_BUFFERS_DEQUEBUFFER_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_STDDEQUEUE_HH_

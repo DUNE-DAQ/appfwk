@@ -18,8 +18,8 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   std::string name,
   std::vector<std::shared_ptr<QueueI>> inputs,
   std::vector<std::shared_ptr<QueueI>> outputs)
-  : DAQModule(name, inputs, outputs)
-  , bufferTimeout_(100)
+  : DAQModuleI(name, inputs, outputs)
+  , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
 {
   if (inputs.size()) {
@@ -34,7 +34,7 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   }
 
   outputQueue_.reset(
-    dynamic_cast<QueueInput<std::vector<int>>*>(&*outputs_[0]));
+    dynamic_cast<QueueSink<std::vector<int>>*>(&*outputs_[0]));
 }
 
 void
@@ -98,35 +98,37 @@ appframework::FakeDataProducerDAQModule::do_work()
   int current_int = starting_int_;
   size_t counter = 0;
   while (thread_.thread_running()) {
-    TLOG(TLVL_DEBUG) << "Creating output vector";
+    TLOG(TLVL_DEBUG) << instance_name_ << ": Creating output vector";
     std::vector<int> output(nIntsPerVector_);
 
-    TLOG(TLVL_DEBUG) << "Start of fill loop";
+    TLOG(TLVL_DEBUG) << instance_name_ << ": Start of fill loop";
     for (auto ii = 0; ii < nIntsPerVector_; ++ii) {
       output[ii] = current_int;
       ++current_int;
       if (current_int > ending_int_)
         current_int = starting_int_;
     }
-    TLOG(TLVL_INFO) << "Produced vector " << counter << " with contents "
+    TLOG(TLVL_INFO) << instance_name_ << ": Produced vector " << counter
+                    << " with contents "
                     << output << " and size " << output.size();
 
-    TLOG(TLVL_DEBUG) << "Pushing vector into outputQueue";
+    TLOG(TLVL_DEBUG) << instance_name_ << ": Pushing vector into outputQueue";
     auto starttime = std::chrono::steady_clock::now();
     outputQueue_->push(std::move(output), queueTimeout_);
     auto endtime = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<decltype(queueTimeout_)>(
           endtime - starttime) > queueTimeout_) {
       TLOG(TLVL_WARNING)
-        << "Timeout attempting to push vector onto outputQueue";
+        << instance_name_
+        << ": Timeout attempting to push vector onto outputQueue";
     }
 
-    TLOG(TLVL_DEBUG) << "Start of sleep between sends";
+    TLOG(TLVL_DEBUG) << instance_name_ << ": Start of sleep between sends";
     std::this_thread::sleep_for(
       std::chrono::milliseconds(wait_between_sends_ms_));
-    TLOG(TLVL_DEBUG) << "End of do_work loop";
+    TLOG(TLVL_DEBUG) << instance_name_ << ": End of do_work loop";
     counter++;
   }
 }
 
-DEFINE_DUNE_USER_MODULE(appframework::FakeDataProducerDAQModule)
+DEFINE_DUNE_DAQ_MODULE(appframework::FakeDataProducerDAQModule)

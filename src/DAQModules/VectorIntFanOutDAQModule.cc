@@ -5,4 +5,4 @@ typedef appframework::FanOutDAQModule<std::vector<int>>
   VectorIntFanOutDAQModule;
 }
 
-DEFINE_DUNE_USER_MODULE(appframework::VectorIntFanOutDAQModule)
+DEFINE_DUNE_DAQ_MODULE(appframework::VectorIntFanOutDAQModule)

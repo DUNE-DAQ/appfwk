@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
 
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
 #include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
@@ -26,14 +26,15 @@ namespace appframework {
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataProducerDAQModule : public DAQModule
+class FakeDataProducerDAQModule : public DAQModuleI
 {
 public:
   FakeDataProducerDAQModule(std::string name,
                             std::vector<std::shared_ptr<QueueI>> inputs,
                             std::vector<std::shared_ptr<QueueI>> outputs);
 
-  std::future<std::string> execute_command(std::string cmd) override;
+  void execute_command(const std::string& cmd,
+                       const std::vector<std::string>& args = {}) override;
 
   FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) = delete;
   FakeDataProducerDAQModule& operator=(const FakeDataProducerDAQModule&) =
@@ -52,8 +53,8 @@ private:
   void do_work();
 
   // Configuration
-  std::shared_ptr<QueueInput<std::vector<int>>> outputQueue_;
-  std::chrono::milliseconds bufferTimeout_;
+  std::shared_ptr<QueueSink<std::vector<int>>> outputQueue_;
+  std::chrono::milliseconds queueTimeout_;
   size_t nIntsPerVector_;
   int starting_int_;
   int ending_int_;
@@ -62,4 +63,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_

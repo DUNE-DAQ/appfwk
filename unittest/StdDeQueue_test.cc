@@ -9,7 +9,7 @@
 
 #include "app-framework/Queues/StdDeQueue.hh"
 
-#define BOOST_TEST_MODULE StdDeQueue_test
+#define BOOST_TEST_MODULE StdDeQueue_test // NOLINT
 #include <boost/test/included/unit_test.hpp>
 
 #include <chrono>
@@ -29,10 +29,17 @@ constexpr auto timeout = std::chrono::microseconds(100);
 constexpr auto timeout_in_us =
   std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-// The decltype means "Have the buffer's push/pop functions expect a duration of
+// The decltype means "Have the Queue's push/pop functions expect a duration of
 // the same type as the timeout we defined"
-appframework::StdDeQueue<int, decltype(timeout)> buffer;
+appframework::StdDeQueue<int, decltype(timeout)> Queue;
 
+/**
+ * \todo StdDeQueue no longer exposes size or capacity methods. This section
+ * should either be deleted or those methods added back
+ *
+ * ELF, May 19, 2020
+ */
+#if 0
 // See
 // https://www.boost.org/doc/libs/1_73_0/libs/test/doc/html/boost_test/tests_organization/enabling.html
 // to better understand CapacityChecker.
@@ -42,17 +49,18 @@ struct CapacityChecker
 
   boost::test_tools::assertion_result operator()(boost::unit_test::test_unit_id)
   {
-    if (buffer.capacity() <= max_testable_capacity) {
+    if (Queue.capacity() <= max_testable_capacity) {
       return true;
     } else {
       boost::test_tools::assertion_result result(false);
-      result.message() << "Capacity of StdDeQueue (" << buffer.capacity()
+      result.message() << "Capacity of StdDeQueue (" << Queue.capacity()
                        << ") larger than max value this suite tests ("
                        << max_testable_capacity << ")";
       return result;
     }
   }
 };
+#endif
 
 } // namespace ""
 
@@ -62,11 +70,10 @@ struct CapacityChecker
 BOOST_AUTO_TEST_CASE(sanity_checks)
 {
 
-  BOOST_REQUIRE_EQUAL(buffer.size(), 0);
-  BOOST_REQUIRE(buffer.empty());
+  BOOST_REQUIRE(!Queue.can_pop());
 
   auto starttime = std::chrono::steady_clock::now();
-  buffer.push(999, timeout);
+  Queue.push(999, timeout);
   auto push_time = std::chrono::steady_clock::now() - starttime;
 
   if (push_time > timeout) {
@@ -74,23 +81,23 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
       std::chrono::duration_cast<std::chrono::microseconds>(push_time).count();
 
     BOOST_TEST_REQUIRE(false,
-                       "Test failure: pushing element onto empty buffer "
+                       "Test failure: pushing element onto empty Queue "
                        "resulted in a timeout (function exited after "
                          << push_time_in_us << " microseconds, timeout is "
                          << timeout_in_us << " microseconds)");
   }
 
-  BOOST_REQUIRE_EQUAL(buffer.size(), 1);
+  BOOST_REQUIRE(Queue.can_pop());
 
   starttime = std::chrono::steady_clock::now();
-  auto popped_value = buffer.pop(timeout);
+  auto popped_value = Queue.pop(timeout);
   auto pop_time = std::chrono::steady_clock::now() - starttime;
 
   if (pop_time > timeout) {
     auto pop_time_in_us =
       std::chrono::duration_cast<std::chrono::microseconds>(pop_time).count();
     BOOST_TEST_REQUIRE(false,
-                       "Test failure: popping element off buffer "
+                       "Test failure: popping element off Queue "
                        "resulted in a timeout (function exited after "
                          << pop_time_in_us << " microseconds, timeout is "
                          << timeout_in_us << " microseconds)");
@@ -104,22 +111,22 @@ BOOST_AUTO_TEST_CASE(empty_checks,
 {
 
   try {
-    while (!buffer.empty()) {
-      buffer.pop(timeout);
+    while (Queue.can_pop()) {
+      Queue.pop(timeout);
     }
   } catch (const std::runtime_error& err) {
     BOOST_WARN_MESSAGE(true, err.what());
     BOOST_TEST(false,
                "Exception thrown in call to StdDeQueue::pop(); unable "
-               "to empty the buffer");
+               "to empty the Queue");
   }
 
-  BOOST_REQUIRE(buffer.empty());
+  BOOST_REQUIRE(!Queue.can_pop());
 
-  // pop off of an empty buffer
+  // pop off of an empty Queue
 
   auto starttime = std::chrono::steady_clock::now();
-  BOOST_CHECK_THROW(buffer.pop(timeout), std::runtime_error);
+  BOOST_CHECK_THROW(Queue.pop(timeout), std::runtime_error);
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
 
   const double fraction_of_pop_timeout_used = pop_duration / timeout;
@@ -130,48 +137,52 @@ BOOST_AUTO_TEST_CASE(empty_checks,
                  1 + fractional_timeout_tolerance);
 }
 
+/**
+ * \todo StdDeQueue no longer exposes size or capacity methods. This section
+ * should either be deleted or those methods added back
+ *
+ * ELF, May 19, 2020
+ */
+#if 0
 BOOST_AUTO_TEST_CASE(capacity_checks,
-                     *boost::unit_test::precondition(CapacityChecker()) *
-                       boost::unit_test::depends_on("sanity_checks"))
-{
+                   *boost::unit_test::precondition(CapacityChecker()) *
+                       boost::unit_test::depends_on("sanity_checks")) {
 
-  // TODO, May-6-2020, John Freeman (jcfree@fnal.gov)
-  // In the next week, figure out if it makes sense beyond this test to create
-  // an insert() function which takes iterators
-
-  try {
-    while (buffer.size() < buffer.capacity()) {
-      buffer.push(-1, timeout);
-    }
-  } catch (const std::runtime_error& err) {
-    BOOST_WARN_MESSAGE(true, err.what());
-    BOOST_TEST(false,
-               "Exception thrown in call to StdDeQueue::push(); unable "
-               "to fill the buffer to its alleged capacity of "
-                 << buffer.capacity() << " elements");
+// TODO, May-6-2020, John Freeman (jcfree@fnal.gov)
+// In the next week, figure out if it makes sense beyond this test to create
+// an insert() function which takes iterators
+try {
+  while (Queue.size() < Queue.capacity()) {
+    Queue.push(-1, timeout);
   }
-
-  BOOST_REQUIRE(buffer.full());
-
-  // Push onto an already-full buffer
-
-  auto starttime = std::chrono::steady_clock::now();
-  try {
-    buffer.push(-1, timeout);
-  } catch (...) { // NOLINT (don't care whether or not a failed push results in
-                  // an exception)
-  }
-  auto push_duration = std::chrono::steady_clock::now() - starttime;
-
-  // Trying to push an element onto a buffer at capacity shouldn't change its
-  // size
-
-  BOOST_CHECK_EQUAL(buffer.size(), buffer.capacity());
-
-  const double fraction_of_push_timeout_used = push_duration / timeout;
-
-  BOOST_CHECK_GT(fraction_of_push_timeout_used,
-                 1 - fractional_timeout_tolerance);
-  BOOST_CHECK_LT(fraction_of_push_timeout_used,
-                 1 + fractional_timeout_tolerance);
+} catch (const std::runtime_error &err) {
+  BOOST_WARN_MESSAGE(true, err.what());
+  BOOST_TEST(false, "Exception thrown in call to StdDeQueue::push(); unable "
+                    "to fill the Queue to its alleged capacity of "
+                        << Queue.capacity() << " elements");
 }
+BOOST_REQUIRE(!Queue.can_push());
+
+// Push onto an already-full Queue
+
+auto starttime = std::chrono::steady_clock::now();
+try {
+  Queue.push(-1, timeout);
+} catch (...) { // NOLINT (don't care whether or not a failed push results in
+                // an exception)
+}
+auto push_duration = std::chrono::steady_clock::now() - starttime;
+
+// Trying to push an element onto a Queue at capacity shouldn't change its
+// size
+
+BOOST_REQUIRE(!Queue.can_push());
+
+const double fraction_of_push_timeout_used = push_duration / timeout;
+
+BOOST_CHECK_GT(fraction_of_push_timeout_used,
+               1 - fractional_timeout_tolerance);
+BOOST_CHECK_LT(fraction_of_push_timeout_used,
+               1 + fractional_timeout_tolerance);
+}
+#endif

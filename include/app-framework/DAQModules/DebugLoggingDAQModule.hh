@@ -9,34 +9,35 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_DEBUGLOGGINGUSERMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_DEBUGLOGGINGUSERMODULE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
 
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
 
-#include <future>
 #include <string>
+#include <vector>
 
 namespace appframework {
 /**
  * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingDAQModule : public DAQModule
+class DebugLoggingDAQModule : public DAQModuleI
 {
 public:
   DebugLoggingDAQModule(std::string name,
                         std::vector<std::shared_ptr<QueueI>> inputs,
                         std::vector<std::shared_ptr<QueueI>> outputs)
-    : DAQModule(name, inputs, outputs)
+    : DAQModuleI(name, inputs, outputs)
   {}
 
   /**
    * @brief Logs the reception of the command
    * @param cmd Command from DAQProcess
    */
-  std::future<std::string> execute_command(std::string cmd) override;
+  void execute_command(const std::string& cmd,
+                       const std::vector<std::string>& args = {}) override;
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_DEBUGLOGGINGUSERMODULE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_

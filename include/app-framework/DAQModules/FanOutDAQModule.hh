@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
 
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
 #include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
@@ -18,20 +18,20 @@
 
 #include "TRACE/trace.h"
 
-#include <future>
 #include <limits>
 #include <list>
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace appframework {
 /**
  * @brief FanOutDAQModule sends data to multiple Queues
  */
-template<typename DATA_TYPE>
-class FanOutDAQModule : public DAQModule
+template<typename ValueType>
+class FanOutDAQModule : public DAQModuleI
 {
 public:
   FanOutDAQModule(std::string name,
@@ -50,7 +50,8 @@ public:
    * @brief Logs the reception of the command
    * @param cmd Command from DAQProcess
    */
-  std::future<std::string> execute_command(std::string cmd) override;
+  void execute_command(const std::string& cmd,
+                       const std::vector<std::string>& args = {}) override;
 
   FanOutDAQModule(const FanOutDAQModule&) = delete;
   FanOutDAQModule& operator=(const FanOutDAQModule&) = delete;
@@ -67,26 +68,26 @@ private:
   // necessary, even though it's just an alias to this user module's
   // data type.
 
-  template<typename U = DATA_TYPE>
+  template<typename U = ValueType>
   typename std::enable_if_t<!std::is_copy_constructible_v<U>> do_broadcast(
-    DATA_TYPE&) const
+    ValueType&) const
   {
     throw std::runtime_error(
       "Broadcast mode cannot be used for non-copy-constructible types!");
   }
-  template<typename U = DATA_TYPE>
+  template<typename U = ValueType>
   typename std::enable_if_t<std::is_copy_constructible_v<U>> do_broadcast(
-    DATA_TYPE& data) const
+    ValueType& data) const
   {
     for (auto& o : outputQueues_) {
       auto starttime = std::chrono::steady_clock::now();
-      o->push(data, bufferTimeout_);
+      o->push(data, queueTimeout_);
       auto endtime = std::chrono::steady_clock::now();
-      if (std::chrono::duration_cast<decltype(bufferTimeout_)>(
-            endtime - starttime) > bufferTimeout_) {
+      if (std::chrono::duration_cast<decltype(queueTimeout_)>(
+            endtime - starttime) > queueTimeout_) {
         TLOG(TLVL_WARNING) << "Timeout occurred trying to broadcast data to "
-                              "output buffer; data may be lost if it doesn't "
-                              "make it into any other output buffers, either";
+                              "output queue; data may be lost if it doesn't "
+                              "make it into any other output queues, either";
       }
     }
   }
@@ -97,14 +98,14 @@ private:
 
   // Configuration
   FanOutMode mode_;
-  std::chrono::milliseconds bufferTimeout_;
+  std::chrono::milliseconds queueTimeout_;
 
-  std::shared_ptr<QueueOutput<DATA_TYPE>> inputQueue_;
-  std::list<std::shared_ptr<QueueInput<DATA_TYPE>>> outputQueues_;
+  std::shared_ptr<QueueSource<ValueType>> inputQueue_;
+  std::list<std::shared_ptr<QueueSink<ValueType>>> outputQueues_;
   size_t wait_interval_us_;
 };
 } // namespace appframework
 
 #include "detail/FanOutDAQModule.icc"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
