@@ -9,7 +9,7 @@
 #include "app-framework-base/Services/CommandFacility.hh"
 #include "app-framework/DAQProcess.hh"
 
-#define BOOST_TEST_MODULE DAQProcess_test
+#define BOOST_TEST_MODULE DAQProcess_test // NOLINT
 
 #include <boost/test/unit_test.hpp>
 

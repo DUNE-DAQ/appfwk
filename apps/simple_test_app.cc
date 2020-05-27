@@ -15,7 +15,7 @@ namespace appframework {
 class simple_test_app_ModuleList : public ModuleList
 {
   // Inherited via ModuleList
-  void ConstructGraph(QueueMap& buffer_map,
+  void ConstructGraph(QueueMap& queue_map,
                       DAQModuleMap& user_module_map,
                       CommandOrderMap& command_order_map) override
   {
@@ -28,7 +28,6 @@ class simple_test_app_ModuleList : public ModuleList
 int
 main(int argc, char* argv[])
 {
-
   auto args =
     appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 

@@ -9,49 +9,35 @@
 #include "app-framework/DAQModules/FakeDataConsumerDAQModule.hh"
 
 #include "TRACE/trace.h"
-#define TRACE_NAME "FakeDataConsumer"
+#define TRACE_NAME "FakeDataConsumer" // NOLINT
 
 #include <chrono>
 #include <functional>
 #include <thread>
 
 appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
-  std::string name,
-  std::vector<std::shared_ptr<QueueI>> inputs,
-  std::vector<std::shared_ptr<QueueI>> outputs)
-  : DAQModule(name, inputs, outputs)
-  , bufferTimeout_(100)
-  , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
-{
-  if (outputs.size()) {
-    throw std::runtime_error(
-      "Invalid Configuration for FakeDataConsumerDAQModule: Output buffer "
-      "provided!");
-  }
-  if (inputs.size() > 1) {
-    throw std::runtime_error("Invalid Configuration for "
-                             "FakeDataConsumerDAQModule: More than one Input "
-                             "provided!");
-  }
+  std::shared_ptr<QueueSource<std::vector<int>>> inputQueue,
+  std::string id)
+  : thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
+  , id_(id)
+  , queueTimeout_(100)
+  , inputQueue_(inputQueue)
+{}
 
-  inputQueue_.reset(dynamic_cast<QueueOutput<std::vector<int>>*>(&*inputs_[0]));
-}
-
-std::future<std::string>
-appframework::FakeDataConsumerDAQModule::execute_command(std::string cmd)
+void
+appframework::FakeDataConsumerDAQModule::execute_command(
+  const std::string& cmd,
+  const std::vector<std::string>& /*args*/)
 {
   if (cmd == "configure" || cmd == "Configure") {
-    return std::async(std::launch::async, [&] { return do_configure(); });
+    do_configure();
   }
   if (cmd == "start" || cmd == "Start") {
-    return std::async(std::launch::async, [&] { return do_start(); });
+    do_start();
   }
   if (cmd == "stop" || cmd == "Stop") {
-    return std::async(std::launch::async, [&] { return do_stop(); });
+    do_stop();
   }
-
-  return std::async(std::launch::async,
-                    [] { return std::string("Unrecognized Command"); });
 }
 
 std::string
@@ -101,13 +87,12 @@ appframework::FakeDataConsumerDAQModule::do_work()
   std::vector<int> vec;
 
   while (thread_.thread_running()) {
-    if (!inputQueue_->empty()) {
+    if (inputQueue_->can_pop()) {
 
-      TLOG(TLVL_DEBUG) << instance_name_
-                       << " Going to receive data from inputQueue";
+      TLOG(TLVL_DEBUG) << getId() << "Going to receive data from inputQueue";
 
       try {
-        vec = inputQueue_->pop(bufferTimeout_);
+        vec = inputQueue_->pop(queueTimeout_);
       } catch (const std::runtime_error& err) {
         TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
                               "inputQueue (exception is \""
@@ -115,25 +100,24 @@ appframework::FakeDataConsumerDAQModule::do_work()
         continue;
       }
 
-      TLOG(TLVL_DEBUG) << instance_name_ << " Received vector of size "
-                       << vec.size();
+      TLOG(TLVL_DEBUG) << getId() << "Received vector of size " << vec.size();
 
       bool failed = false;
 
-      TLOG(TLVL_DEBUG) << instance_name_ << " Starting processing loop";
-      TLOG(TLVL_INFO) << instance_name_ << " Received vector " << counter
-                      << ": " << vec;
+      TLOG(TLVL_DEBUG) << getId() << "Starting processing loop";
+      TLOG(TLVL_INFO) << getId() << "Received vector " << counter << ": "
+                      << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
           if (ii != 0) {
             TLOG(TLVL_WARNING)
-              << instance_name_ << " Error in received vector " << counter
+              << getId() << "Error in received vector " << counter
               << ", position " << ii << ": Expected " << current_int
               << ", received " << point;
             failed = true;
           } else {
-            TLOG(TLVL_INFO) << instance_name_ << " Jump detected!";
+            TLOG(TLVL_INFO) << getId() << "Jump detected!";
           }
           current_int = point;
         }
@@ -142,8 +126,8 @@ appframework::FakeDataConsumerDAQModule::do_work()
           current_int = starting_int_;
         ++ii;
       }
-      TLOG(TLVL_DEBUG) << instance_name_
-                       << " Done with processing loop, failed=" << failed;
+      TLOG(TLVL_DEBUG) << getId()
+                       << "Done with processing loop, failed=" << failed;
       if (failed)
         fail_count++;
 
@@ -153,8 +137,6 @@ appframework::FakeDataConsumerDAQModule::do_work()
     }
   }
 
-  TLOG(TLVL_INFO) << instance_name_ << " Processed " << counter
-                  << " vectors with " << fail_count << " failures.";
+  TLOG(TLVL_INFO) << getId() << "Processed " << counter << " vectors with "
+                  << fail_count << " failures.";
 }
-
-DEFINE_DUNE_USER_MODULE(appframework::FakeDataConsumerDAQModule)

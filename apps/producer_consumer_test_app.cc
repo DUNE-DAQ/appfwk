@@ -20,7 +20,7 @@ namespace appframework {
 class producer_consumer_test_app_ModuleList : public ModuleList
 {
   // Inherited via ModuleList
-  void ConstructGraph(QueueMap& buffer_map,
+  void ConstructGraph(QueueMap& queue_map,
                       DAQModuleMap& user_module_map,
                       CommandOrderMap& command_order_map) override
   {
@@ -28,9 +28,9 @@ class producer_consumer_test_app_ModuleList : public ModuleList
     auto fanOutToConsumer1 = std::make_shared<StdDeQueue<std::vector<int>>>();
     auto fanOutToConsumer2 = std::make_shared<StdDeQueue<std::vector<int>>>();
 
-    buffer_map["producerToFanOut"] = producerToFanOut;
-    buffer_map["fanOutToConsumer1"] = fanOutToConsumer1;
-    buffer_map["fanOutToConsumer2"] = fanOutToConsumer2;
+    queue_map["producerToFanOut"] = producerToFanOut;
+    queue_map["fanOutToConsumer1"] = fanOutToConsumer1;
+    queue_map["fanOutToConsumer2"] = fanOutToConsumer2;
 
     user_module_map["producer"].reset(
       new FakeDataProducerDAQModule("prod", {}, { producerToFanOut }));

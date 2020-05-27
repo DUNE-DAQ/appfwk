@@ -1,13 +1,14 @@
 
-template<typename DATA_TYPE>
-appframework::FanOutDAQModule<DATA_TYPE>::FanOutDAQModule(
+template<typename ValueType>
+appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(
   std::string name,
   std::vector<std::shared_ptr<QueueI>> inputs,
   std::vector<std::shared_ptr<QueueI>> outputs)
   : DAQModule(name, inputs, outputs)
   , mode_(FanOutMode::NotConfigured)
-  , bufferTimeout_(100)
-  , thread_(std::bind(&FanOutDAQModule<DATA_TYPE>::do_work, this))
+  , queueTimeout_(100)
+  , thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this))
+  , wait_interval_us_(std::numeric_limits<size_t>::max())
 {
   if (inputs.size() > 1) {
     throw std::runtime_error("Invalid Configuration for "
@@ -15,35 +16,34 @@ appframework::FanOutDAQModule<DATA_TYPE>::FanOutDAQModule(
                              "provided!");
   }
 
-  inputQueue_.reset(dynamic_cast<QueueOutput<DATA_TYPE>*>(&*inputs_[0]));
+  inputQueue_.reset(dynamic_cast<QueueOutput<ValueType>*>(&*inputs_[0]));
 
   for (auto& output : outputs) {
-    outputQueues_.push_back(std::shared_ptr<QueueInput<DATA_TYPE>>(
-      dynamic_cast<QueueInput<DATA_TYPE>*>(&*output)));
+    outputQueues_.push_back(std::shared_ptr<QueueInput<ValueType>>(
+      dynamic_cast<QueueInput<ValueType>*>(&*output)));
   }
 }
 
-template<typename DATA_TYPE>
-std::future<std::string>
-appframework::FanOutDAQModule<DATA_TYPE>::execute_command(std::string cmd)
+template<typename ValueType>
+void
+appframework::FanOutDAQModule<ValueType>::execute_command(
+  const std::string& cmd,
+  const std::vector<std::string>& /*args*/)
 {
   if (cmd == "configure" || cmd == "Configure") {
-    return std::async(std::launch::async, [&] { return do_configure(); });
+    do_configure();
   }
   if (cmd == "start" || cmd == "Start") {
-    return std::async(std::launch::async, [&] { return do_start(); });
+    do_start();
   }
   if (cmd == "stop" || cmd == "Stop") {
-    return std::async(std::launch::async, [&] { return do_stop(); });
+    do_stop();
   }
-
-  return std::async(std::launch::async,
-                    [] { return std::string("Unrecognized Command"); });
 }
 
-template<typename DATA_TYPE>
+template<typename ValueType>
 std::string
-appframework::FanOutDAQModule<DATA_TYPE>::do_configure()
+appframework::FanOutDAQModule<ValueType>::do_configure()
 {
   // TODO: Get configuration from ConfigurationManager!
   mode_ = FanOutMode::RoundRobin;
@@ -52,63 +52,96 @@ appframework::FanOutDAQModule<DATA_TYPE>::do_configure()
   return "Success";
 }
 
-template<typename DATA_TYPE>
+template<typename ValueType>
 std::string
-appframework::FanOutDAQModule<DATA_TYPE>::do_start()
+appframework::FanOutDAQModule<ValueType>::do_start()
 {
   thread_.start_working_thread_();
   return "Success";
 }
 
-template<typename DATA_TYPE>
+template<typename ValueType>
 std::string
-appframework::FanOutDAQModule<DATA_TYPE>::do_stop()
+appframework::FanOutDAQModule<ValueType>::do_stop()
 {
   thread_.stop_working_thread_();
   return "Success";
 }
 
-template<typename DATA_TYPE>
+template<typename ValueType>
 void
-appframework::FanOutDAQModule<DATA_TYPE>::do_work()
+appframework::FanOutDAQModule<ValueType>::do_work()
 {
   auto roundRobinNext = outputQueues_.begin();
 
+  // unique_ptr needed since there's no guarantee ValueType has a no-argument
+  // constructor
+  std::unique_ptr<ValueType> data_ptr = nullptr;
+
   while (thread_.thread_running()) {
-    if (!inputQueue_->empty()) {
-      auto data = inputQueue_->pop(bufferTimeout_);
+    if (inputQueue_->can_pop()) {
+
+      try {
+        data_ptr = std::make_unique<ValueType>(inputQueue_->pop(queueTimeout_));
+      } catch (const std::runtime_error& err) {
+        TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
+                              "inputQueue (exception is \""
+                           << err.what() << "\")";
+        continue;
+      }
 
       if (mode_ == FanOutMode::Broadcast) {
-        do_broadcast(data);
+        do_broadcast(*data_ptr);
       } else if (mode_ == FanOutMode::FirstAvailable) {
         auto sent = false;
         while (!sent) {
           for (auto& o : outputQueues_) {
-            if (!o->full()) {
-              o->push(std::move(data), bufferTimeout_);
-              sent = true;
-              break;
+            if (o->can_push()) {
+              auto starttime = std::chrono::steady_clock::now();
+              o->push(std::move(*data_ptr), queueTimeout_);
+              auto endtime = std::chrono::steady_clock::now();
+
+              if (std::chrono::duration_cast<decltype(queueTimeout_)>(
+                    endtime - starttime) < queueTimeout_) {
+                sent = true;
+                break;
+              } else {
+                TLOG(TLVL_WARNING) << "A timeout occurred trying to push data "
+                                      "onto an outputqueue; data has been lost";
+              }
             }
           }
           if (!sent) {
-            usleep(wait_interval_us_);
+            std::this_thread::sleep_for(
+              std::chrono::microseconds(wait_interval_us_));
           }
         }
       } else if (mode_ == FanOutMode::RoundRobin) {
         while (true) {
-          if (!(*roundRobinNext)->full()) {
-            (*roundRobinNext)->push(std::move(data), bufferTimeout_);
+          if ((*roundRobinNext)->can_push()) {
 
-            if (++roundRobinNext == outputQueues_.end())
+            auto starttime = std::chrono::steady_clock::now();
+            (*roundRobinNext)->push(std::move(*data_ptr), queueTimeout_);
+            auto endtime = std::chrono::steady_clock::now();
+
+            if (std::chrono::duration_cast<decltype(queueTimeout_)>(
+                  endtime - starttime) >= queueTimeout_) {
+              TLOG(TLVL_WARNING) << "A timeout occurred trying to push data "
+                                    "onto an outputqueue; data has been lost";
+            }
+
+            ++roundRobinNext;
+            if (roundRobinNext == outputQueues_.end())
               roundRobinNext = outputQueues_.begin();
             break;
           } else {
-            usleep(wait_interval_us_);
+            std::this_thread::sleep_for(
+              std::chrono::microseconds(wait_interval_us_));
           }
         }
       }
-    } else {
-      usleep(wait_interval_us_);
+    } else { // inputQueue_ is empty
+      std::this_thread::sleep_for(std::chrono::microseconds(wait_interval_us_));
     }
   }
 }

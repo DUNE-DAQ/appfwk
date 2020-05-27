@@ -14,7 +14,7 @@
 #include "app-framework-base/Services/ServiceManager.hh"
 
 #include "TRACE/trace.h"
-#define TRACE_NAME "DAQProcess"
+#define TRACE_NAME "DAQProcess" // NOLINT
 
 #include <memory>
 #include <unordered_set>
@@ -38,24 +38,24 @@ DAQProcess::DAQProcess(CommandLineInterpreter args)
 void
 DAQProcess::register_modules(ModuleList& ml)
 {
-  ml.ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_);
+  ml.ConstructGraph(queueMap_, daqModuleMap_, commandOrderMap_);
 }
 
 void
 DAQProcess::execute_command(std::string cmd)
 {
-  std::unordered_set<std::string> user_module_list;
-  for (auto const& um : userModuleMap_) {
-    user_module_list.insert(um.first);
+  std::unordered_set<std::string> daq_module_list;
+  for (auto const& dm : daqModuleMap_) {
+    daq_module_list.insert(dm.first);
   }
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
                    << " for DAQModules defined in the CommandOrderMap";
   if (commandOrderMap_.count(cmd)) {
     for (auto& moduleName : commandOrderMap_[cmd]) {
-      if (userModuleMap_.count(moduleName)) {
-        userModuleMap_[moduleName]->execute_command(cmd);
-        user_module_list.erase(moduleName);
+      if (daqModuleMap_.count(moduleName)) {
+        daqModuleMap_[moduleName]->execute_command(cmd);
+        daq_module_list.erase(moduleName);
       }
     }
   } else {
@@ -67,8 +67,8 @@ DAQProcess::execute_command(std::string cmd)
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
                    << " for all remaining DAQModules";
-  for (auto const& moduleName : user_module_list) {
-    userModuleMap_[moduleName]->execute_command(cmd);
+  for (auto const& moduleName : daq_module_list) {
+    daqModuleMap_[moduleName]->execute_command(cmd);
   }
 }
 

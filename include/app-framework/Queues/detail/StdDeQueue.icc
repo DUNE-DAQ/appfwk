@@ -1,24 +1,10 @@
 
 
-template <class T, class U> StdDeQueue<T, U>::StdDeQueue() { Configure(); }
+template <class T, class U> StdDeQueue<T, U>::StdDeQueue() : fDeque(), fSize(0) { Configure(); }
 
-template <class T, class U> void StdDeQueue<T, U>::Configure() {
-
-  this->fAttributes.isBounded = true;
-  this->fAttributes.isSearchable = false;
-
-  fDeque = std::deque<value_type>();
-  fSize = 0;
-
-  if (this->fAttributes.isBounded) {
-    fCapacity = 1000;
-  } else {
-    fCapacity = fDeque.max_size();
-  }
-}
 
 template <class T, class U>
-void StdDeQueue<T, U>::push(value_type &&val,
+void StdDeQueue<T, U>::push(value_type &&object_to_push,
                                       const duration_type &timeout) {
 
   auto starttime = std::chrono::steady_clock::now();
@@ -31,18 +17,18 @@ void StdDeQueue<T, U>::push(value_type &&val,
 
   if (time_to_wait_for_space.count() > 0) {
     fNoLongerFull.wait_for(lk, time_to_wait_for_space,
-                           [&]() { return !this->full(); });
+                           [&]() { return this->can_push(); });
   }
 
-  if (!this->full()) {
-    fDeque.push_back(std::move(val));
+  if ( this->can_push() ) {
+    fDeque.push_back(std::move(object_to_push));
     fSize++;
     fNoLongerEmpty.notify_one();
   } else {
     std::stringstream errmsg;
     errmsg
         << "In StdDeQueue::push: unable to push since queue is full ("
-        << this->size() << " elements) (timeout period was "
+        << fSize.load() << " elements) (timeout period was "
         << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
                .count()
         << " milliseconds)";
@@ -63,10 +49,10 @@ T StdDeQueue<T, U>::pop(const duration_type &timeout) {
 
   if (time_to_wait_for_data.count() > 0) {
     fNoLongerEmpty.wait_for(lk, time_to_wait_for_data,
-                            [&]() { return !this->empty(); });
+                            [&]() { return this->can_pop() ; });
   }
 
-  if (!this->empty()) {
+  if (this->can_pop()) {
     T obj(std::move(fDeque.front()));
     fDeque.pop_front();
     fSize--;
@@ -74,7 +60,7 @@ T StdDeQueue<T, U>::pop(const duration_type &timeout) {
     return obj;
   } else {
     std::stringstream errmsg;
-    errmsg << "In StdDeQueue::pop: unable to pop since queue is "
+    errmsg << "In StdDeQueue::pop_wait_for: unable to pop since queue is "
               "empty (timeout period was "
            << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
                   .count()

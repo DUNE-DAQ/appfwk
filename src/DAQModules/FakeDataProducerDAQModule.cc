@@ -12,7 +12,7 @@
 #include <thread>
 
 #include <TRACE/trace.h>
-#define TRACE_NAME "FakeDataProducer"
+#define TRACE_NAME "FakeDataProducer" // NOLINT
 
 appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   std::string name,
@@ -37,21 +37,20 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
     dynamic_cast<QueueInput<std::vector<int>>*>(&*outputs_[0]));
 }
 
-std::future<std::string>
-appframework::FakeDataProducerDAQModule::execute_command(std::string cmd)
+void
+appframework::FakeDataProducerDAQModule::execute_command(
+  const std::string& cmd,
+  const std::vector<std::string>& /*args*/)
 {
   if (cmd == "configure" || cmd == "Configure") {
-    return std::async(std::launch::async, [&] { return do_configure(); });
+    do_configure();
   }
   if (cmd == "start" || cmd == "Start") {
-    return std::async(std::launch::async, [&] { return do_start(); });
+    do_start();
   }
   if (cmd == "stop" || cmd == "Stop") {
-    return std::async(std::launch::async, [&] { return do_stop(); });
+    do_stop();
   }
-
-  return std::async(std::launch::async,
-                    [] { return std::string("Unrecognized Command"); });
 }
 
 std::string
@@ -114,10 +113,10 @@ appframework::FakeDataProducerDAQModule::do_work()
 
     TLOG(TLVL_DEBUG) << "Pushing vector into outputQueue";
     auto starttime = std::chrono::steady_clock::now();
-    outputQueue_->push(std::move(output), bufferTimeout_);
+    outputQueue_->push(std::move(output), queueTimeout_);
     auto endtime = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<decltype(bufferTimeout_)>(
-          endtime - starttime) > bufferTimeout_) {
+    if (std::chrono::duration_cast<decltype(queueTimeout_)>(
+          endtime - starttime) > queueTimeout_) {
       TLOG(TLVL_WARNING)
         << "Timeout attempting to push vector onto outputQueue";
     }
