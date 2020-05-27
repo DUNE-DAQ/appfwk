@@ -35,9 +35,7 @@ public:
 
   // To use the non-virtual push which leaves its value
   // argument unchanged, make sure to add
-
   // using BufferInput<ValueType,DurationType>::push
-
   // in your derived class declaration (line above assumes you're
   // using the same template parameter labels)
 
