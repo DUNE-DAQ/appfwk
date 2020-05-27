@@ -9,8 +9,8 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
 
-#include "app-framework-base/Buffers/BufferI.hh"
-#include "app-framework-base/UserModules/UserModule.hh"
+#include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework-base/Queues/QueueI.hh"
 
 #include <list>
 #include <map>
@@ -18,39 +18,40 @@
 #include <string>
 
 namespace appframework {
-typedef std::map<std::string, std::unique_ptr<UserModule>>
-    UserModuleMap; ///< UserModules indexed by name
-typedef std::map<std::string, std::shared_ptr<BufferI>>
-    BufferMap; ///< Buffers indexed by name
+typedef std::map<std::string, std::unique_ptr<DAQModuleI>>
+  DAQModuleMap; ///< DAQModules indexed by name
+typedef std::map<std::string, std::shared_ptr<QueueI>>
+  QueueMap; ///< Queues indexed by name
 typedef std::map<std::string, std::list<std::string>>
-    CommandOrderMap; ///< Defined UserModule orders for commands
+  CommandOrderMap; ///< Defined DAQModule orders for commands
 
 /**
- * @brief The ModuleList class is the representation of a UserModule and Buffer
+ * @brief The ModuleList class is the representation of a DAQModule and Queue
  * graph
  *
- * The ConstructGraph method is responsible for instantiating all Buffers and
- * UserModules for a DAQ Application, as well as linking them together.
- * UserModules define their Buffer endpoints by requiring Buffer instances
+ * The ConstructGraph method is responsible for instantiating all Queues and
+ * DAQModules for a DAQ Application, as well as linking them together.
+ * DAQModules define their Queue endpoints by requiring Queue instances
  */
-class ModuleList {
+class ModuleList
+{
 public:
   /**
-   * @brief Construct the graph of UserModules and Buffers.
-   * @param[out] buffer_map A BufferMap that will contain pointers to all of the
-   * Buffer instances, indexed by name
-   * @param[out] user_module_map A UserModuleMap that will contain pointers to
-   * all of the UserModule instances, indexed by name
+   * @brief Construct the graph of DAQModules and Queues.
+   * @param[out] buffer_map A QueueMap that will contain pointers to all of the
+   * Queue instances, indexed by name
+   * @param[out] user_module_map A DAQModuleMap that will contain pointers to
+   * all of the DAQModule instances, indexed by name
    * @param[out] command_order_map A map relating commands to an ordering of
-   * UserModules (by name)
+   * DAQModules (by name)
    *
    * Brief This method is responsible for instantiating and linking all of the
-   * Buffer and UserModule instances in a DAQ Application. Additionally, any
-   * requirements on command order for UserModules should be defined here.
+   * Queue and DAQModule instances in a DAQ Application. Additionally, any
+   * requirements on command order for DAQModules should be defined here.
    */
-  virtual void ConstructGraph(BufferMap &buffer_map,
-                              UserModuleMap &user_module_map,
-                              CommandOrderMap &command_order_map) = 0;
+  virtual void ConstructGraph(QueueMap& queue_map,
+                              DAQModuleMap& daq_module_map,
+                              CommandOrderMap& command_order_map) = 0;
 };
 } // namespace appframework
 

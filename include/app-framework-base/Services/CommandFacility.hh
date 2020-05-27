@@ -20,13 +20,15 @@ class DAQProcess; // forward declaration
 /**
  * @brief Interface needed by Application Framework for CCM command handling
  */
-class CommandFacility {
+class CommandFacility
+{
 public:
   /**
    * @brief Singleton pattern; get a handle to the CommandFacility
    * @return Reference to the CommandFacility
    */
-  static CommandFacility &handle() {
+  static CommandFacility& handle()
+  {
     if (!handle_)
       handle_.reset(new CommandFacility());
     return *handle_;
@@ -45,7 +47,7 @@ public:
    * This function should block for the lifetime of the DAQ Application, calling
    * DAQProcess::execute_command as necessary
    */
-  virtual int listen(DAQProcess * /*process*/) { return 0; }
+  virtual int listen(DAQProcess* /*process*/) { return 0; }
 
 protected:
   /**
@@ -55,7 +57,7 @@ protected:
 
 private:
   static std::unique_ptr<CommandFacility>
-      handle_; ///< Singleton pattern, handle to CommandFacility
+    handle_; ///< Singleton pattern, handle to CommandFacility
 };
 } // namespace appframework
 
