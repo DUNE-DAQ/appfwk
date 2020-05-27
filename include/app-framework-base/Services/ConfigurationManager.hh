@@ -19,7 +19,7 @@
 namespace appframework {
 /**
  * @brief The ConfigurationManager is responsible for receiving configurations
- * from CCM and making them available to UserModules
+ * from CCM and making them available to DAQModules
  */
 class ConfigurationManager {
 public:

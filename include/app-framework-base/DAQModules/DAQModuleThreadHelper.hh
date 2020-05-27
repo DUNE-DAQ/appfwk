@@ -1,7 +1,7 @@
 /**
- * @file The UserModuleThreadHelper class interface
+ * @file The DAQModuleThreadHelper class interface
  *
- * UserModuleThreadHelper defines a std::thread which runs the do_work()
+ * DAQModuleThreadHelper defines a std::thread which runs the do_work()
  * function as well as methods to start and stop that thread.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
 
-#include "app-framework-base/Buffers/Buffer.hh"
+#include "app-framework-base/Queues/Queue.hh"
 
 #include <functional>
 #include <future>
@@ -22,17 +22,17 @@
 
 namespace appframework {
 /**
- * @brief UserModuleThreadHelper contains a thread which runs the do_work()
+ * @brief DAQModuleThreadHelper contains a thread which runs the do_work()
  * function
  */
-class UserModuleThreadHelper {
+class DAQModuleThreadHelper {
 public:
   /**
-   * @brief UserModuleThreadHelper Constructor
+   * @brief DAQModuleThreadHelper Constructor
    *
    * This constructor sets the defaults for the thread control variables
    */
-  explicit UserModuleThreadHelper(std::function<void()> do_work)
+  explicit DAQModuleThreadHelper(std::function<void()> do_work)
       : thread_running_(false), working_thread_(nullptr), do_work_(do_work) {}
 
   /**
@@ -41,7 +41,7 @@ public:
    */
   void start_working_thread_() {
     if (thread_running()) {
-      throw std::runtime_error("Attempted to start UserModule working thread "
+      throw std::runtime_error("Attempted to start DAQModule working thread "
                                "when it is already running!");
     }
     thread_running_ = true;
@@ -54,7 +54,7 @@ public:
    */
   void stop_working_thread_() {
     if (!thread_running()) {
-      throw std::runtime_error("Attempted to stop UserModule working thread "
+      throw std::runtime_error("Attempted to stop DAQModule working thread "
                                "when it is not running!");
     }
     thread_running_ = false;
@@ -62,17 +62,17 @@ public:
     if (working_thread_->joinable()) {
       working_thread_->join();
     } else {
-      throw std::runtime_error("Thread not in joinable state during UserModule "
+      throw std::runtime_error("Thread not in joinable state during DAQModule "
                                "working thread stop!");
     }
   }
 
   bool thread_running() const { return thread_running_.load(); }
 
-  UserModuleThreadHelper(const UserModuleThreadHelper &) = delete;
-  UserModuleThreadHelper &operator=(const UserModuleThreadHelper &) = delete;
-  UserModuleThreadHelper(UserModuleThreadHelper &&) = delete;
-  UserModuleThreadHelper &operator=(UserModuleThreadHelper &&) = delete;
+  DAQModuleThreadHelper(const DAQModuleThreadHelper &) = delete;
+  DAQModuleThreadHelper &operator=(const DAQModuleThreadHelper &) = delete;
+  DAQModuleThreadHelper(DAQModuleThreadHelper &&) = delete;
+  DAQModuleThreadHelper &operator=(DAQModuleThreadHelper &&) = delete;
 
 private:
   std::atomic<bool> thread_running_;
