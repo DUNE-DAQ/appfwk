@@ -5,5 +5,5 @@ set(BUILD_SHARED_LIBS ON)
 find_package(Boost COMPONENTS unit_test_framework)
 
 if(Boost_FOUND)
-    add_subdirectory(UserModules)
+    add_subdirectory(DAQModules)
 endif()
