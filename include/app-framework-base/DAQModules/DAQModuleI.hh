@@ -35,12 +35,12 @@
 
 #define DEFINE_DUNE_USER_MODULE(klass)                                         \
   EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::unique_ptr<appframework::DAQModule> make(                              \
+  std::unique_ptr<appframework::DAQModule> make(                               \
     std::string n,                                                             \
-    std::vector<std::shared_ptr<appframework::QueueI>> i,                     \
-    std::vector<std::shared_ptr<appframework::QueueI>> o)                     \
+    std::vector<std::shared_ptr<appframework::QueueI>> i,                      \
+    std::vector<std::shared_ptr<appframework::QueueI>> o)                      \
   {                                                                            \
-    return std::unique_ptr<appframework::DAQModule>(new klass(n, i, o));      \
+    return std::unique_ptr<appframework::DAQModule>(new klass(n, i, o));       \
   }                                                                            \
   }
 
@@ -52,11 +52,12 @@ namespace appframework {
  * Developers implementing DAQModules should feel free to use whatever Plugins
  * and Services are necessary to accomplish their needed functionality.
  */
-class DAQModule {
+class DAQModule
+{
 public:
   DAQModule(std::string name,
-             std::vector<std::shared_ptr<QueueI>> inputs,
-             std::vector<std::shared_ptr<QueueI>> outputs)
+            std::vector<std::shared_ptr<QueueI>> inputs,
+            std::vector<std::shared_ptr<QueueI>> outputs)
     : instance_name_(name)
     , inputs_(inputs)
     , outputs_(outputs)

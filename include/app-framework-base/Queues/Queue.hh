@@ -19,19 +19,23 @@ using std::size_t;
 
 namespace appframework {
 
-template <class T> class Queue : public QueueI {
+template<class T>
+class Queue : public QueueI
+{
 
 public:
-  virtual size_t capacityBytes() const noexcept {
+  virtual size_t capacityBytes() const noexcept
+  {
     return this->capacity() * sizeof(T);
   } /// bytes in buffer
 };
 
-template <class ValueType, class DurationType = std::chrono::milliseconds>
-class QueueInput : virtual public Queue<ValueType> {
+template<class ValueType, class DurationType = std::chrono::milliseconds>
+class QueueInput : virtual public Queue<ValueType>
+{
 
 public:
-  virtual void push(ValueType &&val, const DurationType &timeout) = 0;
+  virtual void push(ValueType&& val, const DurationType& timeout) = 0;
 
   // To use the non-virtual push which leaves its value
   // argument unchanged, make sure to add
@@ -39,16 +43,18 @@ public:
   // in your derived class declaration (line above assumes you're
   // using the same template parameter labels)
 
-  void push(const ValueType &val, const DurationType &timeout) {
+  void push(const ValueType& val, const DurationType& timeout)
+  {
     push(ValueType(val), timeout);
   }
 };
 
-template <class ValueType, class DurationType = std::chrono::milliseconds>
-class QueueOutput : virtual public Queue<ValueType> {
+template<class ValueType, class DurationType = std::chrono::milliseconds>
+class QueueOutput : virtual public Queue<ValueType>
+{
 
 public:
-  virtual ValueType pop(const DurationType &timeout) = 0;
+  virtual ValueType pop(const DurationType& timeout) = 0;
 };
 
 } // namespace appframework

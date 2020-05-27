@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
+#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
+#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
 
 #include "app-framework-base/Queues/Queue.hh"
 
@@ -25,7 +25,8 @@ namespace appframework {
  * @brief DAQModuleThreadHelper contains a thread which runs the do_work()
  * function
  */
-class DAQModuleThreadHelper {
+class DAQModuleThreadHelper
+{
 public:
   /**
    * @brief DAQModuleThreadHelper Constructor
@@ -33,13 +34,17 @@ public:
    * This constructor sets the defaults for the thread control variables
    */
   explicit DAQModuleThreadHelper(std::function<void()> do_work)
-      : thread_running_(false), working_thread_(nullptr), do_work_(do_work) {}
+    : thread_running_(false)
+    , working_thread_(nullptr)
+    , do_work_(do_work)
+  {}
 
   /**
    * @brief Start the working thread (which executes the do_work() function)
    * @throws std::runtime_error if the thread is already running
    */
-  void start_working_thread_() {
+  void start_working_thread_()
+  {
     if (thread_running()) {
       throw std::runtime_error("Attempted to start DAQModule working thread "
                                "when it is already running!");
@@ -52,7 +57,8 @@ public:
    * @throws std::runtime_error If the thread has not yet been started
    * @throws std::runtime_error If the thread is not in the joinable state
    */
-  void stop_working_thread_() {
+  void stop_working_thread_()
+  {
     if (!thread_running()) {
       throw std::runtime_error("Attempted to stop DAQModule working thread "
                                "when it is not running!");
@@ -69,10 +75,10 @@ public:
 
   bool thread_running() const { return thread_running_.load(); }
 
-  DAQModuleThreadHelper(const DAQModuleThreadHelper &) = delete;
-  DAQModuleThreadHelper &operator=(const DAQModuleThreadHelper &) = delete;
-  DAQModuleThreadHelper(DAQModuleThreadHelper &&) = delete;
-  DAQModuleThreadHelper &operator=(DAQModuleThreadHelper &&) = delete;
+  DAQModuleThreadHelper(const DAQModuleThreadHelper&) = delete;
+  DAQModuleThreadHelper& operator=(const DAQModuleThreadHelper&) = delete;
+  DAQModuleThreadHelper(DAQModuleThreadHelper&&) = delete;
+  DAQModuleThreadHelper& operator=(DAQModuleThreadHelper&&) = delete;
 
 private:
   std::atomic<bool> thread_running_;
@@ -81,4 +87,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_USERMODULES_USERMODULETHREADHELPER_HH_
+#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
