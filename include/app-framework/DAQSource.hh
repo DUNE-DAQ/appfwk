@@ -24,7 +24,7 @@ public:
     using value_type = T;
     using duration_type = std::chrono::milliseconds;
 
-	DAQSource(std::string name, QueueRegistry::queue_kind kind, size_t size);
+	DAQSource(std::string name);
 	T pop(const duration_type& timeout=duration_type::zero());
 	bool can_pop();
 
@@ -33,8 +33,8 @@ private:
 };
 
 template <typename T>
-DAQSource<T>::DAQSource(std::string name, QueueRegistry::queue_kind kind, size_t size) {
-	queue_ = QueueRegistry::get()->get_queue<T>(name, kind, size);
+DAQSource<T>::DAQSource(std::string name) {
+	queue_ = QueueRegistry::get()->get_queue<T>(name);
     if (!queue_)
         throw std::bad_cast();
 }

@@ -12,8 +12,15 @@ using namespace appframework;
 
 int main(int argc, char const *argv[])
 {
-    auto sink = new DAQSink<std::string>("dummy", QueueRegistry::std_deque, 100);
-    auto source = new DAQSource<std::string>("dummy", QueueRegistry::std_deque, 100);
+
+    std::map<std::string, QueueConfig> queuemap = {
+        {"dummy", {QueueConfig::std_deque, 100}}
+    };
+
+    QueueRegistry::get()->configure(queuemap);
+
+    auto sink = new DAQSink<std::string>("dummy");
+    auto source = new DAQSource<std::string>("dummy");
 
 
     std::cout << "sink can push: " << sink->can_push() << std::endl;

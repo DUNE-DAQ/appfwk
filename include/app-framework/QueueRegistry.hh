@@ -10,25 +10,36 @@
 
 namespace appframework {
 
+struct QueueConfig
+{
+  enum queue_kind { std_deque };
+
+  QueueConfig::queue_kind kind;
+  size_t size;
+};
+
 class QueueRegistry {
   public:
 
-    enum queue_kind { std_deque };
 
     ~QueueRegistry();
 
     static QueueRegistry* get();
 
     template<typename T>
-    std::shared_ptr<NamedQueueI<T>> get_queue(std::string name, QueueRegistry::queue_kind kind, size_t size=0);
+    std::shared_ptr<NamedQueueI<T>> get_queue(std::string name);
+
+    void configure( const std::map<std::string, QueueConfig>& );
 
   private:
     QueueRegistry();
 
     template<typename T>
-    std::shared_ptr<NamedObject> create_queue(std::string name, QueueRegistry::queue_kind kind, size_t size);
+    std::shared_ptr<NamedObject> create_queue(std::string name, const QueueConfig& config);
 
-    std::map<std::string,std::shared_ptr<NamedObject> > registry_;
+    std::map<std::string,std::shared_ptr<NamedObject> > queue_registry_;
+    std::map<std::string,QueueConfig> queue_configmap_;
+    bool configured_;
 
     static QueueRegistry* me_;
 
@@ -41,28 +52,33 @@ class QueueRegistry {
 
 
 template<typename T>
-std::shared_ptr<NamedQueueI<T>> QueueRegistry::get_queue(std::string name, QueueRegistry::queue_kind kind, size_t size) {
+std::shared_ptr<NamedQueueI<T>> QueueRegistry::get_queue(std::string name) {
 
-  auto it = registry_.find(name);
-  if ( it != registry_.end() ) {
-    return std::dynamic_pointer_cast<NamedQueueI<T>>(it->second);
-  } else {
-    std::shared_ptr<NamedObject> queue = create_queue<T>(name, kind, size);
-    registry_[name] = queue;
+  auto itQ = queue_registry_.find(name);
+  if ( itQ != queue_registry_.end() ) {
+    return std::dynamic_pointer_cast<NamedQueueI<T>>(itQ->second);
+  } 
+
+  auto itP = queue_configmap_.find(name);
+  if ( itP != queue_configmap_.end() ) {
+    std::shared_ptr<NamedObject> queue = create_queue<T>(name, itP->second);
+    queue_registry_[name] = queue;
     return std::dynamic_pointer_cast<NamedQueueI<T>>(queue);
 
+  } else {
+    throw std::runtime_error("Queue not found");
   }
 
 }
 
 
 template<typename T>
-std::shared_ptr<NamedObject> QueueRegistry::create_queue(std::string name, QueueRegistry::queue_kind kind, size_t size) {
+std::shared_ptr<NamedObject> QueueRegistry::create_queue(std::string name, const QueueConfig& config) {
 
   std::shared_ptr<NamedObject> queue;
-  switch(kind) {
-    case std_deque:
-      queue = std::make_shared<NamedStdDeQueue<T>>(name, size);
+  switch(config.kind) {
+    case QueueConfig::std_deque:
+      queue = std::make_shared<NamedStdDeQueue<T>>(name, config.size);
       break;
     default:
       throw std::runtime_error("Unknown queue kind");

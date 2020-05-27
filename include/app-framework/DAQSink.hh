@@ -23,7 +23,7 @@ public:
     using value_type = T;
     using duration_type = std::chrono::milliseconds;
 
-	DAQSink(std::string name, QueueRegistry::queue_kind kind, size_t size);
+	DAQSink(std::string name);
 	void push(T element, const duration_type& timeout=duration_type::zero());
 	bool can_push();
 
@@ -32,8 +32,8 @@ private:
 };
 
 template <typename T>
-DAQSink<T>::DAQSink(std::string name, QueueRegistry::queue_kind kind, size_t size) {
-	queue_ = QueueRegistry::get()->get_queue<T>(name, kind, size);
+DAQSink<T>::DAQSink(std::string name) {
+	queue_ = QueueRegistry::get()->get_queue<T>(name);
     if (!queue_)
         throw std::bad_cast();
 }
