@@ -12,9 +12,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FANOUTUSERMODULE_HH_
 
-#include "app-framework-base/Queues/Queue.hh"
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
 #include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
+#include "app-framework-base/Queues/Queue.hh"
 
 #include "TRACE/trace.h"
 
@@ -30,19 +30,21 @@ namespace appframework {
 /**
  * @brief FanOutDAQModule sends data to multiple Queues
  */
-template <typename DATA_TYPE> class FanOutDAQModule : public DAQModule {
+template<typename DATA_TYPE>
+class FanOutDAQModule : public DAQModule
+{
 public:
   FanOutDAQModule(std::string name,
-                   std::vector<std::shared_ptr<QueueI>> inputs,
-                   std::vector<std::shared_ptr<QueueI>> outputs);
+                  std::vector<std::shared_ptr<QueueI>> inputs,
+                  std::vector<std::shared_ptr<QueueI>> outputs);
 
-  enum class FanOutMode {
+  enum class FanOutMode
+  {
     NotConfigured,
     Broadcast,
     RoundRobin,
     FirstAvailable
   };
-
 
   /**
    * @brief Logs the reception of the command
@@ -50,10 +52,10 @@ public:
    */
   std::future<std::string> execute_command(std::string cmd) override;
 
-  FanOutDAQModule(const FanOutDAQModule &) = delete;
-  FanOutDAQModule &operator=(const FanOutDAQModule &) = delete;
-  FanOutDAQModule(FanOutDAQModule &&) = delete;
-  FanOutDAQModule &operator=(FanOutDAQModule &&) = delete;
+  FanOutDAQModule(const FanOutDAQModule&) = delete;
+  FanOutDAQModule& operator=(const FanOutDAQModule&) = delete;
+  FanOutDAQModule(FanOutDAQModule&&) = delete;
+  FanOutDAQModule& operator=(FanOutDAQModule&&) = delete;
 
 private:
   // Commands
@@ -65,21 +67,23 @@ private:
   // necessary, even though it's just an alias to this user module's
   // data type.
 
-  template <typename U = DATA_TYPE>
-  typename std::enable_if_t<!std::is_copy_constructible_v<U>>
-  do_broadcast(DATA_TYPE &) const {
+  template<typename U = DATA_TYPE>
+  typename std::enable_if_t<!std::is_copy_constructible_v<U>> do_broadcast(
+    DATA_TYPE&) const
+  {
     throw std::runtime_error(
-        "Broadcast mode cannot be used for non-copy-constructible types!");
+      "Broadcast mode cannot be used for non-copy-constructible types!");
   }
-  template <typename U = DATA_TYPE>
-  typename std::enable_if_t<std::is_copy_constructible_v<U>>
-  do_broadcast(DATA_TYPE &data) const {
-    for (auto &o : outputQueues_) {
+  template<typename U = DATA_TYPE>
+  typename std::enable_if_t<std::is_copy_constructible_v<U>> do_broadcast(
+    DATA_TYPE& data) const
+  {
+    for (auto& o : outputQueues_) {
       auto starttime = std::chrono::steady_clock::now();
       o->push(data, bufferTimeout_);
       auto endtime = std::chrono::steady_clock::now();
       if (std::chrono::duration_cast<decltype(bufferTimeout_)>(
-              endtime - starttime) > bufferTimeout_) {
+            endtime - starttime) > bufferTimeout_) {
         TLOG(TLVL_WARNING) << "Timeout occurred trying to broadcast data to "
                               "output buffer; data may be lost if it doesn't "
                               "make it into any other output buffers, either";

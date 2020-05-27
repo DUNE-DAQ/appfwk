@@ -27,7 +27,7 @@ constexpr double fractional_timeout_tolerance = 0.1;
 // expect the push/pop functions to execute instananeously
 constexpr auto timeout = std::chrono::microseconds(100);
 constexpr auto timeout_in_us =
-    std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
+  std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
 // The decltype means "Have the buffer's push/pop functions expect a duration of
 // the same type as the timeout we defined"
@@ -37,10 +37,11 @@ appframework::StdDeQueue<int, decltype(timeout)> buffer;
 // https://www.boost.org/doc/libs/1_73_0/libs/test/doc/html/boost_test/tests_organization/enabling.html
 // to better understand CapacityChecker.
 
-struct CapacityChecker {
+struct CapacityChecker
+{
 
-  boost::test_tools::assertion_result
-  operator()(boost::unit_test::test_unit_id) {
+  boost::test_tools::assertion_result operator()(boost::unit_test::test_unit_id)
+  {
     if (buffer.capacity() <= max_testable_capacity) {
       return true;
     } else {
@@ -58,7 +59,8 @@ struct CapacityChecker {
 // This test case should run first. Make sure all other test cases depend on
 // this.
 
-BOOST_AUTO_TEST_CASE(sanity_checks) {
+BOOST_AUTO_TEST_CASE(sanity_checks)
+{
 
   BOOST_REQUIRE_EQUAL(buffer.size(), 0);
   BOOST_REQUIRE(buffer.empty());
@@ -69,14 +71,13 @@ BOOST_AUTO_TEST_CASE(sanity_checks) {
 
   if (push_time > timeout) {
     auto push_time_in_us =
-        std::chrono::duration_cast<std::chrono::microseconds>(push_time)
-            .count();
+      std::chrono::duration_cast<std::chrono::microseconds>(push_time).count();
 
-    BOOST_TEST_REQUIRE(false, "Test failure: pushing element onto empty buffer "
-                              "resulted in a timeout (function exited after "
-                                  << push_time_in_us
-                                  << " microseconds, timeout is "
-                                  << timeout_in_us << " microseconds)");
+    BOOST_TEST_REQUIRE(false,
+                       "Test failure: pushing element onto empty buffer "
+                       "resulted in a timeout (function exited after "
+                         << push_time_in_us << " microseconds, timeout is "
+                         << timeout_in_us << " microseconds)");
   }
 
   BOOST_REQUIRE_EQUAL(buffer.size(), 1);
@@ -87,28 +88,30 @@ BOOST_AUTO_TEST_CASE(sanity_checks) {
 
   if (pop_time > timeout) {
     auto pop_time_in_us =
-        std::chrono::duration_cast<std::chrono::microseconds>(pop_time).count();
-    BOOST_TEST_REQUIRE(false, "Test failure: popping element off buffer "
-                              "resulted in a timeout (function exited after "
-                                  << pop_time_in_us
-                                  << " microseconds, timeout is "
-                                  << timeout_in_us << " microseconds)");
+      std::chrono::duration_cast<std::chrono::microseconds>(pop_time).count();
+    BOOST_TEST_REQUIRE(false,
+                       "Test failure: popping element off buffer "
+                       "resulted in a timeout (function exited after "
+                         << pop_time_in_us << " microseconds, timeout is "
+                         << timeout_in_us << " microseconds)");
   }
 
   BOOST_REQUIRE_EQUAL(popped_value, 999);
 }
 
 BOOST_AUTO_TEST_CASE(empty_checks,
-                     *boost::unit_test::depends_on("sanity_checks")) {
+                     *boost::unit_test::depends_on("sanity_checks"))
+{
 
   try {
     while (!buffer.empty()) {
       buffer.pop(timeout);
     }
-  } catch (const std::runtime_error &err) {
+  } catch (const std::runtime_error& err) {
     BOOST_WARN_MESSAGE(true, err.what());
-    BOOST_TEST(false, "Exception thrown in call to StdDeQueue::pop(); unable "
-                      "to empty the buffer");
+    BOOST_TEST(false,
+               "Exception thrown in call to StdDeQueue::pop(); unable "
+               "to empty the buffer");
   }
 
   BOOST_REQUIRE(buffer.empty());
@@ -129,7 +132,8 @@ BOOST_AUTO_TEST_CASE(empty_checks,
 
 BOOST_AUTO_TEST_CASE(capacity_checks,
                      *boost::unit_test::precondition(CapacityChecker()) *
-                         boost::unit_test::depends_on("sanity_checks")) {
+                       boost::unit_test::depends_on("sanity_checks"))
+{
 
   // TODO, May-6-2020, John Freeman (jcfree@fnal.gov)
   // In the next week, figure out if it makes sense beyond this test to create
@@ -139,11 +143,12 @@ BOOST_AUTO_TEST_CASE(capacity_checks,
     while (buffer.size() < buffer.capacity()) {
       buffer.push(-1, timeout);
     }
-  } catch (const std::runtime_error &err) {
+  } catch (const std::runtime_error& err) {
     BOOST_WARN_MESSAGE(true, err.what());
-    BOOST_TEST(false, "Exception thrown in call to StdDeQueue::push(); unable "
-                      "to fill the buffer to its alleged capacity of "
-                          << buffer.capacity() << " elements");
+    BOOST_TEST(false,
+               "Exception thrown in call to StdDeQueue::push(); unable "
+               "to fill the buffer to its alleged capacity of "
+                 << buffer.capacity() << " elements");
   }
 
   BOOST_REQUIRE(buffer.full());

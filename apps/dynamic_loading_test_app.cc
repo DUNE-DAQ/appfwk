@@ -7,8 +7,8 @@
  * received with this code.
  */
 
-#include <memory>
 #include <fstream>
+#include <memory>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -48,8 +48,8 @@ public:
       for (auto& output : module.value()["outputs"]) {
         outputs.push_back(buffer_map[output]);
       }
-      user_module_map[module.key()] =
-        makeModule(module.value()["user_module_type"],module.key(), inputs, outputs);
+      user_module_map[module.key()] = makeModule(
+        module.value()["user_module_type"], module.key(), inputs, outputs);
     }
 
     for (auto& command : config_["commands"].items()) {

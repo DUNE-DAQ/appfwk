@@ -12,9 +12,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_USERMODULES_FAKEDATAPRODUCERUSERMODULE_HH_
 
-#include "app-framework-base/Queues/Queue.hh"
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
 #include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
+#include "app-framework-base/Queues/Queue.hh"
 
 #include <future>
 #include <memory>
@@ -26,19 +26,20 @@ namespace appframework {
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataProducerDAQModule : public DAQModule {
+class FakeDataProducerDAQModule : public DAQModule
+{
 public:
   FakeDataProducerDAQModule(std::string name,
-                             std::vector<std::shared_ptr<QueueI>> inputs,
-                             std::vector<std::shared_ptr<QueueI>> outputs);
+                            std::vector<std::shared_ptr<QueueI>> inputs,
+                            std::vector<std::shared_ptr<QueueI>> outputs);
 
   std::future<std::string> execute_command(std::string cmd) override;
 
-  FakeDataProducerDAQModule(const FakeDataProducerDAQModule &) = delete;
-  FakeDataProducerDAQModule &
-  operator=(const FakeDataProducerDAQModule &) = delete;
-  FakeDataProducerDAQModule(FakeDataProducerDAQModule &&) = delete;
-  FakeDataProducerDAQModule &operator=(FakeDataProducerDAQModule &&) = delete;
+  FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) = delete;
+  FakeDataProducerDAQModule& operator=(const FakeDataProducerDAQModule&) =
+    delete;
+  FakeDataProducerDAQModule(FakeDataProducerDAQModule&&) = delete;
+  FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) = delete;
 
 private:
   // Commands

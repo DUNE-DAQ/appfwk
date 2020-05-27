@@ -28,9 +28,11 @@
 
 namespace appframework {
 
-template <class ValueType, class DurationType = std::chrono::milliseconds>
-class StdDeQueue : public QueueInput<ValueType, DurationType>,
-                    public QueueOutput<ValueType, DurationType> {
+template<class ValueType, class DurationType = std::chrono::milliseconds>
+class StdDeQueue
+  : public QueueInput<ValueType, DurationType>
+  , public QueueOutput<ValueType, DurationType>
+{
 public:
   using value_type = ValueType;
   using duration_type = DurationType;
@@ -51,21 +53,21 @@ public:
   bool empty() const noexcept override { return size() == 0; }
   bool full() const noexcept override { return size() >= capacity(); }
 
-  value_type pop(const duration_type &timeout)
-      override; // Throws std::runtime_error if a timeout occurs
-  void push(value_type &&val, const duration_type &timeout)
-      override; // Throws std::runtime_error if a timeout occurs
+  value_type pop(const duration_type& timeout)
+    override; // Throws std::runtime_error if a timeout occurs
+  void push(value_type&& val, const duration_type& timeout)
+    override; // Throws std::runtime_error if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
 
-  StdDeQueue(const StdDeQueue &) = delete;
-  StdDeQueue &operator=(const StdDeQueue &) = delete;
-  StdDeQueue(StdDeQueue &&) = delete;
-  StdDeQueue &operator=(StdDeQueue &&) = delete;
+  StdDeQueue(const StdDeQueue&) = delete;
+  StdDeQueue& operator=(const StdDeQueue&) = delete;
+  StdDeQueue(StdDeQueue&&) = delete;
+  StdDeQueue& operator=(StdDeQueue&&) = delete;
 
 private:
-  void try_lock_for(std::unique_lock<std::mutex> &, const duration_type &);
+  void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
 
   std::deque<value_type> fDeque;
   std::atomic<size_t> fSize = 0;

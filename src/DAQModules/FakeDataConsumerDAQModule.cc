@@ -21,25 +21,25 @@ appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
   std::vector<std::shared_ptr<QueueI>> outputs)
   : DAQModule(name, inputs, outputs)
   , bufferTimeout_(100)
-    ,thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
-{ 
-if (outputs.size()) {
+  , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
+{
+  if (outputs.size()) {
     throw std::runtime_error(
       "Invalid Configuration for FakeDataConsumerDAQModule: Output buffer "
       "provided!");
-}
-if (inputs.size() > 1) {
-  throw std::runtime_error(
-    "Invalid Configuration for FakeDataConsumerDAQModule: More than one Input "
-    "provided!");
-}
+  }
+  if (inputs.size() > 1) {
+    throw std::runtime_error("Invalid Configuration for "
+                             "FakeDataConsumerDAQModule: More than one Input "
+                             "provided!");
+  }
 
-inputQueue_.reset( dynamic_cast<QueueOutput<std::vector<int>>*>(&*inputs_[0]));
-
+  inputQueue_.reset(dynamic_cast<QueueOutput<std::vector<int>>*>(&*inputs_[0]));
 }
 
 std::future<std::string>
-appframework::FakeDataConsumerDAQModule::execute_command(std::string cmd) {
+appframework::FakeDataConsumerDAQModule::execute_command(std::string cmd)
+{
   if (cmd == "configure" || cmd == "Configure") {
     return std::async(std::launch::async, [&] { return do_configure(); });
   }
@@ -54,7 +54,9 @@ appframework::FakeDataConsumerDAQModule::execute_command(std::string cmd) {
                     [] { return std::string("Unrecognized Command"); });
 }
 
-std::string appframework::FakeDataConsumerDAQModule::do_configure() {
+std::string
+appframework::FakeDataConsumerDAQModule::do_configure()
+{
   nIntsPerVector_ = 10;
   starting_int_ = -4;
   ending_int_ = 14;
@@ -62,17 +64,23 @@ std::string appframework::FakeDataConsumerDAQModule::do_configure() {
   return "Success";
 }
 
-std::string appframework::FakeDataConsumerDAQModule::do_start() {
+std::string
+appframework::FakeDataConsumerDAQModule::do_start()
+{
   thread_.start_working_thread_();
   return "Success";
 }
 
-std::string appframework::FakeDataConsumerDAQModule::do_stop() {
+std::string
+appframework::FakeDataConsumerDAQModule::do_stop()
+{
   thread_.stop_working_thread_();
   return "Success";
 }
 
-TraceStreamer &operator<<(TraceStreamer &t, std::vector<int> ints) {
+TraceStreamer&
+operator<<(TraceStreamer& t, std::vector<int> ints)
+{
   t << "{";
   bool first = true;
   for (auto& i : ints) {
@@ -84,7 +92,9 @@ TraceStreamer &operator<<(TraceStreamer &t, std::vector<int> ints) {
   return t << "}";
 }
 
-void appframework::FakeDataConsumerDAQModule::do_work() {
+void
+appframework::FakeDataConsumerDAQModule::do_work()
+{
   int current_int = starting_int_;
   int counter = 0;
   int fail_count = 0;
@@ -98,7 +108,7 @@ void appframework::FakeDataConsumerDAQModule::do_work() {
 
       try {
         vec = inputQueue_->pop(bufferTimeout_);
-      } catch (const std::runtime_error &err) {
+      } catch (const std::runtime_error& err) {
         TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
                               "inputQueue (exception is \""
                            << err.what() << "\"";
@@ -111,8 +121,8 @@ void appframework::FakeDataConsumerDAQModule::do_work() {
       bool failed = false;
 
       TLOG(TLVL_DEBUG) << instance_name_ << " Starting processing loop";
-      TLOG(TLVL_INFO) << instance_name_ << " Received vector " << counter << ": "
-                      << vec;
+      TLOG(TLVL_INFO) << instance_name_ << " Received vector " << counter
+                      << ": " << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
@@ -143,8 +153,8 @@ void appframework::FakeDataConsumerDAQModule::do_work() {
     }
   }
 
-  TLOG(TLVL_INFO) << instance_name_ << " Processed " << counter << " vectors with "
-                  << fail_count << " failures.";
+  TLOG(TLVL_INFO) << instance_name_ << " Processed " << counter
+                  << " vectors with " << fail_count << " failures.";
 }
 
 DEFINE_DUNE_USER_MODULE(appframework::FakeDataConsumerDAQModule)

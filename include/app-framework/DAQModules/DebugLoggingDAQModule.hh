@@ -22,11 +22,12 @@ namespace appframework {
  * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingDAQModule : public DAQModule {
+class DebugLoggingDAQModule : public DAQModule
+{
 public:
   DebugLoggingDAQModule(std::string name,
-                         std::vector<std::shared_ptr<QueueI>> inputs,
-                         std::vector<std::shared_ptr<QueueI>> outputs)
+                        std::vector<std::shared_ptr<QueueI>> inputs,
+                        std::vector<std::shared_ptr<QueueI>> outputs)
     : DAQModule(name, inputs, outputs)
   {}
 

@@ -7,8 +7,8 @@
  */
 
 #include "app-framework-base/Services/CommandFacility.hh"
-#include "app-framework/Queues/StdDeQueue.hh"
 #include "app-framework/DAQModules/FanOutDAQModule.hh"
+#include "app-framework/Queues/StdDeQueue.hh"
 
 #define BOOST_TEST_MODULE FanOutDAQModule_test
 
@@ -18,13 +18,17 @@ namespace {
 
 constexpr auto buffer_timeout = std::chrono::milliseconds(10);
 
-struct NonCopyableType {
+struct NonCopyableType
+{
   int data;
-  explicit NonCopyableType(int d) : data(d) {}
+  explicit NonCopyableType(int d)
+    : data(d)
+  {}
   NonCopyableType(NonCopyableType const&) = delete;
   NonCopyableType(NonCopyableType&& i) { data = i.data; }
   NonCopyableType& operator=(NonCopyableType const&) = delete;
-  NonCopyableType &operator=(NonCopyableType &&i) {
+  NonCopyableType& operator=(NonCopyableType&& i)
+  {
     data = i.data;
     return *this;
   }
@@ -38,20 +42,22 @@ std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
 BOOST_AUTO_TEST_SUITE(FanOutDAQModule_test)
 
-BOOST_AUTO_TEST_CASE(Construct) {
+BOOST_AUTO_TEST_CASE(Construct)
+{
   auto buf = std::make_shared<appframework::StdDeQueue<int>>();
   appframework::FanOutDAQModule<int> foum("test", { buf }, { buf });
 }
 
-BOOST_AUTO_TEST_CASE(Configure) {
+BOOST_AUTO_TEST_CASE(Configure)
+{
   auto buf = std::make_shared<appframework::StdDeQueue<int>>();
   appframework::FanOutDAQModule<int> foum("test", { buf }, { buf });
   foum.execute_command("configure");
 }
 
-BOOST_AUTO_TEST_CASE(NonCopyableTypeTest) {
-  auto inputbuf =
-    std::make_shared<appframework::StdDeQueue<NonCopyableType>>();
+BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
+{
+  auto inputbuf = std::make_shared<appframework::StdDeQueue<NonCopyableType>>();
   auto outputbuf1 =
     std::make_shared<appframework::StdDeQueue<NonCopyableType>>();
   auto outputbuf2 =

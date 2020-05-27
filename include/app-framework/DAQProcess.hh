@@ -15,9 +15,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 
-#include "app-framework-base/Queues/Queue.hh"
 #include "app-framework-base/Core/ModuleList.hh"
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework-base/Queues/Queue.hh"
 #include "app-framework/CommandLineInterpreter.hh"
 
 #include <string>
@@ -31,7 +31,8 @@ namespace appframework {
  * in the order defined in the CommandOrderMap received from the ModuleList
  * during register_modules.
  */
-class DAQProcess {
+class DAQProcess
+{
 public:
   /**
    * @brief DAQProcess Constructor
@@ -79,8 +80,8 @@ public:
   DAQProcess& operator=(DAQProcess&&) = delete;
 
 private:
-  QueueMap bufferMap_;             ///< String alias for each Queue
-  DAQModuleMap userModuleMap_;     ///< String alias for each DAQModule
+  QueueMap bufferMap_;              ///< String alias for each Queue
+  DAQModuleMap userModuleMap_;      ///< String alias for each DAQModule
   CommandOrderMap commandOrderMap_; ///< Order DAQModule commands by alias
 };
 } // namespace appframework

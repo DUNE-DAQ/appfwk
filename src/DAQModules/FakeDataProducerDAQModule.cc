@@ -18,7 +18,7 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   std::string name,
   std::vector<std::shared_ptr<QueueI>> inputs,
   std::vector<std::shared_ptr<QueueI>> outputs)
-  : DAQModule(name, inputs,outputs)
+  : DAQModule(name, inputs, outputs)
   , bufferTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
 {
@@ -38,7 +38,8 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
 }
 
 std::future<std::string>
-appframework::FakeDataProducerDAQModule::execute_command(std::string cmd) {
+appframework::FakeDataProducerDAQModule::execute_command(std::string cmd)
+{
   if (cmd == "configure" || cmd == "Configure") {
     return std::async(std::launch::async, [&] { return do_configure(); });
   }
@@ -53,7 +54,9 @@ appframework::FakeDataProducerDAQModule::execute_command(std::string cmd) {
                     [] { return std::string("Unrecognized Command"); });
 }
 
-std::string appframework::FakeDataProducerDAQModule::do_configure() {
+std::string
+appframework::FakeDataProducerDAQModule::do_configure()
+{
   nIntsPerVector_ = 10;
   starting_int_ = -4;
   ending_int_ = 14;
@@ -62,17 +65,23 @@ std::string appframework::FakeDataProducerDAQModule::do_configure() {
   return "Success";
 }
 
-std::string appframework::FakeDataProducerDAQModule::do_start() {
+std::string
+appframework::FakeDataProducerDAQModule::do_start()
+{
   thread_.start_working_thread_();
   return "Success";
 }
 
-std::string appframework::FakeDataProducerDAQModule::do_stop() {
+std::string
+appframework::FakeDataProducerDAQModule::do_stop()
+{
   thread_.stop_working_thread_();
   return "Success";
 }
 
-TraceStreamer &operator<<(TraceStreamer &t, std::vector<int> ints) {
+TraceStreamer&
+operator<<(TraceStreamer& t, std::vector<int> ints)
+{
   t << "{";
   bool first = true;
   for (auto& i : ints) {
@@ -84,7 +93,9 @@ TraceStreamer &operator<<(TraceStreamer &t, std::vector<int> ints) {
   return t << "}";
 }
 
-void appframework::FakeDataProducerDAQModule::do_work() {
+void
+appframework::FakeDataProducerDAQModule::do_work()
+{
   int current_int = starting_int_;
   size_t counter = 0;
   while (thread_.thread_running()) {
@@ -106,14 +117,14 @@ void appframework::FakeDataProducerDAQModule::do_work() {
     outputQueue_->push(std::move(output), bufferTimeout_);
     auto endtime = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<decltype(bufferTimeout_)>(
-            endtime - starttime) > bufferTimeout_) {
+          endtime - starttime) > bufferTimeout_) {
       TLOG(TLVL_WARNING)
-          << "Timeout attempting to push vector onto outputQueue";
+        << "Timeout attempting to push vector onto outputQueue";
     }
 
     TLOG(TLVL_DEBUG) << "Start of sleep between sends";
     std::this_thread::sleep_for(
-        std::chrono::milliseconds(wait_between_sends_ms_));
+      std::chrono::milliseconds(wait_between_sends_ms_));
     TLOG(TLVL_DEBUG) << "End of do_work loop";
     counter++;
   }

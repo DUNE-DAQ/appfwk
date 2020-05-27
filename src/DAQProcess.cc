@@ -35,11 +35,15 @@ DAQProcess::DAQProcess(CommandLineInterpreter args)
   ServiceManager::setup(args.servicePluginNames, args.otherOptions);
 }
 
-void DAQProcess::register_modules(ModuleList &ml) {
+void
+DAQProcess::register_modules(ModuleList& ml)
+{
   ml.ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_);
 }
 
-void DAQProcess::execute_command(std::string cmd) {
+void
+DAQProcess::execute_command(std::string cmd)
+{
   std::unordered_set<std::string> user_module_list;
   for (auto const& um : userModuleMap_) {
     user_module_list.insert(um.first);
@@ -68,5 +72,9 @@ void DAQProcess::execute_command(std::string cmd) {
   }
 }
 
-int DAQProcess::listen() { return CommandFacility::handle().listen(this); }
+int
+DAQProcess::listen()
+{
+  return CommandFacility::handle().listen(this);
+}
 } // namespace appframework

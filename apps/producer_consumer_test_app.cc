@@ -6,18 +6,19 @@
  * received with this code.
  */
 
-#include "app-framework/Queues/StdDeQueue.hh"
-#include "app-framework/DAQProcess.hh"
 #include "app-framework/DAQModules/FakeDataConsumerDAQModule.hh"
 #include "app-framework/DAQModules/FakeDataProducerDAQModule.hh"
 #include "app-framework/DAQModules/FanOutDAQModule.hh"
+#include "app-framework/DAQProcess.hh"
+#include "app-framework/Queues/StdDeQueue.hh"
 
 #include <memory>
 #include <vector>
 
 namespace appframework {
 
-class producer_consumer_test_app_ModuleList : public ModuleList {
+class producer_consumer_test_app_ModuleList : public ModuleList
+{
   // Inherited via ModuleList
   void ConstructGraph(QueueMap& buffer_map,
                       DAQModuleMap& user_module_map,

@@ -34,12 +34,18 @@ public:
       << argv[0]
       << " known arguments (additional arguments will be stored and passed on)";
     bpo::options_description desc(descstr.str());
-    desc.add_options()
-        ("commandFacility,c", bpo::value<std::string>(), "CommandFacility plugin name")
-        ( "configManager,m", bpo::value<std::string>(), "ConfigurationManager plugin name")
-        ( "service,s", bpo::value<std::vector<std::string>>(), "Service plugin(s) to load")
-        ("configJson,j",bpo::value<std::string>(), "JSON Application configuration file name")
-        ("help,h", "produce help message");
+    desc.add_options()("commandFacility,c",
+                       bpo::value<std::string>(),
+                       "CommandFacility plugin name")(
+      "configManager,m",
+      bpo::value<std::string>(),
+      "ConfigurationManager plugin name")(
+      "service,s",
+      bpo::value<std::vector<std::string>>(),
+      "Service plugin(s) to load")("configJson,j",
+                                   bpo::value<std::string>(),
+                                   "JSON Application configuration file name")(
+      "help,h", "produce help message");
     bpo::variables_map vm;
     try {
       auto parsed = bpo::command_line_parser(argc, argv)

@@ -8,8 +8,8 @@
 
 #include "app-framework/DAQModules/DebugLoggingDAQModule.hh"
 
-#include "app-framework-base/Services/Logger.hh"
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework-base/Services/Logger.hh"
 
 #include "TRACE/trace.h"
 
@@ -17,7 +17,8 @@
 
 namespace appframework {
 std::future<std::string>
-DebugLoggingDAQModule::execute_command(std::string cmd) {
+DebugLoggingDAQModule::execute_command(std::string cmd)
+{
   TLOG(TLVL_INFO) << "Executing command: " << cmd;
   return std::async([]() { return std::string("Success"); });
 }
