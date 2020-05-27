@@ -23,7 +23,7 @@
   {
 #endif
 
-#define DEFINE_DUNE_BUFFER(klass)                                              \
+#define DEFINE_DUNE_QUEUE(klass)                                              \
   EXTERN_C_FUNC_DECLARE_START                                                  \
   std::shared_ptr<appframework::QueueI> make()                                 \
   {                                                                            \
@@ -56,11 +56,11 @@ public:
 };
 
 inline std::shared_ptr<QueueI>
-makeQueue(std::string const& buffer_name)
+makeQueue(std::string const& queue_name)
 {
   static cet::BasicPluginFactory bpf("duneQueue", "make");
 
-  return bpf.makePlugin<std::shared_ptr<QueueI>>(buffer_name);
+  return bpf.makePlugin<std::shared_ptr<QueueI>>(queue_name);
 }
 
 } // namespace appframework
