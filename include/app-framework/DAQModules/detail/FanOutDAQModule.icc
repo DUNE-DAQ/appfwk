@@ -16,11 +16,10 @@ appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(
                              "provided!");
   }
 
-  inputQueue_.reset(dynamic_cast<QueueSource<ValueType>*>(&*inputs_[0]));
+  inputQueue_ = std::dynamic_pointer_cast<QueueSource<ValueType>>(inputs_[0]);
 
   for (auto& output : outputs) {
-    outputQueues_.push_back(std::shared_ptr<QueueSink<ValueType>>(
-      dynamic_cast<QueueSink<ValueType>*>(&*output)));
+    outputQueues_.push_back((std::dynamic_pointer_cast<QueueSink<ValueType>>(output)));
   }
 }
 

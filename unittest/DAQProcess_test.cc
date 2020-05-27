@@ -18,6 +18,7 @@ BOOST_AUTO_TEST_SUITE(DAQProcess_test)
 BOOST_AUTO_TEST_CASE(Construct)
 {
   appframework::CommandLineInterpreter args;
+  args.commandFacilityPluginName = "QueryResponseCommandFacility";
   appframework::DAQProcess dp(args);
 }
 

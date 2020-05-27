@@ -24,7 +24,7 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
 {
   if (inputs.size()) {
     throw std::runtime_error(
-      "Invalid Configuration for FakeDataProducerDAQModule: Input buffer "
+      "Invalid Configuration for FakeDataProducerDAQModule: Input queue "
       "provided!");
   }
   if (outputs.size() > 1) {
@@ -33,8 +33,7 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
                              "provided!");
   }
 
-  outputQueue_.reset(
-    dynamic_cast<QueueSink<std::vector<int>>*>(&*outputs_[0]));
+  outputQueue_ = std::dynamic_pointer_cast<QueueSink<std::vector<int>>>(outputs_[0]);
 }
 
 void

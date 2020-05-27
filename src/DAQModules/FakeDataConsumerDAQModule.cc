@@ -22,7 +22,19 @@ appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
   : DAQModuleI(name, inputs, outputs)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
-{}
+{
+  if (outputs.size()) {
+    throw std::runtime_error(
+      "Invalid Configuration for FakeDataConsumerDAQModule: Output queue "
+      "provided!");
+  }
+  if (inputs.size() > 1) {
+    throw std::runtime_error("Invalid Configuration for "
+                             "FakeDataConsumerDAQModule: More than one Input "
+                             "provided!");
+  }
+  inputQueue_=  std::dynamic_pointer_cast<QueueSource<std::vector<int>>>(inputs_[0]);
+}
 
 void
 appframework::FakeDataConsumerDAQModule::execute_command(
@@ -109,8 +121,7 @@ appframework::FakeDataConsumerDAQModule::do_work()
 
       TLOG(TLVL_DEBUG) << instance_name_ << ": Starting processing loop";
       TLOG(TLVL_INFO) << instance_name_ << ": Received vector " << counter
-                      << ": "
-                      << vec;
+                      << ": " << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
@@ -142,6 +153,5 @@ appframework::FakeDataConsumerDAQModule::do_work()
   }
 
   TLOG(TLVL_INFO) << instance_name_ << ": Processed " << counter
-                  << " vectors with "
-                  << fail_count << " failures.";
+                  << " vectors with " << fail_count << " failures.";
 }
