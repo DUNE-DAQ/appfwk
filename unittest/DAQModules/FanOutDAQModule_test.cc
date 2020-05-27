@@ -16,7 +16,7 @@
 
 namespace {
 
-constexpr auto buffer_timeout = std::chrono::milliseconds(10);
+constexpr auto queue_timeout = std::chrono::milliseconds(10);
 
 struct NonCopyableType
 {
@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   foum.execute_command("configure");
   foum.execute_command("start");
 
-  inputbuf->push(NonCopyableType(1), buffer_timeout);
-  inputbuf->push(NonCopyableType(2), buffer_timeout);
+  inputbuf->push(NonCopyableType(1), queue_timeout);
+  inputbuf->push(NonCopyableType(2), queue_timeout);
 
   while (inputbuf->can_pop())
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -81,11 +81,11 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   BOOST_REQUIRE_EQUAL(inputbuf->can_pop(), false);
 
   BOOST_REQUIRE_EQUAL(outputbuf1->can_pop(), true);
-  auto res = outputbuf1->pop(buffer_timeout);
+  auto res = outputbuf1->pop(queue_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 1);
 
   BOOST_REQUIRE_EQUAL(outputbuf2->can_pop(), true);
-  res = outputbuf2->pop(buffer_timeout);
+  res = outputbuf2->pop(queue_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 2);
 }
 

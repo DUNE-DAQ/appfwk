@@ -30,23 +30,23 @@ public:
   {}
 
   // Inherited via ModuleList
-  virtual void ConstructGraph(QueueMap& buffer_map,
+  virtual void ConstructGraph(QueueMap& queue_map,
                               DAQModuleMap& user_module_map,
                               CommandOrderMap& command_order_map) override
   {
-    for (auto& buffer : config_["buffers"].items()) {
-      buffer_map[buffer.key()] = makeQueue(buffer.value());
+    for (auto& queue : config_["queues"].items()) {
+      queue_map[queue.key()] = makeQueue(queue.value());
     }
 
     for (auto& module : config_["modules"].items()) {
       std::vector<std::shared_ptr<QueueI>> inputs;
       for (auto& input : module.value()["inputs"]) {
-        inputs.push_back(buffer_map[input]);
+        inputs.push_back(queue_map[input]);
       }
 
       std::vector<std::shared_ptr<QueueI>> outputs;
       for (auto& output : module.value()["outputs"]) {
-        outputs.push_back(buffer_map[output]);
+        outputs.push_back(queue_map[output]);
       }
       user_module_map[module.key()] = makeModule(
         module.value()["user_module_type"], module.key(), inputs, outputs);
@@ -83,7 +83,7 @@ main(int argc, char* argv[])
   } else {
     json_config = R"(
         {
-            "buffers": {
+            "queues": {
                 "producerToFanOut": "VectorIntStdDeQueue",
                 "fanOutToConsumer1": "VectorIntStdDeQueue",
                 "fanOutToConsumer2": "VectorIntStdDeQueue"

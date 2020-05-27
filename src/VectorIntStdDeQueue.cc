@@ -3,4 +3,4 @@
 namespace appframework {
 typedef StdDeQueue<std::vector<int>> VectorIntStdDeQueue;
 }
-DEFINE_DUNE_BUFFER(appframework::VectorIntStdDeQueue)
+DEFINE_DUNE_QUEUE(appframework::VectorIntStdDeQueue)
