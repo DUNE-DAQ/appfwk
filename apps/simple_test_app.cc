@@ -8,7 +8,6 @@
 
 #include "app-framework/CommandLineInterpreter.hh"
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/QueryResponseCommandFacility.hh"
 #include "app-framework/UserModules/DebugLoggingUserModule.hh"
 
 namespace appframework {

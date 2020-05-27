@@ -17,8 +17,7 @@
 
 namespace appframework {
 
-class producer_consumer_test_app_ModuleList : public ModuleList
-{
+class producer_consumer_test_app_ModuleList : public ModuleList {
   // Inherited via ModuleList
   void ConstructGraph(BufferMap& buffer_map,
                       UserModuleMap& user_module_map,
