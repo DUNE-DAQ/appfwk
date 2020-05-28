@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+#include "app-framework-base/DAQModules/DAQModuleIssues.hh"
+
 namespace appframework {
 /**
  * @brief The DAQModule class is a set of code which performs a specific task.
