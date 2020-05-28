@@ -16,23 +16,35 @@
 
 #include <ers/Issue.h>
 
-ERS_DECLARE_ISSUE( appframework, 
-		   DAQModuleIssue, 
-		   "Generic DAQModule Issue " ,
+namespace appframework {
+
+ERS_DECLARE_ISSUE( DAQIssues, 
+		   GeneralDAQModuleIssue, 
+		   "General DAQModule Issue", 
 		   ERS_EMPTY
 		   )
 		    
 
-// ERS_DECLARE_ISSUE_BASE( appframework, 
-// 			UnknownCommand,
-// 			DAQModuleIssue,
-// 			"Command " << cmd << " is not recognised", 
-// 			ERS_EMPTY,
-// 			(( const std::string & ) cmd )			
-// 			)
+ERS_DECLARE_ISSUE_BASE( DAQIssues, 
+  			UnknownCommand,
+  			GeneralDAQModuleIssue,
+  			"Command " << cmd << " is not recognised", 
+			ERS_EMPTY,
+ 			((std::string) cmd)
+			)
+
+
+ERS_DECLARE_ISSUE_BASE( DAQIssues, 
+  			CommandFailed,
+  			GeneralDAQModuleIssue,
+  			"Command " << cmd << " failed to execute for reason " << reason, 
+ 			ERS_EMPTY, 
+			((std::string ) cmd) ((std::string) reason)
+			)
 
 
 
+}
 
 
 #endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEISSUES_HH_
