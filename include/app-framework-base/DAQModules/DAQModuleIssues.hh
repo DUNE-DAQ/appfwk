@@ -18,16 +18,18 @@
 
 ERS_DECLARE_ISSUE( appframework, 
 		   DAQModuleIssue, 
-		   "Generic DAQModule Issue encoutered" 
+		   "Generic DAQModule Issue " ,
+		   ERS_EMPTY
 		   )
 		    
 
-ERS_DECLARE_ISSUE_BASE( appframework, 
-			UnknownCommand,
-			DAQModuleIssue,
-			"Command " << cmd << " is not recognised", 
-			( const std::string & ) cmd 
-			)
+// ERS_DECLARE_ISSUE_BASE( appframework, 
+// 			UnknownCommand,
+// 			DAQModuleIssue,
+// 			"Command " << cmd << " is not recognised", 
+// 			ERS_EMPTY,
+// 			(( const std::string & ) cmd )			
+// 			)
 
 
 
