@@ -7,6 +7,16 @@
 #include <string>
 #include <app-framework-base/NamedObject.hh>
 #include <app-framework/Queues/NamedStdDeQueue.hh>
+#include <ers/Issue.h>
+
+// ERS Issues declaration
+/** \def ers::File This is the base class for all file related issues.
+ */
+ERS_DECLARE_ISSUE_HPP(  appframework,      // namespace
+                        BadQueueType,       // issue class name
+                        "Failed to cast queue " << queue_name << "to NamedQueue<T>",    // no message
+                        ((const char *)queue_name ) // single attribute
+                     )
 
 namespace appframework {
 
@@ -56,7 +66,11 @@ std::shared_ptr<NamedQueueI<T>> QueueRegistry::get_queue(std::string name) {
 
   auto itQ = queue_registry_.find(name);
   if ( itQ != queue_registry_.end() ) {
-    return std::dynamic_pointer_cast<NamedQueueI<T>>(itQ->second);
+      auto queuePtr =  std::dynamic_pointer_cast<NamedQueueI<T>>(itQ->second);
+      if (!queuePtr) {
+        throw BadQueueType(name);
+      }
+    }
   } 
 
   auto itP = queue_configmap_.find(name);
