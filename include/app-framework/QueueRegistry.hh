@@ -71,6 +71,6 @@ class QueueRegistry {
 
 } // namespace appframework
 
-#include "QueueRegistry.hxx"
+#include "QueueRegistry.icc"
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_

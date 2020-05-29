@@ -76,7 +76,7 @@ private:
   std::condition_variable fNoLongerEmpty;
 };
 
-#include "detail/NamedStdDeQueue.hxx"
+#include "detail/NamedStdDeQueue.icc"
 
 } // namespace appframework
 
