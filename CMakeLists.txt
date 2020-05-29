@@ -3,5 +3,7 @@ project(app-framework-base)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include_directories(${CMAKE_SOURCE_DIR}/ers)
+
 add_subdirectory(doc)
 add_subdirectory(unittest)
