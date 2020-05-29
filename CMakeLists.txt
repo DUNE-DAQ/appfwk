@@ -8,6 +8,7 @@ find_package(TRACE 3.15.0 REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/app-framework/include)
 include_directories(${CMAKE_SOURCE_DIR}/app-framework-base/include)
+include_directories(${CMAKE_SOURCE_DIR}/ers)
 
 add_subdirectory(apps)
 add_subdirectory(doc)
