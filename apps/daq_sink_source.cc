@@ -2,6 +2,7 @@
 #include "app-framework/DAQSource.hh"
 #include "app-framework/DAQSink.hh"
 #include "app-framework/Queues/NamedStdDeQueue.hh"
+#include "ers/ers.h"
 
 namespace appframework {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ =
@@ -20,6 +21,14 @@ int main(int argc, char const *argv[])
     QueueRegistry::get()->configure(queuemap);
 
     auto sink = new DAQSink<std::string>("dummy");
+    std::cout << "Expecting queue mismatch error" <<std::endl;    
+    try {
+        auto source = new DAQSource<int>("dummy");
+    } catch ( appframework::DAQSourceConstrutionFailed &e ) {
+        ers::error(e);
+        std::cout << "OK, got it. Carrying on" << std::endl;
+    }
+
     auto source = new DAQSource<std::string>("dummy");
 
 

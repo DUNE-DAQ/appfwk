@@ -14,6 +14,13 @@
 #include <chrono>
 #include <app-framework/QueueRegistry.hh>
 #include <app-framework-base/NamedQueueI.hh>
+#include "ers/Issue.h"
+
+ERS_DECLARE_ISSUE(  appframework,      // namespace
+                        DAQSinkConstrutionFailed,       // issue class name
+                        "Failed to construct DAQSink \"" << name << "\"",    // no message
+                        ((std::string)name ) 
+                     )
 
 namespace appframework {
 
@@ -33,9 +40,11 @@ private:
 
 template <typename T>
 DAQSink<T>::DAQSink(std::string name) {
-	queue_ = QueueRegistry::get()->get_queue<T>(name);
-    if (!queue_)
-        throw std::bad_cast();
+    try {
+	   queue_ = QueueRegistry::get()->get_queue<T>(name);
+    } catch ( QueueTypeMismatch& ex ) {
+        throw DAQSinkConstrutionFailed(ERS_HERE, name, ex);
+    }
 }
 
 template <typename T>

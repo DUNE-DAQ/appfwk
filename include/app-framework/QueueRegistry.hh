@@ -1,21 +1,22 @@
-
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
 
 #include <map>
 #include <memory>
 #include <string>
-#include <app-framework-base/NamedObject.hh>
-#include <app-framework/Queues/NamedStdDeQueue.hh>
-#include <ers/Issue.h>
+#include "app-framework-base/NamedObject.hh"
+#include "app-framework/Queues/NamedStdDeQueue.hh"
+#include "ers/Issue.h"
 
 // ERS Issues declaration
 /** \def ers::File This is the base class for all file related issues.
  */
-ERS_DECLARE_ISSUE_HPP(  appframework,      // namespace
-                        BadQueueType,       // issue class name
-                        "Failed to cast queue " << queue_name << "to NamedQueue<T>",    // no message
-                        ((const char *)queue_name ) // single attribute
+ERS_DECLARE_ISSUE(  appframework,      // namespace
+                        QueueTypeMismatch,       // issue class name
+                        "Requested queue \"" << queue_name << "\" of type '" << target_type << "' already declared as type '" << source_type << "'",    // no message
+                        ((std::string)queue_name ) 
+                        ((std::string)source_type )
+                        ((std::string)target_type )
                      )
 
 namespace appframework {
@@ -42,13 +43,21 @@ class QueueRegistry {
     void configure( const std::map<std::string, QueueConfig>& );
 
   private:
+
+    struct QueueEntry
+    {
+      const std::type_info* type;
+      std::shared_ptr<NamedObject> instance;
+    };
+
     QueueRegistry();
 
     template<typename T>
     std::shared_ptr<NamedObject> create_queue(std::string name, const QueueConfig& config);
 
-    std::map<std::string,std::shared_ptr<NamedObject> > queue_registry_;
+    std::map<std::string,QueueEntry> queue_registry_;
     std::map<std::string,QueueConfig> queue_configmap_;
+
     bool configured_;
 
     static QueueRegistry* me_;
@@ -60,48 +69,8 @@ class QueueRegistry {
 
 };
 
-
-template<typename T>
-std::shared_ptr<NamedQueueI<T>> QueueRegistry::get_queue(std::string name) {
-
-  auto itQ = queue_registry_.find(name);
-  if ( itQ != queue_registry_.end() ) {
-      auto queuePtr =  std::dynamic_pointer_cast<NamedQueueI<T>>(itQ->second);
-      if (!queuePtr) {
-        throw BadQueueType(name);
-      }
-    }
-  } 
-
-  auto itP = queue_configmap_.find(name);
-  if ( itP != queue_configmap_.end() ) {
-    std::shared_ptr<NamedObject> queue = create_queue<T>(name, itP->second);
-    queue_registry_[name] = queue;
-    return std::dynamic_pointer_cast<NamedQueueI<T>>(queue);
-
-  } else {
-    throw std::runtime_error("Queue not found");
-  }
-
-}
-
-
-template<typename T>
-std::shared_ptr<NamedObject> QueueRegistry::create_queue(std::string name, const QueueConfig& config) {
-
-  std::shared_ptr<NamedObject> queue;
-  switch(config.kind) {
-    case QueueConfig::std_deque:
-      queue = std::make_shared<NamedStdDeQueue<T>>(name, config.size);
-      break;
-    default:
-      throw std::runtime_error("Unknown queue kind");
-  }
-
-  return queue;
-}
-
-
 } // namespace appframework
+
+#include "QueueRegistry.hxx"
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
