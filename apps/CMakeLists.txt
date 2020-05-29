@@ -9,3 +9,6 @@ target_link_libraries(producer_consumer_test_app app-framework app-framework_Fak
 
 add_executable(dynamic_loading_test_app dynamic_loading_test_app.cc)
 target_link_libraries(dynamic_loading_test_app app-framework  pthread cetlib cetlib_except ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+add_executable(daq_sink_source daq_sink_source.cc)
+target_link_libraries(daq_sink_source app-framework pthread ers)

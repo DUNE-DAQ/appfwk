@@ -79,6 +79,9 @@ public:
   DAQProcess(DAQProcess&&) = delete;
   DAQProcess& operator=(DAQProcess&&) = delete;
 
+protected:
+  void call_command_on_module( DAQModuleI & module, const std::string & cmd ) ; 
+
 private:
   QueueMap queueMap_;               ///< String alias for each Queue
   DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule

@@ -7,6 +7,7 @@
  */
 
 #include "app-framework/DAQProcess.hh"
+#include "app-framework/DAQProcessIssues.hh"
 
 #include "app-framework-base/Services/CommandFacility.hh"
 #include "app-framework-base/Services/ConfigurationManager.hh"
@@ -15,6 +16,8 @@
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "DAQProcess" // NOLINT
+
+#include "ers/ers.h" 
 
 #include <memory>
 #include <unordered_set>
@@ -51,24 +54,27 @@ DAQProcess::execute_command(std::string cmd)
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
                    << " for DAQModules defined in the CommandOrderMap";
+
   if (commandOrderMap_.count(cmd)) {
     for (auto& moduleName : commandOrderMap_[cmd]) {
-      if (daqModuleMap_.count(moduleName)) {
-        daqModuleMap_[moduleName]->execute_command(cmd);
-        daq_module_list.erase(moduleName);
+      if (daqModuleMap_.count(moduleName)) { 
+        
+	call_command_on_module( *daqModuleMap_[moduleName], cmd );
+     
+	daq_module_list.erase(moduleName);
       }
     }
   } else {
-    TLOG(TLVL_WARNING)
-      << "Command " << cmd
-      << " does not have an entry in the CommandOrderMap! DAQModules will "
-         "receive this command in an unspecified order!";
+
+    ers::warning ( DAQIssues::CommandOrderNotSpecified( ERS_HERE, cmd ) ) ;
+
   }
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
                    << " for all remaining DAQModules";
   for (auto const& moduleName : daq_module_list) {
-    daqModuleMap_[moduleName]->execute_command(cmd);
+
+    call_command_on_module( *daqModuleMap_[moduleName], cmd );
   }
 }
 
@@ -77,4 +83,17 @@ DAQProcess::listen()
 {
   return CommandFacility::handle().listen(this);
 }
+
+  void DAQProcess::call_command_on_module( DAQModuleI & mod, const std::string & cmd ) {
+
+    try {
+      mod.execute_command( cmd ) ;
+    }
+    catch ( DAQIssues::GeneralDAQModuleIssue & ex ) {
+      ers::error( ex ) ;
+    }
+    // catch (...) {
+    //   ers::error( DAQIssues::ModuleThrowUnknown( ERS_HERE, mod.Name(), cmd ) ;
+    // }
+  } 
 } // namespace appframework

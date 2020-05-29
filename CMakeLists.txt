@@ -13,6 +13,7 @@ find_package(Boost 1.72.0 COMPONENTS unit_test_framework program_options REQUIRE
 
 include_directories(${CMAKE_SOURCE_DIR}/app-framework/include)
 include_directories(${CMAKE_SOURCE_DIR}/app-framework-base/include)
+include_directories(${CMAKE_SOURCE_DIR}/ers)
 
 add_subdirectory(apps)
 add_subdirectory(doc)
