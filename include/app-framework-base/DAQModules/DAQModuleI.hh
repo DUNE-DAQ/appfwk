@@ -19,51 +19,35 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
     
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "cetlib/BasicPluginFactory.h"
-#include "cetlib/compiler_macros.h"
+#include <nlohmann/json.hpp>
 
-#include "app-framework-base/Queues/QueueI.hh"
-
-#ifndef EXTERN_C_FUNC_DECLARE_START
-#define EXTERN_C_FUNC_DECLARE_START                                            \
-  extern "C"                                                                   \
-  {
-#endif
-
-#define DEFINE_DUNE_DAQ_MODULE(klass)                                         \
-  EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::unique_ptr<appframework::DAQModuleI> make(                               \
-    std::string n,                                                             \
-    std::vector<std::shared_ptr<appframework::QueueI>> i,                      \
-    std::vector<std::shared_ptr<appframework::QueueI>> o)                      \
-  {                                                                            \
-    return std::unique_ptr<appframework::DAQModuleI>(new klass(n, i, o));       \
-  }                                                                            \
-  }
+#include "app-framework-base/NamedObject.hh"
 
 #include "app-framework-base/DAQModules/DAQModuleIssues.hh"
 
+// for convenience
+using json = nlohmann::json;
+
 namespace appframework {
 /**
- * @brief The DAQModuleI class implementations are a set of code which performs a specific task.
+ * @brief The DAQModuleI class implementations are a set of code which performs
+ * a specific task.
  *
  * This interface defines the basic methods which all DAQModules should expose.
  * Developers implementing DAQModules should feel free to use whatever Plugins
  * and Services are necessary to accomplish their needed functionality.
  */
-class DAQModuleI
+class DAQModuleI : public NamedObject
 {
 public:
-  DAQModuleI(std::string name,
-            std::vector<std::shared_ptr<QueueI>> inputs,
-            std::vector<std::shared_ptr<QueueI>> outputs)
-    : instance_name_(name)
-    , inputs_(inputs)
-    , outputs_(outputs)
+  DAQModuleI(std::string name)
+    : NamedObject(name)
   {}
+
+  void configure(json config) { configuration_ = config; }
 
   /**
    * @brief Execute a command in this DAQModuleI
@@ -80,22 +64,17 @@ public:
                                const std::vector<std::string>& args = {}) = 0;
 
 protected:
-  std::string instance_name_;
-  std::vector<std::shared_ptr<QueueI>> inputs_;
-  std::vector<std::shared_ptr<QueueI>> outputs_;
+  json configuration_;
 };
 
-inline std::unique_ptr<DAQModuleI>
-makeModule(std::string const& module_name,
-           std::string const& instance_name,
-           std::vector<std::shared_ptr<QueueI>> inputs,
-           std::vector<std::shared_ptr<QueueI>> outputs)
+inline std::shared_ptr<DAQModuleI>
+makeModule(std::string const& plugin_name,
+                std::string const& instance_name)
 {
-  static cet::BasicPluginFactory bpf("duneDAQModule", "make");
-
-  return bpf.makePlugin<std::unique_ptr<DAQModuleI>>(
-    module_name, instance_name, inputs, outputs);
+  auto namedObject = makeNamedObject(plugin_name, instance_name);
+  return std::dynamic_pointer_cast<DAQModuleI>(namedObject);
 }
+
 } // namespace appframework
 
 #endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
