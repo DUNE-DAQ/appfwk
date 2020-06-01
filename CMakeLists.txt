@@ -3,7 +3,13 @@ project(app-framework-base)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(cetlib REQUIRED)
+if(EXISTS $ENV{CETLIB_LIB})
+  include_directories($ENV{CETLIB_INC})
+else()
+	find_package(cetlib REQUIRED)
+endif()
+
+
 include_directories(${CMAKE_SOURCE_DIR}/ers)
 
 add_subdirectory(doc)
