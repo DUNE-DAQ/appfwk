@@ -20,8 +20,7 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
   , outputQueue_(nullptr)
-{
-}
+{}
 
 void
 appframework::FakeDataProducerDAQModule::execute_command(
@@ -43,13 +42,14 @@ std::string
 appframework::FakeDataProducerDAQModule::do_configure()
 {
 
-  outputQueue_.reset(new DAQSink<std::vector<int>>(
-    configuration_["output"].get<std::string>()));
+  outputQueue_.reset(
+    new DAQSink<std::vector<int>>(configuration_["output"].get<std::string>()));
 
   nIntsPerVector_ = configuration_.value<int>("nIntsPerVector", 10);
   starting_int_ = configuration_.value<int>("starting_int", -4);
   ending_int_ = configuration_.value<int>("ending_int", 14);
-  wait_between_sends_ms_ = configuration_.value<int>("wait_between_sends_ms", 1000);
+  wait_between_sends_ms_ =
+    configuration_.value<int>("wait_between_sends_ms", 1000);
 
   return "Success";
 }
@@ -109,8 +109,7 @@ appframework::FakeDataProducerDAQModule::do_work()
     if (std::chrono::duration_cast<decltype(queueTimeout_)>(
           endtime - starttime) > queueTimeout_) {
       TLOG(TLVL_WARNING)
-        << get_name()
-        << ": Timeout attempting to push vector onto outputQueue";
+        << get_name() << ": Timeout attempting to push vector onto outputQueue";
     }
 
     TLOG(TLVL_DEBUG) << get_name() << ": Start of sleep between sends";

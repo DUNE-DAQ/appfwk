@@ -21,8 +21,7 @@ appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
   , inputQueue_(nullptr)
-{
-}
+{}
 
 void
 appframework::FakeDataConsumerDAQModule::execute_command(
@@ -111,8 +110,8 @@ appframework::FakeDataConsumerDAQModule::do_work()
       bool failed = false;
 
       TLOG(TLVL_DEBUG) << get_name() << ": Starting processing loop";
-      TLOG(TLVL_INFO) << get_name() << ": Received vector " << counter
-                      << ": " << vec;
+      TLOG(TLVL_INFO) << get_name() << ": Received vector " << counter << ": "
+                      << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
@@ -143,8 +142,8 @@ appframework::FakeDataConsumerDAQModule::do_work()
     }
   }
 
-  TLOG(TLVL_INFO) << get_name() << ": Processed " << counter
-                  << " vectors with " << fail_count << " failures.";
+  TLOG(TLVL_INFO) << get_name() << ": Processed " << counter << " vectors with "
+                  << fail_count << " failures.";
 }
 
 DEFINE_DUNE_OBJECT(appframework::FakeDataConsumerDAQModule)

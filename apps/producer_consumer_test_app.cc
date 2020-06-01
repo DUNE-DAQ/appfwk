@@ -24,14 +24,11 @@ class producer_consumer_test_app_ModuleList : public ModuleList
                       CommandOrderMap& command_order_map) override
   {
 
-    user_module_map["producer"].reset(
-      new FakeDataProducerDAQModule("prod"));
-    user_module_map["fanOut"].reset(new FanOutDAQModule<std::vector<int>>(
-      "fanOut"));
-    user_module_map["consumer1"].reset(
-      new FakeDataConsumerDAQModule("C1"));
-    user_module_map["consumer2"].reset(
-      new FakeDataConsumerDAQModule("C2"));
+    user_module_map["producer"].reset(new FakeDataProducerDAQModule("prod"));
+    user_module_map["fanOut"].reset(
+      new FanOutDAQModule<std::vector<int>>("fanOut"));
+    user_module_map["consumer1"].reset(new FakeDataConsumerDAQModule("C1"));
+    user_module_map["consumer2"].reset(new FakeDataConsumerDAQModule("C2"));
 
     command_order_map["start"] = {
       "consumer1", "consumer2", "fanOut", "producer"

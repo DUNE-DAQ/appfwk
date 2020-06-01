@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   inputbuf.push(appframework::NonCopyableType(1), queue_timeout);
   inputbuf.push(appframework::NonCopyableType(2), queue_timeout);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   foum.execute_command("stop");
 

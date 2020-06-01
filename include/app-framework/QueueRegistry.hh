@@ -30,7 +30,7 @@ struct QueueConfig
 
   static queue_kind stoqk(std::string /*name*/)
   {
-    //if (name == "StdDeQueue" || name == "std_deque")
+    // if (name == "StdDeQueue" || name == "std_deque")
     return std_deque;
   }
 

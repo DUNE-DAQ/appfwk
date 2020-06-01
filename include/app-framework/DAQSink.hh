@@ -8,8 +8,8 @@
 #ifndef DAQSOURCE_HH_
 #define DAQSOURCE_HH_
 
-#include "ers/Issue.h"
 #include "TRACE/trace.h"
+#include "ers/Issue.h"
 #include <app-framework-base/QueueI.hh>
 #include <app-framework/QueueRegistry.hh>
 #include <chrono>
@@ -44,7 +44,8 @@ DAQSink<T>::DAQSink(std::string name)
 {
   try {
     queue_ = QueueRegistry::get()->get_queue<T>(name);
-    TLOG(TLVL_TRACE, "DAQSink") << "Queue " << name << " is at " << queue_.get();
+    TLOG(TLVL_TRACE, "DAQSink")
+      << "Queue " << name << " is at " << queue_.get();
   } catch (QueueTypeMismatch& ex) {
     throw DAQSinkConstrutionFailed(ERS_HERE, name, ex);
   }

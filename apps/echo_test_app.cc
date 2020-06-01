@@ -15,8 +15,7 @@ namespace appframework {
 class echo_test_app_ModuleList : public ModuleList
 {
   // Inherited via ModuleList
-  void ConstructGraph(
-                      DAQModuleMap& user_module_map,
+  void ConstructGraph(DAQModuleMap& user_module_map,
                       CommandOrderMap& command_order_map) override
   {
     user_module_map["debugLogger"].reset(
