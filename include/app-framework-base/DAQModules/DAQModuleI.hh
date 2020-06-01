@@ -22,8 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "app-framework-base/DAQModules/DAQModuleIssues.hh"
-
 namespace appframework {
 /**
  * @brief The DAQModule class is a set of code which performs a specific task.
@@ -31,6 +29,9 @@ namespace appframework {
  * This interface defines the basic methods which all DAQModules should expose.
  * Developers implementing DAQModules should feel free to use whatever Plugins
  * and Services are necessary to accomplish their needed functionality.
+ *
+ * This header also contains the definitions of the Issues that can be 
+ * thrown by the DAQModule.
  */
 class DAQModuleI
 {
@@ -49,6 +50,40 @@ public:
   virtual void execute_command(const std::string& cmd,
                                const std::vector<std::string>& args = {}) = 0;
 };
-} // namespace appframework
+
+}  // namespace appframework
+
+#include <ers/Issue.h>
+
+  
+ERS_DECLARE_ISSUE( appframework, 
+		   GeneralDAQModuleIssue, 
+		   "General DAQModule Issue", 
+		   ERS_EMPTY
+		   )
+                    
+
+ERS_DECLARE_ISSUE_BASE( appframework, 
+			UnknownCommand,
+			GeneralDAQModuleIssue,
+			"Command " << cmd << " is not recognised", 
+			ERS_EMPTY,
+			((std::string) cmd)
+			)
+
+
+ERS_DECLARE_ISSUE_BASE( appframework, 
+			CommandFailed,
+			GeneralDAQModuleIssue,
+			"Command " << cmd << " failed to execute for reason " << reason, 
+			ERS_EMPTY, 
+			((std::string ) cmd) ((std::string) reason)
+			)
+
+
+
+
+
+
 
 #endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
