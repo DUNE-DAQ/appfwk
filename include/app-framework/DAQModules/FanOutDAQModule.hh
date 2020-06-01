@@ -14,7 +14,8 @@
 
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
 #include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
-#include "app-framework-base/Queues/Queue.hh"
+#include "app-framework/DAQSink.hh"
+#include "app-framework/DAQSource.hh"
 
 #include "TRACE/trace.h"
 
@@ -34,9 +35,7 @@ template<typename ValueType>
 class FanOutDAQModule : public DAQModuleI
 {
 public:
-  FanOutDAQModule(std::string name,
-                  std::vector<std::shared_ptr<QueueI>> inputs,
-                  std::vector<std::shared_ptr<QueueI>> outputs);
+  FanOutDAQModule(std::string name);
 
   enum class FanOutMode
   {
@@ -81,7 +80,7 @@ private:
   {
     for (auto& o : outputQueues_) {
       auto starttime = std::chrono::steady_clock::now();
-      o->push(data, queueTimeout_);
+      o->push(ValueType(data), queueTimeout_);
       auto endtime = std::chrono::steady_clock::now();
       if (std::chrono::duration_cast<decltype(queueTimeout_)>(
             endtime - starttime) > queueTimeout_) {
@@ -100,8 +99,8 @@ private:
   FanOutMode mode_;
   std::chrono::milliseconds queueTimeout_;
 
-  std::shared_ptr<QueueSource<ValueType>> inputQueue_;
-  std::list<std::shared_ptr<QueueSink<ValueType>>> outputQueues_;
+  std::unique_ptr<DAQSource<ValueType>> inputQueue_;
+  std::list<std::unique_ptr<DAQSink<ValueType>>> outputQueues_;
   size_t wait_interval_us_;
 };
 } // namespace appframework

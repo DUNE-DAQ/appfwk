@@ -1,17 +1,16 @@
 
 
-template<class T, class U>
-StdDeQueue<T, U>::StdDeQueue()
-  : fDeque()
+template<class T>
+StdDeQueue<T>::StdDeQueue(const std::string& name)
+  : QueueI<T>(name)
+  , fMaxSize(0)
+  , fDeque()
   , fSize(0)
-{
-  Configure();
-}
+{}
 
-template<class T, class U>
+template<class T>
 void
-StdDeQueue<T, U>::push(value_type&& object_to_push,
-                       const duration_type& timeout)
+StdDeQueue<T>::push(value_type&& object_to_push, const duration_type& timeout)
 {
 
   auto starttime = std::chrono::steady_clock::now();
@@ -42,9 +41,9 @@ StdDeQueue<T, U>::push(value_type&& object_to_push,
   }
 }
 
-template<class T, class U>
+template<class T>
 T
-StdDeQueue<T, U>::pop(const duration_type& timeout)
+StdDeQueue<T>::pop(const duration_type& timeout)
 {
 
   auto starttime = std::chrono::steady_clock::now();
@@ -82,10 +81,10 @@ StdDeQueue<T, U>::pop(const duration_type& timeout)
 // std::condition_variable::wait_for functions used in this class's push
 // and pop operations require an std::mutex
 
-template<class T, class U>
+template<class T>
 void
-StdDeQueue<T, U>::try_lock_for(std::unique_lock<std::mutex>& lk,
-                               const duration_type& timeout)
+StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk,
+                            const duration_type& timeout)
 {
   assert(!lk.owns_lock());
 

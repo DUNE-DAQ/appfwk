@@ -19,9 +19,8 @@ void
 DebugLoggingDAQModule::execute_command(const std::string& cmd,
                                        const std::vector<std::string>& args)
 {
-  TLOG(TLVL_INFO) << instance_name_  << ": Executing command: " << cmd << " with "
-                  << args.size()
-                  << " args";
+  TLOG(TLVL_INFO) << get_name() << ": Executing command: " << cmd
+                  << " with " << args.size() << " args";
   for (auto& a : args) {
     TLOG(TLVL_INFO) << a;
   }
@@ -29,4 +28,4 @@ DebugLoggingDAQModule::execute_command(const std::string& cmd,
 }
 } // namespace appframework
 
-DEFINE_DUNE_DAQ_MODULE(appframework::DebugLoggingDAQModule)
+DEFINE_DUNE_OBJECT(appframework::DebugLoggingDAQModule)

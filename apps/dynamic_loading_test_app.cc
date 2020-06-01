@@ -14,8 +14,9 @@
 #include <nlohmann/json.hpp>
 
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
-#include "app-framework-base/Queues/QueueI.hh"
+#include "app-framework-base/QueueI.hh"
 #include "app-framework/DAQProcess.hh"
+#include "app-framework/QueueRegistry.hh"
 
 // for convenience
 using json = nlohmann::json;
@@ -30,26 +31,23 @@ public:
   {}
 
   // Inherited via ModuleList
-  virtual void ConstructGraph(QueueMap& queue_map,
-                              DAQModuleMap& user_module_map,
+  virtual void ConstructGraph(DAQModuleMap& user_module_map,
                               CommandOrderMap& command_order_map) override
   {
+    std::map<std::string, QueueConfig> queue_configuration;
     for (auto& queue : config_["queues"].items()) {
-      queue_map[queue.key()] = makeQueue(queue.value());
+      QueueConfig qc;
+      qc.kind = qc.stoqk(queue.value()["kind"].get<std::string>());
+      qc.size = queue.value()["size"].get<size_t>();
+      queue_configuration[queue.key()] = qc;
     }
+    QueueRegistry::get()->configure(queue_configuration);
 
     for (auto& module : config_["modules"].items()) {
-      std::vector<std::shared_ptr<QueueI>> inputs;
-      for (auto& input : module.value()["inputs"]) {
-        inputs.push_back(queue_map[input]);
-      }
 
-      std::vector<std::shared_ptr<QueueI>> outputs;
-      for (auto& output : module.value()["outputs"]) {
-        outputs.push_back(queue_map[output]);
-      }
-      user_module_map[module.key()] = makeModule(
-        module.value()["user_module_type"], module.key(), inputs, outputs);
+      user_module_map[module.key()] =
+        makeModule(module.value()["user_module_type"], module.key());
+      user_module_map[module.key()]->configure(module.value());
     }
 
     for (auto& command : config_["commands"].items()) {
@@ -84,30 +82,28 @@ main(int argc, char* argv[])
     json_config = R"(
         {
             "queues": {
-                "producerToFanOut": "VectorIntStdDeQueue",
-                "fanOutToConsumer1": "VectorIntStdDeQueue",
-                "fanOutToConsumer2": "VectorIntStdDeQueue"
+                "producerToFanOut": {"size": 10, "kind": "StdDeQueue"},
+                "fanOutToConsumer1": {"size": 5, "kind": "StdDeQueue"},
+                "fanOutToConsumer2":{"size": 5, "kind": "StdDeQueue"}
             },
             "modules": {
                 "producer": {
                     "user_module_type": "FakeDataProducerDAQModule",
-                    "inputs": [],
-                    "outputs": ["producerToFanOut"]
+                    "output": "producerToFanOut"
                 },
                 "fanOut": {
                     "user_module_type": "VectorIntFanOutDAQModule",
-                    "inputs": ["producerToFanOut"],
-                    "outputs": ["fanOutToConsumer1", "fanOutToConsumer2" ]
+                    "input": "producerToFanOut",
+                    "outputs": ["fanOutToConsumer1", "fanOutToConsumer2" ],
+                    "fanout_mode": "RoundRobin"
                 },
                 "consumer1": {
                     "user_module_type": "FakeDataConsumerDAQModule",
-                    "inputs": ["fanOutToConsumer1"],
-                    "outputs": []
+                    "input": "fanOutToConsumer1"
                 },
                 "consumer2": {
                     "user_module_type": "FakeDataConsumerDAQModule",
-                    "inputs": ["fanOutToConsumer2"],
-                    "outputs": []
+                    "input": "fanOutToConsumer2"
                 }
             },
             "commands": {

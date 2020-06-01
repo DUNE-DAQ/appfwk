@@ -16,9 +16,8 @@
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 
 #include "app-framework-base/Core/ModuleList.hh"
-#include "app-framework/CommandLineInterpreter.hh"
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
-#include "app-framework-base/Queues/QueueI.hh"
+#include "app-framework/CommandLineInterpreter.hh"
 
 #include <string>
 
@@ -80,10 +79,9 @@ public:
   DAQProcess& operator=(DAQProcess&&) = delete;
 
 protected:
-  void call_command_on_module( DAQModuleI & module, const std::string & cmd ) ; 
+  void call_command_on_module(DAQModuleI& module, const std::string& cmd);
 
 private:
-  QueueMap queueMap_;               ///< String alias for each Queue
   DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule
   CommandOrderMap commandOrderMap_; ///< Order DAQModule commands by alias
 };

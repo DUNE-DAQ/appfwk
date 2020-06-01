@@ -36,12 +36,11 @@ namespace {
 // becomes available
 
 std::string queue_type = "StdDeQueue";
-auto timeout = std::chrono::microseconds(100);
+auto timeout = std::chrono::milliseconds(100);
 
 // The decltype means "Have the queue's push/pop functions expect a duration of
 // the same type as the timeout we defined"
-std::unique_ptr<appframework::StdDeQueue<int, decltype(timeout)>> queue =
-  nullptr;
+std::unique_ptr<appframework::StdDeQueue<int>> queue = nullptr;
 
 constexpr int nelements = 100;
 int n_adding_threads = 1;
@@ -65,10 +64,10 @@ std::atomic<int> throw_pops = 0;
 double initial_capacity_used = 0;
 
 auto relatively_random_seed =
-  std::chrono::duration_cast<std::chrono::microseconds>(
+  std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::system_clock::now().time_since_epoch())
     .count() %
-  1000000;
+  1000;
 std::default_random_engine generator(relatively_random_seed);
 std::unique_ptr<std::uniform_int_distribution<int>> push_distribution = nullptr;
 std::unique_ptr<std::uniform_int_distribution<int>> pop_distribution = nullptr;
@@ -80,10 +79,10 @@ add_things()
   for (int i = 0; i < nelements / n_adding_threads; ++i) {
 
     std::this_thread::sleep_for(
-      std::chrono::microseconds((*push_distribution)(generator)));
+      std::chrono::milliseconds((*push_distribution)(generator)));
 
     while (!queue->can_push()) {
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     push_attempts++;
@@ -96,7 +95,7 @@ add_things()
       TLOG(TLVL_DEBUG) << msg.str();
 
       auto starttime = std::chrono::steady_clock::now();
-      queue->push(i, timeout);
+      queue->push(std::move(i), timeout);
       if (std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - starttime) < timeout) {
         successful_pushes++;
@@ -126,10 +125,10 @@ remove_things()
   for (int i = 0; i < nelements / n_removing_threads; ++i) {
 
     std::this_thread::sleep_for(
-      std::chrono::microseconds((*pop_distribution)(generator)));
+      std::chrono::milliseconds((*pop_distribution)(generator)));
 
     while (!queue->can_pop()) {
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     pop_attempts++;
@@ -227,7 +226,7 @@ main(int argc, char* argv[])
   }
 
   if (queue_type == "StdDeQueue") {
-    queue.reset(new appframework::StdDeQueue<int, decltype(timeout)>);
+    queue.reset(new appframework::StdDeQueue<int>("StdDeQueue"));
   } else {
     TLOG(TLVL_ERROR) << "Unknown queue type \"" << queue_type
                      << "\" requested for testing";
@@ -293,13 +292,13 @@ main(int argc, char* argv[])
     << " elements between them, each thread has an average time of "
     << avg_milliseconds_between_pops << " milliseconds between pops";
 
-  /**
-   * \todo Add capacity constructor to Queue interface so that this code section
-   * makes sense
-   *
-   * ELF, May 19, 2020
-   */
-  #if 0
+/**
+ * \todo Add capacity constructor to Queue interface so that this code section
+ * makes sense
+ *
+ * ELF, May 19, 2020
+ */
+#if 0
   if (initial_capacity_used > 0) {
 
     int max_capacity = 1000000;
@@ -317,7 +316,7 @@ main(int argc, char* argv[])
       throw std::domain_error(msg.str());
     }
   }
-  #endif
+#endif
 
   std::vector<std::thread> adders;
   std::vector<std::thread> removers;

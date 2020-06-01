@@ -20,28 +20,18 @@ namespace appframework {
 class producer_consumer_test_app_ModuleList : public ModuleList
 {
   // Inherited via ModuleList
-  void ConstructGraph(QueueMap& queue_map,
-                      DAQModuleMap& user_module_map,
+  void ConstructGraph(DAQModuleMap& user_module_map,
                       CommandOrderMap& command_order_map) override
   {
-    auto producerToFanOut = std::make_shared<StdDeQueue<std::vector<int>>>();
-    auto fanOutToConsumer1 = std::make_shared<StdDeQueue<std::vector<int>>>();
-    auto fanOutToConsumer2 = std::make_shared<StdDeQueue<std::vector<int>>>();
-
-    queue_map["producerToFanOut"] = producerToFanOut;
-    queue_map["fanOutToConsumer1"] = fanOutToConsumer1;
-    queue_map["fanOutToConsumer2"] = fanOutToConsumer2;
 
     user_module_map["producer"].reset(
-      new FakeDataProducerDAQModule("prod", {}, { producerToFanOut }));
+      new FakeDataProducerDAQModule("prod"));
     user_module_map["fanOut"].reset(new FanOutDAQModule<std::vector<int>>(
-      "fanOut",
-      { producerToFanOut },
-      { fanOutToConsumer1, fanOutToConsumer2 }));
+      "fanOut"));
     user_module_map["consumer1"].reset(
-      new FakeDataConsumerDAQModule("C1", { fanOutToConsumer1 }, {}));
+      new FakeDataConsumerDAQModule("C1"));
     user_module_map["consumer2"].reset(
-      new FakeDataConsumerDAQModule("C2", { fanOutToConsumer2 }, {}));
+      new FakeDataConsumerDAQModule("C2"));
 
     command_order_map["start"] = {
       "consumer1", "consumer2", "fanOut", "producer"

@@ -1,14 +1,14 @@
 include_directories(${CMAKE_SOURCE_DIR}/app-framework/include)
 include_directories(${CMAKE_SOURCE_DIR}/app-framework-base/include)
 
-add_executable(simple_test_app simple_test_app.cc)
-target_link_libraries(simple_test_app app-framework app-framework_DebugLoggingDAQModule_duneDAQModule pthread cetlib cetlib_except ${Boost_PROGRAM_OPTIONS_LIBRARY})
+add_executable(echo_test_app echo_test_app.cc)
+target_link_libraries(echo_test_app app-framework app-framework_DebugLoggingDAQModule_duneObject pthread ers cetlib cetlib_except ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 add_executable(producer_consumer_test_app producer_consumer_test_app.cc)
-target_link_libraries(producer_consumer_test_app app-framework app-framework_FakeDataProducerDAQModule_duneDAQModule app-framework_FakeDataConsumerDAQModule_duneDAQModule pthread cetlib cetlib_except ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(producer_consumer_test_app app-framework app-framework_FakeDataProducerDAQModule_duneObject ers app-framework_FakeDataConsumerDAQModule_duneObject pthread cetlib cetlib_except ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 add_executable(dynamic_loading_test_app dynamic_loading_test_app.cc)
-target_link_libraries(dynamic_loading_test_app app-framework  pthread cetlib cetlib_except ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(dynamic_loading_test_app app-framework  pthread ers cetlib cetlib_except ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 add_executable(daq_sink_source daq_sink_source.cc)
 target_link_libraries(daq_sink_source app-framework pthread ers)

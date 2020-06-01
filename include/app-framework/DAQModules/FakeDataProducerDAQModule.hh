@@ -14,7 +14,7 @@
 
 #include "app-framework-base/DAQModules/DAQModuleI.hh"
 #include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
-#include "app-framework-base/Queues/Queue.hh"
+#include "app-framework/DAQSink.hh"
 
 #include <future>
 #include <memory>
@@ -29,9 +29,7 @@ namespace appframework {
 class FakeDataProducerDAQModule : public DAQModuleI
 {
 public:
-  FakeDataProducerDAQModule(std::string name,
-                            std::vector<std::shared_ptr<QueueI>> inputs,
-                            std::vector<std::shared_ptr<QueueI>> outputs);
+  FakeDataProducerDAQModule(std::string name);
 
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
@@ -53,7 +51,7 @@ private:
   void do_work();
 
   // Configuration
-  std::shared_ptr<QueueSink<std::vector<int>>> outputQueue_;
+  std::unique_ptr<DAQSink<std::vector<int>>> outputQueue_;
   std::chrono::milliseconds queueTimeout_;
   size_t nIntsPerVector_;
   int starting_int_;

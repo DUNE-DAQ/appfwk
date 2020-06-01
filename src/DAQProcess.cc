@@ -17,7 +17,7 @@
 #include "TRACE/trace.h"
 #define TRACE_NAME "DAQProcess" // NOLINT
 
-#include "ers/ers.h" 
+#include "ers/ers.h"
 
 #include <memory>
 #include <unordered_set>
@@ -41,7 +41,7 @@ DAQProcess::DAQProcess(CommandLineInterpreter args)
 void
 DAQProcess::register_modules(ModuleList& ml)
 {
-  ml.ConstructGraph(queueMap_, daqModuleMap_, commandOrderMap_);
+  ml.ConstructGraph(daqModuleMap_, commandOrderMap_);
 }
 
 void
@@ -57,24 +57,23 @@ DAQProcess::execute_command(std::string cmd)
 
   if (commandOrderMap_.count(cmd)) {
     for (auto& moduleName : commandOrderMap_[cmd]) {
-      if (daqModuleMap_.count(moduleName)) { 
-        
-	call_command_on_module( *daqModuleMap_[moduleName], cmd );
-     
-	daq_module_list.erase(moduleName);
+      if (daqModuleMap_.count(moduleName)) {
+
+        call_command_on_module(*daqModuleMap_[moduleName], cmd);
+
+        daq_module_list.erase(moduleName);
       }
     }
   } else {
 
-    ers::warning ( DAQIssues::CommandOrderNotSpecified( ERS_HERE, cmd ) ) ;
-
+    ers::warning(DAQIssues::CommandOrderNotSpecified(ERS_HERE, cmd));
   }
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
                    << " for all remaining DAQModules";
   for (auto const& moduleName : daq_module_list) {
 
-    call_command_on_module( *daqModuleMap_[moduleName], cmd );
+    call_command_on_module(*daqModuleMap_[moduleName], cmd);
   }
 }
 
@@ -84,16 +83,17 @@ DAQProcess::listen()
   return CommandFacility::handle().listen(this);
 }
 
-  void DAQProcess::call_command_on_module( DAQModuleI & mod, const std::string & cmd ) {
+void
+DAQProcess::call_command_on_module(DAQModuleI& mod, const std::string& cmd)
+{
 
-    try {
-      mod.execute_command( cmd ) ;
-    }
-    catch ( DAQIssues::GeneralDAQModuleIssue & ex ) {
-      ers::error( ex ) ;
-    }
-    // catch (...) {
-    //   ers::error( DAQIssues::ModuleThrowUnknown( ERS_HERE, mod.Name(), cmd ) ;
-    // }
-  } 
+  try {
+    mod.execute_command(cmd);
+  } catch (DAQIssues::GeneralDAQModuleIssue& ex) {
+    ers::error(ex);
+  }
+  // catch (...) {
+  //   ers::error( DAQIssues::ModuleThrowUnknown( ERS_HERE, mod.Name(), cmd ) ;
+  // }
+}
 } // namespace appframework

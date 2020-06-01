@@ -25,10 +25,8 @@ namespace appframework {
 class DebugLoggingDAQModule : public DAQModuleI
 {
 public:
-  DebugLoggingDAQModule(std::string name,
-                        std::vector<std::shared_ptr<QueueI>> inputs,
-                        std::vector<std::shared_ptr<QueueI>> outputs)
-    : DAQModuleI(name, inputs, outputs)
+  DebugLoggingDAQModule(std::string name)
+    : DAQModuleI(name)
   {}
 
   /**
