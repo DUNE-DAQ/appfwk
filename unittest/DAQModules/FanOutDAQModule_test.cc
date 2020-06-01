@@ -20,6 +20,24 @@ using namespace appframework;
 
 BOOST_AUTO_TEST_SUITE(FanOutDAQModule_test)
 
+struct FanOutDAQModuleTestFixture {
+  FanOutDAQModuleTestFixture() {}
+  void setup() {
+
+    std::map<std::string, QueueConfig> queue_config;
+    queue_config["input"].kind = QueueConfig::std_deque;
+    queue_config["input"].size = 10;
+    queue_config["output1"].kind = QueueConfig::std_deque;
+    queue_config["output1"].size = 5;
+    queue_config["output2"].kind = QueueConfig::std_deque;
+    queue_config["output2"].size = 5;
+
+    QueueRegistry::get()->configure(queue_config);
+  }
+};
+
+BOOST_TEST_GLOBAL_FIXTURE(FanOutDAQModuleTestFixture);
+
 BOOST_AUTO_TEST_CASE(Construct)
 {
   appframework::FanOutDAQModule<int> foum("test");
@@ -27,7 +45,11 @@ BOOST_AUTO_TEST_CASE(Construct)
 
 BOOST_AUTO_TEST_CASE(Configure)
 {
-  appframework::FanOutDAQModule<int> foum("test");
+  appframework::FanOutDAQModule<appframework::NonCopyableType> foum("test");
+
+  auto config = R"({"input": "input"})"_json;
+  foum.configure(config);
+
   foum.execute_command("configure");
 }
 
@@ -35,15 +57,6 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
 {
   appframework::FanOutDAQModule<appframework::NonCopyableType> foum("test");
 
-  std::map<std::string, QueueConfig> queue_config;
-  queue_config["input"].kind = QueueConfig::std_deque;
-  queue_config["input"].size = 10;
-  queue_config["output1"].kind = QueueConfig::std_deque;
-  queue_config["output1"].size = 5;
-  queue_config["output2"].kind = QueueConfig::std_deque;
-  queue_config["output2"].size = 5;
-
-  QueueRegistry::get()->configure(queue_config);
 
   nlohmann::json module_config = R"(
         {
