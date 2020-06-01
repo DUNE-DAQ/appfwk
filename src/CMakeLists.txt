@@ -3,7 +3,7 @@ file(GLOB source_files *.cc)
 
 list(FILTER source_files EXCLUDE REGEX "QueryResponseCommandFacility.cc")
 add_library(app-framework SHARED ${source_files})
-target_link_libraries(app-framework cetlib cetlib_except)
+target_link_libraries(app-framework ${CETLIB} ${CETLIB_EXCEPT})
 
 add_subdirectory(DAQModules)
 
