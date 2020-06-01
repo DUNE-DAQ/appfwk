@@ -18,7 +18,7 @@
 
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
-    
+
 #include <string>
 #include <vector>
 
@@ -68,8 +68,7 @@ protected:
 };
 
 inline std::shared_ptr<DAQModuleI>
-makeModule(std::string const& plugin_name,
-                std::string const& instance_name)
+makeModule(std::string const& plugin_name, std::string const& instance_name)
 {
   auto namedObject = makeNamedObject(plugin_name, instance_name);
   return std::dynamic_pointer_cast<DAQModuleI>(namedObject);

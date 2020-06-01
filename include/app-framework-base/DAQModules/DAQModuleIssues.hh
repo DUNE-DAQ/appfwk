@@ -1,7 +1,7 @@
 /**
  * @file DAQModule Issues definition
  *
- * This is the files that implements the some generic ERS issues that can be 
+ * This is the files that implements the some generic ERS issues that can be
  * reported by a DAQModule
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -18,24 +18,24 @@
 
 namespace appframework {
 
-ERS_DECLARE_ISSUE( DAQIssues, 
-		   GeneralDAQModuleIssue, 
-		   "General DAQModule Issue", 
+ERS_DECLARE_ISSUE(DAQIssues,
+                  GeneralDAQModuleIssue,
+                  "General DAQModule Issue",
                   ERS_EMPTY)
 
-ERS_DECLARE_ISSUE_BASE( DAQIssues, 
-  			UnknownCommand,
-  			GeneralDAQModuleIssue,
-  			"Command " << cmd << " is not recognised", 
-			ERS_EMPTY,
+ERS_DECLARE_ISSUE_BASE(DAQIssues,
+                       UnknownCommand,
+                       GeneralDAQModuleIssue,
+                       "Command " << cmd << " is not recognised",
+                       ERS_EMPTY,
                        ((std::string)cmd))
 
-ERS_DECLARE_ISSUE_BASE( DAQIssues, 
-  			CommandFailed,
-  			GeneralDAQModuleIssue,
+ERS_DECLARE_ISSUE_BASE(DAQIssues,
+                       CommandFailed,
+                       GeneralDAQModuleIssue,
                        "Command " << cmd << " failed to execute for reason "
                                   << reason,
- 			ERS_EMPTY, 
+                       ERS_EMPTY,
                        ((std::string)cmd)((std::string)reason))
 
 }

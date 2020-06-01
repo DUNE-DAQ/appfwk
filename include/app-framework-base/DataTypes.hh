@@ -22,19 +22,19 @@ struct NonCopyableType
   }
 };
 
- template<typename T>
+template<typename T>
 std::string
 GetClassName(std::string base)
 {
   return "UNKNWON" + base;
 }
- template<>
+template<>
 std::string
 GetClassName<std::vector<int>>(std::string base)
 {
   return "VectorInt" + base;
 }
- template<>
+template<>
 std::string
 GetClassName<std::string>(std::string base)
 {
