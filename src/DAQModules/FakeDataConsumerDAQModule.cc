@@ -31,11 +31,14 @@ appframework::FakeDataConsumerDAQModule::execute_command(
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
   }
-  if (cmd == "start" || cmd == "Start") {
+  else if (cmd == "start" || cmd == "Start") {
     do_start();
   }
-  if (cmd == "stop" || cmd == "Stop") {
+  else if (cmd == "stop" || cmd == "Stop") {
     do_stop();
+  }
+  else {
+    throw UnknownCommand( ERS_HERE, cmd ) ;
   }
 }
 

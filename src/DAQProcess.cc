@@ -7,7 +7,6 @@
  */
 
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/DAQProcessIssues.hh"
 
 #include "app-framework-base/Services/CommandFacility.hh"
 #include "app-framework-base/Services/ConfigurationManager.hh"
@@ -66,7 +65,7 @@ DAQProcess::execute_command(std::string cmd)
     }
   } else {
 
-    ers::warning(DAQIssues::CommandOrderNotSpecified(ERS_HERE, cmd));
+    ers::warning(CommandOrderNotSpecified(ERS_HERE, cmd));
   }
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
@@ -89,7 +88,7 @@ DAQProcess::call_command_on_module(DAQModuleI& mod, const std::string& cmd)
 
   try {
     mod.execute_command(cmd);
-  } catch (DAQIssues::GeneralDAQModuleIssue& ex) {
+  } catch (GeneralDAQModuleIssue& ex) {
     ers::error(ex);
   }
   // catch (...) {

@@ -87,4 +87,42 @@ private:
 };
 } // namespace appframework
 
+
+ERS_DECLARE_ISSUE( appframework, 
+                   DAQProcessIssue, 
+                   "General DAQProcess Issue", 
+                   ERS_EMPTY
+                   )
+                    
+
+ERS_DECLARE_ISSUE_BASE( appframework, 
+                        CommandOrderNotSpecified,
+                        DAQProcessIssue,
+                        "Command " << cmd << " does not have a specified propagation order ",
+                        ERS_EMPTY,
+                        ((std::string) cmd)
+                        )
+
+
+
+ERS_DECLARE_ISSUE_BASE( appframework, 
+                        ModuleThrowUknown,
+                        DAQProcessIssue,
+                        "Module " << mod_name << " threw an unknown exception after command " << cmd, 
+                        ERS_EMPTY, 
+                        ((std::string) mod_name) ((std::string) cmd)
+                        )
+
+
+ERS_DECLARE_ISSUE_BASE( appframework, 
+                        ModuleThowStd,
+                        DAQProcessIssue,
+                        "Module " << mod_name << " threw an std::exception after command " << cmd, 
+                        ERS_EMPTY, 
+                        ((std::string ) mod_name) ((std::string) cmd)
+                        )
+
+
+
+
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
