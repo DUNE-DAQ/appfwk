@@ -34,12 +34,12 @@ class producer_consumer_test_app_ModuleList : public ModuleList
     QueueRegistry::get()->configure(queue_configuration);
 
     auto producerConfig = R"({ "output" : "producerToFanOut" })"_json;
-    auto fanOutConfig = R"({ "input" : "producerToFanOut", "outputs" : [ "fanOutToConsumer1", "fanOutToConsumer2" ], "fanout_mode" : "RoundRobin" })"_json;
+    auto fanOutConfig =
+      R"({ "input" : "producerToFanOut", "outputs" : [ "fanOutToConsumer1", "fanOutToConsumer2" ], "fanout_mode" : "RoundRobin" })"_json;
     auto consumer1Config = R"({ "input" : "fanOutToConsumer1" })"_json;
     auto consumer2Config = R"({ "input" : "fanOutToConsumer2" })"_json;
 
-    user_module_map["producer"]
-      .reset(new FakeDataProducerDAQModule("prod"));
+    user_module_map["producer"].reset(new FakeDataProducerDAQModule("prod"));
     user_module_map["producer"]->configure(producerConfig);
     user_module_map["fanOut"].reset(
       new FanOutDAQModule<std::vector<int>>("fanOut"));

@@ -20,9 +20,11 @@ using namespace appframework;
 
 BOOST_AUTO_TEST_SUITE(FanOutDAQModule_test)
 
-struct FanOutDAQModuleTestFixture {
+struct FanOutDAQModuleTestFixture
+{
   FanOutDAQModuleTestFixture() {}
-  void setup() {
+  void setup()
+  {
 
     std::map<std::string, QueueConfig> queue_config;
     queue_config["input"].kind = QueueConfig::std_deque;
@@ -56,7 +58,6 @@ BOOST_AUTO_TEST_CASE(Configure)
 BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
 {
   appframework::FanOutDAQModule<appframework::NonCopyableType> foum("test");
-
 
   nlohmann::json module_config = R"(
         {

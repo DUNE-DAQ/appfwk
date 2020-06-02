@@ -29,15 +29,12 @@ appframework::FakeDataProducerDAQModule::execute_command(
 {
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
-  }
-  else if (cmd == "start" || cmd == "Start") {
+  } else if (cmd == "start" || cmd == "Start") {
     do_start();
-  }
-  else if (cmd == "stop" || cmd == "Stop") {
+  } else if (cmd == "stop" || cmd == "Stop") {
     do_stop();
-  }
-  else {
-    throw UnknownCommand( ERS_HERE, cmd ) ;
+  } else {
+    throw UnknownCommand(ERS_HERE, cmd);
   }
 }
 
