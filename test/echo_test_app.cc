@@ -7,7 +7,7 @@
  */
 
 #include "app-framework/CommandLineInterpreter.hh"
-#include "app-framework/DAQModules/DebugLoggingDAQModule.hh"
+#include "DebugLoggingDAQModule.hh"
 #include "app-framework/DAQProcess.hh"
 
 namespace appframework {

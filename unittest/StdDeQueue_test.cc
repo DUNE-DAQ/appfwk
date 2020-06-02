@@ -7,7 +7,7 @@
  * received with this code.
  */
 
-#include "app-framework/Queues/StdDeQueue.hh"
+#include "app-framework/StdDeQueue.hh"
 
 #define BOOST_TEST_MODULE StdDeQueue_test // NOLINT
 #include <boost/test/included/unit_test.hpp>

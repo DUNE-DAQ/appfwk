@@ -2,7 +2,7 @@
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
 
 #include "app-framework/NamedObject.hh"
-#include "app-framework/Queues/StdDeQueue.hh"
+#include "app-framework/StdDeQueue.hh"
 #include "ers/Issue.h"
 #include <map>
 #include <memory>

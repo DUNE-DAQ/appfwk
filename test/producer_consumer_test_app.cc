@@ -6,11 +6,11 @@
  * received with this code.
  */
 
-#include "app-framework/DAQModules/FakeDataConsumerDAQModule.hh"
-#include "app-framework/DAQModules/FakeDataProducerDAQModule.hh"
-#include "app-framework/DAQModules/FanOutDAQModule.hh"
+#include "FakeDataConsumerDAQModule.hh"
+#include "FakeDataProducerDAQModule.hh"
+#include "app-framework/FanOutDAQModule.hh"
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/Queues/StdDeQueue.hh"
+#include "app-framework/StdDeQueue.hh"
 
 #include <memory>
 #include <vector>

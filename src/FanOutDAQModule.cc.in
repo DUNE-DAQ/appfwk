@@ -1,4 +1,4 @@
-#include "app-framework/DAQModules/FanOutDAQModule.hh"
+#include "app-framework/FanOutDAQModule.hh"
 
 namespace appframework {
 

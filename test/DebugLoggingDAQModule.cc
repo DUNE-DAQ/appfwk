@@ -6,9 +6,9 @@
  * received with this code.
  */
 
-#include "app-framework/DAQModules/DebugLoggingDAQModule.hh"
+#include "DebugLoggingDAQModule.hh"
 
-#include "app-framework/Services/Logger.hh"
+#include "app-framework/Logger.hh"
 
 #include "TRACE/trace.h"
 

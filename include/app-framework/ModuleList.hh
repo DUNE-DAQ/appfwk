@@ -9,7 +9,7 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
 
-#include "app-framework/DAQModules/DAQModuleI.hh"
+#include "app-framework/DAQModuleI.hh"
 
 #include <list>
 #include <map>

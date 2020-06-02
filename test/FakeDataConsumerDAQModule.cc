@@ -6,7 +6,7 @@
  * received with this code.
  */
 
-#include "app-framework/DAQModules/FakeDataConsumerDAQModule.hh"
+#include "FakeDataConsumerDAQModule.hh"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "FakeDataConsumer" // NOLINT

@@ -12,7 +12,7 @@
  * received with this code.
  */
 
-#include "app-framework/Queues/StdDeQueue.hh"
+#include "app-framework/StdDeQueue.hh"
 
 #include "TRACE/trace.h"
 

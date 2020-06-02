@@ -1,7 +1,7 @@
-#include "app-framework/Services/CommandFacility.hh"
+#include "app-framework/CommandFacility.hh"
 #include "app-framework/DAQSink.hh"
 #include "app-framework/DAQSource.hh"
-#include "app-framework/Queues/StdDeQueue.hh"
+#include "app-framework/StdDeQueue.hh"
 #include "ers/ers.h"
 
 namespace appframework {

@@ -8,10 +8,8 @@
 
 #include "app-framework/DAQProcess.hh"
 
-#include "app-framework/Services/CommandFacility.hh"
-#include "app-framework/Services/ConfigurationManager.hh"
-#include "app-framework/Services/Logger.hh"
-#include "app-framework/Services/ServiceManager.hh"
+#include "app-framework/CommandFacility.hh"
+#include "app-framework/Logger.hh"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "DAQProcess" // NOLINT
@@ -22,8 +20,6 @@
 #include <unordered_set>
 
 namespace appframework {
-std::unique_ptr<ServiceManager> ServiceManager::handle_ = nullptr;
-std::unique_ptr<ConfigurationManager> ConfigurationManager::handle_ = nullptr;
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
 DAQProcess::DAQProcess(CommandLineInterpreter args)
@@ -32,9 +28,6 @@ DAQProcess::DAQProcess(CommandLineInterpreter args)
     makeCommandFacility(args.commandFacilityPluginName));
   Logger::setup(args.otherOptions);
   CommandFacility::setup(args.otherOptions);
-  ConfigurationManager::setup(args.configurationManagerPluginName,
-                              args.otherOptions);
-  ServiceManager::setup(args.servicePluginNames, args.otherOptions);
 }
 
 void

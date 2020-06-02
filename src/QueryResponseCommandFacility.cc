@@ -6,7 +6,7 @@
  * received with this code.
  */
 
-#include "app-framework/QueryResponseCommandFacility.hh"
+#include "QueryResponseCommandFacility.hh"
 
 #include <iostream>
 

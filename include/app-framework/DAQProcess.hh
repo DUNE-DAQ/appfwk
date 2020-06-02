@@ -15,8 +15,8 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 
-#include "app-framework/Core/ModuleList.hh"
-#include "app-framework/DAQModules/DAQModuleI.hh"
+#include "app-framework/ModuleList.hh"
+#include "app-framework/DAQModuleI.hh"
 #include "app-framework/CommandLineInterpreter.hh"
 
 #include <string>
