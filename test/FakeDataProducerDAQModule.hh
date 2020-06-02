@@ -1,5 +1,5 @@
 /**
- * @file The FakeDataProducerDAQModule class interface
+ * @file FakeDataProducerDAQModule.hh
  *
  * FakeDataProducerDAQModule is a simple DAQModule implementation that simply
  * logs the fact that it received a command from DAQProcess.
@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
+#ifndef APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HH_
+#define APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HH_
 
 #include "app-framework/DAQModuleI.hh"
 #include "app-framework/DAQModuleThreadHelper.hh"
@@ -29,7 +29,7 @@ namespace appframework {
 class FakeDataProducerDAQModule : public DAQModuleI
 {
 public:
-  FakeDataProducerDAQModule(std::string name);
+  explicit FakeDataProducerDAQModule(std::string name);
 
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
@@ -61,4 +61,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
+#endif // APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HH_

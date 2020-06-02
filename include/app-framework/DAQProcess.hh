@@ -1,5 +1,5 @@
 /**
- * @file DAQProcess class interface
+ * @file DAQProcess.hh DAQProcess class declaration
  *
  * DAQProcess is the central container for instantiated DAQModules and Queues
  * within a DAQ Application. It loads a ModuleList which defines the graph of
@@ -62,7 +62,8 @@ public:
    * that list in the order specified. Then, any remaining DAQModules will
    * receive the command in an unspecified order.
    */
-  void execute_command(std::string cmd);
+  void execute_command(std::string const& cmd,
+                       std::vector<std::string> const& args = {});
   /**
    * @brief Start the CommandFacility listener
    * @return Return code from listener
@@ -79,7 +80,7 @@ public:
   DAQProcess& operator=(DAQProcess&&) = delete;
 
 protected:
-  void call_command_on_module(DAQModuleI& module, const std::string& cmd);
+  void call_command_on_module(DAQModuleI& module, const std::string& cmd, std::vector<std::string> const& args);
 
 private:
   DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule

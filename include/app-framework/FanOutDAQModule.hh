@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
 
 #include "app-framework/DAQModuleI.hh"
 #include "app-framework/DAQModuleThreadHelper.hh"
@@ -55,7 +55,7 @@ template<typename ValueType>
 class FanOutDAQModule : public DAQModuleI
 {
 public:
-  FanOutDAQModule(std::string name);
+  explicit FanOutDAQModule(std::string name);
 
   enum class FanOutMode
   {
@@ -66,8 +66,9 @@ public:
   };
 
   /**
-   * @brief Logs the reception of the command
+   * @brief Execute a command from DAQProcess
    * @param cmd Command from DAQProcess
+   * @param args Arguments for the command from DAQProcess
    */
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
@@ -127,4 +128,4 @@ private:
 
 #include "detail/FanOutDAQModule.icc"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_

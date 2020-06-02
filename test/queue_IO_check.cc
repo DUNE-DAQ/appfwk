@@ -63,6 +63,9 @@ std::atomic<int> throw_pops = 0;
 
 double initial_capacity_used = 0;
 
+/**
+ * @brief A time-based seed for the random number generators
+*/
 auto relatively_random_seed =
   std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::system_clock::now().time_since_epoch())
@@ -99,7 +102,7 @@ add_things()
       if (std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - starttime) < timeout) {
         successful_pushes++;
-        auto size = ++queue_size;
+        auto size = queue_size.fetch_add(1) + 1; // fetch_add returns previous value
         if (size > max_queue_size) {
           max_queue_size = size;
         }

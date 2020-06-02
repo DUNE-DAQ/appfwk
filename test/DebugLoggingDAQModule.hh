@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
+#ifndef APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
+#define APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
 
 #include "app-framework/DAQModuleI.hh"
 
@@ -25,17 +25,18 @@ namespace appframework {
 class DebugLoggingDAQModule : public DAQModuleI
 {
 public:
-  DebugLoggingDAQModule(std::string name)
+  explicit DebugLoggingDAQModule(std::string name)
     : DAQModuleI(name)
   {}
 
   /**
-   * @brief Logs the reception of the command
+   * @brief Execute a command from DAQProcess
    * @param cmd Command from DAQProcess
+   * @param args Arguments for the command from DAQProcess
    */
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
+#endif // APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_

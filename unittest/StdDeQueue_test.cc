@@ -1,6 +1,6 @@
 /**
  *
- * @file StdDeQueue class Unit Tests
+ * @file StdDeQueue_test.cc StdDeQueue class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -23,9 +23,16 @@ namespace {
 constexpr int max_testable_capacity = 1000000000;
 constexpr double fractional_timeout_tolerance = 0.1;
 
-// Don't set the timeout to zero, otherwise the tests will fail since they'd
-// expect the push/pop functions to execute instananeously
+/**
+ * @brief Timeout to use for tests
+ *
+ * Don't set the timeout to zero, otherwise the tests will fail since they'd
+ * expect the push/pop functions to execute instananeously
+ */
 constexpr auto timeout = std::chrono::milliseconds(1);
+/**
+ * @brief Timeout expressed in microseconds
+*/
 constexpr auto timeout_in_us =
   std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 

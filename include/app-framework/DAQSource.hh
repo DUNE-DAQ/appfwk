@@ -1,12 +1,13 @@
-/*
- * DAQSource.hh
+/**
+ * @file DAQSource.hh DAQSource class interface
  *
- *  Created on: 20 May 2020
- *      Author: glehmann
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
  */
 
-#ifndef DAQSINK_HH_
-#define DAQSINK_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
@@ -32,7 +33,7 @@ public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
-  DAQSource(std::string name);
+  explicit DAQSource(std::string name);
   T pop(const duration_type& timeout = duration_type::zero());
   bool can_pop();
 
@@ -68,4 +69,4 @@ DAQSource<T>::can_pop()
 
 } // namespace appframework
 
-#endif /* DAQSINK_HH_ */
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_

@@ -1,5 +1,5 @@
 /**
- * @file The DAQModuleThreadHelper class interface
+ * @file DAQModuleThreadHelper.hh DAQModuleThreadHelper class declarations
  *
  * DAQModuleThreadHelper defines a std::thread which runs the do_work()
  * function as well as methods to start and stop that thread.
@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULETHREADHELPER_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULETHREADHELPER_HH_
 
 #include <functional>
 #include <future>
@@ -85,4 +85,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULETHREADHELPER_HH_

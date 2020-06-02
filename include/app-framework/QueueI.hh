@@ -6,8 +6,10 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_QUEUES_QUEUEI_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_QUEUES_QUEUEI_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEI_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEI_HH_
+
+#include "app-framework/NamedObject.hh"
 
 #include <chrono>
 #include <cstddef>
@@ -15,7 +17,6 @@
 #include <string>
 #include <vector>
 
-#include "app-framework/NamedObject.hh"
 
 namespace appframework {
 
@@ -33,7 +34,7 @@ public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
-  QueueI(std::string name)
+  explicit QueueI(std::string name)
     : NamedObject(name)
   {}
 
@@ -54,4 +55,4 @@ private:
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_QUEUES_QUEUEI_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEI_HH_

@@ -1,5 +1,5 @@
 /**
- * @file The FakeDataConsumerDAQModule class implementation
+ * @file FakeDataConsumerDAQModule.cc FakeDataConsumerDAQModule class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -26,7 +26,7 @@ appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
 void
 appframework::FakeDataConsumerDAQModule::execute_command(
   const std::string& cmd,
-  const std::vector<std::string>& /*args*/)
+  const std::vector<std::string>& args)
 {
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();

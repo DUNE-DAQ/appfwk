@@ -1,37 +1,45 @@
 /**
- * @file dynamic_loading_test_app to demonstrate loading Queues and DAQModules
- * from a configuration file
+ * @file daq_application.cc Main Application for the DAQ Framework, loads
+ * DAQModules based on json configuration file
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
+#include "app-framework/DAQModuleI.hh"
+#include "app-framework/DAQProcess.hh"
+#include "app-framework/QueueI.hh"
+#include "app-framework/QueueRegistry.hh"
+
+#include <nlohmann/json.hpp>
+
 #include <fstream>
 #include <memory>
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
-#include "app-framework/DAQModuleI.hh"
-#include "app-framework/QueueI.hh"
-#include "app-framework/DAQProcess.hh"
-#include "app-framework/QueueRegistry.hh"
-
-// for convenience
+/**
+ * @brief Using namespace for convenience
+ */
 using json = nlohmann::json;
 
 namespace appframework {
-
-class dynamic_loading_test_app_ModuleList : public ModuleList
+/**
+ * @brief ModuleList for daq_application
+ */
+class daq_application_ModuleList : public ModuleList
 {
 public:
-  dynamic_loading_test_app_ModuleList(json config_json)
+  /**
+   * @brief Constructor for the daq_application_ModuleList
+   * @param config_json Configuration file to be used to create the DAQModule graph
+   */
+  explicit daq_application_ModuleList(json config_json)
     : config_(config_json)
   {}
 
   // Inherited via ModuleList
-  virtual void ConstructGraph(DAQModuleMap& user_module_map,
+  void ConstructGraph(DAQModuleMap& user_module_map,
                               CommandOrderMap& command_order_map) override
   {
     std::map<std::string, QueueConfig> queue_configuration;
@@ -64,6 +72,12 @@ private:
 };
 } // namespace appframework
 
+/**
+ * @brief Entry point for daq_application
+ * @param argc Number of arguments
+ * @param argv Arguments
+ * @return Status Code
+*/
 int
 main(int argc, char* argv[])
 {
@@ -114,7 +128,7 @@ main(int argc, char* argv[])
     )"_json;
   }
 
-  appframework::dynamic_loading_test_app_ModuleList ml(json_config);
+  appframework::daq_application_ModuleList ml(json_config);
   theDAQProcess.register_modules(ml);
 
   return theDAQProcess.listen();

@@ -1,5 +1,5 @@
 /**
- * @file DAQModule Class Interface
+ * @file DAQModuleI.hh DAQModule Class Interface
  *
  * The DAQModule interface defines the required functionality for all
  * DAQModules that use the Application Framework. DAQModules are defined as "a
@@ -16,24 +16,29 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
-
-#include <string>
-#include <vector>
-
-#include <nlohmann/json.hpp>
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULEI_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULEI_HH_
 
 #include "app-framework/NamedObject.hh"
 
-#include "cetlib/BasicPluginFactory.h"
-#include "cetlib/compiler_macros.h"
+#include <cetlib/BasicPluginFactory.h>
+#include <cetlib/compiler_macros.h>
+#include <nlohmann/json.hpp>
+
+#include <memory>
+#include <string>
+#include <vector>
+
 #ifndef EXTERN_C_FUNC_DECLARE_START
 #define EXTERN_C_FUNC_DECLARE_START                                            \
   extern "C"                                                                   \
   {
 #endif
 
+/**
+ * @brief Declare the function that will be called by the plugin loader
+ * @param klass Class to be defined as a DUNE DAQ Module
+ */
 #define DEFINE_DUNE_DAQ_MODULE(klass)                                          \
   EXTERN_C_FUNC_DECLARE_START                                                  \
   std::shared_ptr<appframework::DAQModuleI> make(std::string n)                \
@@ -60,30 +65,51 @@ namespace appframework {
 class DAQModuleI : public NamedObject
 {
 public:
-  DAQModuleI(std::string name)
+  /**
+   * @brief DAQModuleI Constructor
+   * @param name Name of the DAQModule
+   */
+  explicit DAQModuleI(std::string name)
     : NamedObject(name)
   {}
 
+  /**
+   * @brief Set the configuration for the DAQModule
+   * @param config JSON Configuration for the DAQModule
+   *
+   * This function is a placeholder; once CCM is implemented more completely, it
+   * will not continue to be part of the application framework. DAQModule
+   * developers should not assume that it will be accessible in the future.
+   */
   void configure(json config) { configuration_ = config; }
 
   /**
    * @brief Execute a command in this DAQModuleI
    * @param cmd The command from CCM
+   * @param args Arguments for the command from CCM
    * @return String with detailed status of the command (future).
    *
    * execute_command is the single entry point for DAQProcess to pass CCM
    * commands to DAQModules. The implementation of this function should route
    * accepted commands to the appropriate functions within the DAQModuleI.
-   *  Non-accepted commands or failure should return an std::exception
+   *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
   virtual void execute_command(const std::string& cmd,
-                               const std::vector<std::string>& args = {}) = 0;
+                               const std::vector<std::string>& args) = 0;
 
 protected:
-  json configuration_;
+  json configuration_; ///< JSON configuration for the DAQModule
 };
 
+/**
+ * @brief Load a DAQModule plugin and return a shared_ptr to the contained
+ * DAQModule class
+ * @param plugin_name Name of the plugin, e.g. DebugLoggingDAQModule
+ * @param instance_name Name of the returned DAQModule instance, e.g.
+ * DebugLogger1
+ * @return shared_ptr to created DAQModule instance
+ */
 inline std::shared_ptr<DAQModuleI>
 makeModule(std::string const& plugin_name, std::string const& instance_name)
 {
@@ -97,11 +123,17 @@ makeModule(std::string const& plugin_name, std::string const& instance_name)
 
 #include <ers/Issue.h>
 
+/**
+ * @brief A generic DAQModule ERS Issue
+ */
 ERS_DECLARE_ISSUE(appframework,
                   GeneralDAQModuleIssue,
                   "General DAQModule Issue",
                   ERS_EMPTY)
 
+/**
+ * @brief The UnknownCommand DAQModule ERS Issue
+ */
 ERS_DECLARE_ISSUE_BASE(appframework,
                        UnknownCommand,
                        GeneralDAQModuleIssue,
@@ -109,6 +141,9 @@ ERS_DECLARE_ISSUE_BASE(appframework,
                        ERS_EMPTY,
                        ((std::string)cmd))
 
+/**
+ * @brief The CommandFailed DAQModule ERS Issue
+ */
 ERS_DECLARE_ISSUE_BASE(appframework,
                        CommandFailed,
                        GeneralDAQModuleIssue,
@@ -117,4 +152,4 @@ ERS_DECLARE_ISSUE_BASE(appframework,
                        ERS_EMPTY,
                        ((std::string)cmd)((std::string)reason))
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULEI_HH_

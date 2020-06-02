@@ -1,3 +1,11 @@
+/**
+ * @file QueueRegistry.hh The QueueRegistry class declarations
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
+ */
+
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
 
@@ -48,7 +56,11 @@ public:
   template<typename T>
   std::shared_ptr<QueueI<T>> get_queue(std::string name);
 
-  void configure(const std::map<std::string, QueueConfig>&);
+  /**
+   * @brief Configure the QueueRegistry
+   * @param configmap Map relating Queue names to their configurations
+  */
+  void configure(const std::map<std::string, QueueConfig>& configmap);
 
 private:
   struct QueueEntry
@@ -78,6 +90,6 @@ private:
 
 } // namespace appframework
 
-#include "QueueRegistry.icc"
+#include "detail/QueueRegistry.icc"
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_

@@ -27,7 +27,7 @@ DAQProcess::DAQProcess(CommandLineInterpreter args)
   CommandFacility::setHandle(
     makeCommandFacility(args.commandFacilityPluginName));
   Logger::setup(args.otherOptions);
-  CommandFacility::setup(args.otherOptions);
+  CommandFacility::handle().setup(args.otherOptions);
 }
 
 void
@@ -37,7 +37,8 @@ DAQProcess::register_modules(ModuleList& ml)
 }
 
 void
-DAQProcess::execute_command(std::string cmd)
+DAQProcess::execute_command(std::string const& cmd,
+                            std::vector<std::string> const& args)
 {
   std::unordered_set<std::string> daq_module_list;
   for (auto const& dm : daqModuleMap_) {
@@ -51,7 +52,7 @@ DAQProcess::execute_command(std::string cmd)
     for (auto& moduleName : commandOrderMap_[cmd]) {
       if (daqModuleMap_.count(moduleName)) {
 
-        call_command_on_module(*daqModuleMap_[moduleName], cmd);
+        call_command_on_module(*daqModuleMap_[moduleName], cmd, args);
 
         daq_module_list.erase(moduleName);
       }
@@ -65,7 +66,7 @@ DAQProcess::execute_command(std::string cmd)
                    << " for all remaining DAQModules";
   for (auto const& moduleName : daq_module_list) {
 
-    call_command_on_module(*daqModuleMap_[moduleName], cmd);
+    call_command_on_module(*daqModuleMap_[moduleName], cmd, args);
   }
 }
 
@@ -76,11 +77,13 @@ DAQProcess::listen()
 }
 
 void
-DAQProcess::call_command_on_module(DAQModuleI& mod, const std::string& cmd)
+DAQProcess::call_command_on_module(DAQModuleI& mod,
+                                   const std::string& cmd,
+                                   std::vector<std::string> const& args)
 {
 
   try {
-    mod.execute_command(cmd);
+    mod.execute_command(cmd, args);
   } catch (GeneralDAQModuleIssue& ex) {
     ers::error(ex);
   }

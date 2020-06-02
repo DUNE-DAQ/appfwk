@@ -1,5 +1,5 @@
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_NAMEDSTDDEQUEUE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_NAMEDSTDDEQUEUE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HH_
 
 /**
  *
@@ -41,7 +41,7 @@ public:
 
   // using QueueSink<T, DurationType>::push;
 
-  StdDeQueue(const std::string& name);
+  explicit StdDeQueue(const std::string& name);
 
   bool can_pop() const noexcept override { return fSize.load() > 0; }
   value_type pop(const duration_type&)
@@ -78,4 +78,4 @@ private:
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_NAMEDSTDDEQUEUE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HH_

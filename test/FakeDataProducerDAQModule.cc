@@ -1,5 +1,5 @@
 /**
- * @file The FakeDataProducerDAQModule class implementation
+ * @file FakeDataProducerDAQModule.cc FakeDataProducerDAQModule class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <thread>
+#include <utility>
 
 #include <TRACE/trace.h>
 #define TRACE_NAME "FakeDataProducer" // NOLINT
@@ -25,7 +26,7 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
 void
 appframework::FakeDataProducerDAQModule::execute_command(
   const std::string& cmd,
-  const std::vector<std::string>& /*args*/)
+  const std::vector<std::string>& args)
 {
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
