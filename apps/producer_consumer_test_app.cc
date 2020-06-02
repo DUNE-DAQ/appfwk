@@ -10,7 +10,6 @@
 #include "app-framework/DAQModules/FakeDataProducerDAQModule.hh"
 #include "app-framework/DAQModules/FanOutDAQModule.hh"
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/QueryResponseCommandFacility.hh"
 #include "app-framework/Queues/StdDeQueue.hh"
 
 #include <memory>
@@ -18,32 +17,37 @@
 
 namespace appframework {
 
-std::unique_ptr<CommandFacility> CommandFacility::handle_ =
-  std::unique_ptr<CommandFacility>(new QueryResponseCommandFacility());
-
 class producer_consumer_test_app_ModuleList : public ModuleList
 {
   // Inherited via ModuleList
-  void ConstructGraph(QueueMap& queue_map,
-                      DAQModuleMap& user_module_map,
+  void ConstructGraph(DAQModuleMap& user_module_map,
                       CommandOrderMap& command_order_map) override
   {
-    auto producerToFanOut = std::make_shared<StdDeQueue<std::vector<int>>>();
-    auto fanOutToConsumer1 = std::make_shared<StdDeQueue<std::vector<int>>>();
-    auto fanOutToConsumer2 = std::make_shared<StdDeQueue<std::vector<int>>>();
 
-    queue_map["producerToFanOut"] = producerToFanOut;
-    queue_map["fanOutToConsumer1"] = fanOutToConsumer1;
-    queue_map["fanOutToConsumer2"] = fanOutToConsumer2;
+    std::map<std::string, QueueConfig> queue_configuration;
+    queue_configuration["producerToFanOut"].kind = QueueConfig::std_deque;
+    queue_configuration["producerToFanOut"].size = 10;
+    queue_configuration["fanOutToConsumer1"].kind = QueueConfig::std_deque;
+    queue_configuration["fanOutToConsumer1"].size = 5;
+    queue_configuration["fanOutToConsumer2"].kind = QueueConfig::std_deque;
+    queue_configuration["fanOutToConsumer2"].size = 5;
+    QueueRegistry::get()->configure(queue_configuration);
 
-    user_module_map["producer"].reset(
-      new FakeDataProducerDAQModule(producerToFanOut));
-    user_module_map["fanOut"].reset(new FanOutDAQModule<std::vector<int>>(
-      producerToFanOut, { fanOutToConsumer1, fanOutToConsumer2 }));
-    user_module_map["consumer1"].reset(
-      new FakeDataConsumerDAQModule(fanOutToConsumer1, "C1"));
-    user_module_map["consumer2"].reset(
-      new FakeDataConsumerDAQModule(fanOutToConsumer2, "C2"));
+    auto producerConfig = R"({ "output" : "producerToFanOut" })"_json;
+    auto fanOutConfig =
+      R"({ "input" : "producerToFanOut", "outputs" : [ "fanOutToConsumer1", "fanOutToConsumer2" ], "fanout_mode" : "RoundRobin" })"_json;
+    auto consumer1Config = R"({ "input" : "fanOutToConsumer1" })"_json;
+    auto consumer2Config = R"({ "input" : "fanOutToConsumer2" })"_json;
+
+    user_module_map["producer"].reset(new FakeDataProducerDAQModule("prod"));
+    user_module_map["producer"]->configure(producerConfig);
+    user_module_map["fanOut"].reset(
+      new FanOutDAQModule<std::vector<int>>("fanOut"));
+    user_module_map["fanOut"]->configure(fanOutConfig);
+    user_module_map["consumer1"].reset(new FakeDataConsumerDAQModule("C1"));
+    user_module_map["consumer1"]->configure(consumer1Config);
+    user_module_map["consumer2"].reset(new FakeDataConsumerDAQModule("C2"));
+    user_module_map["consumer2"]->configure(consumer2Config);
 
     command_order_map["start"] = {
       "consumer1", "consumer2", "fanOut", "producer"
@@ -56,10 +60,8 @@ class producer_consumer_test_app_ModuleList : public ModuleList
 int
 main(int argc, char* argv[])
 {
-  std::list<std::string> args;
-  for (int ii = 1; ii < argc; ++ii) {
-    args.push_back(std::string(argv[ii]));
-  }
+  auto args =
+    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
   appframework::DAQProcess theDAQProcess(args);
 

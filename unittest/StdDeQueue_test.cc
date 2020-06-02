@@ -25,13 +25,11 @@ constexpr double fractional_timeout_tolerance = 0.1;
 
 // Don't set the timeout to zero, otherwise the tests will fail since they'd
 // expect the push/pop functions to execute instananeously
-constexpr auto timeout = std::chrono::microseconds(100);
+constexpr auto timeout = std::chrono::milliseconds(1);
 constexpr auto timeout_in_us =
   std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-// The decltype means "Have the Queue's push/pop functions expect a duration of
-// the same type as the timeout we defined"
-appframework::StdDeQueue<int, decltype(timeout)> Queue;
+appframework::StdDeQueue<int> Queue("StdDeQueue");
 
 /**
  * \todo StdDeQueue no longer exposes size or capacity methods. This section
@@ -69,6 +67,7 @@ struct CapacityChecker
 
 BOOST_AUTO_TEST_CASE(sanity_checks)
 {
+  Queue.SetSize(10);
 
   BOOST_REQUIRE(!Queue.can_pop());
 

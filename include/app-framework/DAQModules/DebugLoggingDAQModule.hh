@@ -25,6 +25,10 @@ namespace appframework {
 class DebugLoggingDAQModule : public DAQModuleI
 {
 public:
+  DebugLoggingDAQModule(std::string name)
+    : DAQModuleI(name)
+  {}
+
   /**
    * @brief Logs the reception of the command
    * @param cmd Command from DAQProcess

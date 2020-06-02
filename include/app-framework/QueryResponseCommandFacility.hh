@@ -31,6 +31,7 @@ public:
    * received commands
    */
   int listen(DAQProcess* theProcess) override;
+  virtual ~QueryResponseCommandFacility();
 };
 } // namespace appframework
 

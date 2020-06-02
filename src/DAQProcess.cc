@@ -16,7 +16,7 @@
 #include "TRACE/trace.h"
 #define TRACE_NAME "DAQProcess" // NOLINT
 
-#include "ers/ers.h" 
+#include "ers/ers.h"
 
 #include <memory>
 #include <unordered_set>
@@ -24,19 +24,23 @@
 namespace appframework {
 std::unique_ptr<ServiceManager> ServiceManager::handle_ = nullptr;
 std::unique_ptr<ConfigurationManager> ConfigurationManager::handle_ = nullptr;
+std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
-DAQProcess::DAQProcess(std::list<std::string> args)
+DAQProcess::DAQProcess(CommandLineInterpreter args)
 {
-  Logger::setup(args);
-  CommandFacility::setup(args);
-  ConfigurationManager::setup(args);
-  ServiceManager::setup(args);
+  CommandFacility::setHandle(
+    makeCommandFacility(args.commandFacilityPluginName));
+  Logger::setup(args.otherOptions);
+  CommandFacility::setup(args.otherOptions);
+  ConfigurationManager::setup(args.configurationManagerPluginName,
+                              args.otherOptions);
+  ServiceManager::setup(args.servicePluginNames, args.otherOptions);
 }
 
 void
 DAQProcess::register_modules(ModuleList& ml)
 {
-  ml.ConstructGraph(queueMap_, daqModuleMap_, commandOrderMap_);
+  ml.ConstructGraph(daqModuleMap_, commandOrderMap_);
 }
 
 void
@@ -52,24 +56,23 @@ DAQProcess::execute_command(std::string cmd)
 
   if (commandOrderMap_.count(cmd)) {
     for (auto& moduleName : commandOrderMap_[cmd]) {
-      if (daqModuleMap_.count(moduleName)) { 
-        
-	call_command_on_module( *daqModuleMap_[moduleName], cmd );
-     
-	daq_module_list.erase(moduleName);
+      if (daqModuleMap_.count(moduleName)) {
+
+        call_command_on_module(*daqModuleMap_[moduleName], cmd);
+
+        daq_module_list.erase(moduleName);
       }
     }
   } else {
 
-    ers::warning ( CommandOrderNotSpecified( ERS_HERE, cmd ) ) ;
-
+    ers::warning(CommandOrderNotSpecified(ERS_HERE, cmd));
   }
 
   TLOG(TLVL_DEBUG) << "Executing Command " << cmd
                    << " for all remaining DAQModules";
   for (auto const& moduleName : daq_module_list) {
 
-    call_command_on_module( *daqModuleMap_[moduleName], cmd );
+    call_command_on_module(*daqModuleMap_[moduleName], cmd);
   }
 }
 
@@ -79,16 +82,17 @@ DAQProcess::listen()
   return CommandFacility::handle().listen(this);
 }
 
-  void DAQProcess::call_command_on_module( DAQModuleI & mod, const std::string & cmd ) {
+void
+DAQProcess::call_command_on_module(DAQModuleI& mod, const std::string& cmd)
+{
 
-    try {
-      mod.execute_command( cmd ) ;
-    }
-    catch ( GeneralDAQModuleIssue & ex ) {
-      ers::error( ex ) ;
-    }
-    // catch (...) {
-    //   ers::error( DAQIssues::ModuleThrowUnknown( ERS_HERE, mod.Name(), cmd ) ;
-    // }
-  } 
+  try {
+    mod.execute_command(cmd);
+  } catch (GeneralDAQModuleIssue& ex) {
+    ers::error(ex);
+  }
+  // catch (...) {
+  //   ers::error( DAQIssues::ModuleThrowUnknown( ERS_HERE, mod.Name(), cmd ) ;
+  // }
+}
 } // namespace appframework
