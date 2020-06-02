@@ -21,6 +21,8 @@ QueueRegistry::get_queue(std::string name) {
 
         throw QueueTypeMismatch(ERS_HERE, name, realname_source, realname_target);
       }
+
+      return queuePtr;
   } 
 
   auto itP = this->queue_configmap_.find(name);
