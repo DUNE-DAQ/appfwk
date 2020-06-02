@@ -26,8 +26,6 @@
 
 #include "app-framework-base/NamedObject.hh"
 
-#include "app-framework-base/DAQModules/DAQModuleIssues.hh"
-
 #include "cetlib/BasicPluginFactory.h"
 #include "cetlib/compiler_macros.h"
 #ifndef EXTERN_C_FUNC_DECLARE_START
