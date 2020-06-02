@@ -24,7 +24,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "app-framework-base/NamedObject.hh"
+#include "app-framework/NamedObject.hh"
 
 #include "cetlib/BasicPluginFactory.h"
 #include "cetlib/compiler_macros.h"

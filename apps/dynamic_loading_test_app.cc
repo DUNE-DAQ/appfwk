@@ -13,8 +13,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "app-framework-base/DAQModules/DAQModuleI.hh"
-#include "app-framework-base/QueueI.hh"
+#include "app-framework/DAQModules/DAQModuleI.hh"
+#include "app-framework/QueueI.hh"
 #include "app-framework/DAQProcess.hh"
 #include "app-framework/QueueRegistry.hh"
 

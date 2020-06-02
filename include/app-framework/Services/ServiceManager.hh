@@ -9,7 +9,7 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_SERVICEMANAGER_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_SERVICEMANAGER_HH_
 
-#include "app-framework-base/Services/Service.hh"
+#include "app-framework/Services/Service.hh"
 
 #include <list>
 #include <map>

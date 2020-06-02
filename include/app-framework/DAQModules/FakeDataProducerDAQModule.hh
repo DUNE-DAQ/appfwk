@@ -12,8 +12,8 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
 
-#include "app-framework-base/DAQModules/DAQModuleI.hh"
-#include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
+#include "app-framework/DAQModules/DAQModuleI.hh"
+#include "app-framework/DAQModules/DAQModuleThreadHelper.hh"
 #include "app-framework/DAQSink.hh"
 
 #include <future>

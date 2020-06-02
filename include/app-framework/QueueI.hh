@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "app-framework-base/NamedObject.hh"
+#include "app-framework/NamedObject.hh"
 
 namespace appframework {
 

@@ -14,7 +14,7 @@
 
 #include "app-framework/DAQProcess.hh"
 
-#include "app-framework-base/Services/CommandFacility.hh"
+#include "app-framework/Services/CommandFacility.hh"
 
 namespace appframework {
 /**

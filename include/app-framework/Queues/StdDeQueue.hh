@@ -10,7 +10,7 @@
  * received with this code.
  */
 
-#include "app-framework-base/QueueI.hh"
+#include "app-framework/QueueI.hh"
 
 #include <atomic>
 #include <cassert>
