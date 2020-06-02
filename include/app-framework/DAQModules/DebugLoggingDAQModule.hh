@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
 
-#include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework/DAQModules/DAQModuleI.hh"
 
 #include <string>
 #include <vector>

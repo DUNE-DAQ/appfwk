@@ -8,10 +8,10 @@
 
 #include "app-framework/DAQProcess.hh"
 
-#include "app-framework-base/Services/CommandFacility.hh"
-#include "app-framework-base/Services/ConfigurationManager.hh"
-#include "app-framework-base/Services/Logger.hh"
-#include "app-framework-base/Services/ServiceManager.hh"
+#include "app-framework/Services/CommandFacility.hh"
+#include "app-framework/Services/ConfigurationManager.hh"
+#include "app-framework/Services/Logger.hh"
+#include "app-framework/Services/ServiceManager.hh"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "DAQProcess" // NOLINT

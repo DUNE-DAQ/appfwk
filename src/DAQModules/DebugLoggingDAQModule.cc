@@ -8,7 +8,7 @@
 
 #include "app-framework/DAQModules/DebugLoggingDAQModule.hh"
 
-#include "app-framework-base/Services/Logger.hh"
+#include "app-framework/Services/Logger.hh"
 
 #include "TRACE/trace.h"
 

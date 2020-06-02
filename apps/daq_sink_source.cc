@@ -1,4 +1,4 @@
-#include "app-framework-base/Services/CommandFacility.hh"
+#include "app-framework/Services/CommandFacility.hh"
 #include "app-framework/DAQSink.hh"
 #include "app-framework/DAQSource.hh"
 #include "app-framework/Queues/StdDeQueue.hh"

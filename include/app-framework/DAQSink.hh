@@ -10,7 +10,7 @@
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
-#include <app-framework-base/QueueI.hh>
+#include <app-framework/QueueI.hh>
 #include <app-framework/QueueRegistry.hh>
 #include <chrono>
 #include <memory>
