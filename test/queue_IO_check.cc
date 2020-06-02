@@ -1,6 +1,8 @@
 /**
  *
- * @file A low-level test of queue classes which inherit both from
+ * @file queue_IO_check.cc
+ *
+ * A low-level test of queue classes which inherit both from
  * QueueSource and QueueSink where we have a user-settable number
  * of threads writing elements to a queue while a user-settable
  * number of threads reads from the queue
@@ -29,39 +31,43 @@ namespace bpo = boost::program_options;
 
 namespace {
 
-// TODO John Freeman, May-8-2020 (jcfree@fnal.gov)
-
-// Will replace use of StdDeQueue in the unique_ptr with a base
-// class which supports both push and pop operations if and when one
-// becomes available
-
+/**
+ * @brief Type of the queue
+ * @todo John Freeman, May-8-2020 (jcfree@fnal.gov)
+ * Will replace use of StdDeQueue in the unique_ptr with a base
+ * class which supports both push and pop operations if and when one
+ * becomes available
+ */
 std::string queue_type = "StdDeQueue";
-auto timeout = std::chrono::milliseconds(100);
 
-// The decltype means "Have the queue's push/pop functions expect a duration of
-// the same type as the timeout we defined"
+auto timeout = std::chrono::milliseconds(100); ///< Queue's timeout
+
+
+/**
+ * @brief Queue instance for test
+*/
 std::unique_ptr<appframework::StdDeQueue<int>> queue = nullptr;
 
-constexpr int nelements = 100;
-int n_adding_threads = 1;
-int n_removing_threads = 1;
+constexpr int nelements = 100; ///< Number of elements to push to the Queue (total)
+int n_adding_threads = 1; ///< Number of threads which will call push
+int n_removing_threads = 1; ///< Number of threads which will call pop
 
-int avg_milliseconds_between_pushes = 5;
-int avg_milliseconds_between_pops = 5;
+int avg_milliseconds_between_pushes = 5; ///< Target average rate of pushes
+int avg_milliseconds_between_pops = 5; ///< Target average rate of pops
 
-std::atomic<size_t> queue_size = 0;
-std::atomic<size_t> max_queue_size = 0;
+std::atomic<size_t> queue_size = 0; ///< Queue's current size
+std::atomic<size_t> max_queue_size = 0; ///< Queue's maximum size
 
-std::atomic<int> push_attempts = 0;
-std::atomic<int> pop_attempts = 0;
-std::atomic<int> successful_pushes = 0;
-std::atomic<int> successful_pops = 0;
-std::atomic<int> timeout_pushes = 0;
-std::atomic<int> timeout_pops = 0;
-std::atomic<int> throw_pushes = 0;
-std::atomic<int> throw_pops = 0;
+std::atomic<int> push_attempts = 0; ///< Number of push attempts in the test
+std::atomic<int> pop_attempts = 0; ///< Number of pop attempts in the test
+std::atomic<int> successful_pushes = 0; ///< Number of successful pushes in the test
+std::atomic<int> successful_pops = 0; ///< Number of successful pops in the test
+std::atomic<int> timeout_pushes = 0; ///< Number of pushes which timed out
+std::atomic<int> timeout_pops = 0; ///< Number of pops which timed out
+std::atomic<int> throw_pushes = 0; ///< Number of pushes which threw an exception
+std::atomic<int> throw_pops = 0; ///< Number of pops which threw an exception
 
-double initial_capacity_used = 0;
+double initial_capacity_used = 0; ///< The initial portion of the Queue which was full.
 
 /**
  * @brief A time-based seed for the random number generators
@@ -71,10 +77,13 @@ auto relatively_random_seed =
     std::chrono::system_clock::now().time_since_epoch())
     .count() %
   1000;
-std::default_random_engine generator(relatively_random_seed);
-std::unique_ptr<std::uniform_int_distribution<int>> push_distribution = nullptr;
-std::unique_ptr<std::uniform_int_distribution<int>> pop_distribution = nullptr;
+std::default_random_engine generator(relatively_random_seed); ///< Random number generator with time-based seed
+std::unique_ptr<std::uniform_int_distribution<int>> push_distribution = nullptr;///< Random number distribution to use for push waits
+std::unique_ptr<std::uniform_int_distribution<int>> pop_distribution = nullptr; ///< Random number distribution to use for pop waits
 
+/**
+ * @brief Put elements onto the queue
+*/
 void
 add_things()
 {
@@ -121,6 +130,9 @@ add_things()
   }
 }
 
+/**
+ * @brief Pop elements off of the queue
+*/
 void
 remove_things()
 {

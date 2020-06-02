@@ -1,5 +1,5 @@
 /**
- * @file QueryResponseCommandFacility class interface
+ * @file QueryResponseCommandFacility.hh
  *
  * QueryResponseCommandFacility is a simple CommandFacility plugin which is
  * designed to take commands from standard input for testing purposes.
@@ -29,6 +29,7 @@ public:
    * DAQProcess
    * @param theProcess Pointer to the DAQProcess instance which will distribute
    * received commands
+   * @return Status code. 0 if terminated by quit command, -1 if an exception occurs
    */
   int listen(DAQProcess* theProcess) override;
   virtual ~QueryResponseCommandFacility();

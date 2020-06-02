@@ -29,16 +29,23 @@ namespace appframework {
 class FakeDataProducerDAQModule : public DAQModuleI
 {
 public:
+  /**
+   * @brief FakeDataProducerDAQModule Constructor
+   * @param name Instance name for this FakeDataProducerDAQModule instance
+  */
   explicit FakeDataProducerDAQModule(std::string name);
 
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
 
-  FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) = delete;
+  FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) =
+    delete; ///< FakeDataProducerDAQModule is not copy-constructible
   FakeDataProducerDAQModule& operator=(const FakeDataProducerDAQModule&) =
-    delete;
-  FakeDataProducerDAQModule(FakeDataProducerDAQModule&&) = delete;
-  FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) = delete;
+    delete; ///< FakeDataProducerDAQModule is not copy-assignable
+  FakeDataProducerDAQModule(FakeDataProducerDAQModule&&) =
+    delete; ///< FakeDataProducerDAQModule is not move-constructible
+  FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) =
+    delete; ///< FakeDataProducerDAQModule is not move-assignable
 
 private:
   // Commands

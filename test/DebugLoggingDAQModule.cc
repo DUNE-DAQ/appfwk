@@ -1,5 +1,5 @@
 /**
- * @file DebugLoggingDAQModule class implementation
+ * @file DebugLoggingDAQModule.cc DebugLoggingDAQModule class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have

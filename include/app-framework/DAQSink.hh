@@ -20,6 +20,10 @@
 #include <string>
 #include <utility>
 
+/**
+ * @brief Define an ERS Issue for when DAQSink is unable to retrieve its Queue
+ * handle
+ */
 ERS_DECLARE_ISSUE(appframework,             // namespace
                   DAQSinkConstrutionFailed, // issue class name
                   "Failed to construct DAQSink \"" << name

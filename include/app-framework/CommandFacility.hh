@@ -92,6 +92,11 @@ private:
     handle_; ///< Singleton pattern, handle to CommandFacility
 };
 
+/**
+ * @brief Instantiate a CommandFacility from a plugin
+ * @param facility_name Name of the CommandFacility plugin to load
+ * @return Pointer to loaded CommandFacility from plugin
+*/
 inline std::unique_ptr<CommandFacility>
 makeCommandFacility(std::string const& facility_name)
 {

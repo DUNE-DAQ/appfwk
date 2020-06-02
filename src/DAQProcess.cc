@@ -1,5 +1,5 @@
 /**
- * @file DAQProcess class implementation
+ * @file DAQProcess.cc DAQProcess class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -12,6 +12,9 @@
 #include "app-framework/Logger.hh"
 
 #include "TRACE/trace.h"
+/**
+ * @brief Name used by TRACE TLOG calls from this source file
+ */
 #define TRACE_NAME "DAQProcess" // NOLINT
 
 #include "ers/ers.h"

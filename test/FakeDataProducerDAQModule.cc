@@ -13,6 +13,9 @@
 #include <utility>
 
 #include <TRACE/trace.h>
+/**
+ * @brief Name used by TRACE TLOG calls from this source file
+ */
 #define TRACE_NAME "FakeDataProducer" // NOLINT
 
 appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
@@ -69,6 +72,12 @@ appframework::FakeDataProducerDAQModule::do_stop()
   return "Success";
 }
 
+/**
+ * @brief Format a std::vector<int> for TRACE
+ * @param t TraceStreamer Instance
+ * @param ints Vector to format
+ * @return TraceStreamer Instance
+ */
 TraceStreamer&
 operator<<(TraceStreamer& t, std::vector<int> ints)
 {

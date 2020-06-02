@@ -1,5 +1,5 @@
 /**
- * @file The DebugLoggingDAQModule class interface
+ * @file DebugLoggingDAQModule.hh
  *
  * DebugLoggingDAQModule is a simple DAQModule implementation that simply logs
  * the fact that it received a command from DAQProcess.
@@ -25,6 +25,10 @@ namespace appframework {
 class DebugLoggingDAQModule : public DAQModuleI
 {
 public:
+  /**
+   * @brief DebugLoggingDAQModule Constructor
+   * @param name Instance name for this DebugLoggingDAQModule
+  */
   explicit DebugLoggingDAQModule(std::string name)
     : DAQModuleI(name)
   {}

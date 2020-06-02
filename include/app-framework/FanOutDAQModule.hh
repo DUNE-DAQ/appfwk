@@ -1,5 +1,5 @@
 /**
- * @file The FanOutDAQModule class interface
+ * @file FanOutDAQModule.hh
  *
  * FanOutDAQModule is a simple DAQModule implementation that simply logs the
  * fact that it received a command from DAQProcess.
@@ -34,13 +34,26 @@ namespace appframework {
 */
 struct NonCopyableType
 {
-  int data;
+  int data; ///< Integer data for NonCopyableType
+  /**
+   * @brief NonCopyableType Constructor
+   * @param d Initialization for data member
+  */
   explicit NonCopyableType(int d)
     : data(d)
   {}
-  NonCopyableType(NonCopyableType const&) = delete;
+  NonCopyableType(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-constructible
+  /**
+   * @brief Move Constructor for NonCopyableType
+   * @param i NonCopyableType rvalue to move from
+  */
   NonCopyableType(NonCopyableType&& i) { data = i.data; }
-  NonCopyableType& operator=(NonCopyableType const&) = delete;
+  NonCopyableType& operator=(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-assignable
+  /**
+   * @brief Move assignment operator for NonCopyableType
+   * @param i NonCopyableType to move from
+   * @return NonCopyableType instance
+  */
   NonCopyableType& operator=(NonCopyableType&& i)
   {
     data = i.data;
@@ -55,14 +68,21 @@ template<typename ValueType>
 class FanOutDAQModule : public DAQModuleI
 {
 public:
+  /**
+   * @brief FanOutDAQModule Constructor
+   * @param name Name of this FanOutDAQModule instance
+  */
   explicit FanOutDAQModule(std::string name);
 
+  /**
+   * @brief Defines the possible modes for FanOutDAQModule
+  */
   enum class FanOutMode
   {
-    NotConfigured,
-    Broadcast,
-    RoundRobin,
-    FirstAvailable
+    NotConfigured, ///< FanOutDAQModule is not configured
+    Broadcast, ///< FanOutDAQModule will copy elements from input to all outputs
+    RoundRobin, ///< FanOutDAQModule will distribute elements from input to outputs in a round-robin fashion
+    FirstAvailable ///< FanOutDAQModule will distribute elements from input to the first available output
   };
 
   /**
@@ -73,10 +93,10 @@ public:
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
 
-  FanOutDAQModule(const FanOutDAQModule&) = delete;
-  FanOutDAQModule& operator=(const FanOutDAQModule&) = delete;
-  FanOutDAQModule(FanOutDAQModule&&) = delete;
-  FanOutDAQModule& operator=(FanOutDAQModule&&) = delete;
+  FanOutDAQModule(const FanOutDAQModule&) = delete; ///< FanOutDAQModule is not copy-constructible
+  FanOutDAQModule& operator=(const FanOutDAQModule&) = delete; ///< FanOutDAQModule is not copy-assignable
+  FanOutDAQModule(FanOutDAQModule&&) = delete; ///< FanOutDAQModule is not move-constructible
+  FanOutDAQModule& operator=(FanOutDAQModule&&) = delete; ///< FanOutDAQModule is not move-assignable
 
 private:
   // Commands

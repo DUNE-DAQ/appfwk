@@ -1,5 +1,5 @@
 /**
- * @file FanOutDAQModule class Unit Tests
+ * @file FanOutDAQModule_test.cc FanOutDAQModule class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -19,6 +19,9 @@ using namespace appframework;
 
 BOOST_AUTO_TEST_SUITE(FanOutDAQModule_test)
 
+/**
+ * @brief Initializes the QueueRegistry for use by the FanOutDAQModule test
+*/
 struct FanOutDAQModuleTestFixture
 {
   FanOutDAQModuleTestFixture() {}

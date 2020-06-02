@@ -18,6 +18,9 @@
 #include <string>
 #include <typeinfo>
 
+/**
+ * @brief Define an ERS Issue for when DAQSource is unable to retrieve its Queue handle
+ */
 ERS_DECLARE_ISSUE(appframework,               // namespace
                   DAQSourceConstrutionFailed, // issue class name
                   "Failed to construct DAQSource \"" << name

@@ -28,6 +28,7 @@ class DAQModuleThreadHelper
 public:
   /**
    * @brief DAQModuleThreadHelper Constructor
+   * @param do_work Function to be executed in the thread
    *
    * This constructor sets the defaults for the thread control variables
    */
@@ -71,12 +72,16 @@ public:
     }
   }
 
+  /**
+   * @brief Determine if the thread is currently running
+   * @return Whether the thread is currently running
+  */
   bool thread_running() const { return thread_running_.load(); }
 
-  DAQModuleThreadHelper(const DAQModuleThreadHelper&) = delete;
-  DAQModuleThreadHelper& operator=(const DAQModuleThreadHelper&) = delete;
-  DAQModuleThreadHelper(DAQModuleThreadHelper&&) = delete;
-  DAQModuleThreadHelper& operator=(DAQModuleThreadHelper&&) = delete;
+  DAQModuleThreadHelper(const DAQModuleThreadHelper&) = delete; ///< DAQModuleThreadHelper is not copy-constructible
+  DAQModuleThreadHelper& operator=(const DAQModuleThreadHelper&) = delete; ///< DAQModuleThreadHelper is not copy-assginable
+  DAQModuleThreadHelper(DAQModuleThreadHelper&&) = delete; ///< DAQModuleThreadHelper is not move-constructible
+  DAQModuleThreadHelper& operator=(DAQModuleThreadHelper&&) = delete; ///< DAQModuleThreadHelper is not move-assignable
 
 private:
   std::atomic<bool> thread_running_;

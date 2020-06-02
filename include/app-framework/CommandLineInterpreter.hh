@@ -20,11 +20,20 @@
 
 namespace bpo = boost::program_options;
 
-
 namespace appframework {
+/**
+ * @brief CommandLineInterpreter parses the command-line options given to the
+ * application and stores the results as validated data members
+ */
 struct CommandLineInterpreter
 {
 public:
+  /**
+   * @brief Parse the command line and return a CommandLineInterpreter struct
+   * @param argc Number of arguments
+   * @param argv Command-line arguments
+   * @return CommandLineInterpreter structure with parsed arguments
+   */
   static CommandLineInterpreter ParseCommandLineArguments(int argc, char** argv)
   {
     CommandLineInterpreter output;
@@ -92,12 +101,18 @@ public:
     return output;
   }
 
-  bool isValid{ false };
-  std::string applicaitonConfigurationFile;
-  std::string commandFacilityPluginName;
-  std::string configurationManagerPluginName;
-  std::vector<std::string> servicePluginNames;
-  std::vector<std::string> otherOptions;
+  bool isValid{ false }; ///< Whether the command line was successfully parsed
+  std::string applicaitonConfigurationFile; ///< File that contains application
+                                            ///< configuration (JSON)
+  std::string
+    commandFacilityPluginName; ///< Name of the CommandFacility plugin to load
+  std::string
+    configurationManagerPluginName; ///< Name of the ConfigurationManager plugin
+                                    ///< to load
+  std::vector<std::string>
+    servicePluginNames; ///< Names of the Service plugins to load
+  std::vector<std::string>
+    otherOptions; ///< Any other options which were passed and not recognized
 };
 } // namespace appframework
 

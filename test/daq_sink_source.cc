@@ -19,6 +19,12 @@ std::unique_ptr<CommandFacility> CommandFacility::handle_ =
 
 using namespace appframework;
 
+/**
+ * @brief Entry point for the daq_sink_source application
+ * @param argc Number of arguments
+ * @param argv arguments
+ * @return Status code
+*/
 int
 main(int argc, char const* argv[])
 {

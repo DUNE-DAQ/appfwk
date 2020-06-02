@@ -3,7 +3,9 @@
 
 /**
  *
- * @file A deque
+ * @file StdDeQueue.hh
+ *
+ * A std::deque-based implementation of QueueI
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -27,20 +29,21 @@
 #include <utility>
 
 namespace appframework {
-
+/**
+ * @brief A Queue Implementation that uses a std::deque as its backend
+ * @tparam T Data Type to be stored in the std::deque
+*/
 template<class T>
 class StdDeQueue : public QueueI<T>
 {
 public:
-  using value_type = T;
-  using duration_type = typename QueueI<T>::duration_type;
+  using value_type = T; ///< Type of data stored in the StdDeQueue
+  using duration_type = typename QueueI<T>::duration_type; ///< Type used for expressing timeouts
 
-  // This is needed in order for all signatures of the functions of
-  // this name in the base class to be accessible here, given that a
-  // subset are overridden
-
-  // using QueueSink<T, DurationType>::push;
-
+  /**
+   * @brief StdDeQueue Constructor
+   * @param name Name of this StdDeQueue instance
+  */
   explicit StdDeQueue(const std::string& name);
 
   bool can_pop() const noexcept override { return fSize.load() > 0; }
@@ -54,11 +57,15 @@ public:
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
 
-  StdDeQueue(const StdDeQueue&) = delete;
-  StdDeQueue& operator=(const StdDeQueue&) = delete;
-  StdDeQueue(StdDeQueue&&) = delete;
-  StdDeQueue& operator=(StdDeQueue&&) = delete;
+  StdDeQueue(const StdDeQueue&) = delete; ///< StdDeQueue is not copy-constructible
+  StdDeQueue& operator=(const StdDeQueue&) = delete; ///< StdDeQueue is not copy-assignable
+  StdDeQueue(StdDeQueue&&) = delete; ///< StdDeQueue is not move-constructible
+  StdDeQueue& operator=(StdDeQueue&&) = delete; ///< StdDeQueue is not move-assignable
 
+  /**
+   * @brief Set the size of the StdDeQueue
+   * @param sz Maximum size for the StdDeQueue
+  */
   void SetSize(size_t sz) { fMaxSize = sz; }
 
 private:

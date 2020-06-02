@@ -1,5 +1,8 @@
 /**
- * @file ModuleList class interface
+ * @file ModuleList.hh
+ *
+ * A ModuleList defines a DAQ Application's DAQModule graph. It may also
+ * register Queues with QueueRegistry.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have

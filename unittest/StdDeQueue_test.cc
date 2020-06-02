@@ -20,8 +20,8 @@
 
 namespace {
 
-constexpr int max_testable_capacity = 1000000000;
-constexpr double fractional_timeout_tolerance = 0.1;
+constexpr int max_testable_capacity = 1000000000; ///< The maximum capacity this test will attempt to check
+constexpr double fractional_timeout_tolerance = 0.1; ///< The fraction of the timeout which the timing is allowed to be off by
 
 /**
  * @brief Timeout to use for tests
@@ -36,7 +36,7 @@ constexpr auto timeout = std::chrono::milliseconds(1);
 constexpr auto timeout_in_us =
   std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-appframework::StdDeQueue<int> Queue("StdDeQueue");
+appframework::StdDeQueue<int> Queue("StdDeQueue"); ///< Queue instance for the test
 
 /**
  * \todo StdDeQueue no longer exposes size or capacity methods. This section

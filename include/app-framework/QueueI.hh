@@ -1,5 +1,10 @@
 /**
- * @file Queue class interface
+ * @file QueueI.hh
+ *
+ * QueueI is the interface for Queue objects which connect DAQModules. Queues
+ * are exposed to DAQModules via the DAQSource and DAQSink classes, and should
+ * not be handled directly. Queues are registered with QueueRegistry for
+ * retrieval by DAQSink and DAQSource instances.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -17,7 +22,6 @@
 #include <string>
 #include <vector>
 
-
 namespace appframework {
 
 /**
@@ -31,19 +35,51 @@ template<class T>
 class QueueI : public NamedObject
 {
 public:
-  using value_type = T;
-  using duration_type = std::chrono::milliseconds;
+  using value_type = T; ///< Type stored in the QueueI
+  using duration_type = std::chrono::milliseconds; ///< Base duration type for timeouts
 
+  /**
+   * @brief QueueI Constructor
+   * @param name Name of the Queue instance
+  */
   explicit QueueI(std::string name)
     : NamedObject(name)
   {}
 
+  /**
+   * @brief Push a value onto the Queue.
+   * @param val Value to push (rvalue)
+   * @param timeout Timeout for the push operation. 
+   *
+   * This is a pure virtual function.
+   * If push takes longer than the timeout, implementations should throw an exception.
+  */
   virtual void push(T&& val, const duration_type& timeout) = 0;
 
+  /**
+   * @brief Determine whether the Queue may be pushed onto
+   * @return True if the queue is not full, false if it is
+   *
+   * This is a pure virtual function
+  */
   virtual bool can_push() const noexcept = 0;
 
+  /**
+   * @brief Pop the first value off of the queue
+   * @param timeout Timeout for the pop operation
+   * @return Value popped from the Queue
+   *
+   * This is a pure virtual function
+   * If pop takes longer than the timeout, implementations should throw an exception
+  */
   virtual T pop(const duration_type& timeout) = 0;
 
+  /**
+   * @brief Determine whether the Queue may be popped from
+   * @return True if the queue is not empty, false if it is
+   *
+   * This is a pure virtual function 
+  */
   virtual bool can_pop() const noexcept = 0;
 
 private:

@@ -47,7 +47,9 @@
   }                                                                            \
   }
 
-// for convenience
+/**
+ * @brief Using of a namespace for convinience
+*/
 using json = nlohmann::json;
 
 namespace appframework {
@@ -134,22 +136,22 @@ ERS_DECLARE_ISSUE(appframework,
 /**
  * @brief The UnknownCommand DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appframework,
-                       UnknownCommand,
-                       GeneralDAQModuleIssue,
-                       "Command " << cmd << " is not recognised",
-                       ERS_EMPTY,
-                       ((std::string)cmd))
+ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
+                       UnknownCommand, ///< Type of the issue
+                       GeneralDAQModuleIssue, ///< Base class of the issue
+                       "Command " << cmd << " is not recognised", ///< Log Message from the issue
+                       ERS_EMPTY, ///< End of variable declarations
+                       ((std::string)cmd)) ///< Variables to capture
 
 /**
  * @brief The CommandFailed DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appframework,
-                       CommandFailed,
-                       GeneralDAQModuleIssue,
+ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
+                       CommandFailed, ///< Type of the Issue
+                       GeneralDAQModuleIssue, ///< Base class of the Issue
                        "Command " << cmd << " failed to execute for reason "
-                                  << reason,
-                       ERS_EMPTY,
-                       ((std::string)cmd)((std::string)reason))
+                                  << reason, ///< Log Message from the issue
+                       ERS_EMPTY, ///< End of variable declarations
+                       ((std::string)cmd)((std::string)reason)) ///< Variables to capture
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULEI_HH_
