@@ -1,7 +1,7 @@
 #include "app-framework/DAQModules/FanOutDAQModule.hh"
-#include "app-framework-base/DataTypes.hh"
 
 namespace appframework {
+
 typedef appframework::FanOutDAQModule<@MAKE_DATATYPE_CPPTYPE@>
   @MAKE_DATATYPE_PREFIX@FanOutDAQModule;
 }

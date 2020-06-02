@@ -6,7 +6,6 @@
  * received with this code.
  */
 
-#include "app-framework-base/DataTypes.hh"
 #include "app-framework/DAQModules/FanOutDAQModule.hh"
 #include "app-framework/QueueRegistry.hh"
 

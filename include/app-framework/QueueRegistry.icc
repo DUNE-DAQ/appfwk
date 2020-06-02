@@ -2,7 +2,6 @@
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HXX_
 
 #include <cxxabi.h>
-#include "app-framework-base/DataTypes.hh"
 
 // Declarations
 namespace appframework {

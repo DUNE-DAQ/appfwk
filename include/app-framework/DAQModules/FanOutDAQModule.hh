@@ -28,6 +28,26 @@
 #include <vector>
 
 namespace appframework {
+
+/**
+ * @brief Struct used for FanOutDAQModule_test
+*/
+struct NonCopyableType
+{
+  int data;
+  explicit NonCopyableType(int d)
+    : data(d)
+  {}
+  NonCopyableType(NonCopyableType const&) = delete;
+  NonCopyableType(NonCopyableType&& i) { data = i.data; }
+  NonCopyableType& operator=(NonCopyableType const&) = delete;
+  NonCopyableType& operator=(NonCopyableType&& i)
+  {
+    data = i.data;
+    return *this;
+  }
+};
+
 /**
  * @brief FanOutDAQModule sends data to multiple Queues
  */
