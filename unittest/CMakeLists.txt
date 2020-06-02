@@ -14,9 +14,9 @@ if(Boost_FOUND)
     target_include_directories(DAQProcess_test PRIVATE ${Boost_INCLUDE_DIRS})
     add_test(NAME DAQProcess_test COMMAND DAQProcess_test)
     
-    add_executable(DequeBuffer_test DequeBuffer_test.cc)
-    add_test(NAME DequeBuffer_test COMMAND DequeBuffer_test)
+    add_executable(StdDeQueue_test StdDeQueue_test.cc)
+    add_test(NAME StdDeQueue_test COMMAND StdDeQueue_test)
 
-    add_subdirectory(UserModules)
+    add_subdirectory(DAQModules)
 endif()
 

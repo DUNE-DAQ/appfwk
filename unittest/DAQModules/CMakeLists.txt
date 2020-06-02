@@ -1,0 +1,5 @@
+    add_executable(FanOutDAQModule_test FanOutDAQModule_test.cc)
+    target_link_libraries(FanOutDAQModule_test app-framework ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread ers)
+target_compile_definitions(FanOutDAQModule_test PRIVATE "BOOST_TEST_DYN_LINK=1")
+    target_include_directories(FanOutDAQModule_test PRIVATE ${Boost_INCLUDE_DIRS})
+    add_test(NAME FanOutDAQModule_test COMMAND FanOutDAQModule_test ers)

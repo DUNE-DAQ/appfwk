@@ -7,16 +7,15 @@
  */
 
 #include "app-framework/DAQProcess.hh"
+#include "app-framework/DAQProcessIssues.hh"
 
 #include "app-framework-base/Services/CommandFacility.hh"
 #include "app-framework-base/Services/ConfigurationManager.hh"
 #include "app-framework-base/Services/Logger.hh"
 #include "app-framework-base/Services/ServiceManager.hh"
 
-// #include "TRACE/trace.h"
-// #define TRACE_NAME "DAQProcess"
-//#include <ers/ers.h>
 #include "app-framework/CommandIssues.hh"
+#define TRACE_NAME "DAQProcess" // NOLINT
 
 #include <memory>
 #include <unordered_set>
@@ -25,21 +24,26 @@ namespace appframework {
 std::unique_ptr<ServiceManager> ServiceManager::handle_ = nullptr;
 std::unique_ptr<ConfigurationManager> ConfigurationManager::handle_ = nullptr;
 
-DAQProcess::DAQProcess(std::list<std::string> args) {
+DAQProcess::DAQProcess(std::list<std::string> args)
+{
   Logger::setup(args);
   CommandFacility::setup(args);
   ConfigurationManager::setup(args);
   ServiceManager::setup(args);
 }
 
-void DAQProcess::register_modules(ModuleList &ml) {
-  ml.ConstructGraph(bufferMap_, userModuleMap_, commandOrderMap_);
+void
+DAQProcess::register_modules(ModuleList& ml)
+{
+  ml.ConstructGraph(queueMap_, daqModuleMap_, commandOrderMap_);
 }
 
-void DAQProcess::execute_command(std::string cmd) {
-  std::unordered_set<std::string> user_module_list;
-  for (auto const &um : userModuleMap_) {
-    user_module_list.insert(um.first);
+void
+DAQProcess::execute_command(std::string cmd)
+{
+  std::unordered_set<std::string> daq_module_list;
+  for (auto const& dm : daqModuleMap_) {
+    daq_module_list.insert(dm.first);
   }
 
   //ERS_LOG("Executing Command " << cmd 
@@ -48,23 +52,44 @@ void DAQProcess::execute_command(std::string cmd) {
           << " for UserModules defined in the CommandOrderMap";
 
   if (commandOrderMap_.count(cmd)) {
-    for (auto &moduleName : commandOrderMap_[cmd]) {
-      if (userModuleMap_.count(moduleName)) {
-        userModuleMap_[moduleName]->execute_command(cmd);
-        user_module_list.erase(moduleName);
+    for (auto& moduleName : commandOrderMap_[cmd]) {
+      if (daqModuleMap_.count(moduleName)) { 
+        
+	call_command_on_module( *daqModuleMap_[moduleName], cmd );
+     
+	daq_module_list.erase(moduleName);
       }
     }
   } else {
-	//ers::warning( appframework::CommandNotRegisted(ERS_HERE, cmd.c_str()) );
-	  ERS_WARNING() << appframework::CommandNotRegisted(ERS_HERE,cmd.c_str());
+
+	  ERS_WARNING() << DAQIssues::CommandOrderNotSpecified( ERS_HERE, cmd );
+
   }
 
-  ERS_LOG() <<"Executing Command " << cmd 
-          << " for all remaining UserModules";
-  for (auto const &moduleName : user_module_list) {
-    userModuleMap_[moduleName]->execute_command(cmd);
+  ERS_LOG() << "Executing Command " << cmd
+                   << " for all remaining DAQModules";
+  for (auto const& moduleName : daq_module_list) {
+
+    call_command_on_module( *daqModuleMap_[moduleName], cmd );
   }
 }
 
-int DAQProcess::listen() { return CommandFacility::handle().listen(this); }
+int
+DAQProcess::listen()
+{
+  return CommandFacility::handle().listen(this);
+}
+
+  void DAQProcess::call_command_on_module( DAQModuleI & mod, const std::string & cmd ) {
+
+    try {
+      mod.execute_command( cmd ) ;
+    }
+    catch ( DAQIssues::GeneralDAQModuleIssue & ex ) {
+      ers::error( ex ) ;
+    }
+    // catch (...) {
+    //   ers::error( DAQIssues::ModuleThrowUnknown( ERS_HERE, mod.Name(), cmd ) ;
+    // }
+  } 
 } // namespace appframework

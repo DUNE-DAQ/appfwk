@@ -1,25 +1,11 @@
 
 
-template <class T, class U> DequeBuffer<T, U>::DequeBuffer() { Configure(); }
+template <class T>
+NamedStdDeQueue<T>::NamedStdDeQueue(const std::string& name, size_t size) : NamedQueueI<T>(name), fMaxSize(size), fDeque(), fSize(0) {}
 
-template <class T, class U> void DequeBuffer<T, U>::Configure() {
-
-  this->fAttributes.isBounded = true;
-  this->fAttributes.isSearchable = false;
-
-  fDeque = std::deque<value_type>();
-  fSize = 0;
-
-  if (this->fAttributes.isBounded) {
-    fCapacity = 1000;
-  } else {
-    fCapacity = fDeque.max_size();
-  }
-}
-
-template <class T, class U>
-void DequeBuffer<T, U>::push(value_type &&val,
-                                      const duration_type &timeout) {
+template <class T>
+void NamedStdDeQueue<T>::push(value_type &&object_to_push,
+		            const duration_type &timeout) {
 
   auto starttime = std::chrono::steady_clock::now();
   std::unique_lock<std::mutex> lk(fMutex, std::defer_lock);
@@ -31,18 +17,18 @@ void DequeBuffer<T, U>::push(value_type &&val,
 
   if (time_to_wait_for_space.count() > 0) {
     fNoLongerFull.wait_for(lk, time_to_wait_for_space,
-                           [&]() { return !this->full(); });
+                           [&]() { return this->can_push(); });
   }
 
-  if (!this->full()) {
-    fDeque.push_back(std::move(val));
+  if ( this->can_push() ) {
+    fDeque.push_back(std::move(object_to_push));
     fSize++;
     fNoLongerEmpty.notify_one();
   } else {
     std::stringstream errmsg;
     errmsg
-        << "In DequeBuffer::push: unable to push since queue is full ("
-        << this->size() << " elements) (timeout period was "
+        << "In NamedStdDeQueue::push: unable to push since queue is full ("
+        << fSize.load() << " elements) (timeout period was "
         << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
                .count()
         << " milliseconds)";
@@ -50,8 +36,8 @@ void DequeBuffer<T, U>::push(value_type &&val,
   }
 }
 
-template <class T, class U>
-T DequeBuffer<T, U>::pop(const duration_type &timeout) {
+template <class T>
+T NamedStdDeQueue<T>::pop(const duration_type &timeout) {
 
   auto starttime = std::chrono::steady_clock::now();
   std::unique_lock<std::mutex> lk(fMutex, std::defer_lock);
@@ -63,10 +49,10 @@ T DequeBuffer<T, U>::pop(const duration_type &timeout) {
 
   if (time_to_wait_for_data.count() > 0) {
     fNoLongerEmpty.wait_for(lk, time_to_wait_for_data,
-                            [&]() { return !this->empty(); });
+                            [&]() { return this->can_pop() ; });
   }
 
-  if (!this->empty()) {
+  if (this->can_pop()) {
     T obj(std::move(fDeque.front()));
     fDeque.pop_front();
     fSize--;
@@ -74,7 +60,7 @@ T DequeBuffer<T, U>::pop(const duration_type &timeout) {
     return obj;
   } else {
     std::stringstream errmsg;
-    errmsg << "In DequeBuffer::pop: unable to pop since queue is "
+    errmsg << "In NamedStdDeQueue::pop_wait_for: unable to pop since queue is "
               "empty (timeout period was "
            << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
                   .count()
@@ -88,8 +74,8 @@ T DequeBuffer<T, U>::pop(const duration_type &timeout) {
 // std::condition_variable::wait_for functions used in this class's push
 // and pop operations require an std::mutex
 
-template <class T, class U>
-void DequeBuffer<T, U>::try_lock_for(std::unique_lock<std::mutex> &lk,
+template <class T>
+void NamedStdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex> &lk,
                                      const duration_type &timeout) {
   assert(!lk.owns_lock());
 
@@ -113,7 +99,7 @@ void DequeBuffer<T, U>::try_lock_for(std::unique_lock<std::mutex> &lk,
 
   if (!lk.owns_lock()) {
     std::ostringstream errmsg;
-    errmsg << "Unable to lock the DequeBuffer's mutex "
+    errmsg << "Unable to lock the NamedStdDeQueue's mutex "
               "within the timeout period of "
            << std::chrono::duration_cast<std::chrono::milliseconds>(timeout)
                   .count()
