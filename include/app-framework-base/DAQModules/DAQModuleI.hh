@@ -28,6 +28,22 @@
 
 #include "app-framework-base/DAQModules/DAQModuleIssues.hh"
 
+#include "cetlib/BasicPluginFactory.h"
+#include "cetlib/compiler_macros.h"
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START                                            \
+  extern "C"                                                                   \
+  {
+#endif
+
+#define DEFINE_DUNE_DAQ_MODULE(klass)                                              \
+  EXTERN_C_FUNC_DECLARE_START                                                  \
+  std::shared_ptr<appframework::DAQModuleI> make(std::string n)               \
+  {                                                                            \
+    return std::shared_ptr<appframework::DAQModuleI>(new klass(n));           \
+  }                                                                            \
+  }
+
 // for convenience
 using json = nlohmann::json;
 
@@ -70,8 +86,10 @@ protected:
 inline std::shared_ptr<DAQModuleI>
 makeModule(std::string const& plugin_name, std::string const& instance_name)
 {
-  auto namedObject = makeNamedObject(plugin_name, instance_name);
-  return std::dynamic_pointer_cast<DAQModuleI>(namedObject);
+  static cet::BasicPluginFactory bpf("duneDAQModule", "make");
+
+  return bpf.makePlugin<std::shared_ptr<DAQModuleI>>(plugin_name,
+                                                      instance_name);
 }
 
 } // namespace appframework
