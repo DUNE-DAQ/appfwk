@@ -36,11 +36,11 @@
   {
 #endif
 
-#define DEFINE_DUNE_DAQ_MODULE(klass)                                              \
+#define DEFINE_DUNE_DAQ_MODULE(klass)                                          \
   EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::shared_ptr<appframework::DAQModuleI> make(std::string n)               \
+  std::shared_ptr<appframework::DAQModuleI> make(std::string n)                \
   {                                                                            \
-    return std::shared_ptr<appframework::DAQModuleI>(new klass(n));           \
+    return std::shared_ptr<appframework::DAQModuleI>(new klass(n));            \
   }                                                                            \
   }
 
@@ -56,7 +56,7 @@ namespace appframework {
  * Developers implementing DAQModules should feel free to use whatever Plugins
  * and Services are necessary to accomplish their needed functionality.
  *
- * This header also contains the definitions of the Issues that can be 
+ * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
 class DAQModuleI : public NamedObject
@@ -92,36 +92,31 @@ makeModule(std::string const& plugin_name, std::string const& instance_name)
   static cet::BasicPluginFactory bpf("duneDAQModule", "make");
 
   return bpf.makePlugin<std::shared_ptr<DAQModuleI>>(plugin_name,
-                                                      instance_name);
+                                                     instance_name);
 }
 
 } // namespace appframework
 
 #include <ers/Issue.h>
 
-  
-ERS_DECLARE_ISSUE( appframework, 
-		   GeneralDAQModuleIssue, 
-		   "General DAQModule Issue", 
-		   ERS_EMPTY
-		   )
-                    
+ERS_DECLARE_ISSUE(appframework,
+                  GeneralDAQModuleIssue,
+                  "General DAQModule Issue",
+                  ERS_EMPTY)
 
-ERS_DECLARE_ISSUE_BASE( appframework, 
-			UnknownCommand,
-			GeneralDAQModuleIssue,
-			"Command " << cmd << " is not recognised", 
-			ERS_EMPTY,
-			((std::string) cmd)
-			)
+ERS_DECLARE_ISSUE_BASE(appframework,
+                       UnknownCommand,
+                       GeneralDAQModuleIssue,
+                       "Command " << cmd << " is not recognised",
+                       ERS_EMPTY,
+                       ((std::string)cmd))
 
-
-ERS_DECLARE_ISSUE_BASE( appframework, 
-			CommandFailed,
-			GeneralDAQModuleIssue,
-			"Command " << cmd << " failed to execute for reason " << reason, 
-			ERS_EMPTY, 
-			((std::string ) cmd) ((std::string) reason)
-			)
+ERS_DECLARE_ISSUE_BASE(appframework,
+                       CommandFailed,
+                       GeneralDAQModuleIssue,
+                       "Command " << cmd << " failed to execute for reason "
+                                  << reason,
+                       ERS_EMPTY,
+                       ((std::string)cmd)((std::string)reason))
 
 #endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULEI_HH_
