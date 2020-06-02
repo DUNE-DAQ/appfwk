@@ -146,4 +146,4 @@ appframework::FakeDataConsumerDAQModule::do_work()
                   << fail_count << " failures.";
 }
 
-DEFINE_DUNE_OBJECT(appframework::FakeDataConsumerDAQModule)
+DEFINE_DUNE_DAQ_MODULE(appframework::FakeDataConsumerDAQModule)

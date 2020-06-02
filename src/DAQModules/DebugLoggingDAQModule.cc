@@ -28,4 +28,4 @@ DebugLoggingDAQModule::execute_command(const std::string& cmd,
 }
 } // namespace appframework
 
-DEFINE_DUNE_OBJECT(appframework::DebugLoggingDAQModule)
+DEFINE_DUNE_DAQ_MODULE(appframework::DebugLoggingDAQModule)

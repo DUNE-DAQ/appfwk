@@ -120,4 +120,4 @@ appframework::FakeDataProducerDAQModule::do_work()
   }
 }
 
-DEFINE_DUNE_OBJECT(appframework::FakeDataProducerDAQModule)
+DEFINE_DUNE_DAQ_MODULE(appframework::FakeDataProducerDAQModule)

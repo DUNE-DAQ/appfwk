@@ -6,4 +6,4 @@ typedef appframework::FanOutDAQModule<@MAKE_DATATYPE_CPPTYPE@>
   @MAKE_DATATYPE_PREFIX@FanOutDAQModule;
 }
 
-DEFINE_DUNE_OBJECT(appframework::@MAKE_DATATYPE_PREFIX@FanOutDAQModule)
+DEFINE_DUNE_DAQ_MODULE(appframework::@MAKE_DATATYPE_PREFIX@FanOutDAQModule)

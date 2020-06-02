@@ -13,11 +13,8 @@ macro(MakeDataTypeLibraries)
    set(oneValueArgs CPPTYPE PREFIX)
    cmake_parse_arguments(MAKE_DATATYPE "" "${oneValueArgs}" "" ${ARGN})
 
-   configure_file(StdDeQueue.cc.in ${MAKE_DATATYPE_PREFIX}StdDeQueue.cc)
-   add_library(${MAKE_DATATYPE_PREFIX}StdDeQueue_duneObject SHARED ${MAKE_DATATYPE_PREFIX}StdDeQueue.cc)
-
    configure_file(FanOutDAQModule.cc.in ${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cc)
-   add_library(${MAKE_DATATYPE_PREFIX}FanOutDAQModule_duneObject SHARED ${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cc)
+   add_library(${MAKE_DATATYPE_PREFIX}FanOutDAQModule_duneDAQModule SHARED ${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cc)
 
 endmacro()
 

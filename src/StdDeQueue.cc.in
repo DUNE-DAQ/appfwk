@@ -1,8 +1,0 @@
-#include "app-framework/Queues/StdDeQueue.hh"
-#include "app-framework-base/DataTypes.hh"
-
-namespace appframework {
-   typedef StdDeQueue<@MAKE_DATATYPE_CPPTYPE@> @MAKE_DATATYPE_PREFIX@StdDeQueue;
-} // namespace appframework
-
-DEFINE_DUNE_OBJECT(appframework::@MAKE_DATATYPE_PREFIX@StdDeQueue)
