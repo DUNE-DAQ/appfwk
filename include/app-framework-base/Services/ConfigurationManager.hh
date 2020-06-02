@@ -13,6 +13,9 @@
 #include <memory>
 #include <string>
 
+#include <string>
+#include <vector>
+
 namespace appframework {
 /**
  * @brief The ConfigurationManager is responsible for receiving configurations
@@ -36,7 +39,9 @@ public:
    * the provided command-line paramters
    * @param args Command-line arguments used to setup ConfigurationManager
    */
-  static void setup(std::list<std::string> /*args*/) {}
+  static void setup(std::string /*pluginName*/,
+                    std::vector<std::string> /*args*/)
+  {}
 
 protected:
   ConfigurationManager() {

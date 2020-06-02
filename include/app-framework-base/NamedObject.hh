@@ -1,15 +1,21 @@
 #ifndef APP_FRAMEWORK_BASE_NAMEDOBJECT_HH_
-#define APP_FRAMEWORK_BASE_NAMEDOBJECT_HH_ 
+#define APP_FRAMEWORK_BASE_NAMEDOBJECT_HH_
 
-class NamedObject {
- public:
-  NamedObject(const std::string& name) : name_(name) {}
+#include <string>
+
+namespace appframework {
+class NamedObject
+{
+public:
+  NamedObject(const std::string& name)
+    : name_(name)
+  {}
   virtual ~NamedObject() = default;
 
-  const std::string& get_name() const {return name_; }
+  const std::string& get_name() const { return name_; }
 
- private:
+private:
   std::string name_;
 };
-
+} // namespace appframework
 #endif // APP_FRAMEWORK_BASE_NAMEDOBJECT_HH_

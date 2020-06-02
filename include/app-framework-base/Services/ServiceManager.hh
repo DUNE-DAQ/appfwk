@@ -30,7 +30,9 @@ public:
    * @param args Command-line arguments, may contain list of services to load
    * and parameters for each
    */
-  static void setup(std::list<std::string> /*args*/) {}
+  static void setup(std::vector<std::string> /*services*/,
+                    std::vector<std::string> /*args*/)
+  {}
 
   /**
    * @brief Get a handle to the ServiceManager (Singleton pattern)

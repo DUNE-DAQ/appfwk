@@ -9,8 +9,8 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_LOGGER_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_LOGGER_HH_
 
-#include <list>
 #include <string>
+#include <vector>
 
 namespace appframework {
 /**
@@ -24,7 +24,7 @@ public:
    * @brief Setup the Logger service
    * @param args Command-line arguments used to setup the Logger
    */
-  static void setup(std::list<std::string> /*args*/) {}
+  static void setup(std::vector<std::string> /*args*/) {}
 };
 } // namespace appframework
 

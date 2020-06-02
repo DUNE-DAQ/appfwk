@@ -9,10 +9,27 @@
 #ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
 #define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
 
+#include "cetlib/BasicPluginFactory.h"
+#include "cetlib/compiler_macros.h"
 #include <iostream>
 #include <list>
 #include <memory>
 #include <string>
+#include <vector>
+
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START                                            \
+  extern "C"                                                                   \
+  {
+#endif
+
+#define DEFINE_DUNE_COMMAND_FACILITY(klass)                                    \
+  EXTERN_C_FUNC_DECLARE_START                                                  \
+  std::unique_ptr<appframework::CommandFacility> make()                        \
+  {                                                                            \
+    return std::unique_ptr<appframework::CommandFacility>(new klass());        \
+  }                                                                            \
+  }
 
 namespace appframework {
 class DAQProcess; // forward declaration
@@ -33,12 +50,16 @@ public:
       handle_.reset(new CommandFacility());
     return *handle_;
   }
+  static void setHandle(std::unique_ptr<CommandFacility>&& handle)
+  {
+    handle_ = std::move(handle);
+  }
   /**
    * @brief Perform basic setup actions needed by the CommandFacility, using
    * command-line arguments and environment variables
    * @param args Command-line arguments to the CommandFacility
    */
-  static void setup(std::list<std::string> /*args*/) {}
+  static void setup(std::vector<std::string> /*args*/) {}
   /**
    * @brief Listen for commands and relay them to the given DAQProcess
    * @param process DAQProcess to relay commands to
@@ -59,6 +80,15 @@ private:
   static std::unique_ptr<CommandFacility>
     handle_; ///< Singleton pattern, handle to CommandFacility
 };
+
+inline std::unique_ptr<CommandFacility>
+makeCommandFacility(std::string const& facility_name)
+{
+  static cet::BasicPluginFactory bpf("duneCommandFacility", "make");
+
+  return bpf.makePlugin<std::unique_ptr<CommandFacility>>(facility_name);
+}
+
 } // namespace appframework
 
 #endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
