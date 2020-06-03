@@ -1,22 +1,26 @@
-/*
- * DAQSource.hh
+/**
+ * @file DAQSource.hh DAQSource class interface
  *
- *  Created on: 20 May 2020
- *      Author: glehmann
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
  */
 
-#ifndef DAQSINK_HH_
-#define DAQSINK_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
-#include <app-framework/QueueI.hh>
+#include <app-framework/Queue.hh>
 #include <app-framework/QueueRegistry.hh>
 #include <chrono>
 #include <memory>
 #include <string>
 #include <typeinfo>
 
+/**
+ * @brief Define an ERS Issue for when DAQSource is unable to retrieve its Queue handle
+ */
 ERS_DECLARE_ISSUE(appframework,               // namespace
                   DAQSourceConstrutionFailed, // issue class name
                   "Failed to construct DAQSource \"" << name
@@ -32,12 +36,12 @@ public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
-  DAQSource(std::string name);
+  explicit DAQSource(std::string name);
   T pop(const duration_type& timeout = duration_type::zero());
   bool can_pop();
 
 private:
-  std::shared_ptr<QueueI<T>> queue_;
+  std::shared_ptr<Queue<T>> queue_;
 };
 
 template<typename T>
@@ -68,4 +72,4 @@ DAQSource<T>::can_pop()
 
 } // namespace appframework
 
-#endif /* DAQSINK_HH_ */
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_

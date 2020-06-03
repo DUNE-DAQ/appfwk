@@ -1,22 +1,29 @@
 /**
- * @file simple_test_app to show basic functionality of DAQProcess
+ * @file producer_consumer_test_app.cc
+ *
+ * This application loads a producer, two consumers and a fan-out DAQModules.
+ * The producer creates vectors of ints, and the consumers each check that the
+ * integers are increasing within each vector. They also see if there was a jump
+ * indicating that a vector was missed (i.e. passed to the other consumer).
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/DAQModules/FakeDataConsumerDAQModule.hh"
-#include "app-framework/DAQModules/FakeDataProducerDAQModule.hh"
-#include "app-framework/DAQModules/FanOutDAQModule.hh"
+#include "FakeDataConsumerDAQModule.hh"
+#include "FakeDataProducerDAQModule.hh"
 #include "app-framework/DAQProcess.hh"
-#include "app-framework/Queues/StdDeQueue.hh"
+#include "app-framework/FanOutDAQModule.hh"
+#include "app-framework/StdDeQueue.hh"
 
 #include <memory>
 #include <vector>
 
 namespace appframework {
-
+/**
+ * @brief ModuleList for the producer_consumer_test_app
+*/
 class producer_consumer_test_app_ModuleList : public ModuleList
 {
   // Inherited via ModuleList
@@ -57,6 +64,12 @@ class producer_consumer_test_app_ModuleList : public ModuleList
 };
 } // namespace appframework
 
+/**
+ * @brief producer_consumer_test_app main entry point
+ * @param argc Number of arguments
+ * @param argv Arguments
+ * @return Status code from DAQProcess::listen
+ */
 int
 main(int argc, char* argv[])
 {

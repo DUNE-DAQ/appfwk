@@ -1,5 +1,5 @@
 /**
- * @file The DebugLoggingDAQModule class interface
+ * @file DebugLoggingDAQModule.hh
  *
  * DebugLoggingDAQModule is a simple DAQModule implementation that simply logs
  * the fact that it received a command from DAQProcess.
@@ -9,10 +9,10 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
+#ifndef APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
+#define APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
 
-#include "app-framework/DAQModules/DAQModuleI.hh"
+#include "app-framework/DAQModule.hh"
 
 #include <string>
 #include <vector>
@@ -22,20 +22,25 @@ namespace appframework {
  * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingDAQModule : public DAQModuleI
+class DebugLoggingDAQModule : public DAQModule
 {
 public:
-  DebugLoggingDAQModule(std::string name)
-    : DAQModuleI(name)
+  /**
+   * @brief DebugLoggingDAQModule Constructor
+   * @param name Instance name for this DebugLoggingDAQModule
+  */
+  explicit DebugLoggingDAQModule(std::string name)
+    : DAQModule(name)
   {}
 
   /**
-   * @brief Logs the reception of the command
+   * @brief Execute a command from DAQProcess
    * @param cmd Command from DAQProcess
+   * @param args Arguments for the command from DAQProcess
    */
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
+#endif // APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_

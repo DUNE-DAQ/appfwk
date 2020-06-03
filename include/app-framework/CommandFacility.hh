@@ -1,20 +1,22 @@
 /**
- * @file CommandFacility interface
+ * @file CommandFacility.hh CommandFacility interface
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HH_
 
-#include "cetlib/BasicPluginFactory.h"
-#include "cetlib/compiler_macros.h"
+#include <cetlib/BasicPluginFactory.h>
+#include <cetlib/compiler_macros.h>
+
 #include <iostream>
 #include <list>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
@@ -23,6 +25,10 @@
   {
 #endif
 
+/**
+ * @brief Declare the function that will be called by the plugin loader
+ * @param klass Class to be defined as a DUNE Command Facility
+ */
 #define DEFINE_DUNE_COMMAND_FACILITY(klass)                                    \
   EXTERN_C_FUNC_DECLARE_START                                                  \
   std::unique_ptr<appframework::CommandFacility> make()                        \
@@ -50,6 +56,11 @@ public:
       handle_.reset(new CommandFacility());
     return *handle_;
   }
+
+  /**
+   * @brief Set the pointer returned by the handle() function
+   * @param handle Handle to a loaded CommandFacility plugin
+   */
   static void setHandle(std::unique_ptr<CommandFacility>&& handle)
   {
     handle_ = std::move(handle);
@@ -59,7 +70,7 @@ public:
    * command-line arguments and environment variables
    * @param args Command-line arguments to the CommandFacility
    */
-  static void setup(std::vector<std::string> /*args*/) {}
+  virtual void setup(std::vector<std::string> args) {}
   /**
    * @brief Listen for commands and relay them to the given DAQProcess
    * @param process DAQProcess to relay commands to
@@ -68,7 +79,7 @@ public:
    * This function should block for the lifetime of the DAQ Application, calling
    * DAQProcess::execute_command as necessary
    */
-  virtual int listen(DAQProcess* /*process*/) { return 0; }
+  virtual int listen(DAQProcess* process) { return 0; }
 
 protected:
   /**
@@ -81,6 +92,11 @@ private:
     handle_; ///< Singleton pattern, handle to CommandFacility
 };
 
+/**
+ * @brief Instantiate a CommandFacility from a plugin
+ * @param facility_name Name of the CommandFacility plugin to load
+ * @return Pointer to loaded CommandFacility from plugin
+*/
 inline std::unique_ptr<CommandFacility>
 makeCommandFacility(std::string const& facility_name)
 {
@@ -91,4 +107,4 @@ makeCommandFacility(std::string const& facility_name)
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_SERVICES_COMMANDFACILITY_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HH_

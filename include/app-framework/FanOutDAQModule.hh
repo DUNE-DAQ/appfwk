@@ -1,5 +1,5 @@
 /**
- * @file The FanOutDAQModule class interface
+ * @file FanOutDAQModule.hh
  *
  * FanOutDAQModule is a simple DAQModule implementation that simply logs the
  * fact that it received a command from DAQProcess.
@@ -9,11 +9,11 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
 
-#include "app-framework/DAQModules/DAQModuleI.hh"
-#include "app-framework/DAQModules/DAQModuleThreadHelper.hh"
+#include "app-framework/DAQModule.hh"
+#include "app-framework/DAQModuleThreadHelper.hh"
 #include "app-framework/DAQSink.hh"
 #include "app-framework/DAQSource.hh"
 
@@ -34,13 +34,26 @@ namespace appframework {
 */
 struct NonCopyableType
 {
-  int data;
+  int data; ///< Integer data for NonCopyableType
+  /**
+   * @brief NonCopyableType Constructor
+   * @param d Initialization for data member
+  */
   explicit NonCopyableType(int d)
     : data(d)
   {}
-  NonCopyableType(NonCopyableType const&) = delete;
+  NonCopyableType(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-constructible
+  /**
+   * @brief Move Constructor for NonCopyableType
+   * @param i NonCopyableType rvalue to move from
+  */
   NonCopyableType(NonCopyableType&& i) { data = i.data; }
-  NonCopyableType& operator=(NonCopyableType const&) = delete;
+  NonCopyableType& operator=(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-assignable
+  /**
+   * @brief Move assignment operator for NonCopyableType
+   * @param i NonCopyableType to move from
+   * @return NonCopyableType instance
+  */
   NonCopyableType& operator=(NonCopyableType&& i)
   {
     data = i.data;
@@ -52,30 +65,38 @@ struct NonCopyableType
  * @brief FanOutDAQModule sends data to multiple Queues
  */
 template<typename ValueType>
-class FanOutDAQModule : public DAQModuleI
+class FanOutDAQModule : public DAQModule
 {
 public:
-  FanOutDAQModule(std::string name);
+  /**
+   * @brief FanOutDAQModule Constructor
+   * @param name Name of this FanOutDAQModule instance
+  */
+  explicit FanOutDAQModule(std::string name);
 
+  /**
+   * @brief Defines the possible modes for FanOutDAQModule
+  */
   enum class FanOutMode
   {
-    NotConfigured,
-    Broadcast,
-    RoundRobin,
-    FirstAvailable
+    NotConfigured, ///< FanOutDAQModule is not configured
+    Broadcast, ///< FanOutDAQModule will copy elements from input to all outputs
+    RoundRobin, ///< FanOutDAQModule will distribute elements from input to outputs in a round-robin fashion
+    FirstAvailable ///< FanOutDAQModule will distribute elements from input to the first available output
   };
 
   /**
-   * @brief Logs the reception of the command
+   * @brief Execute a command from DAQProcess
    * @param cmd Command from DAQProcess
+   * @param args Arguments for the command from DAQProcess
    */
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
 
-  FanOutDAQModule(const FanOutDAQModule&) = delete;
-  FanOutDAQModule& operator=(const FanOutDAQModule&) = delete;
-  FanOutDAQModule(FanOutDAQModule&&) = delete;
-  FanOutDAQModule& operator=(FanOutDAQModule&&) = delete;
+  FanOutDAQModule(const FanOutDAQModule&) = delete; ///< FanOutDAQModule is not copy-constructible
+  FanOutDAQModule& operator=(const FanOutDAQModule&) = delete; ///< FanOutDAQModule is not copy-assignable
+  FanOutDAQModule(FanOutDAQModule&&) = delete; ///< FanOutDAQModule is not move-constructible
+  FanOutDAQModule& operator=(FanOutDAQModule&&) = delete; ///< FanOutDAQModule is not move-assignable
 
 private:
   // Commands
@@ -127,4 +148,4 @@ private:
 
 #include "detail/FanOutDAQModule.icc"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FANOUTDAQMODULE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_

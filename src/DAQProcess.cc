@@ -1,5 +1,5 @@
 /**
- * @file DAQProcess class implementation
+ * @file DAQProcess.cc DAQProcess class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -8,12 +8,13 @@
 
 #include "app-framework/DAQProcess.hh"
 
-#include "app-framework/Services/CommandFacility.hh"
-#include "app-framework/Services/ConfigurationManager.hh"
-#include "app-framework/Services/Logger.hh"
-#include "app-framework/Services/ServiceManager.hh"
+#include "app-framework/CommandFacility.hh"
+#include "app-framework/Logger.hh"
 
 #include "TRACE/trace.h"
+/**
+ * @brief Name used by TRACE TLOG calls from this source file
+ */
 #define TRACE_NAME "DAQProcess" // NOLINT
 
 #include "ers/ers.h"
@@ -22,8 +23,6 @@
 #include <unordered_set>
 
 namespace appframework {
-std::unique_ptr<ServiceManager> ServiceManager::handle_ = nullptr;
-std::unique_ptr<ConfigurationManager> ConfigurationManager::handle_ = nullptr;
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
 DAQProcess::DAQProcess(CommandLineInterpreter args)
@@ -31,10 +30,7 @@ DAQProcess::DAQProcess(CommandLineInterpreter args)
   CommandFacility::setHandle(
     makeCommandFacility(args.commandFacilityPluginName));
   Logger::setup(args.otherOptions);
-  CommandFacility::setup(args.otherOptions);
-  ConfigurationManager::setup(args.configurationManagerPluginName,
-                              args.otherOptions);
-  ServiceManager::setup(args.servicePluginNames, args.otherOptions);
+  CommandFacility::handle().setup(args.otherOptions);
 }
 
 void
@@ -44,7 +40,8 @@ DAQProcess::register_modules(ModuleList& ml)
 }
 
 void
-DAQProcess::execute_command(std::string cmd)
+DAQProcess::execute_command(std::string const& cmd,
+                            std::vector<std::string> const& args)
 {
   std::unordered_set<std::string> daq_module_list;
   for (auto const& dm : daqModuleMap_) {
@@ -58,7 +55,7 @@ DAQProcess::execute_command(std::string cmd)
     for (auto& moduleName : commandOrderMap_[cmd]) {
       if (daqModuleMap_.count(moduleName)) {
 
-        call_command_on_module(*daqModuleMap_[moduleName], cmd);
+        call_command_on_module(*daqModuleMap_[moduleName], cmd, args);
 
         daq_module_list.erase(moduleName);
       }
@@ -72,7 +69,7 @@ DAQProcess::execute_command(std::string cmd)
                    << " for all remaining DAQModules";
   for (auto const& moduleName : daq_module_list) {
 
-    call_command_on_module(*daqModuleMap_[moduleName], cmd);
+    call_command_on_module(*daqModuleMap_[moduleName], cmd, args);
   }
 }
 
@@ -83,12 +80,14 @@ DAQProcess::listen()
 }
 
 void
-DAQProcess::call_command_on_module(DAQModuleI& mod, const std::string& cmd)
+DAQProcess::call_command_on_module(DAQModule& mod,
+                                   const std::string& cmd,
+                                   std::vector<std::string> const& args)
 {
 
   try {
-    mod.execute_command(cmd);
-  } catch (GeneralDAQModuleIssue& ex) {
+    mod.execute_command(cmd, args);
+  } catch (GeneralDAQModulessue& ex) {
     ers::error(ex);
   }
   // catch (...) {

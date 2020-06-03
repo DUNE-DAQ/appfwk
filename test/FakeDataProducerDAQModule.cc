@@ -1,22 +1,26 @@
 /**
- * @file The FakeDataProducerDAQModule class implementation
+ * @file FakeDataProducerDAQModule.cc FakeDataProducerDAQModule class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/DAQModules/FakeDataProducerDAQModule.hh"
+#include "FakeDataProducerDAQModule.hh"
 
 #include <chrono>
 #include <thread>
+#include <utility>
 
 #include <TRACE/trace.h>
+/**
+ * @brief Name used by TRACE TLOG calls from this source file
+ */
 #define TRACE_NAME "FakeDataProducer" // NOLINT
 
 appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   std::string name)
-  : DAQModuleI(name)
+  : DAQModule(name)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
   , outputQueue_(nullptr)
@@ -25,7 +29,7 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
 void
 appframework::FakeDataProducerDAQModule::execute_command(
   const std::string& cmd,
-  const std::vector<std::string>& /*args*/)
+  const std::vector<std::string>& args)
 {
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
@@ -68,6 +72,12 @@ appframework::FakeDataProducerDAQModule::do_stop()
   return "Success";
 }
 
+/**
+ * @brief Format a std::vector<int> for TRACE
+ * @param t TraceStreamer Instance
+ * @param ints Vector to format
+ * @return TraceStreamer Instance
+ */
 TraceStreamer&
 operator<<(TraceStreamer& t, std::vector<int> ints)
 {

@@ -1,13 +1,13 @@
 /**
  *
- * @file StdDeQueue class Unit Tests
+ * @file StdDeQueue_test.cc StdDeQueue class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/Queues/StdDeQueue.hh"
+#include "app-framework/StdDeQueue.hh"
 
 #define BOOST_TEST_MODULE StdDeQueue_test // NOLINT
 #include <boost/test/included/unit_test.hpp>
@@ -20,16 +20,23 @@
 
 namespace {
 
-constexpr int max_testable_capacity = 1000000000;
-constexpr double fractional_timeout_tolerance = 0.1;
+constexpr int max_testable_capacity = 1000000000; ///< The maximum capacity this test will attempt to check
+constexpr double fractional_timeout_tolerance = 0.1; ///< The fraction of the timeout which the timing is allowed to be off by
 
-// Don't set the timeout to zero, otherwise the tests will fail since they'd
-// expect the push/pop functions to execute instananeously
+/**
+ * @brief Timeout to use for tests
+ *
+ * Don't set the timeout to zero, otherwise the tests will fail since they'd
+ * expect the push/pop functions to execute instananeously
+ */
 constexpr auto timeout = std::chrono::milliseconds(1);
+/**
+ * @brief Timeout expressed in microseconds
+*/
 constexpr auto timeout_in_us =
   std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-appframework::StdDeQueue<int> Queue("StdDeQueue");
+appframework::StdDeQueue<int> Queue("StdDeQueue"); ///< Queue instance for the test
 
 /**
  * \todo StdDeQueue no longer exposes size or capacity methods. This section

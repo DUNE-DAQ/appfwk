@@ -1,7 +1,7 @@
 
 template<typename ValueType>
 appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
-  : DAQModuleI(name)
+  : DAQModule(name)
   , mode_(FanOutMode::NotConfigured)
   , queueTimeout_(100)
   , thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this))

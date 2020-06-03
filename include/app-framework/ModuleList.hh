@@ -1,15 +1,18 @@
 /**
- * @file ModuleList class interface
+ * @file ModuleList.hh
+ *
+ * A ModuleList defines a DAQ Application's DAQModule graph. It may also
+ * register Queues with QueueRegistry.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_MODULELIST_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_MODULELIST_HH_
 
-#include "app-framework/DAQModules/DAQModuleI.hh"
+#include "app-framework/DAQModule.hh"
 
 #include <list>
 #include <map>
@@ -17,7 +20,7 @@
 #include <string>
 
 namespace appframework {
-typedef std::map<std::string, std::shared_ptr<DAQModuleI>>
+typedef std::map<std::string, std::shared_ptr<DAQModule>>
   DAQModuleMap; ///< DAQModules indexed by name
 typedef std::map<std::string, std::list<std::string>>
   CommandOrderMap; ///< Defined DAQModule orders for commands
@@ -48,4 +51,4 @@ public:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_CORE_MODULELIST_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_MODULELIST_HH_

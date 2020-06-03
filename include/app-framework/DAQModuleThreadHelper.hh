@@ -1,5 +1,5 @@
 /**
- * @file The DAQModuleThreadHelper class interface
+ * @file DAQModuleThreadHelper.hh DAQModuleThreadHelper class declarations
  *
  * DAQModuleThreadHelper defines a std::thread which runs the do_work()
  * function as well as methods to start and stop that thread.
@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
-#define APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULETHREADHELPER_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULETHREADHELPER_HH_
 
 #include <functional>
 #include <future>
@@ -28,6 +28,7 @@ class DAQModuleThreadHelper
 public:
   /**
    * @brief DAQModuleThreadHelper Constructor
+   * @param do_work Function to be executed in the thread
    *
    * This constructor sets the defaults for the thread control variables
    */
@@ -71,12 +72,16 @@ public:
     }
   }
 
+  /**
+   * @brief Determine if the thread is currently running
+   * @return Whether the thread is currently running
+  */
   bool thread_running() const { return thread_running_.load(); }
 
-  DAQModuleThreadHelper(const DAQModuleThreadHelper&) = delete;
-  DAQModuleThreadHelper& operator=(const DAQModuleThreadHelper&) = delete;
-  DAQModuleThreadHelper(DAQModuleThreadHelper&&) = delete;
-  DAQModuleThreadHelper& operator=(DAQModuleThreadHelper&&) = delete;
+  DAQModuleThreadHelper(const DAQModuleThreadHelper&) = delete; ///< DAQModuleThreadHelper is not copy-constructible
+  DAQModuleThreadHelper& operator=(const DAQModuleThreadHelper&) = delete; ///< DAQModuleThreadHelper is not copy-assginable
+  DAQModuleThreadHelper(DAQModuleThreadHelper&&) = delete; ///< DAQModuleThreadHelper is not move-constructible
+  DAQModuleThreadHelper& operator=(DAQModuleThreadHelper&&) = delete; ///< DAQModuleThreadHelper is not move-assignable
 
 private:
   std::atomic<bool> thread_running_;
@@ -85,4 +90,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_BASE_INCLUDE_APP_FRAMEWORK_BASE_DAQMODULES_DAQMODULETHREADHELPER_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULETHREADHELPER_HH_

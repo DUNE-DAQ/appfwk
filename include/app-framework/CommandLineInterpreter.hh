@@ -1,5 +1,5 @@
 /**
- * @file CommandLineInterpreter helper class
+ * @file CommandLineInterpreter.hh CommandLineInterpreter helper class
  *
  * CommandLineInterpreter takes the command-line arguments and produces a
  * configuration object for use by DAQProcess
@@ -9,22 +9,31 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_APPS_COMMANDLINEINTERPRETER_HH
-#define APP_FRAMEWORK_APPS_COMMANDLINEINTERPRETER_HH
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HH_
+
+#include <TRACE/trace.h>
 
 #include <boost/program_options.hpp>
+#include <string>
+#include <vector>
+
 namespace bpo = boost::program_options;
 
-#include "TRACE/trace.h"
-
 namespace appframework {
+/**
+ * @brief CommandLineInterpreter parses the command-line options given to the
+ * application and stores the results as validated data members
+ */
 struct CommandLineInterpreter
 {
 public:
-  explicit CommandLineInterpreter()
-    : isValid(false)
-  {}
-
+  /**
+   * @brief Parse the command line and return a CommandLineInterpreter struct
+   * @param argc Number of arguments
+   * @param argv Command-line arguments
+   * @return CommandLineInterpreter structure with parsed arguments
+   */
   static CommandLineInterpreter ParseCommandLineArguments(int argc, char** argv)
   {
     CommandLineInterpreter output;
@@ -65,7 +74,7 @@ public:
     }
 
     if (vm.count("help")) {
-      std::cout << desc;
+      std::cout << desc; // NOLINT
       exit(0);
     }
 
@@ -75,7 +84,7 @@ public:
     } else {
       TLOG_ERROR("CommandLineInterpreter")
         << "CommandFacility not specified on command line! Exiting";
-      std::cout << desc;
+      std::cout << desc; // NOLINT
       exit(-2);
     }
     if (vm.count("configManager")) {
@@ -92,13 +101,19 @@ public:
     return output;
   }
 
-  bool isValid;
-  std::string applicaitonConfigurationFile;
-  std::string commandFacilityPluginName;
-  std::string configurationManagerPluginName;
-  std::vector<std::string> servicePluginNames;
-  std::vector<std::string> otherOptions;
+  bool isValid{ false }; ///< Whether the command line was successfully parsed
+  std::string applicaitonConfigurationFile; ///< File that contains application
+                                            ///< configuration (JSON)
+  std::string
+    commandFacilityPluginName; ///< Name of the CommandFacility plugin to load
+  std::string
+    configurationManagerPluginName; ///< Name of the ConfigurationManager plugin
+                                    ///< to load
+  std::vector<std::string>
+    servicePluginNames; ///< Names of the Service plugins to load
+  std::vector<std::string>
+    otherOptions; ///< Any other options which were passed and not recognized
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_APPS_COMMANDLINEINTERPRETER_HH
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HH_

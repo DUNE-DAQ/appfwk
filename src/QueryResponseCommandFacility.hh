@@ -1,5 +1,5 @@
 /**
- * @file QueryResponseCommandFacility class interface
+ * @file QueryResponseCommandFacility.hh
  *
  * QueryResponseCommandFacility is a simple CommandFacility plugin which is
  * designed to take commands from standard input for testing purposes.
@@ -9,12 +9,12 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH_
+#ifndef APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HH_
+#define APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HH_
 
 #include "app-framework/DAQProcess.hh"
 
-#include "app-framework/Services/CommandFacility.hh"
+#include "app-framework/CommandFacility.hh"
 
 namespace appframework {
 /**
@@ -29,10 +29,11 @@ public:
    * DAQProcess
    * @param theProcess Pointer to the DAQProcess instance which will distribute
    * received commands
+   * @return Status code. 0 if terminated by quit command, -1 if an exception occurs
    */
   int listen(DAQProcess* theProcess) override;
   virtual ~QueryResponseCommandFacility();
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUERYRESPONSECOMMANDFACILITY_HH_
+#endif // APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HH_

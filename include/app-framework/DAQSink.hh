@@ -1,21 +1,29 @@
-/*
- * DAQSink.hh
+/**
+ * @file DAQSink.hh DAQSink class interface
  *
- *  Created on: 19 May 2020
- *      Author: glehmann
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
  */
 
-#ifndef DAQSOURCE_HH_
-#define DAQSOURCE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HH_
+
+#include "app-framework/Queue.hh"
+#include "app-framework/QueueRegistry.hh"
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
-#include <app-framework/QueueI.hh>
-#include <app-framework/QueueRegistry.hh>
+
 #include <chrono>
 #include <memory>
 #include <string>
+#include <utility>
 
+/**
+ * @brief Define an ERS Issue for when DAQSink is unable to retrieve its Queue
+ * handle
+ */
 ERS_DECLARE_ISSUE(appframework,             // namespace
                   DAQSinkConstrutionFailed, // issue class name
                   "Failed to construct DAQSink \"" << name
@@ -31,12 +39,12 @@ public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
-  DAQSink(std::string name);
+  explicit DAQSink(std::string name);
   void push(T&& element, const duration_type& timeout = duration_type::zero());
   bool can_push();
 
 private:
-  std::shared_ptr<QueueI<T>> queue_;
+  std::shared_ptr<Queue<T>> queue_;
 };
 
 template<typename T>
@@ -67,4 +75,4 @@ DAQSink<T>::can_push()
 
 } // namespace appframework
 
-#endif /* DAQSOURCE_HH_ */
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HH_

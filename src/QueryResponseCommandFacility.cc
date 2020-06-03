@@ -1,14 +1,15 @@
 /**
- * @file QueryResponseCommandFacility class Implementation
+ * @file QueryResponseCommandFacility.cc QueryResponseCommandFacility class Implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/QueryResponseCommandFacility.hh"
+#include "QueryResponseCommandFacility.hh"
 
 #include <iostream>
+#include <string>
 
 namespace appframework {
 
@@ -18,7 +19,7 @@ QueryResponseCommandFacility::listen(DAQProcess* process)
   try {
     bool keepGoing = true;
     while (keepGoing) {
-      std::cout << "Enter a command" << std::endl;
+      std::cout << "Enter a command" << std::endl; // NOLINT
       std::string comm;
       std::getline(std::cin, comm);
 
@@ -29,7 +30,8 @@ QueryResponseCommandFacility::listen(DAQProcess* process)
         process->execute_command(comm);
       }
     }
-  } catch (...) {
+  } catch (...)  // NOLINT
+  {
     return -1;
   }
 

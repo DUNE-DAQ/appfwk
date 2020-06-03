@@ -1,5 +1,5 @@
 /**
- * @file The FakeDataProducerDAQModule class interface
+ * @file FakeDataProducerDAQModule.hh
  *
  * FakeDataProducerDAQModule is a simple DAQModule implementation that simply
  * logs the fact that it received a command from DAQProcess.
@@ -9,11 +9,11 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
+#ifndef APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HH_
+#define APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HH_
 
-#include "app-framework/DAQModules/DAQModuleI.hh"
-#include "app-framework/DAQModules/DAQModuleThreadHelper.hh"
+#include "app-framework/DAQModule.hh"
+#include "app-framework/DAQModuleThreadHelper.hh"
 #include "app-framework/DAQSink.hh"
 
 #include <future>
@@ -26,19 +26,26 @@ namespace appframework {
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataProducerDAQModule : public DAQModuleI
+class FakeDataProducerDAQModule : public DAQModule
 {
 public:
-  FakeDataProducerDAQModule(std::string name);
+  /**
+   * @brief FakeDataProducerDAQModule Constructor
+   * @param name Instance name for this FakeDataProducerDAQModule instance
+  */
+  explicit FakeDataProducerDAQModule(std::string name);
 
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
 
-  FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) = delete;
+  FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) =
+    delete; ///< FakeDataProducerDAQModule is not copy-constructible
   FakeDataProducerDAQModule& operator=(const FakeDataProducerDAQModule&) =
-    delete;
-  FakeDataProducerDAQModule(FakeDataProducerDAQModule&&) = delete;
-  FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) = delete;
+    delete; ///< FakeDataProducerDAQModule is not copy-assignable
+  FakeDataProducerDAQModule(FakeDataProducerDAQModule&&) =
+    delete; ///< FakeDataProducerDAQModule is not move-constructible
+  FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) =
+    delete; ///< FakeDataProducerDAQModule is not move-assignable
 
 private:
   // Commands
@@ -61,4 +68,4 @@ private:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATAPRODUCERDAQMODULE_HH_
+#endif // APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HH_

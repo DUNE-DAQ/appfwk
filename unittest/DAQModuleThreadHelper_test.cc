@@ -1,13 +1,13 @@
 /**
  *
- * @file DAQModuleThreadHelper class Unit Tests
+ * @file DAQModuleThreadHelper_test.cc DAQModuleThreadHelper class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/DAQModules/DAQModuleThreadHelper.hh"
+#include "app-framework/DAQModuleThreadHelper.hh"
 
 #define BOOST_TEST_MODULE DAQModuleThreadHelper_test // NOLINT
 #include <boost/test/unit_test.hpp>
