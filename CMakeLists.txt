@@ -32,8 +32,7 @@ else()
 	set(CETLIB_EXCEPT cetlib_except)
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/appfwk/include)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/ers)
 
 function( point_build_to output_dir )
