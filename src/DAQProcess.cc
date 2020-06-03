@@ -13,7 +13,6 @@
 #include "app-framework/Services/Logger.hh"
 #include "app-framework/Services/ServiceManager.hh"
 
-#include "app-framework/CommandIssues.hh"
 #define TRACE_NAME "DAQProcess" // NOLINT
 
 #include <memory>
@@ -65,13 +64,11 @@ DAQProcess::execute_command(std::string cmd)
     }
   } else {
 
-	  //ERS_WARNING() << DAQIssues::CommandOrderNotSpecified( ERS_HERE, cmd );
-	  ERS_WARNING() << appframework::CommandNotRegisted( ERS_HERE, cmd.c_str() );
-
+    ERS_WARNING() << CommandOrderNotSpecified( ERS_HERE, cmd );
   }
-
+  
   ERS_LOG() << "Executing Command " << cmd
-                   << " for all remaining DAQModules";
+	    << " for all remaining DAQModules";
   for (auto const& moduleName : daq_module_list) {
 
     call_command_on_module(*daqModuleMap_[moduleName], cmd);
