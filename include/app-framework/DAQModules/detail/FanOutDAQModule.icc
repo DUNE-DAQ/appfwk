@@ -1,14 +1,13 @@
 
 template<typename ValueType>
-appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(
-  std::shared_ptr<QueueSource<ValueType>> inputQueue,
-  std::initializer_list<std::shared_ptr<QueueSink<ValueType>>> outputQueues)
-  : thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this))
+appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
+  : DAQModuleI(name)
   , mode_(FanOutMode::NotConfigured)
   , queueTimeout_(100)
-  , inputQueue_(inputQueue)
-  , outputQueues_(outputQueues)
+  , thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this))
   , wait_interval_us_(std::numeric_limits<size_t>::max())
+  , inputQueue_(nullptr)
+  , outputQueues_()
 {}
 
 template<typename ValueType>
@@ -32,8 +31,33 @@ template<typename ValueType>
 std::string
 appframework::FanOutDAQModule<ValueType>::do_configure()
 {
-  mode_ = FanOutMode::RoundRobin;
-  wait_interval_us_ = 1000000;
+  if (configuration_.contains("fanout_mode")) {
+    auto modeString = configuration_["fanout_mode"].get<std::string>();
+    if (modeString.find("roadcast") != std::string::npos) {
+
+      mode_ = FanOutMode::Broadcast;
+    } else if (modeString.find("irst") != std::string::npos) {
+
+      mode_ = FanOutMode::FirstAvailable;
+    } else {
+      // RoundRobin by default
+      mode_ = FanOutMode::RoundRobin;
+    }
+  } else {
+    // RoundRobin by default
+    mode_ = FanOutMode::RoundRobin;
+  }
+
+  wait_interval_us_ = configuration_.value<int>("wait_interval", 1000000);
+
+  auto inputName = configuration_["input"].get<std::string>();
+  TLOG(TLVL_DEBUG, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName
+                  << " as input";
+  inputQueue_.reset(new DAQSource<ValueType>(inputName));
+  for (auto& output : configuration_["outputs"]) {
+    outputQueues_.emplace_back(
+      new DAQSink<ValueType>(output.get<std::string>()));
+  }
 
   return "Success";
 }
@@ -70,7 +94,8 @@ appframework::FanOutDAQModule<ValueType>::do_work()
       try {
         data_ptr = std::make_unique<ValueType>(inputQueue_->pop(queueTimeout_));
       } catch (const std::runtime_error& err) {
-        TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
+        TLOG(TLVL_WARNING) << get_name()
+                           << ": Tried but failed to pop a value from an "
                               "inputQueue (exception is \""
                            << err.what() << "\")";
         continue;
@@ -92,8 +117,10 @@ appframework::FanOutDAQModule<ValueType>::do_work()
                 sent = true;
                 break;
               } else {
-                TLOG(TLVL_WARNING) << "A timeout occurred trying to push data "
-                                      "onto an outputqueue; data has been lost";
+                TLOG(TLVL_WARNING)
+                  << get_name()
+                  << ": A timeout occurred trying to push data "
+                     "onto an outputqueue; data has been lost";
               }
             }
           }
@@ -112,7 +139,8 @@ appframework::FanOutDAQModule<ValueType>::do_work()
 
             if (std::chrono::duration_cast<decltype(queueTimeout_)>(
                   endtime - starttime) >= queueTimeout_) {
-              TLOG(TLVL_WARNING) << "A timeout occurred trying to push data "
+              TLOG(TLVL_WARNING) << get_name()
+                                 << ": A timeout occurred trying to push data "
                                     "onto an outputqueue; data has been lost";
             }
 
@@ -127,6 +155,7 @@ appframework::FanOutDAQModule<ValueType>::do_work()
         }
       }
     } else { // inputQueue_ is empty
+      TLOG(TLVL_TRACE, "FanOutDAQModule") << get_name() << ": Waiting for data";
       std::this_thread::sleep_for(std::chrono::microseconds(wait_interval_us_));
     }
   }

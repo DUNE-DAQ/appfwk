@@ -15,13 +15,10 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 
-#include "app-framework-base/Core/ModuleList.hh"
-#include "app-framework-base/DAQModules/DAQModuleI.hh"
-#include "app-framework-base/Queues/QueueI.hh"
+#include "app-framework/Core/ModuleList.hh"
+#include "app-framework/DAQModules/DAQModuleI.hh"
+#include "app-framework/CommandLineInterpreter.hh"
 
-#include <list>
-#include <map>
-#include <memory>
 #include <string>
 
 namespace appframework {
@@ -44,7 +41,7 @@ public:
    * Services are passed the command-line options and may also read basic
    * configuration from the environment.
    */
-  explicit DAQProcess(std::list<std::string> args);
+  explicit DAQProcess(CommandLineInterpreter args);
   /**
    * @brief Using the given ModuleList, construct the graph of DAQModules and
    * Queues
@@ -82,13 +79,44 @@ public:
   DAQProcess& operator=(DAQProcess&&) = delete;
 
 protected:
-  void call_command_on_module( DAQModuleI & module, const std::string & cmd ) ; 
+  void call_command_on_module(DAQModuleI& module, const std::string& cmd);
 
 private:
-  QueueMap queueMap_;               ///< String alias for each Queue
   DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule
   CommandOrderMap commandOrderMap_; ///< Order DAQModule commands by alias
 };
 } // namespace appframework
+
+ERS_DECLARE_ISSUE(appframework,
+                  DAQProcessIssue,
+                  "General DAQProcess Issue",
+                  ERS_EMPTY)
+
+ERS_DECLARE_ISSUE_BASE(appframework,
+                       CommandOrderNotSpecified,
+                       DAQProcessIssue,
+                       "Command "
+                         << cmd
+                         << " does not have a specified propagation order ",
+                       ERS_EMPTY,
+                       ((std::string)cmd))
+
+ERS_DECLARE_ISSUE_BASE(appframework,
+                       ModuleThrowUknown,
+                       DAQProcessIssue,
+                       "Module " << mod_name
+                                 << " threw an unknown exception after command "
+                                 << cmd,
+                       ERS_EMPTY,
+                       ((std::string)mod_name)((std::string)cmd))
+
+ERS_DECLARE_ISSUE_BASE(appframework,
+                       ModuleThowStd,
+                       DAQProcessIssue,
+                       "Module " << mod_name
+                                 << " threw an std::exception after command "
+                                 << cmd,
+                       ERS_EMPTY,
+                       ((std::string)mod_name)((std::string)cmd))
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_

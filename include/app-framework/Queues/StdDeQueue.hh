@@ -1,5 +1,5 @@
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_STDDEQUEUE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_STDDEQUEUE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_NAMEDSTDDEQUEUE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_NAMEDSTDDEQUEUE_HH_
 
 /**
  *
@@ -10,7 +10,7 @@
  * received with this code.
  */
 
-#include "app-framework-base/Queues/Queue.hh"
+#include "app-framework/QueueI.hh"
 
 #include <atomic>
 #include <cassert>
@@ -28,33 +28,26 @@
 
 namespace appframework {
 
-template<class ValueType, class DurationType = std::chrono::milliseconds>
-class StdDeQueue
-  : public QueueSink<ValueType, DurationType>
-  , public QueueSource<ValueType, DurationType>
+template<class T>
+class StdDeQueue : public QueueI<T>
 {
 public:
-  using value_type = ValueType;
-  using duration_type = DurationType;
+  using value_type = T;
+  using duration_type = typename QueueI<T>::duration_type;
 
   // This is needed in order for all signatures of the functions of
   // this name in the base class to be accessible here, given that a
   // subset are overridden
 
-  using QueueSink<ValueType, DurationType>::push;
+  // using QueueSink<T, DurationType>::push;
 
-  using QueueI::Configure; //(const std::vector<std::string> & args = {}) ;
-
-  StdDeQueue();
+  StdDeQueue(const std::string& name);
 
   bool can_pop() const noexcept override { return fSize.load() > 0; }
   value_type pop(const duration_type&)
     override; // Throws std::runtime_error if a timeout occurs
 
-  bool can_push() const noexcept override
-  {
-    return fSize.load() < fDeque.max_size();
-  }
+  bool can_push() const noexcept override { return fSize.load() < fMaxSize; }
   void push(value_type&&, const duration_type&)
     override; // Throws std::runtime_error if a timeout occurs
 
@@ -66,8 +59,12 @@ public:
   StdDeQueue(StdDeQueue&&) = delete;
   StdDeQueue& operator=(StdDeQueue&&) = delete;
 
+  void SetSize(size_t sz) { fMaxSize = sz; }
+
 private:
   void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
+
+  size_t fMaxSize;
 
   std::deque<value_type> fDeque;
   std::atomic<size_t> fSize = 0;
@@ -81,4 +78,4 @@ private:
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_STDDEQUEUE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_NAMEDSTDDEQUEUE_HH_

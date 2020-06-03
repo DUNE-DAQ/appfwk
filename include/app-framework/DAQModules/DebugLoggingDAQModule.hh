@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_DEBUGLOGGINGDAQMODULE_HH_
 
-#include "app-framework-base/DAQModules/DAQModuleI.hh"
+#include "app-framework/DAQModules/DAQModuleI.hh"
 
 #include <string>
 #include <vector>
@@ -25,6 +25,10 @@ namespace appframework {
 class DebugLoggingDAQModule : public DAQModuleI
 {
 public:
+  DebugLoggingDAQModule(std::string name)
+    : DAQModuleI(name)
+  {}
+
   /**
    * @brief Logs the reception of the command
    * @param cmd Command from DAQProcess

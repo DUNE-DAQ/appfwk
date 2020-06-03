@@ -14,7 +14,7 @@
 
 #include "app-framework/DAQProcess.hh"
 
-#include "app-framework-base/Services/CommandFacility.hh"
+#include "app-framework/Services/CommandFacility.hh"
 
 namespace appframework {
 /**
@@ -31,6 +31,7 @@ public:
    * received commands
    */
   int listen(DAQProcess* theProcess) override;
+  virtual ~QueryResponseCommandFacility();
 };
 } // namespace appframework
 

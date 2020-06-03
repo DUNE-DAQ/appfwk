@@ -15,10 +15,11 @@
 #define TRACE_NAME "FakeDataProducer" // NOLINT
 
 appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
-  std::shared_ptr<QueueSink<std::vector<int>>> outputQueue)
-  : outputQueue_(outputQueue)
+  std::string name)
+  : DAQModuleI(name)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
+  , outputQueue_(nullptr)
 {}
 
 void
@@ -28,22 +29,27 @@ appframework::FakeDataProducerDAQModule::execute_command(
 {
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
-  }
-  if (cmd == "start" || cmd == "Start") {
+  } else if (cmd == "start" || cmd == "Start") {
     do_start();
-  }
-  if (cmd == "stop" || cmd == "Stop") {
+  } else if (cmd == "stop" || cmd == "Stop") {
     do_stop();
+  } else {
+    throw UnknownCommand(ERS_HERE, cmd);
   }
 }
 
 std::string
 appframework::FakeDataProducerDAQModule::do_configure()
 {
-  nIntsPerVector_ = 10;
-  starting_int_ = -4;
-  ending_int_ = 14;
-  wait_between_sends_ms_ = 1000;
+
+  outputQueue_.reset(
+    new DAQSink<std::vector<int>>(configuration_["output"].get<std::string>()));
+
+  nIntsPerVector_ = configuration_.value<int>("nIntsPerVector", 10);
+  starting_int_ = configuration_.value<int>("starting_int", -4);
+  ending_int_ = configuration_.value<int>("ending_int", 14);
+  wait_between_sends_ms_ =
+    configuration_.value<int>("wait_between_sends_ms", 1000);
 
   return "Success";
 }
@@ -82,33 +88,36 @@ appframework::FakeDataProducerDAQModule::do_work()
   int current_int = starting_int_;
   size_t counter = 0;
   while (thread_.thread_running()) {
-    TLOG(TLVL_DEBUG) << "Creating output vector";
+    TLOG(TLVL_DEBUG) << get_name() << ": Creating output vector";
     std::vector<int> output(nIntsPerVector_);
 
-    TLOG(TLVL_DEBUG) << "Start of fill loop";
+    TLOG(TLVL_DEBUG) << get_name() << ": Start of fill loop";
     for (auto ii = 0; ii < nIntsPerVector_; ++ii) {
       output[ii] = current_int;
       ++current_int;
       if (current_int > ending_int_)
         current_int = starting_int_;
     }
-    TLOG(TLVL_INFO) << "Produced vector " << counter << " with contents "
-                    << output << " and size " << output.size();
+    TLOG(TLVL_INFO) << get_name() << ": Produced vector " << counter
+                    << " with contents " << output << " and size "
+                    << output.size();
 
-    TLOG(TLVL_DEBUG) << "Pushing vector into outputQueue";
+    TLOG(TLVL_DEBUG) << get_name() << ": Pushing vector into outputQueue";
     auto starttime = std::chrono::steady_clock::now();
     outputQueue_->push(std::move(output), queueTimeout_);
     auto endtime = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<decltype(queueTimeout_)>(
           endtime - starttime) > queueTimeout_) {
       TLOG(TLVL_WARNING)
-        << "Timeout attempting to push vector onto outputQueue";
+        << get_name() << ": Timeout attempting to push vector onto outputQueue";
     }
 
-    TLOG(TLVL_DEBUG) << "Start of sleep between sends";
+    TLOG(TLVL_DEBUG) << get_name() << ": Start of sleep between sends";
     std::this_thread::sleep_for(
       std::chrono::milliseconds(wait_between_sends_ms_));
-    TLOG(TLVL_DEBUG) << "End of do_work loop";
+    TLOG(TLVL_DEBUG) << get_name() << ": End of do_work loop";
     counter++;
   }
 }
+
+DEFINE_DUNE_DAQ_MODULE(appframework::FakeDataProducerDAQModule)

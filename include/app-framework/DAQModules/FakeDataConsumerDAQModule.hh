@@ -12,9 +12,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATACONSUMERDAQMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULES_FAKEDATACONSUMERDAQMODULE_HH_
 
-#include "app-framework-base/DAQModules/DAQModuleI.hh"
-#include "app-framework-base/DAQModules/DAQModuleThreadHelper.hh"
-#include "app-framework-base/Queues/Queue.hh"
+#include "app-framework/DAQModules/DAQModuleI.hh"
+#include "app-framework/DAQModules/DAQModuleThreadHelper.hh"
+#include "app-framework/DAQSource.hh"
 
 #include <future>
 #include <memory>
@@ -29,9 +29,7 @@ namespace appframework {
 class FakeDataConsumerDAQModule : public DAQModuleI
 {
 public:
-  explicit FakeDataConsumerDAQModule(
-    std::shared_ptr<QueueSource<std::vector<int>>> inputQueue,
-    std::string id = "");
+  FakeDataConsumerDAQModule(std::string name);
 
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
@@ -56,10 +54,8 @@ private:
   size_t nIntsPerVector_;
   int starting_int_;
   int ending_int_;
-  std::string id_;
   std::chrono::milliseconds queueTimeout_;
-  std::string getId() { return id_ != "" ? id_ + ": " : ""; }
-  std::shared_ptr<QueueSource<std::vector<int>>> inputQueue_;
+  std::unique_ptr<DAQSource<std::vector<int>>> inputQueue_;
 };
 } // namespace appframework
 

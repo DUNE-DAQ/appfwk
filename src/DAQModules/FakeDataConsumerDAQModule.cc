@@ -16,12 +16,11 @@
 #include <thread>
 
 appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
-  std::shared_ptr<QueueSource<std::vector<int>>> inputQueue,
-  std::string id)
-  : thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
-  , id_(id)
+  std::string name)
+  : DAQModuleI(name)
   , queueTimeout_(100)
-  , inputQueue_(inputQueue)
+  , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
+  , inputQueue_(nullptr)
 {}
 
 void
@@ -31,21 +30,24 @@ appframework::FakeDataConsumerDAQModule::execute_command(
 {
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
-  }
-  if (cmd == "start" || cmd == "Start") {
+  } else if (cmd == "start" || cmd == "Start") {
     do_start();
-  }
-  if (cmd == "stop" || cmd == "Stop") {
+  } else if (cmd == "stop" || cmd == "Stop") {
     do_stop();
+  } else {
+    throw UnknownCommand(ERS_HERE, cmd);
   }
 }
 
 std::string
 appframework::FakeDataConsumerDAQModule::do_configure()
 {
-  nIntsPerVector_ = 10;
-  starting_int_ = -4;
-  ending_int_ = 14;
+  inputQueue_.reset(new DAQSource<std::vector<int>>(
+    configuration_["input"].get<std::string>()));
+
+  nIntsPerVector_ = configuration_.value<int>("nIntsPerVector", 10);
+  starting_int_ = configuration_.value<int>("starting_int", -4);
+  ending_int_ = configuration_.value<int>("ending_int", 14);
 
   return "Success";
 }
@@ -89,35 +91,38 @@ appframework::FakeDataConsumerDAQModule::do_work()
   while (thread_.thread_running()) {
     if (inputQueue_->can_pop()) {
 
-      TLOG(TLVL_DEBUG) << getId() << "Going to receive data from inputQueue";
+      TLOG(TLVL_DEBUG) << get_name()
+                       << ": Going to receive data from inputQueue";
 
       try {
         vec = inputQueue_->pop(queueTimeout_);
       } catch (const std::runtime_error& err) {
-        TLOG(TLVL_WARNING) << "Tried but failed to pop a value from an "
+        TLOG(TLVL_WARNING) << get_name()
+                           << ": Tried but failed to pop a value from an "
                               "inputQueue (exception is \""
                            << err.what() << "\"";
         continue;
       }
 
-      TLOG(TLVL_DEBUG) << getId() << "Received vector of size " << vec.size();
+      TLOG(TLVL_DEBUG) << get_name() << ": Received vector of size "
+                       << vec.size();
 
       bool failed = false;
 
-      TLOG(TLVL_DEBUG) << getId() << "Starting processing loop";
-      TLOG(TLVL_INFO) << getId() << "Received vector " << counter << ": "
+      TLOG(TLVL_DEBUG) << get_name() << ": Starting processing loop";
+      TLOG(TLVL_INFO) << get_name() << ": Received vector " << counter << ": "
                       << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
           if (ii != 0) {
             TLOG(TLVL_WARNING)
-              << getId() << "Error in received vector " << counter
+              << get_name() << ": Error in received vector " << counter
               << ", position " << ii << ": Expected " << current_int
               << ", received " << point;
             failed = true;
           } else {
-            TLOG(TLVL_INFO) << getId() << "Jump detected!";
+            TLOG(TLVL_INFO) << get_name() << ": Jump detected!";
           }
           current_int = point;
         }
@@ -126,8 +131,8 @@ appframework::FakeDataConsumerDAQModule::do_work()
           current_int = starting_int_;
         ++ii;
       }
-      TLOG(TLVL_DEBUG) << getId()
-                       << "Done with processing loop, failed=" << failed;
+      TLOG(TLVL_DEBUG) << get_name()
+                       << ": Done with processing loop, failed=" << failed;
       if (failed)
         fail_count++;
 
@@ -137,6 +142,8 @@ appframework::FakeDataConsumerDAQModule::do_work()
     }
   }
 
-  TLOG(TLVL_INFO) << getId() << "Processed " << counter << " vectors with "
+  TLOG(TLVL_INFO) << get_name() << ": Processed " << counter << " vectors with "
                   << fail_count << " failures.";
 }
+
+DEFINE_DUNE_DAQ_MODULE(appframework::FakeDataConsumerDAQModule)
