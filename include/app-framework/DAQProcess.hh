@@ -16,7 +16,7 @@
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
 
 #include "app-framework/ModuleList.hh"
-#include "app-framework/DAQModuleI.hh"
+#include "app-framework/DAQModule.hh"
 #include "app-framework/CommandLineInterpreter.hh"
 
 #include <string>
@@ -87,7 +87,7 @@ protected:
    * @param cmd Command name
    * @param args Command arguments
   */
-  void call_command_on_module(DAQModuleI& module, const std::string& cmd, std::vector<std::string> const& args);
+  void call_command_on_module(DAQModule& module, const std::string& cmd, std::vector<std::string> const& args);
 
 private:
   DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule

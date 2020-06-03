@@ -9,7 +9,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HH_
 
-#include "app-framework/QueueI.hh"
+#include "app-framework/Queue.hh"
 #include "app-framework/QueueRegistry.hh"
 
 #include "TRACE/trace.h"
@@ -44,7 +44,7 @@ public:
   bool can_push();
 
 private:
-  std::shared_ptr<QueueI<T>> queue_;
+  std::shared_ptr<Queue<T>> queue_;
 };
 
 template<typename T>

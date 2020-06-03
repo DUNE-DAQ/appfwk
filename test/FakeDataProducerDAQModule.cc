@@ -20,7 +20,7 @@
 
 appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   std::string name)
-  : DAQModuleI(name)
+  : DAQModule(name)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
   , outputQueue_(nullptr)

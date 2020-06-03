@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_MODULELIST_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_MODULELIST_HH_
 
-#include "app-framework/DAQModuleI.hh"
+#include "app-framework/DAQModule.hh"
 
 #include <list>
 #include <map>
@@ -20,7 +20,7 @@
 #include <string>
 
 namespace appframework {
-typedef std::map<std::string, std::shared_ptr<DAQModuleI>>
+typedef std::map<std::string, std::shared_ptr<DAQModule>>
   DAQModuleMap; ///< DAQModules indexed by name
 typedef std::map<std::string, std::list<std::string>>
   CommandOrderMap; ///< Defined DAQModule orders for commands

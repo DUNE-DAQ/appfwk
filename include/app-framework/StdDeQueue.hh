@@ -5,14 +5,14 @@
  *
  * @file StdDeQueue.hh
  *
- * A std::deque-based implementation of QueueI
+ * A std::deque-based implementation of Queue
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/QueueI.hh"
+#include "app-framework/Queue.hh"
 
 #include <atomic>
 #include <cassert>
@@ -34,11 +34,11 @@ namespace appframework {
  * @tparam T Data Type to be stored in the std::deque
 */
 template<class T>
-class StdDeQueue : public QueueI<T>
+class StdDeQueue : public Queue<T>
 {
 public:
   using value_type = T; ///< Type of data stored in the StdDeQueue
-  using duration_type = typename QueueI<T>::duration_type; ///< Type used for expressing timeouts
+  using duration_type = typename Queue<T>::duration_type; ///< Type used for expressing timeouts
 
   /**
    * @brief StdDeQueue Constructor

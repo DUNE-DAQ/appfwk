@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
 
-#include "app-framework/DAQModuleI.hh"
+#include "app-framework/DAQModule.hh"
 #include "app-framework/DAQModuleThreadHelper.hh"
 #include "app-framework/DAQSink.hh"
 #include "app-framework/DAQSource.hh"
@@ -65,7 +65,7 @@ struct NonCopyableType
  * @brief FanOutDAQModule sends data to multiple Queues
  */
 template<typename ValueType>
-class FanOutDAQModule : public DAQModuleI
+class FanOutDAQModule : public DAQModule
 {
 public:
   /**

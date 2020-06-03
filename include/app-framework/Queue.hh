@@ -1,7 +1,7 @@
 /**
- * @file QueueI.hh
+ * @file Queue.hh
  *
- * QueueI is the interface for Queue objects which connect DAQModules. Queues
+ * This is the interface for Queue objects which connect DAQModules. Queues
  * are exposed to DAQModules via the DAQSource and DAQSink classes, and should
  * not be handled directly. Queues are registered with QueueRegistry for
  * retrieval by DAQSink and DAQSource instances.
@@ -11,8 +11,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEI_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEI_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HH_
 
 #include "app-framework/NamedObject.hh"
 
@@ -32,17 +32,17 @@ namespace appframework {
  * it can be included in generic containers), all implementations should be.
  */
 template<class T>
-class QueueI : public NamedObject
+class Queue : public NamedObject
 {
 public:
-  using value_type = T; ///< Type stored in the QueueI
+  using value_type = T; ///< Type stored in the Queue
   using duration_type = std::chrono::milliseconds; ///< Base duration type for timeouts
 
   /**
-   * @brief QueueI Constructor
+   * @brief Queue Constructor
    * @param name Name of the Queue instance
   */
-  explicit QueueI(std::string name)
+  explicit Queue(std::string name)
     : NamedObject(name)
   {}
 
@@ -83,12 +83,12 @@ public:
   virtual bool can_pop() const noexcept = 0;
 
 private:
-  QueueI(const QueueI&) = delete;
-  QueueI& operator=(const QueueI&) = delete;
-  QueueI(QueueI&&) = default;
-  QueueI& operator=(QueueI&&) = default;
+  Queue(const Queue&) = delete;
+  Queue& operator=(const Queue&) = delete;
+  Queue(Queue&&) = default;
+  Queue& operator=(Queue&&) = default;
 };
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEI_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HH_

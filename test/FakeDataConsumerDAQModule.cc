@@ -20,7 +20,7 @@
 
 appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
   std::string name)
-  : DAQModuleI(name)
+  : DAQModule(name)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
   , inputQueue_(nullptr)

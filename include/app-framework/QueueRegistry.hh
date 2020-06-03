@@ -74,7 +74,7 @@ public:
    * @return std::shared_ptr to generic queue pointer
   */
   template<typename T>
-  std::shared_ptr<QueueI<T>> get_queue(std::string name);
+  std::shared_ptr<Queue<T>> get_queue(std::string name);
 
   /**
    * @brief Configure the QueueRegistry

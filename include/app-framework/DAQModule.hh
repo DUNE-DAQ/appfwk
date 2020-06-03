@@ -1,5 +1,5 @@
 /**
- * @file DAQModuleI.hh DAQModule Class Interface
+ * @file DAQModule.hh DAQModule Class Interface
  *
  * The DAQModule interface defines the required functionality for all
  * DAQModules that use the Application Framework. DAQModules are defined as "a
@@ -16,8 +16,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULEI_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULEI_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HH_
 
 #include "app-framework/NamedObject.hh"
 
@@ -41,9 +41,9 @@
  */
 #define DEFINE_DUNE_DAQ_MODULE(klass)                                          \
   EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::shared_ptr<appframework::DAQModuleI> make(std::string n)                \
+  std::shared_ptr<appframework::DAQModule> make(std::string n)                \
   {                                                                            \
-    return std::shared_ptr<appframework::DAQModuleI>(new klass(n));            \
+    return std::shared_ptr<appframework::DAQModule>(new klass(n));            \
   }                                                                            \
   }
 
@@ -54,7 +54,7 @@ using json = nlohmann::json;
 
 namespace appframework {
 /**
- * @brief The DAQModuleI class implementations are a set of code which performs
+ * @brief The DAQModule class implementations are a set of code which performs
  * a specific task.
  *
  * This interface defines the basic methods which all DAQModules should expose.
@@ -64,14 +64,14 @@ namespace appframework {
  * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
-class DAQModuleI : public NamedObject
+class DAQModule : public NamedObject
 {
 public:
   /**
-   * @brief DAQModuleI Constructor
+   * @brief DAQModule Constructor
    * @param name Name of the DAQModule
    */
-  explicit DAQModuleI(std::string name)
+  explicit DAQModule(std::string name)
     : NamedObject(name)
   {}
 
@@ -86,14 +86,14 @@ public:
   void configure(json config) { configuration_ = config; }
 
   /**
-   * @brief Execute a command in this DAQModuleI
+   * @brief Execute a command in this DAQModule
    * @param cmd The command from CCM
    * @param args Arguments for the command from CCM
    * @return String with detailed status of the command (future).
    *
    * execute_command is the single entry point for DAQProcess to pass CCM
    * commands to DAQModules. The implementation of this function should route
-   * accepted commands to the appropriate functions within the DAQModuleI.
+   * accepted commands to the appropriate functions within the DAQModule.
    *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
@@ -112,12 +112,12 @@ protected:
  * DebugLogger1
  * @return shared_ptr to created DAQModule instance
  */
-inline std::shared_ptr<DAQModuleI>
+inline std::shared_ptr<DAQModule>
 makeModule(std::string const& plugin_name, std::string const& instance_name)
 {
   static cet::BasicPluginFactory bpf("duneDAQModule", "make");
 
-  return bpf.makePlugin<std::shared_ptr<DAQModuleI>>(plugin_name,
+  return bpf.makePlugin<std::shared_ptr<DAQModule>>(plugin_name,
                                                      instance_name);
 }
 
@@ -129,7 +129,7 @@ makeModule(std::string const& plugin_name, std::string const& instance_name)
  * @brief A generic DAQModule ERS Issue
  */
 ERS_DECLARE_ISSUE(appframework,
-                  GeneralDAQModuleIssue,
+                  GeneralDAQModulessue,
                   "General DAQModule Issue",
                   ERS_EMPTY)
 
@@ -138,7 +138,7 @@ ERS_DECLARE_ISSUE(appframework,
  */
 ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
                        UnknownCommand, ///< Type of the issue
-                       GeneralDAQModuleIssue, ///< Base class of the issue
+                       GeneralDAQModulessue, ///< Base class of the issue
                        "Command " << cmd << " is not recognised", ///< Log Message from the issue
                        ERS_EMPTY, ///< End of variable declarations
                        ((std::string)cmd)) ///< Variables to capture
@@ -148,10 +148,10 @@ ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
  */
 ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
                        CommandFailed, ///< Type of the Issue
-                       GeneralDAQModuleIssue, ///< Base class of the Issue
+                       GeneralDAQModulessue, ///< Base class of the Issue
                        "Command " << cmd << " failed to execute for reason "
                                   << reason, ///< Log Message from the issue
                        ERS_EMPTY, ///< End of variable declarations
                        ((std::string)cmd)((std::string)reason)) ///< Variables to capture
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULEI_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HH_

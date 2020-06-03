@@ -80,14 +80,14 @@ DAQProcess::listen()
 }
 
 void
-DAQProcess::call_command_on_module(DAQModuleI& mod,
+DAQProcess::call_command_on_module(DAQModule& mod,
                                    const std::string& cmd,
                                    std::vector<std::string> const& args)
 {
 
   try {
     mod.execute_command(cmd, args);
-  } catch (GeneralDAQModuleIssue& ex) {
+  } catch (GeneralDAQModulessue& ex) {
     ers::error(ex);
   }
   // catch (...) {

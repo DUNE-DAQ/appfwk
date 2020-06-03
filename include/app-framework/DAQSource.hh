@@ -11,7 +11,7 @@
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
-#include <app-framework/QueueI.hh>
+#include <app-framework/Queue.hh>
 #include <app-framework/QueueRegistry.hh>
 #include <chrono>
 #include <memory>
@@ -41,7 +41,7 @@ public:
   bool can_pop();
 
 private:
-  std::shared_ptr<QueueI<T>> queue_;
+  std::shared_ptr<Queue<T>> queue_;
 };
 
 template<typename T>

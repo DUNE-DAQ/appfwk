@@ -2,7 +2,7 @@
 
 template<class T>
 StdDeQueue<T>::StdDeQueue(const std::string& name)
-  : QueueI<T>(name)
+  : Queue<T>(name)
   , fMaxSize(0)
   , fDeque()
   , fSize(0)

@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HH_
 #define APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HH_
 
-#include "app-framework/DAQModuleI.hh"
+#include "app-framework/DAQModule.hh"
 #include "app-framework/DAQModuleThreadHelper.hh"
 #include "app-framework/DAQSink.hh"
 
@@ -26,7 +26,7 @@ namespace appframework {
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataProducerDAQModule : public DAQModuleI
+class FakeDataProducerDAQModule : public DAQModule
 {
 public:
   /**

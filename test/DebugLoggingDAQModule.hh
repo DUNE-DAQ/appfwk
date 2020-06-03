@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
 #define APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
 
-#include "app-framework/DAQModuleI.hh"
+#include "app-framework/DAQModule.hh"
 
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@ namespace appframework {
  * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingDAQModule : public DAQModuleI
+class DebugLoggingDAQModule : public DAQModule
 {
 public:
   /**
@@ -30,7 +30,7 @@ public:
    * @param name Instance name for this DebugLoggingDAQModule
   */
   explicit DebugLoggingDAQModule(std::string name)
-    : DAQModuleI(name)
+    : DAQModule(name)
   {}
 
   /**
