@@ -19,7 +19,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
 
-#include "app-framework/NamedObject.hh"
+#include "app-framework/NamedObject.hpp"
 
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>

@@ -15,9 +15,9 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
 
-#include "app-framework/ModuleList.hh"
-#include "app-framework/DAQModule.hh"
-#include "app-framework/CommandLineInterpreter.hh"
+#include "app-framework/GraphConstructor.hpp"
+#include "app-framework/DAQModule.hpp"
+#include "app-framework/CommandLineInterpreter.hpp"
 
 #include <string>
 
@@ -52,7 +52,7 @@ public:
    * needed by this DAQ Application. ConstructGraph also defines any ordering of
    * commands for DAQModules.
    */
-  void register_modules(ModuleList& ml);
+  void register_modules( GraphConstructor & gc );
   /**
    * @brief Execute the specified command on the loaded DAQModules
    * @param cmd Command to execute

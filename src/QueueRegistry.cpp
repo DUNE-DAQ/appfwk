@@ -1,5 +1,5 @@
 /**
- * @file QueueRegistry.cc 
+ * @file QueueRegistry.cpp 
  *
  * The QueueRegistry class implementation
  *
@@ -8,7 +8,7 @@
  * received with this code.
  */
 
-#include "app-framework/QueueRegistry.hh"
+#include "app-framework/QueueRegistry.hpp"
 
 namespace appframework {
 

@@ -9,10 +9,10 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_
 
-#include "app-framework/DAQModule.hh"
+#include "app-framework/DAQModule.hpp"
 
 #include <list>
 #include <map>
@@ -51,4 +51,4 @@ public:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_

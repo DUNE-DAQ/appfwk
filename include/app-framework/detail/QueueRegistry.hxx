@@ -1,10 +1,11 @@
+#include "app-framework/StdDeQueue.hpp"
 
 #include <cxxabi.h>
 
 // Declarations
 namespace appframework {
 
-  QueueConfig::queue_kind QueueConfig::stoqk( const string & name )   {
+  QueueConfig::queue_kind QueueConfig::stoqk( const std::string & name )   {
     if (name == "StdDeQueue" || name == "std_deque")
       return queue_kind::kStdDeQueue ;
     else

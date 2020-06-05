@@ -1,5 +1,5 @@
 /**
- * @file QueryResponseCommandFacility.hh
+ * @file QueryResponseCommandFacility.hpp
  *
  * QueryResponseCommandFacility is a simple CommandFacility plugin which is
  * designed to take commands from standard input for testing purposes.
@@ -9,12 +9,12 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HH_
-#define APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HH_
+#ifndef APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
+#define APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
 
-#include "app-framework/DAQProcess.hh"
+#include "app-framework/DAQProcess.hpp"
 
-#include "app-framework/CommandFacility.hh"
+#include "app-framework/CommandFacility.hpp"
 
 namespace appframework {
 /**
@@ -36,4 +36,4 @@ public:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HH_
+#endif // APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_

@@ -3,7 +3,7 @@
 
 /**
  *
- * @file StdDeQueue.hh
+ * @file StdDeQueue.hpp
  *
  * A std::deque-based implementation of Queue
  *
@@ -12,7 +12,7 @@
  * received with this code.
  */
 
-#include "app-framework/Queue.hh"
+#include "app-framework/Queue.hpp"
 
 #include <atomic>
 #include <cassert>
@@ -81,7 +81,7 @@ private:
   std::condition_variable fNoLongerEmpty;
 };
 
-#include "detail/StdDeQueue.icc"
+#include "detail/StdDeQueue.hxx"
 
 } // namespace appframework
 

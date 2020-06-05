@@ -1,15 +1,15 @@
 /**
- * @file DAQProcess.cc DAQProcess class implementation
+ * @file DAQProcess.cpp DAQProcess class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/DAQProcess.hh"
+#include "app-framework/DAQProcess.hpp"
 
-#include "app-framework/CommandFacility.hh"
-#include "app-framework/Logger.hh"
+#include "app-framework/CommandFacility.hpp"
+#include "app-framework/Logger.hpp"
 
 #include "TRACE/trace.h"
 /**
@@ -34,7 +34,7 @@ DAQProcess::DAQProcess(CommandLineInterpreter args)
 }
 
 void
-DAQProcess::register_modules(ModuleList& ml)
+DAQProcess::register_modules( GraphConstructor & ml)
 {
   ml.ConstructGraph(daqModuleMap_, commandOrderMap_);
 }
@@ -87,11 +87,12 @@ DAQProcess::call_command_on_module(DAQModule& mod,
 
   try {
     mod.execute_command(cmd, args);
-  } catch (GeneralDAQModulessue& ex) {
+  } 
+  catch (GeneralDAQModulessue& ex) {
     ers::error(ex);
   }
-  // catch (...) {
-  //   ers::error( DAQIssues::ModuleThrowUnknown( ERS_HERE, mod.Name(), cmd ) ;
-  // }
+  catch (...) {  // NOLINT
+    ers::error( ModuleThrowUnknown( ERS_HERE, mod.get_name(), cmd ) ) ;
+  }
 }
 } // namespace appframework

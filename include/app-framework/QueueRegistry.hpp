@@ -11,8 +11,8 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
 
-#include "app-framework/NamedObject.hh"
-#include "app-framework/StdDeQueue.hh"
+#include "app-framework/Queue.hpp"
+
 #include "ers/Issue.h"
 #include <map>
 #include <memory>
@@ -135,6 +135,6 @@ ERS_DECLARE_ISSUE(
 
 
 
-#include "detail/QueueRegistry.icc"
+#include "detail/QueueRegistry.hxx"
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
