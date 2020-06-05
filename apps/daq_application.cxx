@@ -1,5 +1,5 @@
 /**
- * @file daq_application.cc Main Application for the DAQ Framework, loads
+ * @file daq_application.cxx Main Application for the DAQ Framework, loads
  * DAQModules based on json configuration file
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -7,10 +7,10 @@
  * received with this code.
  */
 
-#include "app-framework/DAQModule.hh"
-#include "app-framework/DAQProcess.hh"
-#include "app-framework/Queue.hh"
-#include "app-framework/QueueRegistry.hh"
+#include "app-framework/DAQModule.hpp"
+#include "app-framework/DAQProcess.hpp"
+#include "app-framework/Queue.hpp"
+#include "app-framework/QueueRegistry.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -27,20 +27,20 @@ namespace appframework {
 /**
  * @brief ModuleList for daq_application
  */
-class daq_application_ModuleList : public ModuleList
+class daq_application_contructor : public GraphConstructor 
 {
 public:
   /**
    * @brief Constructor for the daq_application_ModuleList
    * @param config_json Configuration file to be used to create the DAQModule graph
    */
-  explicit daq_application_ModuleList(json config_json)
+  explicit daq_application_contructor( const json & config_json)
     : config_(config_json)
   {}
 
   // Inherited via ModuleList
   void ConstructGraph(DAQModuleMap& user_module_map,
-                              CommandOrderMap& command_order_map) override
+		      CommandOrderMap& command_order_map) override
   {
     std::map<std::string, QueueConfig> queue_configuration;
     for (auto& queue : config_["queues"].items()) {
@@ -128,8 +128,8 @@ main(int argc, char* argv[])
     )"_json;
   }
 
-  appframework::daq_application_ModuleList ml(json_config);
-  theDAQProcess.register_modules(ml);
+  appframework::daq_application_constructor gc(json_config);
+  theDAQProcess.register_modules( gc );
 
   return theDAQProcess.listen();
 }
