@@ -1,5 +1,5 @@
 /**
- * @file CommandLineInterpreter.hh CommandLineInterpreter helper class
+ * @file CommandLineInterpreter.hpp CommandLineInterpreter helper class
  *
  * CommandLineInterpreter takes the command-line arguments and produces a
  * configuration object for use by DAQProcess
@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_
 
 #include <TRACE/trace.h>
 
@@ -116,4 +116,4 @@ public:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_

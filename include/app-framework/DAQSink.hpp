@@ -1,13 +1,13 @@
 /**
- * @file DAQSink.hh DAQSink class interface
+ * @file DAQSink.hpp DAQSink class interface
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
 
 #include "app-framework/Queue.hh"
 #include "app-framework/QueueRegistry.hh"
@@ -48,7 +48,7 @@ private:
 };
 
 template<typename T>
-DAQSink<T>::DAQSink(std::string name)
+DAQSink<T>::DAQSink( const std::string & name)
 {
   try {
     queue_ = QueueRegistry::get().get_queue<T>(name);
@@ -75,4 +75,4 @@ DAQSink<T>::can_push()
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_

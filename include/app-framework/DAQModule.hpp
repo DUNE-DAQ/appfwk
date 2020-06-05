@@ -1,5 +1,5 @@
 /**
- * @file DAQModule.hh DAQModule Class Interface
+ * @file DAQModule.hpp DAQModule Class Interface
  *
  * The DAQModule interface defines the required functionality for all
  * DAQModules that use the Application Framework. DAQModules are defined as "a
@@ -16,8 +16,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
 
 #include "app-framework/NamedObject.hh"
 
@@ -154,4 +154,4 @@ ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
                        ERS_EMPTY, ///< End of variable declarations
                        ((std::string)cmd)((std::string)reason)) ///< Variables to capture
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_

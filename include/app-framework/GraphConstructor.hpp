@@ -1,7 +1,7 @@
 /**
- * @file ModuleList.hh
+ * @file GraphConstructor.hpp
  *
- * A ModuleList defines a DAQ Application's DAQModule graph. It may also
+ * A GraphConstructor defines a DAQ Application's DAQModule graph. It may also
  * register Queues with QueueRegistry.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_MODULELIST_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_MODULELIST_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HH_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HH_
 
 #include "app-framework/DAQModule.hh"
 
@@ -26,13 +26,13 @@ typedef std::map<std::string, std::list<std::string>>
   CommandOrderMap; ///< Defined DAQModule orders for commands
 
 /**
- * @brief The ModuleList class is the representation of a DAQModule and Queue
+ * @brief The GraphConstructor class is the representation of a DAQModule and Queue
  * graph
  *
  * The ConstructGraph method is responsible for configuring all Queues and
  * DAQModules for a DAQ Application
  */
-class ModuleList
+class GraphConstructor
 {
 public:
   /**
@@ -51,4 +51,4 @@ public:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_MODULELIST_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HH_

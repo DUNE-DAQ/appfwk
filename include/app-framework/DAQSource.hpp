@@ -1,13 +1,13 @@
 /**
- * @file DAQSource.hh DAQSource class interface
+ * @file DAQSource.hpp DAQSource class interface
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
@@ -45,7 +45,7 @@ private:
 };
 
 template<typename T>
-DAQSource<T>::DAQSource(std::string name)
+DAQSource<T>::DAQSource(const std::string & name)
 {
   try {
     queue_ = QueueRegistry::get().get_queue<T>(name);
@@ -72,4 +72,4 @@ DAQSource<T>::can_pop()
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_

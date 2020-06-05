@@ -1,5 +1,5 @@
 /**
- * @file DAQProcess.hh DAQProcess class declaration
+ * @file DAQProcess.hpp DAQProcess class declaration
  *
  * DAQProcess is the central container for instantiated DAQModules and Queues
  * within a DAQ Application. It loads a ModuleList which defines the graph of
@@ -12,8 +12,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
 
 #include "app-framework/ModuleList.hh"
 #include "app-framework/DAQModule.hh"
@@ -139,4 +139,4 @@ ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
                        ERS_EMPTY,
                        ((std::string)mod_name)((std::string)cmd))
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_

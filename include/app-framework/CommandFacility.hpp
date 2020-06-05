@@ -1,13 +1,13 @@
 /**
- * @file CommandFacility.hh CommandFacility interface
+ * @file CommandFacility.hpp CommandFacility interface
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HPP_
 
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
@@ -107,4 +107,4 @@ makeCommandFacility(std::string const& facility_name)
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HPP_
