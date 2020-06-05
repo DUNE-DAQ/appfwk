@@ -27,14 +27,14 @@ namespace appframework {
 /**
  * @brief ModuleList for daq_application
  */
-class daq_application_contructor : public GraphConstructor 
+class daq_application_constructor : public GraphConstructor 
 {
 public:
   /**
    * @brief Constructor for the daq_application_ModuleList
    * @param config_json Configuration file to be used to create the DAQModule graph
    */
-  explicit daq_application_contructor( const json & config_json)
+  explicit daq_application_constructor( const json & config_json)
     : config_(config_json)
   {}
 

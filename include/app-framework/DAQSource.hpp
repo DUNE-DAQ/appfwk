@@ -11,8 +11,8 @@
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
-#include <app-framework/Queue.hh>
-#include <app-framework/QueueRegistry.hh>
+#include <app-framework/Queue.hpp>
+#include <app-framework/QueueRegistry.hpp>
 #include <chrono>
 #include <memory>
 #include <string>
@@ -36,7 +36,7 @@ public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
-  explicit DAQSource(std::string name);
+  explicit DAQSource(const std::string & name);
   T pop(const duration_type& timeout = duration_type::zero());
   bool can_pop();
 

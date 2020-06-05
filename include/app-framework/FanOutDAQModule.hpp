@@ -12,10 +12,10 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
 
-#include "app-framework/DAQModule.hh"
-#include "app-framework/DAQModuleThreadHelper.hh"
-#include "app-framework/DAQSink.hh"
-#include "app-framework/DAQSource.hh"
+#include "app-framework/DAQModule.hpp"
+#include "app-framework/DAQModuleThreadHelper.hpp"
+#include "app-framework/DAQSink.hpp"
+#include "app-framework/DAQSource.hpp"
 
 #include "TRACE/trace.h"
 

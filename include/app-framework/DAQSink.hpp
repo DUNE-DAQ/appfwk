@@ -9,8 +9,8 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
 
-#include "app-framework/Queue.hh"
-#include "app-framework/QueueRegistry.hh"
+#include "app-framework/Queue.hpp"
+#include "app-framework/QueueRegistry.hpp"
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
@@ -39,7 +39,7 @@ public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
-  explicit DAQSink(std::string name);
+  explicit DAQSink(const std::string & name);
   void push(T&& element, const duration_type& timeout = duration_type::zero());
   bool can_push();
 
