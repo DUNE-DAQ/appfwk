@@ -20,13 +20,13 @@ QueueRegistry::QueueRegistry()
 
 QueueRegistry::~QueueRegistry() {}
 
-QueueRegistry*
+QueueRegistry & 
 QueueRegistry::get()
 {
   if (!me_) {
     me_ = new QueueRegistry();
   }
-  return me_;
+  return *me_;
 }
 
 void

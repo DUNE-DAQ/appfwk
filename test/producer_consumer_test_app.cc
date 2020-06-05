@@ -38,7 +38,7 @@ class producer_consumer_test_app_ModuleList : public ModuleList
     queue_configuration["fanOutToConsumer1"].size = 5;
     queue_configuration["fanOutToConsumer2"].kind = QueueConfig::std_deque;
     queue_configuration["fanOutToConsumer2"].size = 5;
-    QueueRegistry::get()->configure(queue_configuration);
+    QueueRegistry::get().configure(queue_configuration);
 
     auto producerConfig = R"({ "output" : "producerToFanOut" })"_json;
     auto fanOutConfig =

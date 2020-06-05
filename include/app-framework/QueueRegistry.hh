@@ -65,7 +65,7 @@ public:
    * @brief Get a handle to the QueueRegistry
    * @return QueueRegistry handle
   */
-  static QueueRegistry* get();
+  static QueueRegistry & get();
 
   /**
    * @brief Get a handle to a Queue

@@ -48,7 +48,7 @@ template<typename T>
 DAQSource<T>::DAQSource(std::string name)
 {
   try {
-    queue_ = QueueRegistry::get()->get_queue<T>(name);
+    queue_ = QueueRegistry::get().get_queue<T>(name);
     TLOG(TLVL_TRACE, "DAQSource")
       << "Queue " << name << " is at " << queue_.get();
   } catch (QueueTypeMismatch& ex) {

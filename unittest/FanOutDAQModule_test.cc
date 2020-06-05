@@ -36,7 +36,7 @@ struct FanOutDAQModuleTestFixture
     queue_config["output2"].kind = QueueConfig::std_deque;
     queue_config["output2"].size = 5;
 
-    QueueRegistry::get()->configure(queue_config);
+    QueueRegistry::get().configure(queue_config);
   }
 };
 

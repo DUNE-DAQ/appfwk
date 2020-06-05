@@ -33,7 +33,7 @@ main(int argc, char const* argv[])
     { "dummy", { QueueConfig::std_deque, 100 } }
   };
 
-  QueueRegistry::get()->configure(queuemap);
+  QueueRegistry::get().configure(queuemap);
 
   auto sink = new DAQSink<std::string>("dummy");
   TLOG(TLVL_DEBUG) << "Expecting queue mismatch error";

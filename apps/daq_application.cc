@@ -49,7 +49,7 @@ public:
       qc.size = queue.value()["size"].get<size_t>();
       queue_configuration[queue.key()] = qc;
     }
-    QueueRegistry::get()->configure(queue_configuration);
+    QueueRegistry::get().configure(queue_configuration);
 
     for (auto& module : config_["modules"].items()) {
 

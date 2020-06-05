@@ -51,7 +51,7 @@ template<typename T>
 DAQSink<T>::DAQSink(std::string name)
 {
   try {
-    queue_ = QueueRegistry::get()->get_queue<T>(name);
+    queue_ = QueueRegistry::get().get_queue<T>(name);
     TLOG(TLVL_TRACE, "DAQSink")
       << "Queue " << name << " is at " << queue_.get();
   } catch (QueueTypeMismatch& ex) {
