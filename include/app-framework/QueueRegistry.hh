@@ -18,7 +18,21 @@
 #include <memory>
 #include <string>
 
+
+/**
+ * @brief QueueKindUnknown ERS Issue
+ */
+ERS_DECLARE_ISSUE(
+		  appframework,      // namespace
+		  QueueKindUnknown, // issue class name
+		  "Queue kind \"" << queue_kind << "\" is unknown " , 
+		  ((std::string)queue_kind) 
+		  )
+
+
 namespace appframework {
+
+
 
 /**
  * @brief The QueueConfig class encapsulates the basic configuration common to
@@ -31,7 +45,8 @@ struct QueueConfig
   */
   enum queue_kind
   {
-    std_deque ///< The StdDeQueue
+    kUnknown = -1, 
+    kStdDeQueue = 1 ///< The StdDeQueue
   };
 
   /**
@@ -39,14 +54,16 @@ struct QueueConfig
    * @param name Name of the Queue Type
    * @return Queue type corresponding to the name. Currently only std_deque.
   */
-  static queue_kind stoqk(std::string name)
+  static queue_kind stoqk(const std::string & name )
   {
-    // if (name == "StdDeQueue" || name == "std_deque")
-    return std_deque;
+    if (name == "StdDeQueue" || name == "std_deque")
+      return queue_kind::kStdDeQueue ;
+    else 
+      throw QueueKindUnknown( ERS_HERE, name ) ;
   }
 
-  QueueConfig::queue_kind kind; ///< The kind of Queue represented by this QueueConfig
-  size_t size; ///< The size of the queue
+  QueueConfig::queue_kind kind = queue_kind::kUnknown ; ///< The kind of Queue represented by this QueueConfig
+  size_t size = 0 ; ///< The size of the queue
 };
 
 /**
@@ -120,6 +137,8 @@ ERS_DECLARE_ISSUE(
                        << "' already declared as type '" << source_type
                        << "'", // message
   ((std::string)queue_name)((std::string)source_type)((std::string)target_type))
+
+
 
 #include "detail/QueueRegistry.icc"
 

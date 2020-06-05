@@ -30,7 +30,7 @@ main(int argc, char const* argv[])
 {
 
   std::map<std::string, QueueConfig> queuemap = {
-    { "dummy", { QueueConfig::std_deque, 100 } }
+    { "dummy", { QueueConfig::queue_kind::kStdDeQueue, 100 } }
   };
 
   QueueRegistry::get().configure(queuemap);

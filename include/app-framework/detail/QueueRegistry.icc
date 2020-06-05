@@ -41,7 +41,7 @@ std::shared_ptr<NamedObject> QueueRegistry::create_queue(std::string name, const
 
   std::shared_ptr<NamedObject> queue;
   switch(config.kind) {
-    case QueueConfig::std_deque:
+    case QueueConfig::kStdDeQueue :
       queue = std::make_shared<StdDeQueue<T>>(name);
       std::dynamic_pointer_cast<StdDeQueue<T>>(queue)->SetSize(config.size);
       break;
