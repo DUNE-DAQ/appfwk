@@ -1,13 +1,13 @@
 /**
- * @file Logger.hh Logger interface definition
+ * @file Logger.hpp Logger interface definition
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HPP_
 
 #include <string>
 #include <vector>
@@ -24,8 +24,8 @@ public:
    * @brief Setup the Logger service
    * @param args Command-line arguments used to setup the Logger
    */
-  static void setup(std::vector<std::string> args) {}
+  static void setup(const std::vector<std::string> & args) {}
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HPP_

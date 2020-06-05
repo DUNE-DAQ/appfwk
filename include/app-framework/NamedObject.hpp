@@ -1,13 +1,13 @@
 /**
- * @file NamedObject.hh NamedObject class interface
+ * @file NamedObject.hpp NamedObject class interface
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HPP_
 
 #include <string>
 
@@ -45,4 +45,4 @@ private:
   std::string name_;
 };
 } // namespace appframework
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HPP_

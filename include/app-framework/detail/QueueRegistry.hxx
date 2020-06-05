@@ -1,10 +1,15 @@
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HXX_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HXX_
 
 #include <cxxabi.h>
 
 // Declarations
 namespace appframework {
+
+  QueueConfig::queue_kind QueueConfig::stoqk( const string & name )   {
+    if (name == "StdDeQueue" || name == "std_deque")
+      return queue_kind::kStdDeQueue ;
+    else
+      throw QueueKindUnknown( ERS_HERE, name ) ;
+  }
 
 template<typename T>
 std::shared_ptr<Queue<T>> 
@@ -54,4 +59,3 @@ std::shared_ptr<NamedObject> QueueRegistry::create_queue(std::string name, const
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HXX_

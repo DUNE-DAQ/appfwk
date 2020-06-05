@@ -1,5 +1,5 @@
 /**
- * @file FanOutDAQModule.hh
+ * @file FanOutDAQModule.hpp
  *
  * FanOutDAQModule is a simple DAQModule implementation that simply logs the
  * fact that it received a command from DAQProcess.
@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
 
 #include "app-framework/DAQModule.hh"
 #include "app-framework/DAQModuleThreadHelper.hh"
@@ -146,6 +146,6 @@ private:
 };
 } // namespace appframework
 
-#include "detail/FanOutDAQModule.icc"
+#include "detail/FanOutDAQModule.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_

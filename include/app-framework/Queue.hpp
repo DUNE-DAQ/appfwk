@@ -1,5 +1,5 @@
 /**
- * @file Queue.hh
+ * @file Queue.hpp
  *
  * This is the interface for Queue objects which connect DAQModules. Queues
  * are exposed to DAQModules via the DAQSource and DAQSink classes, and should
@@ -11,8 +11,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
 
 #include "app-framework/NamedObject.hh"
 
@@ -42,7 +42,7 @@ public:
    * @brief Queue Constructor
    * @param name Name of the Queue instance
   */
-  explicit Queue(std::string name)
+  explicit Queue(const std::string & name)
     : NamedObject(name)
   {}
 
@@ -91,4 +91,4 @@ private:
 
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_

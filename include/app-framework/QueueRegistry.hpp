@@ -1,5 +1,5 @@
 /**
- * @file QueueRegistry.hh
+ * @file QueueRegistry.hpp
  *
  * The QueueRegistry class declarations
  *
@@ -8,8 +8,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
+#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
+#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
 
 #include "app-framework/NamedObject.hh"
 #include "app-framework/StdDeQueue.hh"
@@ -18,16 +18,6 @@
 #include <memory>
 #include <string>
 
-
-/**
- * @brief QueueKindUnknown ERS Issue
- */
-ERS_DECLARE_ISSUE(
-		  appframework,      // namespace
-		  QueueKindUnknown, // issue class name
-		  "Queue kind \"" << queue_kind << "\" is unknown " , 
-		  ((std::string)queue_kind) 
-		  )
 
 
 namespace appframework {
@@ -54,13 +44,7 @@ struct QueueConfig
    * @param name Name of the Queue Type
    * @return Queue type corresponding to the name. Currently only std_deque.
   */
-  static queue_kind stoqk(const std::string & name )
-  {
-    if (name == "StdDeQueue" || name == "std_deque")
-      return queue_kind::kStdDeQueue ;
-    else 
-      throw QueueKindUnknown( ERS_HERE, name ) ;
-  }
+  static queue_kind stoqk(const std::string & name ) ; 
 
   QueueConfig::queue_kind kind = queue_kind::kUnknown ; ///< The kind of Queue represented by this QueueConfig
   size_t size = 0 ; ///< The size of the queue
@@ -139,7 +123,18 @@ ERS_DECLARE_ISSUE(
   ((std::string)queue_name)((std::string)source_type)((std::string)target_type))
 
 
+/**
+ * @brief QueueKindUnknown ERS Issue
+ */
+ERS_DECLARE_ISSUE(
+		  appframework,      // namespace
+		  QueueKindUnknown, // issue class name
+		  "Queue kind \"" << queue_kind << "\" is unknown " , 
+		  ((std::string)queue_kind) 
+		  )
+
+
 
 #include "detail/QueueRegistry.icc"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HH_
+#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
