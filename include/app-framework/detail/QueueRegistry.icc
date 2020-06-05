@@ -8,7 +8,7 @@ namespace appframework {
 
 template<typename T>
 std::shared_ptr<Queue<T>> 
-QueueRegistry::get_queue(std::string name) {
+QueueRegistry::get_queue( const std::string & name) {
 
   auto itQ = queue_registry_.find(name);
   if ( itQ != queue_registry_.end() ) {
