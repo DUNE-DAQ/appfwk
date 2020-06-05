@@ -1,5 +1,5 @@
 /**
- * @file echo_test_app.cc
+ * @file echo_test_app.cxx
  *
  * echo_test_app shows the basic functionality of DAQProcess by loading a
  * DebugLoggingDAQModule
@@ -9,15 +9,15 @@
  * received with this code.
  */
 
-#include "DebugLoggingDAQModule.hh"
-#include "app-framework/CommandLineInterpreter.hh"
-#include "app-framework/DAQProcess.hh"
+#include "DebugLoggingDAQModule.hpp"
+#include "app-framework/CommandLineInterpreter.hpp"
+#include "app-framework/DAQProcess.hpp"
 
 namespace appframework {
 /**
  * @brief ModuleList for the echo_test_app
 */
-class echo_test_app_ModuleList : public ModuleList
+class echo_test_app_contructor : public GraphConstructor
 {
   // Inherited via ModuleList
   void ConstructGraph(DAQModuleMap& user_module_map,
@@ -43,8 +43,8 @@ main(int argc, char* argv[])
 
   appframework::DAQProcess theDAQProcess(args);
 
-  appframework::echo_test_app_ModuleList ml;
-  theDAQProcess.register_modules(ml);
+  appframework::echo_test_app_contructor gc;
+  theDAQProcess.register_modules(gc);
 
   return theDAQProcess.listen();
 }

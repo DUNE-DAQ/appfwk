@@ -1,5 +1,5 @@
 /**
- * @file DebugLoggingDAQModule.hh
+ * @file DebugLoggingDAQModule.hpp
  *
  * DebugLoggingDAQModule is a simple DAQModule implementation that simply logs
  * the fact that it received a command from DAQProcess.
@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
-#define APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
+#ifndef APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HPP_
+#define APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HPP_
 
 #include "app-framework/DAQModule.hh"
 
@@ -29,7 +29,7 @@ public:
    * @brief DebugLoggingDAQModule Constructor
    * @param name Instance name for this DebugLoggingDAQModule
   */
-  explicit DebugLoggingDAQModule(std::string name)
+  explicit DebugLoggingDAQModule( const std::string & name)
     : DAQModule(name)
   {}
 
@@ -43,4 +43,4 @@ public:
 };
 } // namespace appframework
 
-#endif // APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HH_
+#endif // APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HPP_

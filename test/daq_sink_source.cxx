@@ -1,15 +1,16 @@
 /**
- * @file daq_sink_source.cc Test application which demonstrates the functionality of the QueueRegistry, DAQSink, and DAQSource
+ * @file daq_sink_source.cxx Test application which demonstrates the functionality of the QueueRegistry, DAQSink, and DAQSource
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "app-framework/CommandFacility.hh"
-#include "app-framework/DAQSink.hh"
-#include "app-framework/DAQSource.hh"
-#include "app-framework/StdDeQueue.hh"
+#include "app-framework/CommandFacility.hpp"
+#include "app-framework/DAQSink.hpp"
+#include "app-framework/DAQSource.hpp"
+#include "app-framework/StdDeQueue.hpp"
+
 #include "ers/ers.h"
 
 namespace appframework {

@@ -1,12 +1,12 @@
 /**
- * @file FakeDataConsumerDAQModule.cc FakeDataConsumerDAQModule class implementation
+ * @file FakeDataConsumerDAQModule.cxx FakeDataConsumerDAQModule class implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "FakeDataConsumerDAQModule.hh"
+#include "FakeDataConsumerDAQModule.hpp"
 
 #include "TRACE/trace.h"
 /**
@@ -19,7 +19,7 @@
 #include <thread>
 
 appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
-  std::string name)
+  const std::string & name)
   : DAQModule(name)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))

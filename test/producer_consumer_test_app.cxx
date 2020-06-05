@@ -1,5 +1,5 @@
 /**
- * @file producer_consumer_test_app.cc
+ * @file producer_consumer_test_app.cxx
  *
  * This application loads a producer, two consumers and a fan-out DAQModules.
  * The producer creates vectors of ints, and the consumers each check that the
@@ -11,11 +11,11 @@
  * received with this code.
  */
 
-#include "FakeDataConsumerDAQModule.hh"
-#include "FakeDataProducerDAQModule.hh"
-#include "app-framework/DAQProcess.hh"
-#include "app-framework/FanOutDAQModule.hh"
-#include "app-framework/StdDeQueue.hh"
+#include "FakeDataConsumerDAQModule.hpp"
+#include "FakeDataProducerDAQModule.hpp"
+#include "app-framework/DAQProcess.hpp"
+#include "app-framework/FanOutDAQModule.hpp"
+#include "app-framework/StdDeQueue.hpp"
 
 #include <memory>
 #include <vector>
@@ -24,7 +24,7 @@ namespace appframework {
 /**
  * @brief ModuleList for the producer_consumer_test_app
 */
-class producer_consumer_test_app_ModuleList : public ModuleList
+class producer_consumer_test_app_constructor : public GraphConstructor 
 {
   // Inherited via ModuleList
   void ConstructGraph(DAQModuleMap& user_module_map,
@@ -78,8 +78,8 @@ main(int argc, char* argv[])
 
   appframework::DAQProcess theDAQProcess(args);
 
-  appframework::producer_consumer_test_app_ModuleList ml;
-  theDAQProcess.register_modules(ml);
+  appframework::producer_consumer_test_app_constructor gc;
+  theDAQProcess.register_modules( gc );
 
   return theDAQProcess.listen();
 }

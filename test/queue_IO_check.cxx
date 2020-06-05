@@ -1,6 +1,6 @@
 /**
  *
- * @file queue_IO_check.cc
+ * @file queue_IO_check.cxx
  *
  * A low-level test of queue classes which inherit both from
  * QueueSource and QueueSink where we have a user-settable number
@@ -14,7 +14,7 @@
  * received with this code.
  */
 
-#include "app-framework/StdDeQueue.hh"
+#include "app-framework/StdDeQueue.hpp"
 
 #include "TRACE/trace.h"
 

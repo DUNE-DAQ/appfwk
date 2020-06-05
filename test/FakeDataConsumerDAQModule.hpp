@@ -1,5 +1,5 @@
 /**
- * @file FakeDataConsumerDAQModule.hh
+ * @file FakeDataConsumerDAQModule.hpp
  *
  * FakeDataConsumerDAQModule is a simple DAQModule implementation that simply
  * logs the fact that it received a command from DAQProcess.
@@ -12,9 +12,9 @@
 #ifndef APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_
 #define APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_
 
-#include "app-framework/DAQModule.hh"
-#include "app-framework/DAQModuleThreadHelper.hh"
-#include "app-framework/DAQSource.hh"
+#include "app-framework/DAQModule.hpp"
+#include "app-framework/DAQModuleThreadHelper.hpp"
+#include "app-framework/DAQSource.hpp"
 
 #include <future>
 #include <memory>
@@ -33,7 +33,7 @@ public:
    * @brief FakeDataConsumerDAQModule Constructor
    * @param name Instance name for this FakeDataConsumerDAQModule instance
    */
-  explicit FakeDataConsumerDAQModule(std::string name);
+  explicit FakeDataConsumerDAQModule(const std::string & name);
 
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;

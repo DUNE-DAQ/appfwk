@@ -19,7 +19,7 @@
 #define TRACE_NAME "FakeDataProducer" // NOLINT
 
 appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
-  std::string name)
+  const std::string & name)
   : DAQModule(name)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
