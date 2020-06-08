@@ -6,7 +6,7 @@
  * received with this code.
  */
 
-#include "FakeDataProducerDAQModule.hh"
+#include "FakeDataProducerDAQModule.hpp"
 
 #include <chrono>
 #include <thread>

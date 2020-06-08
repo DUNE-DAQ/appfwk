@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#include "app-framework/FanOutDAQModule.hh"
-#include "app-framework/QueueRegistry.hh"
+#include "app-framework/FanOutDAQModule.hpp"
+#include "app-framework/QueueRegistry.hpp"
 
 #define BOOST_TEST_MODULE FanOutDAQModule_test // NOLINT
 

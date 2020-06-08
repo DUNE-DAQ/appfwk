@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HPP_
 #define APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HPP_
 
-#include "app-framework/DAQModule.hh"
+#include "app-framework/DAQModule.hpp"
 
 #include <string>
 #include <vector>

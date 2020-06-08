@@ -7,7 +7,7 @@
  * received with this code.
  */
 
-#include "app-framework/DAQModuleThreadHelper.hh"
+#include "app-framework/DAQModuleThreadHelper.hpp"
 
 #define BOOST_TEST_MODULE DAQModuleThreadHelper_test // NOLINT
 #include <boost/test/unit_test.hpp>
