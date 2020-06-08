@@ -1,5 +1,5 @@
 /**
- * @file FanOutDAQModule_test.cc FanOutDAQModule class Unit Tests
+ * @file FanOutDAQModule_test.cxx FanOutDAQModule class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -87,11 +87,12 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   foum.execute_command("stop");
 
   BOOST_REQUIRE_EQUAL(outputbuf1.can_pop(), true);
-  auto res = outputbuf1.pop(queue_timeout);
+  appframework::NonCopyableType res(0) ;
+  outputbuf1.pop(res, queue_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 1);
 
   BOOST_REQUIRE_EQUAL(outputbuf2.can_pop(), true);
-  res = outputbuf2.pop(queue_timeout);
+  outputbuf2.pop(res, queue_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 2);
 }
 

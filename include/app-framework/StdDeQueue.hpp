@@ -47,7 +47,7 @@ public:
   explicit StdDeQueue(const std::string& name);
 
   bool can_pop() const noexcept override { return fSize.load() > 0; }
-  value_type pop(const duration_type&)
+  bool pop( value_type & val, const duration_type&)
     override; // Throws std::runtime_error if a timeout occurs
 
   bool can_push() const noexcept override { return fSize.load() < fMaxSize; }

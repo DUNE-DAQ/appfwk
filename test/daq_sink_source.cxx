@@ -51,7 +51,8 @@ main(int argc, char const* argv[])
   TLOG(TLVL_DEBUG) << "source can pop: " << source->can_pop();
 
   sink->push(std::move("hello"));
-  std::string x = source->pop();
+  std::string x;
+  source->pop(x);
 
   TLOG(TLVL_DEBUG) << "x = " << x;
 

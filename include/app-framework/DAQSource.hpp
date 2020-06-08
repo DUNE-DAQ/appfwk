@@ -37,7 +37,7 @@ public:
   using duration_type = std::chrono::milliseconds;
 
   explicit DAQSource(const std::string & name);
-  T pop(const duration_type& timeout = duration_type::zero());
+  bool pop( T &, const duration_type& timeout = duration_type::zero());
   bool can_pop();
 
 private:
@@ -57,10 +57,10 @@ DAQSource<T>::DAQSource(const std::string & name)
 }
 
 template<typename T>
-T
-DAQSource<T>::pop(const duration_type& timeout)
+bool 
+DAQSource<T>::pop( T & val , const duration_type& timeout)
 {
-  return queue_->pop(timeout);
+  return queue_->pop(val, timeout);
 }
 
 template<typename T>

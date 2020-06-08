@@ -91,15 +91,11 @@ appframework::FanOutDAQModule<ValueType>::do_work()
   while (thread_.thread_running()) {
     if (inputQueue_->can_pop()) {
 
-      try {
-        data_ptr = std::make_unique<ValueType>(inputQueue_->pop(queueTimeout_));
-      } catch (const std::runtime_error& err) {
-        TLOG(TLVL_WARNING) << get_name()
-                           << ": Tried but failed to pop a value from an "
-                              "inputQueue (exception is \""
-                           << err.what() << "\")";
-        continue;
-      }
+      if ( ! inputQueue_->pop( *data_ptr, queueTimeout_) ) {
+	TLOG(TLVL_WARNING) << get_name()
+                           << ": Tried but failed to pop a value from an inputQueue" ; 
+	  continue;
+	}
 
       if (mode_ == FanOutMode::Broadcast) {
         do_broadcast(*data_ptr);
@@ -111,7 +107,7 @@ appframework::FanOutDAQModule<ValueType>::do_work()
               auto starttime = std::chrono::steady_clock::now();
               o->push(std::move(*data_ptr), queueTimeout_);
               auto endtime = std::chrono::steady_clock::now();
-
+	      
               if (std::chrono::duration_cast<decltype(queueTimeout_)>(
                     endtime - starttime) < queueTimeout_) {
                 sent = true;

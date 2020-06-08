@@ -103,21 +103,17 @@ appframework::FakeDataConsumerDAQModule::do_work()
       TLOG(TLVL_DEBUG) << get_name()
                        << ": Going to receive data from inputQueue";
 
-      try {
-        vec = inputQueue_->pop(queueTimeout_);
-      } catch (const std::runtime_error& err) {
+      if ( ! inputQueue_->pop(vec, queueTimeout_) ) {
         TLOG(TLVL_WARNING) << get_name()
-                           << ": Tried but failed to pop a value from an "
-                              "inputQueue (exception is \""
-                           << err.what() << "\"";
+                           << ": Tried but failed to pop a value from an inputQueue" ;
         continue;
       }
-
+      
       TLOG(TLVL_DEBUG) << get_name() << ": Received vector of size "
                        << vec.size();
 
       bool failed = false;
-
+      
       TLOG(TLVL_DEBUG) << get_name() << ": Starting processing loop";
       TLOG(TLVL_INFO) << get_name() << ": Received vector " << counter << ": "
                       << vec;

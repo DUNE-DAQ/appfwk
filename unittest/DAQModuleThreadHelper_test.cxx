@@ -1,6 +1,6 @@
 /**
  *
- * @file DAQModuleThreadHelper_test.cc DAQModuleThreadHelper class Unit Tests
+ * @file DAQModuleThreadHelper_test.cxx DAQModuleThreadHelper class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have

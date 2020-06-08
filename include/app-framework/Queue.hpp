@@ -72,7 +72,7 @@ public:
    * This is a pure virtual function
    * If pop takes longer than the timeout, implementations should throw an exception
   */
-  virtual T pop(const duration_type& timeout) = 0;
+  virtual bool pop( T & val, const duration_type& timeout) = 0;
 
   /**
    * @brief Determine whether the Queue may be popped from

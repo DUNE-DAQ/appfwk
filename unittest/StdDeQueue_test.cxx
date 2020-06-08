@@ -1,6 +1,6 @@
 /**
  *
- * @file StdDeQueue_test.cc StdDeQueue class Unit Tests
+ * @file StdDeQueue_test.cxx StdDeQueue class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -96,7 +96,8 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
   BOOST_REQUIRE(Queue.can_pop());
 
   starttime = std::chrono::steady_clock::now();
-  auto popped_value = Queue.pop(timeout);
+  int popped_value ; 
+  Queue.pop( popped_value, timeout);
   auto pop_time = std::chrono::steady_clock::now() - starttime;
 
   if (pop_time > timeout) {
@@ -118,23 +119,28 @@ BOOST_AUTO_TEST_CASE(empty_checks,
 
   try {
     while (Queue.can_pop()) {
-      Queue.pop(timeout);
+      int popped_value ; 
+      if ( ! Queue.pop(popped_value, timeout) ) {
+	BOOST_TEST(false,
+		   "False returned in call to StdDeQueue::pop(); unable "
+		   "to empty the Queue");
+	break ;
+      }
     }
   } catch (const std::runtime_error& err) {
     BOOST_WARN_MESSAGE(true, err.what());
-    BOOST_TEST(false,
-               "Exception thrown in call to StdDeQueue::pop(); unable "
-               "to empty the Queue");
   }
-
+  
   BOOST_REQUIRE(!Queue.can_pop());
-
+  
   // pop off of an empty Queue
 
+  int popped_value ; 
+  
   auto starttime = std::chrono::steady_clock::now();
-  BOOST_CHECK_THROW(Queue.pop(timeout), std::runtime_error);
+  BOOST_TEST( ! Queue.pop(popped_value, timeout) ) ; 
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
-
+  
   const double fraction_of_pop_timeout_used = pop_duration / timeout;
 
   BOOST_CHECK_GT(fraction_of_pop_timeout_used,

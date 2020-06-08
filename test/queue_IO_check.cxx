@@ -156,7 +156,7 @@ remove_things()
       TLOG(TLVL_DEBUG) << msg.str();
 
       auto starttime = std::chrono::steady_clock::now();
-      val = queue->pop(timeout);
+      queue->pop(val, timeout);
 
       msg.str(std::string());
       msg << "Thread #" << std::this_thread::get_id()
