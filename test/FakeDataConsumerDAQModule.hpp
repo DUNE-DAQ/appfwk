@@ -12,16 +12,16 @@
 #ifndef APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_
 #define APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_
 
-#include "app-framework/DAQModule.hpp"
-#include "app-framework/DAQModuleThreadHelper.hpp"
-#include "app-framework/DAQSource.hpp"
+#include "appfwk/DAQModule.hpp"
+#include "appfwk/DAQModuleThreadHelper.hpp"
+#include "appfwk/DAQSource.hpp"
 
 #include <future>
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief FakeDataConsumerDAQModule creates vectors of ints and sends them
  * downstream
@@ -61,6 +61,6 @@ private:
   std::chrono::milliseconds queueTimeout_;
   std::unique_ptr<DAQSource<std::vector<int>>> inputQueue_;
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_

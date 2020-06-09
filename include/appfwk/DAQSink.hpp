@@ -9,8 +9,8 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
 
-#include "app-framework/Queue.hpp"
-#include "app-framework/QueueRegistry.hpp"
+#include "appfwk/Queue.hpp"
+#include "appfwk/QueueRegistry.hpp"
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
@@ -30,7 +30,7 @@ ERS_DECLARE_ISSUE(appframework,             // namespace
                                                    << "\"", // no message
                   ((std::string)name))
 
-namespace appframework {
+namespace dunedaq::appfwk {
 
 template<typename T>
 class DAQSink
@@ -73,6 +73,6 @@ DAQSink<T>::can_push()
   return queue_->can_push();
 }
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_

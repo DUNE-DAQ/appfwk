@@ -12,10 +12,10 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
 
-#include "app-framework/DAQModule.hpp"
-#include "app-framework/DAQModuleThreadHelper.hpp"
-#include "app-framework/DAQSink.hpp"
-#include "app-framework/DAQSource.hpp"
+#include "appfwk/DAQModule.hpp"
+#include "appfwk/DAQModuleThreadHelper.hpp"
+#include "appfwk/DAQSink.hpp"
+#include "appfwk/DAQSource.hpp"
 
 #include "TRACE/trace.h"
 
@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 
 /**
  * @brief Struct used for FanOutDAQModule_test
@@ -144,7 +144,7 @@ private:
   std::list<std::unique_ptr<DAQSink<ValueType>>> outputQueues_;
   size_t wait_interval_us_;
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #include "detail/FanOutDAQModule.hxx"
 

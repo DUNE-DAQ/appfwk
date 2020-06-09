@@ -1,9 +1,9 @@
-#include "app-framework/StdDeQueue.hpp"
+#include "appfwk/StdDeQueue.hpp"
 
 #include <cxxabi.h>
 
 // Declarations
-namespace appframework {
+namespace dunedaq::appfwk {
 
   QueueConfig::queue_kind QueueConfig::stoqk( const std::string & name )   {
     if (name == "StdDeQueue" || name == "std_deque")
@@ -58,5 +58,5 @@ std::shared_ptr<NamedObject> QueueRegistry::create_queue(std::string name, const
   return queue;
 }
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 

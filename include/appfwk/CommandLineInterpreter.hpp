@@ -20,7 +20,7 @@
 
 namespace bpo = boost::program_options;
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief CommandLineInterpreter parses the command-line options given to the
  * application and stores the results as validated data members
@@ -114,6 +114,6 @@ public:
   std::vector<std::string>
     otherOptions; ///< Any other options which were passed and not recognized
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_

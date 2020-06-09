@@ -11,8 +11,8 @@
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
-#include <app-framework/Queue.hpp>
-#include <app-framework/QueueRegistry.hpp>
+#include <appfwk/Queue.hpp>
+#include <appfwk/QueueRegistry.hpp>
 #include <chrono>
 #include <memory>
 #include <string>
@@ -27,7 +27,7 @@ ERS_DECLARE_ISSUE(appframework,               // namespace
                                                      << "\"", // no message
                   ((std::string)name))
 
-namespace appframework {
+namespace dunedaq::appfwk {
 
 template<typename T>
 class DAQSource
@@ -70,6 +70,6 @@ DAQSource<T>::can_pop()
   return queue_->can_pop();
 }
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_

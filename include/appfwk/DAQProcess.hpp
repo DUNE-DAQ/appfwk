@@ -15,13 +15,13 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
 
-#include "app-framework/GraphConstructor.hpp"
-#include "app-framework/DAQModule.hpp"
-#include "app-framework/CommandLineInterpreter.hpp"
+#include "appfwk/GraphConstructor.hpp"
+#include "appfwk/DAQModule.hpp"
+#include "appfwk/CommandLineInterpreter.hpp"
 
 #include <string>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief The DAQProcess class is the central container for DAQModules and
  * Queues.
@@ -93,7 +93,7 @@ private:
   DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule
   CommandOrderMap commandOrderMap_; ///< Order DAQModule commands by alias
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 /**
  * @brief DAQ Process generic Issue

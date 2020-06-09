@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#include "app-framework/FanOutDAQModule.hpp"
-#include "app-framework/QueueRegistry.hpp"
+#include "appfwk/FanOutDAQModule.hpp"
+#include "appfwk/QueueRegistry.hpp"
 
 #define BOOST_TEST_MODULE FanOutDAQModule_test // NOLINT
 
@@ -15,7 +15,7 @@
 #include <nlohmann/json.hpp>
 
 constexpr auto queue_timeout = std::chrono::milliseconds(10);
-using namespace appframework;
+using namespace dunedaq::appfwk;
 
 BOOST_AUTO_TEST_SUITE(FanOutDAQModule_test)
 

@@ -14,7 +14,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
 
-#include "app-framework/NamedObject.hpp"
+#include "appfwk/NamedObject.hpp"
 
 #include <chrono>
 #include <cstddef>
@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 
 /**
  * @brief Implementations of the Queue class are responsible for relaying data
@@ -89,6 +89,6 @@ private:
   Queue& operator=(Queue&&) = default;
 };
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_

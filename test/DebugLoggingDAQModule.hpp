@@ -12,12 +12,12 @@
 #ifndef APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HPP_
 #define APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HPP_
 
-#include "app-framework/DAQModule.hpp"
+#include "appfwk/DAQModule.hpp"
 
 #include <string>
 #include <vector>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
@@ -41,6 +41,6 @@ public:
   void execute_command(const std::string& cmd,
                        const std::vector<std::string>& args = {}) override;
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_TEST_DEBUGLOGGINGDAQMODULE_HPP_

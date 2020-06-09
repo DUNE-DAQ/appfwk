@@ -14,7 +14,7 @@
  * received with this code.
  */
 
-#include "app-framework/StdDeQueue.hpp"
+#include "appfwk/StdDeQueue.hpp"
 
 #include "TRACE/trace.h"
 

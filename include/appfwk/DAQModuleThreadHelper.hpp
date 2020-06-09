@@ -18,7 +18,7 @@
 #include <memory>
 #include <string>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief DAQModuleThreadHelper contains a thread which runs the do_work()
  * function
@@ -88,6 +88,6 @@ private:
   std::unique_ptr<std::thread> working_thread_;
   std::function<void()> do_work_;
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULETHREADHELPER_HPP_

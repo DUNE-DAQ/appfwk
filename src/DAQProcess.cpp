@@ -6,10 +6,10 @@
  * received with this code.
  */
 
-#include "app-framework/DAQProcess.hpp"
+#include "appfwk/DAQProcess.hpp"
 
-#include "app-framework/CommandFacility.hpp"
-#include "app-framework/Logger.hpp"
+#include "appfwk/CommandFacility.hpp"
+#include "appfwk/Logger.hpp"
 
 #include "TRACE/trace.h"
 /**
@@ -22,7 +22,7 @@
 #include <memory>
 #include <unordered_set>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
 
 DAQProcess::DAQProcess(CommandLineInterpreter args)
@@ -95,4 +95,4 @@ DAQProcess::call_command_on_module(DAQModule& mod,
     ers::error( ModuleThrowUnknown( ERS_HERE, mod.get_name(), cmd ) ) ;
   }
 }
-} // namespace appframework
+} // namespace dunedaq::appfwk
