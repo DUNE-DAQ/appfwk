@@ -37,7 +37,7 @@
   }                                                                            \
   }
 
-namespace appframework {
+namespace dunedaq::appfwk {
 class DAQProcess; // forward declaration
 
 /**
@@ -105,6 +105,6 @@ makeCommandFacility(std::string const& facility_name)
   return bpf.makePlugin<std::unique_ptr<CommandFacility>>(facility_name);
 }
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HPP_

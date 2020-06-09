@@ -12,16 +12,16 @@
 #ifndef APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_
 #define APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_
 
-#include "app-framework/DAQModule.hpp"
-#include "app-framework/DAQModuleThreadHelper.hpp"
-#include "app-framework/DAQSink.hpp"
+#include "appfwk/DAQModule.hpp"
+#include "appfwk/DAQModuleThreadHelper.hpp"
+#include "appfwk/DAQSink.hpp"
 
 #include <future>
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
@@ -66,6 +66,6 @@ private:
 
   size_t wait_between_sends_ms_;
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_

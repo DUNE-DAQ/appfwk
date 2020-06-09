@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief A NamedObject is a DAQ object (Queue or DAQModule) which has an
  * instance name
@@ -44,5 +44,5 @@ public:
 private:
   std::string name_;
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HPP_

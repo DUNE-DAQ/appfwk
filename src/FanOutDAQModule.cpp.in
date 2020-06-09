@@ -1,6 +1,6 @@
-#include "app-framework/FanOutDAQModule.hpp"
+#include "appfwk/FanOutDAQModule.hpp"
 
-namespace appframework {
+namespace dunedaq::appfwk {
 
 typedef appframework::FanOutDAQModule<@MAKE_DATATYPE_CPPTYPE@>
   @MAKE_DATATYPE_PREFIX@FanOutDAQModule;

@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief The Logger class defines the interface necessary to configure central
  * logging within a DAQ Application.
@@ -26,6 +26,6 @@ public:
    */
   static void setup(const std::vector<std::string> & args) {}
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HPP_

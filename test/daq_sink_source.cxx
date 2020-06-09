@@ -6,19 +6,19 @@
  * received with this code.
  */
 
-#include "app-framework/CommandFacility.hpp"
-#include "app-framework/DAQSink.hpp"
-#include "app-framework/DAQSource.hpp"
-#include "app-framework/StdDeQueue.hpp"
+#include "appfwk/CommandFacility.hpp"
+#include "appfwk/DAQSink.hpp"
+#include "appfwk/DAQSource.hpp"
+#include "appfwk/StdDeQueue.hpp"
 
 #include "ers/ers.h"
 
-namespace appframework {
+namespace dunedaq::appfwk {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ =
   std::unique_ptr<CommandFacility>();
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
-using namespace appframework;
+using namespace dunedaq::appfwk;
 
 /**
  * @brief Entry point for the daq_sink_source application

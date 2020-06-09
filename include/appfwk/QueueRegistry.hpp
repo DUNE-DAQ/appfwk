@@ -11,7 +11,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
 
-#include "app-framework/Queue.hpp"
+#include "appfwk/Queue.hpp"
 
 #include "ers/Issue.h"
 #include <map>
@@ -20,7 +20,7 @@
 
 
 
-namespace appframework {
+namespace dunedaq::appfwk {
 
 
 
@@ -109,7 +109,7 @@ private:
   QueueRegistry& operator=(QueueRegistry&&) = delete;
 };
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 /**
  * @brief QueueTypeMismatch ERS Issue

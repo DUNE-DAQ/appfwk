@@ -19,7 +19,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
 
-#include "app-framework/NamedObject.hpp"
+#include "appfwk/NamedObject.hpp"
 
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
@@ -52,7 +52,7 @@
 */
 using json = nlohmann::json;
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief The DAQModule class implementations are a set of code which performs
  * a specific task.
@@ -121,7 +121,7 @@ makeModule(std::string const& plugin_name, std::string const& instance_name)
                                                      instance_name);
 }
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #include <ers/Issue.h>
 

@@ -12,7 +12,7 @@
  * received with this code.
  */
 
-#include "app-framework/Queue.hpp"
+#include "appfwk/Queue.hpp"
 
 #include <atomic>
 #include <cassert>
@@ -28,7 +28,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief A Queue Implementation that uses a std::deque as its backend
  * @tparam T Data Type to be stored in the std::deque
@@ -83,6 +83,6 @@ private:
 
 #include "detail/StdDeQueue.hxx"
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_
