@@ -18,11 +18,8 @@
 #include <memory>
 #include <string>
 
-
-
-namespace dunedaq::appfwk {
-
-
+namespace dunedaq {
+namespace appfwk {
 
 /**
  * @brief The QueueConfig class encapsulates the basic configuration common to
@@ -32,10 +29,10 @@ struct QueueConfig
 {
   /**
    * @brief Enumeration of all possible types of Queue
-  */
+   */
   enum queue_kind
   {
-    kUnknown = -1, 
+    kUnknown = -1,
     kStdDeQueue = 1 ///< The StdDeQueue
   };
 
@@ -43,11 +40,12 @@ struct QueueConfig
    * @brief  Transform a string to a queue_kind
    * @param name Name of the Queue Type
    * @return Queue type corresponding to the name. Currently only std_deque.
-  */
-  static queue_kind stoqk(const std::string & name ) ; 
+   */
+  static queue_kind stoqk(const std::string& name);
 
-  QueueConfig::queue_kind kind = queue_kind::kUnknown ; ///< The kind of Queue represented by this QueueConfig
-  size_t size = 0 ; ///< The size of the queue
+  QueueConfig::queue_kind kind =
+    queue_kind::kUnknown; ///< The kind of Queue represented by this QueueConfig
+  size_t size = 0;        ///< The size of the queue
 };
 
 /**
@@ -65,17 +63,17 @@ public:
   /**
    * @brief Get a handle to the QueueRegistry
    * @return QueueRegistry handle
-  */
-  static QueueRegistry & get();
+   */
+  static QueueRegistry& get();
 
   /**
    * @brief Get a handle to a Queue
    * @tparam T Type of the data stored in the Queue
    * @param name Name of the Queue
    * @return std::shared_ptr to generic queue pointer
-  */
+   */
   template<typename T>
-  std::shared_ptr<Queue<T>> get_queue(const std::string & name ) ;
+  std::shared_ptr<Queue<T>> get_queue(const std::string& name);
 
   /**
    * @brief Configure the QueueRegistry
@@ -109,31 +107,28 @@ private:
   QueueRegistry& operator=(QueueRegistry&&) = delete;
 };
 
-} // namespace dunedaq::appfwk
+} // namespace appfwk
 
 /**
  * @brief QueueTypeMismatch ERS Issue
  */
 ERS_DECLARE_ISSUE(
-  appframework,      // namespace
+  appfwk,            // namespace
   QueueTypeMismatch, // issue class name
   "Requested queue \"" << queue_name << "\" of type '" << target_type
                        << "' already declared as type '" << source_type
                        << "'", // message
   ((std::string)queue_name)((std::string)source_type)((std::string)target_type))
 
-
 /**
  * @brief QueueKindUnknown ERS Issue
  */
-ERS_DECLARE_ISSUE(
-		  appframework,      // namespace
-		  QueueKindUnknown, // issue class name
-		  "Queue kind \"" << queue_kind << "\" is unknown " , 
-		  ((std::string)queue_kind) 
-		  )
+ERS_DECLARE_ISSUE(appfwk,           // namespace
+                  QueueKindUnknown, // issue class name
+                  "Queue kind \"" << queue_kind << "\" is unknown ",
+                  ((std::string)queue_kind))
 
-
+} // namespace dunedaq
 
 #include "detail/QueueRegistry.hxx"
 

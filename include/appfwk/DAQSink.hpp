@@ -20,17 +20,18 @@
 #include <string>
 #include <utility>
 
+namespace dunedaq {
 /**
  * @brief Define an ERS Issue for when DAQSink is unable to retrieve its Queue
  * handle
  */
-ERS_DECLARE_ISSUE(appframework,             // namespace
+ERS_DECLARE_ISSUE(appfwk,          // namespace
                   DAQSinkConstrutionFailed, // issue class name
                   "Failed to construct DAQSink \"" << name
                                                    << "\"", // no message
                   ((std::string)name))
 
-namespace dunedaq::appfwk {
+namespace appfwk {
 
 template<typename T>
 class DAQSink
@@ -73,6 +74,7 @@ DAQSink<T>::can_push()
   return queue_->can_push();
 }
 
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
