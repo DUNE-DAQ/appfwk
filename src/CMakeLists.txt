@@ -1,19 +1,19 @@
 
-file(GLOB source_files *.cc)
+file(GLOB source_files *.cpp)
 
-list(FILTER source_files EXCLUDE REGEX "QueryResponseCommandFacility.cc")
+list(FILTER source_files EXCLUDE REGEX "QueryResponseCommandFacility.cpp")
 add_library(app-framework SHARED ${source_files})
 target_link_libraries(app-framework ${CETLIB} ${CETLIB_EXCEPT})
 
 
-add_library(app-framework_QueryResponseCommandFacility_duneCommandFacility QueryResponseCommandFacility.cc)
+add_library(app-framework_QueryResponseCommandFacility_duneCommandFacility QueryResponseCommandFacility.cpp)
 
 macro(MakeDataTypeLibraries)
    set(oneValueArgs CPPTYPE PREFIX)
    cmake_parse_arguments(MAKE_DATATYPE "" "${oneValueArgs}" "" ${ARGN})
 
-   configure_file(FanOutDAQModule.cc.in ${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cc)
-   add_library(${MAKE_DATATYPE_PREFIX}FanOutDAQModule_duneDAQModule SHARED ${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cc)
+   configure_file(FanOutDAQModule.cpp.in ${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cpp)
+   add_library(${MAKE_DATATYPE_PREFIX}FanOutDAQModule_duneDAQModule SHARED ${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cpp)
 
 endmacro()
 
