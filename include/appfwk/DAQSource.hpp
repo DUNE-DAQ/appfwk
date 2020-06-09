@@ -18,16 +18,18 @@
 #include <string>
 #include <typeinfo>
 
+namespace dunedaq {
 /**
- * @brief Define an ERS Issue for when DAQSource is unable to retrieve its Queue handle
+ * @brief Define an ERS Issue for when DAQSource is unable to retrieve its Queue
+ * handle
  */
-ERS_DECLARE_ISSUE(appframework,               // namespace
+ERS_DECLARE_ISSUE(appfwk,                     // namespace
                   DAQSourceConstrutionFailed, // issue class name
                   "Failed to construct DAQSource \"" << name
                                                      << "\"", // no message
                   ((std::string)name))
 
-namespace dunedaq::appfwk {
+namespace appfwk {
 
 template<typename T>
 class DAQSource
@@ -45,7 +47,7 @@ private:
 };
 
 template<typename T>
-DAQSource<T>::DAQSource(const std::string & name)
+DAQSource<T>::DAQSource(const std::string& name)
 {
   try {
     queue_ = QueueRegistry::get().get_queue<T>(name);
@@ -70,6 +72,7 @@ DAQSource<T>::can_pop()
   return queue_->can_pop();
 }
 
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_

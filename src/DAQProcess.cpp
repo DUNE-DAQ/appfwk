@@ -88,7 +88,7 @@ DAQProcess::call_command_on_module(DAQModule& mod,
   try {
     mod.execute_command(cmd, args);
   } 
-  catch (GeneralDAQModulessue& ex) {
+  catch (GeneralDAQModuleIssue& ex) {
     ers::error(ex);
   }
   catch (...) {  // NOLINT
