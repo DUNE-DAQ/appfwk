@@ -44,12 +44,12 @@ BOOST_TEST_GLOBAL_FIXTURE(FanOutDAQModuleTestFixture);
 
 BOOST_AUTO_TEST_CASE(Construct)
 {
-  appframework::FanOutDAQModule<int> foum("test");
+  dunedaq::appfwk::FanOutDAQModule<int> foum("test");
 }
 
 BOOST_AUTO_TEST_CASE(Configure)
 {
-  appframework::FanOutDAQModule<appframework::NonCopyableType> foum("test");
+  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
 
   auto config = R"({"input": "input"})"_json;
   foum.configure(config);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(Configure)
 
 BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
 {
-  appframework::FanOutDAQModule<appframework::NonCopyableType> foum("test");
+  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
 
   nlohmann::json module_config = R"(
         {
@@ -79,15 +79,15 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   DAQSource<NonCopyableType> outputbuf1("output1");
   DAQSource<NonCopyableType> outputbuf2("output2");
 
-  inputbuf.push(appframework::NonCopyableType(1), queue_timeout);
-  inputbuf.push(appframework::NonCopyableType(2), queue_timeout);
+  inputbuf.push(dunedaq::appfwk::NonCopyableType(1), queue_timeout);
+  inputbuf.push(dunedaq::appfwk::NonCopyableType(2), queue_timeout);
 
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   foum.execute_command("stop");
 
   BOOST_REQUIRE_EQUAL(outputbuf1.can_pop(), true);
-  appframework::NonCopyableType res(0) ;
+  dunedaq::appfwk::NonCopyableType res(0) ;
   outputbuf1.pop(res, queue_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 1);
 

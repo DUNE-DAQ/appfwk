@@ -88,7 +88,7 @@ endmacro()
 
 MakeDataTypeLibraries(CPPTYPE std::vector<int> PREFIX VectorInt)
 MakeDataTypeLibraries(CPPTYPE std::string PREFIX String)
-MakeDataTypeLibraries(CPPTYPE appframework::NonCopyableType PREFIX NonCopyableType)
+MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyableType)
 
 point_build_to( test )
 

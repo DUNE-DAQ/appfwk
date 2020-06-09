@@ -41,9 +41,9 @@
  */
 #define DEFINE_DUNE_DAQ_MODULE(klass)                                          \
   EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::shared_ptr<appframework::DAQModule> make(std::string n)                \
+  std::shared_ptr<dunedaq::appfwk::DAQModule> make(std::string n)                \
   {                                                                            \
-    return std::shared_ptr<appframework::DAQModule>(new klass(n));            \
+    return std::shared_ptr<dunedaq::appfwk::DAQModule>(new klass(n));            \
   }                                                                            \
   }
 

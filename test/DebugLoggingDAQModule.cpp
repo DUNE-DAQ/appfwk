@@ -28,4 +28,4 @@ DebugLoggingDAQModule::execute_command(const std::string& cmd,
 }
 } // namespace dunedaq::appfwk
 
-DEFINE_DUNE_DAQ_MODULE(appframework::DebugLoggingDAQModule)
+DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::DebugLoggingDAQModule)

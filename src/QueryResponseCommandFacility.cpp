@@ -41,4 +41,4 @@ QueryResponseCommandFacility::listen(DAQProcess* process)
 QueryResponseCommandFacility::~QueryResponseCommandFacility() = default;
 } // namespace dunedaq::appfwk
 
-DEFINE_DUNE_COMMAND_FACILITY(appframework::QueryResponseCommandFacility)
+DEFINE_DUNE_COMMAND_FACILITY(dunedaq::appfwk::QueryResponseCommandFacility)

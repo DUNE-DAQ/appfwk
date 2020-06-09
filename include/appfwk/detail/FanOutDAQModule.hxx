@@ -1,6 +1,6 @@
 
 template<typename ValueType>
-appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
+dunedaq::appfwk::FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
   : DAQModule(name)
   , mode_(FanOutMode::NotConfigured)
   , queueTimeout_(100)
@@ -12,7 +12,7 @@ appframework::FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
 
 template<typename ValueType>
 void
-appframework::FanOutDAQModule<ValueType>::execute_command(
+dunedaq::appfwk::FanOutDAQModule<ValueType>::execute_command(
   const std::string& cmd,
   const std::vector<std::string>& /*args*/)
 {
@@ -29,7 +29,7 @@ appframework::FanOutDAQModule<ValueType>::execute_command(
 
 template<typename ValueType>
 std::string
-appframework::FanOutDAQModule<ValueType>::do_configure()
+dunedaq::appfwk::FanOutDAQModule<ValueType>::do_configure()
 {
   if (configuration_.contains("fanout_mode")) {
     auto modeString = configuration_["fanout_mode"].get<std::string>();
@@ -64,7 +64,7 @@ appframework::FanOutDAQModule<ValueType>::do_configure()
 
 template<typename ValueType>
 std::string
-appframework::FanOutDAQModule<ValueType>::do_start()
+dunedaq::appfwk::FanOutDAQModule<ValueType>::do_start()
 {
   thread_.start_working_thread_();
   return "Success";
@@ -72,7 +72,7 @@ appframework::FanOutDAQModule<ValueType>::do_start()
 
 template<typename ValueType>
 std::string
-appframework::FanOutDAQModule<ValueType>::do_stop()
+dunedaq::appfwk::FanOutDAQModule<ValueType>::do_stop()
 {
   thread_.stop_working_thread_();
   return "Success";
@@ -80,7 +80,7 @@ appframework::FanOutDAQModule<ValueType>::do_stop()
 
 template<typename ValueType>
 void
-appframework::FanOutDAQModule<ValueType>::do_work()
+dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work()
 {
   auto roundRobinNext = outputQueues_.begin();
 

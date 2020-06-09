@@ -31,9 +31,9 @@
  */
 #define DEFINE_DUNE_COMMAND_FACILITY(klass)                                    \
   EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::unique_ptr<appframework::CommandFacility> make()                        \
+  std::unique_ptr<dunedaq::appfwk::CommandFacility> make()                        \
   {                                                                            \
-    return std::unique_ptr<appframework::CommandFacility>(new klass());        \
+    return std::unique_ptr<dunedaq::appfwk::CommandFacility>(new klass());        \
   }                                                                            \
   }
 

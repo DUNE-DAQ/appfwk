@@ -74,11 +74,11 @@ int
 main(int argc, char* argv[])
 {
   auto args =
-    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+    dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
-  appframework::DAQProcess theDAQProcess(args);
+  dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
-  appframework::producer_consumer_test_app_constructor gc;
+  dunedaq::appfwk::producer_consumer_test_app_constructor gc;
   theDAQProcess.register_modules( gc );
 
   return theDAQProcess.listen();
