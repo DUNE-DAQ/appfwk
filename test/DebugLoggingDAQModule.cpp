@@ -17,10 +17,10 @@ void
 DebugLoggingDAQModule::execute_command(const std::string& cmd,
                                        const std::vector<std::string>& args)
 {
-	ERS_INFO() << get_name() << ": Executing command: " << cmd << " with "
+	ERS_DEBUG(0) << get_name() << ": Executing command: " << cmd << " with "
                   << args.size() << " args";
   for (auto& a : args) {
-	  ERS_INFO() << a;
+	  ERS_DEBUG(0) << a;
   }
   return;
 }
