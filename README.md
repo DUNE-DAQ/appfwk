@@ -1,2 +1,2 @@
-# app-framework
+# appfwk
 DUNE DAQ Application Framework Repository 

@@ -8,9 +8,9 @@
  * received with this code.
  */
 
-#include "app-framework/QueueRegistry.hpp"
+#include "appfwk/QueueRegistry.hpp"
 
-namespace appframework {
+namespace dunedaq::appfwk {
 
 QueueRegistry* QueueRegistry::me_ = nullptr;
 
@@ -40,4 +40,4 @@ QueueRegistry::configure(const std::map<std::string, QueueConfig>& configmap)
   configured_ = true;
 }
 
-} // namespace appframework
+} // namespace dunedaq::appfwk

@@ -7,10 +7,10 @@
  * received with this code.
  */
 
-#include "app-framework/DAQModule.hpp"
-#include "app-framework/DAQProcess.hpp"
-#include "app-framework/Queue.hpp"
-#include "app-framework/QueueRegistry.hpp"
+#include "appfwk/DAQModule.hpp"
+#include "appfwk/DAQProcess.hpp"
+#include "appfwk/Queue.hpp"
+#include "appfwk/QueueRegistry.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -23,7 +23,7 @@
  */
 using json = nlohmann::json;
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief ModuleList for daq_application
  */
@@ -70,7 +70,7 @@ public:
 private:
   json config_;
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 /**
  * @brief Entry point for daq_application
@@ -83,9 +83,9 @@ main(int argc, char* argv[])
 {
 
   auto args =
-    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+    dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
-  appframework::DAQProcess theDAQProcess(args);
+  dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
   json json_config;
   if (args.applicaitonConfigurationFile != "") {
@@ -128,7 +128,7 @@ main(int argc, char* argv[])
     )"_json;
   }
 
-  appframework::daq_application_constructor gc(json_config);
+  dunedaq::appfwk::daq_application_constructor gc(json_config);
   theDAQProcess.register_modules( gc );
 
   return theDAQProcess.listen();

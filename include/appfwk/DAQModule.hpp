@@ -19,11 +19,12 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
 
-#include "app-framework/NamedObject.hpp"
+#include "appfwk/NamedObject.hpp"
 
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
 #include <nlohmann/json.hpp>
+#include <ers/Issue.h>
 
 #include <memory>
 #include <string>
@@ -41,18 +42,19 @@
  */
 #define DEFINE_DUNE_DAQ_MODULE(klass)                                          \
   EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::shared_ptr<appframework::DAQModule> make(std::string n)                \
+  std::shared_ptr<dunedaq::appfwk::DAQModule> make(std::string n)              \
   {                                                                            \
-    return std::shared_ptr<appframework::DAQModule>(new klass(n));            \
+    return std::shared_ptr<dunedaq::appfwk::DAQModule>(new klass(n));          \
   }                                                                            \
   }
 
 /**
  * @brief Using of a namespace for convinience
-*/
+ */
 using json = nlohmann::json;
 
-namespace appframework {
+namespace dunedaq {
+namespace appfwk {
 /**
  * @brief The DAQModule class implementations are a set of code which performs
  * a specific task.
@@ -117,41 +119,41 @@ makeModule(std::string const& plugin_name, std::string const& instance_name)
 {
   static cet::BasicPluginFactory bpf("duneDAQModule", "make");
 
-  return bpf.makePlugin<std::shared_ptr<DAQModule>>(plugin_name,
-                                                     instance_name);
+  return bpf.makePlugin<std::shared_ptr<DAQModule>>(plugin_name, instance_name);
 }
 
-} // namespace appframework
-
-#include <ers/Issue.h>
+} // namespace appfwk
 
 /**
  * @brief A generic DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE(appframework,
-                  GeneralDAQModulessue,
+ERS_DECLARE_ISSUE(appfwk,
+                  GeneralDAQModuleIssue,
                   "General DAQModule Issue",
                   ERS_EMPTY)
 
 /**
  * @brief The UnknownCommand DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
-                       UnknownCommand, ///< Type of the issue
-                       GeneralDAQModulessue, ///< Base class of the issue
-                       "Command " << cmd << " is not recognised", ///< Log Message from the issue
-                       ERS_EMPTY, ///< End of variable declarations
-                       ((std::string)cmd)) ///< Variables to capture
+ERS_DECLARE_ISSUE_BASE(
+  appfwk,                                    ///< Namespace
+  UnknownCommand,                            ///< Type of the issue
+  GeneralDAQModuleIssue,                     ///< Base class of the issue
+  "Command " << cmd << " is not recognised", ///< Log Message from the issue
+  ERS_EMPTY,                                 ///< End of variable declarations
+  ((std::string)cmd))                        ///< Variables to capture
 
 /**
  * @brief The CommandFailed DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appframework, ///< Namespace
-                       CommandFailed, ///< Type of the Issue
-                       GeneralDAQModulessue, ///< Base class of the Issue
-                       "Command " << cmd << " failed to execute for reason "
-                                  << reason, ///< Log Message from the issue
-                       ERS_EMPTY, ///< End of variable declarations
-                       ((std::string)cmd)((std::string)reason)) ///< Variables to capture
+ERS_DECLARE_ISSUE_BASE(
+  appfwk,               ///< Namespace
+  CommandFailed,        ///< Type of the Issue
+  GeneralDAQModuleIssue, ///< Base class of the Issue
+  "Command " << cmd << " failed to execute for reason "
+             << reason,                    ///< Log Message from the issue
+  ERS_EMPTY,                               ///< End of variable declarations
+  ((std::string)cmd)((std::string)reason)) ///< Variables to capture
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_

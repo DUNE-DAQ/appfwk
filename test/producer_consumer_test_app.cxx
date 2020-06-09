@@ -13,14 +13,14 @@
 
 #include "FakeDataConsumerDAQModule.hpp"
 #include "FakeDataProducerDAQModule.hpp"
-#include "app-framework/DAQProcess.hpp"
-#include "app-framework/FanOutDAQModule.hpp"
-#include "app-framework/StdDeQueue.hpp"
+#include "appfwk/DAQProcess.hpp"
+#include "appfwk/FanOutDAQModule.hpp"
+#include "appfwk/StdDeQueue.hpp"
 
 #include <memory>
 #include <vector>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief ModuleList for the producer_consumer_test_app
 */
@@ -62,7 +62,7 @@ class producer_consumer_test_app_constructor : public GraphConstructor
     command_order_map["stop"] = { "producer" };
   }
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 /**
  * @brief producer_consumer_test_app main entry point
@@ -74,11 +74,11 @@ int
 main(int argc, char* argv[])
 {
   auto args =
-    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+    dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
-  appframework::DAQProcess theDAQProcess(args);
+  dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
-  appframework::producer_consumer_test_app_constructor gc;
+  dunedaq::appfwk::producer_consumer_test_app_constructor gc;
   theDAQProcess.register_modules( gc );
 
   return theDAQProcess.listen();

@@ -10,10 +10,10 @@
  */
 
 #include "DebugLoggingDAQModule.hpp"
-#include "app-framework/CommandLineInterpreter.hpp"
-#include "app-framework/DAQProcess.hpp"
+#include "appfwk/CommandLineInterpreter.hpp"
+#include "appfwk/DAQProcess.hpp"
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief ModuleList for the echo_test_app
 */
@@ -27,7 +27,7 @@ class echo_test_app_contructor : public GraphConstructor
       new DebugLoggingDAQModule("debugLogger"));
   }
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 /**
  * @brief echo_test_app main entry point
@@ -39,11 +39,11 @@ int
 main(int argc, char* argv[])
 {
   auto args =
-    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+    dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
-  appframework::DAQProcess theDAQProcess(args);
+  dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
-  appframework::echo_test_app_contructor gc;
+  dunedaq::appfwk::echo_test_app_contructor gc;
   theDAQProcess.register_modules(gc);
 
   return theDAQProcess.listen();

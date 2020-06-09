@@ -7,7 +7,7 @@
  * received with this code.
  */
 
-#include "app-framework/StdDeQueue.hpp"
+#include "appfwk/StdDeQueue.hpp"
 
 #define BOOST_TEST_MODULE StdDeQueue_test // NOLINT
 #include <boost/test/included/unit_test.hpp>
@@ -36,7 +36,7 @@ constexpr auto timeout = std::chrono::milliseconds(1);
 constexpr auto timeout_in_us =
   std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-appframework::StdDeQueue<int> Queue("StdDeQueue"); ///< Queue instance for the test
+dunedaq::appfwk::StdDeQueue<int> Queue("StdDeQueue"); ///< Queue instance for the test
 
 /**
  * \todo StdDeQueue no longer exposes size or capacity methods. This section

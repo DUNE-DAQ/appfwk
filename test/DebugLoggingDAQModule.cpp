@@ -8,13 +8,13 @@
 
 #include "DebugLoggingDAQModule.hpp"
 
-#include "app-framework/Logger.hpp"
+#include "appfwk/Logger.hpp"
 
 #include "TRACE/trace.h"
 
 #include <iostream>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 void
 DebugLoggingDAQModule::execute_command(const std::string& cmd,
                                        const std::vector<std::string>& args)
@@ -26,6 +26,6 @@ DebugLoggingDAQModule::execute_command(const std::string& cmd,
   }
   return;
 }
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
-DEFINE_DUNE_DAQ_MODULE(appframework::DebugLoggingDAQModule)
+DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::DebugLoggingDAQModule)

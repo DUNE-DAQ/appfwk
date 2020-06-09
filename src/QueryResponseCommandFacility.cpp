@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 
 int
 QueryResponseCommandFacility::listen(DAQProcess* process)
@@ -39,6 +39,6 @@ QueryResponseCommandFacility::listen(DAQProcess* process)
 }
 
 QueryResponseCommandFacility::~QueryResponseCommandFacility() = default;
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
-DEFINE_DUNE_COMMAND_FACILITY(appframework::QueryResponseCommandFacility)
+DEFINE_DUNE_COMMAND_FACILITY(dunedaq::appfwk::QueryResponseCommandFacility)

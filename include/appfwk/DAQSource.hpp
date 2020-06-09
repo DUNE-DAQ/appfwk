@@ -11,23 +11,25 @@
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
-#include <app-framework/Queue.hpp>
-#include <app-framework/QueueRegistry.hpp>
+#include <appfwk/Queue.hpp>
+#include <appfwk/QueueRegistry.hpp>
 #include <chrono>
 #include <memory>
 #include <string>
 #include <typeinfo>
 
+namespace dunedaq {
 /**
- * @brief Define an ERS Issue for when DAQSource is unable to retrieve its Queue handle
+ * @brief Define an ERS Issue for when DAQSource is unable to retrieve its Queue
+ * handle
  */
-ERS_DECLARE_ISSUE(appframework,               // namespace
+ERS_DECLARE_ISSUE(appfwk,                     // namespace
                   DAQSourceConstrutionFailed, // issue class name
                   "Failed to construct DAQSource \"" << name
                                                      << "\"", // no message
                   ((std::string)name))
 
-namespace appframework {
+namespace appfwk {
 
 template<typename T>
 class DAQSource
@@ -36,8 +38,8 @@ public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
-  explicit DAQSource(const std::string & name);
-  bool pop( T &, const duration_type& timeout = duration_type::zero());
+  explicit DAQSource(const std::string& name);
+  bool pop(T&, const duration_type& timeout = duration_type::zero());
   bool can_pop();
 
 private:
@@ -45,7 +47,7 @@ private:
 };
 
 template<typename T>
-DAQSource<T>::DAQSource(const std::string & name)
+DAQSource<T>::DAQSource(const std::string& name)
 {
   try {
     queue_ = QueueRegistry::get().get_queue<T>(name);
@@ -57,8 +59,8 @@ DAQSource<T>::DAQSource(const std::string & name)
 }
 
 template<typename T>
-bool 
-DAQSource<T>::pop( T & val , const duration_type& timeout)
+bool
+DAQSource<T>::pop(T& val, const duration_type& timeout)
 {
   return queue_->pop(val, timeout);
 }
@@ -70,6 +72,7 @@ DAQSource<T>::can_pop()
   return queue_->can_pop();
 }
 
-} // namespace appframework
+} // namespace appfwk
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_

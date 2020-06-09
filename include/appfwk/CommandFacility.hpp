@@ -31,13 +31,13 @@
  */
 #define DEFINE_DUNE_COMMAND_FACILITY(klass)                                    \
   EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::unique_ptr<appframework::CommandFacility> make()                        \
+  std::unique_ptr<dunedaq::appfwk::CommandFacility> make()                        \
   {                                                                            \
-    return std::unique_ptr<appframework::CommandFacility>(new klass());        \
+    return std::unique_ptr<dunedaq::appfwk::CommandFacility>(new klass());        \
   }                                                                            \
   }
 
-namespace appframework {
+namespace dunedaq::appfwk {
 class DAQProcess; // forward declaration
 
 /**
@@ -105,6 +105,6 @@ makeCommandFacility(std::string const& facility_name)
   return bpf.makePlugin<std::unique_ptr<CommandFacility>>(facility_name);
 }
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HPP_

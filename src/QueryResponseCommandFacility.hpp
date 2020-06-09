@@ -12,11 +12,11 @@
 #ifndef APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
 #define APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
 
-#include "app-framework/DAQProcess.hpp"
+#include "appfwk/DAQProcess.hpp"
 
-#include "app-framework/CommandFacility.hpp"
+#include "appfwk/CommandFacility.hpp"
 
-namespace appframework {
+namespace dunedaq::appfwk {
 /**
  * @brief QueryResponseCommandFacility is a CommandFacility plugin for running a
  * DAQ Application in an interactive session
@@ -34,6 +34,6 @@ public:
   int listen(DAQProcess* theProcess) override;
   virtual ~QueryResponseCommandFacility();
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_

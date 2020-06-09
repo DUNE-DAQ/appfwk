@@ -7,7 +7,7 @@
  * received with this code.
  */
 
-#include "app-framework/DAQModuleThreadHelper.hpp"
+#include "appfwk/DAQModuleThreadHelper.hpp"
 
 #define BOOST_TEST_MODULE DAQModuleThreadHelper_test // NOLINT
 #include <boost/test/unit_test.hpp>
@@ -34,12 +34,12 @@ DoSomething()
 BOOST_AUTO_TEST_CASE(sanity_checks)
 {
 
-  std::unique_ptr<appframework::DAQModuleThreadHelper> umth_ptr = nullptr;
+  std::unique_ptr<dunedaq::appfwk::DAQModuleThreadHelper> umth_ptr = nullptr;
 
   auto starttime = std::chrono::steady_clock::now();
   BOOST_REQUIRE_NO_THROW(
     umth_ptr =
-      std::make_unique<appframework::DAQModuleThreadHelper>(DoSomething));
+      std::make_unique<dunedaq::appfwk::DAQModuleThreadHelper>(DoSomething));
   auto construction_time_in_ms =
     std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - starttime)
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(inappropriate_transitions,
                      *boost::unit_test::depends_on("sanity_checks"))
 {
 
-  appframework::DAQModuleThreadHelper umth(DoSomething);
+  dunedaq::appfwk::DAQModuleThreadHelper umth(DoSomething);
   BOOST_REQUIRE_THROW(umth.stop_working_thread_(), std::runtime_error);
 
   umth.start_working_thread_();
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(abort_checks,
 {
 
   {
-    appframework::DAQModuleThreadHelper umth(DoSomething);
+    dunedaq::appfwk::DAQModuleThreadHelper umth(DoSomething);
   }
   BOOST_TEST(
     true,
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(abort_checks,
   //     "start_working_thread_() but before calling stop_working_thread_()");
 
   // {
-  //   appframework::DAQModuleThreadHelper umth(DoSomething);
+  //   dunedaq::appfwk::DAQModuleThreadHelper umth(DoSomething);
   //   umth.start_working_thread_();
   // }
 }

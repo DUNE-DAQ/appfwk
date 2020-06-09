@@ -12,14 +12,14 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_
 
-#include "app-framework/DAQModule.hpp"
+#include "appfwk/DAQModule.hpp"
 
 #include <list>
 #include <map>
 #include <memory>
 #include <string>
 
-namespace appframework {
+namespace dunedaq::appfwk {
 typedef std::map<std::string, std::shared_ptr<DAQModule>>
   DAQModuleMap; ///< DAQModules indexed by name
 typedef std::map<std::string, std::list<std::string>>
@@ -49,6 +49,6 @@ public:
   virtual void ConstructGraph(DAQModuleMap& daq_module_map,
                               CommandOrderMap& command_order_map) = 0;
 };
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_
