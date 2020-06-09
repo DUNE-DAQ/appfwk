@@ -18,7 +18,7 @@
  */
 #define TRACE_NAME "FakeDataProducer" // NOLINT
 
-appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
+dunedaq::appfwk::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
   const std::string & name)
   : DAQModule(name)
   , queueTimeout_(100)
@@ -27,7 +27,7 @@ appframework::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
 {}
 
 void
-appframework::FakeDataProducerDAQModule::execute_command(
+dunedaq::appfwk::FakeDataProducerDAQModule::execute_command(
   const std::string& cmd,
   const std::vector<std::string>& args)
 {
@@ -43,7 +43,7 @@ appframework::FakeDataProducerDAQModule::execute_command(
 }
 
 std::string
-appframework::FakeDataProducerDAQModule::do_configure()
+dunedaq::appfwk::FakeDataProducerDAQModule::do_configure()
 {
 
   outputQueue_.reset(
@@ -59,14 +59,14 @@ appframework::FakeDataProducerDAQModule::do_configure()
 }
 
 std::string
-appframework::FakeDataProducerDAQModule::do_start()
+dunedaq::appfwk::FakeDataProducerDAQModule::do_start()
 {
   thread_.start_working_thread_();
   return "Success";
 }
 
 std::string
-appframework::FakeDataProducerDAQModule::do_stop()
+dunedaq::appfwk::FakeDataProducerDAQModule::do_stop()
 {
   thread_.stop_working_thread_();
   return "Success";
@@ -93,7 +93,7 @@ operator<<(TraceStreamer& t, std::vector<int> ints)
 }
 
 void
-appframework::FakeDataProducerDAQModule::do_work()
+dunedaq::appfwk::FakeDataProducerDAQModule::do_work()
 {
   int current_int = starting_int_;
   size_t counter = 0;
@@ -130,4 +130,4 @@ appframework::FakeDataProducerDAQModule::do_work()
   }
 }
 
-DEFINE_DUNE_DAQ_MODULE(appframework::FakeDataProducerDAQModule)
+DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::FakeDataProducerDAQModule)

@@ -18,7 +18,7 @@
 #include <functional>
 #include <thread>
 
-appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
+dunedaq::appfwk::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
   const std::string & name)
   : DAQModule(name)
   , queueTimeout_(100)
@@ -27,7 +27,7 @@ appframework::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
 {}
 
 void
-appframework::FakeDataConsumerDAQModule::execute_command(
+dunedaq::appfwk::FakeDataConsumerDAQModule::execute_command(
   const std::string& cmd,
   const std::vector<std::string>& args)
 {
@@ -43,7 +43,7 @@ appframework::FakeDataConsumerDAQModule::execute_command(
 }
 
 std::string
-appframework::FakeDataConsumerDAQModule::do_configure()
+dunedaq::appfwk::FakeDataConsumerDAQModule::do_configure()
 {
   inputQueue_.reset(new DAQSource<std::vector<int>>(
     configuration_["input"].get<std::string>()));
@@ -56,14 +56,14 @@ appframework::FakeDataConsumerDAQModule::do_configure()
 }
 
 std::string
-appframework::FakeDataConsumerDAQModule::do_start()
+dunedaq::appfwk::FakeDataConsumerDAQModule::do_start()
 {
   thread_.start_working_thread_();
   return "Success";
 }
 
 std::string
-appframework::FakeDataConsumerDAQModule::do_stop()
+dunedaq::appfwk::FakeDataConsumerDAQModule::do_stop()
 {
   thread_.stop_working_thread_();
   return "Success";
@@ -90,7 +90,7 @@ operator<<(TraceStreamer& t, std::vector<int> ints)
 }
 
 void
-appframework::FakeDataConsumerDAQModule::do_work()
+dunedaq::appfwk::FakeDataConsumerDAQModule::do_work()
 {
   int current_int = starting_int_;
   int counter = 0;
@@ -155,4 +155,4 @@ appframework::FakeDataConsumerDAQModule::do_work()
                   << fail_count << " failures.";
 }
 
-DEFINE_DUNE_DAQ_MODULE(appframework::FakeDataConsumerDAQModule)
+DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::FakeDataConsumerDAQModule)

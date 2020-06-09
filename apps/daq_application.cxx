@@ -83,9 +83,9 @@ main(int argc, char* argv[])
 {
 
   auto args =
-    appframework::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+    dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
-  appframework::DAQProcess theDAQProcess(args);
+  dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
   json json_config;
   if (args.applicaitonConfigurationFile != "") {
@@ -128,7 +128,7 @@ main(int argc, char* argv[])
     )"_json;
   }
 
-  appframework::daq_application_constructor gc(json_config);
+  dunedaq::appfwk::daq_application_constructor gc(json_config);
   theDAQProcess.register_modules( gc );
 
   return theDAQProcess.listen();

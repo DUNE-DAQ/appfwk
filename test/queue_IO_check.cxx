@@ -46,7 +46,7 @@ auto timeout = std::chrono::milliseconds(100); ///< Queue's timeout
 /**
  * @brief Queue instance for test
 */
-std::unique_ptr<appframework::StdDeQueue<int>> queue = nullptr;
+std::unique_ptr<dunedaq::appfwk::StdDeQueue<int>> queue = nullptr;
 
 constexpr int nelements = 100; ///< Number of elements to push to the Queue (total)
 int n_adding_threads = 1; ///< Number of threads which will call push
@@ -241,7 +241,7 @@ main(int argc, char* argv[])
   }
 
   if (queue_type == "StdDeQueue") {
-    queue.reset(new appframework::StdDeQueue<int>("StdDeQueue"));
+    queue.reset(new dunedaq::appfwk::StdDeQueue<int>("StdDeQueue"));
   } else {
     TLOG(TLVL_ERROR) << "Unknown queue type \"" << queue_type
                      << "\" requested for testing";
