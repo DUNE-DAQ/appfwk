@@ -276,7 +276,7 @@ ERS_REGISTER_OUTPUT_STREAM( ers::erstraceStream, "erstrace", ERS_EMPTY )    // l
 										  _tlog_ARG2(not_used, CHOOSE(__VA_ARGS__)(__VA_ARGS__) 0,need_at_least_one), \
 										  _tlog_ARG3(not_used, CHOOSE(__VA_ARGS__)(__VA_ARGS__) 0,"",need_at_least_one), \
 										  1, SL_FRC(TLVL_LOG) )
-#define ERS_DEBUG(lvl,...) TRACE_STREAMER(TLVL_DEBUG+lvl+3,			\
+#define ERS_DEBUG(lvl,...) TRACE_STREAMER(TLVL_DEBUG+3+(((lvl)<0)?0:(((lvl)>58)?58:(lvl))), \
 										  tlog_ARG2(not_used, ##__VA_ARGS__,0,need_at_least_one), \
 										  tlog_ARG3(not_used, ##__VA_ARGS__,0,"",need_at_least_one), \
 										  1, SL_FRC(TLVL_DEBUG+lvl) )
