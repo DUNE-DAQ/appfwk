@@ -1,4 +1,5 @@
 #include "appfwk/StdDeQueue.hpp"
+#include "appfwk/FollyQueue.hpp"
 
 #include <cxxabi.h>
 
@@ -8,6 +9,10 @@ namespace dunedaq::appfwk {
   QueueConfig::queue_kind QueueConfig::stoqk( const std::string & name )   {
     if (name == "StdDeQueue" || name == "std_deque")
       return queue_kind::kStdDeQueue ;
+    else if (name == "FollySPSCQueue")
+      return queue_kind::kFollySPSCQueue ;
+    else if (name == "FollyMPMCQueue")
+      return queue_kind::kFollyMPMCQueue ;
     else
       throw QueueKindUnknown( ERS_HERE, name ) ;
   }
@@ -51,6 +56,15 @@ std::shared_ptr<NamedObject> QueueRegistry::create_queue(std::string name, const
       queue = std::make_shared<StdDeQueue<T>>(name);
       std::dynamic_pointer_cast<StdDeQueue<T>>(queue)->SetSize(config.size);
       break;
+    case QueueConfig::kFollySPSCQueue :
+      queue = std::make_shared<FollySPSCQueue<T>>(name);
+      std::dynamic_pointer_cast<FollySPSCQueue<T>>(queue)->SetSize(config.size);
+      break;
+    case QueueConfig::kFollyMPMCQueue :
+      queue = std::make_shared<FollyMPMCQueue<T>>(name);
+      std::dynamic_pointer_cast<FollyMPMCQueue<T>>(queue)->SetSize(config.size);
+      break;
+
     default:
       throw std::runtime_error("Unknown queue kind");
   }

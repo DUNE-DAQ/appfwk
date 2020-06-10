@@ -3,6 +3,8 @@ project(appfwk)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include(FindThreads)
+
 find_package(TRACE 3.15.0 REQUIRED)
 
 find_package(nlohmann_json 3.2.0)
@@ -18,6 +20,7 @@ set(Boost_NO_BOOST_CMAKE ON)
 set(BUILD_SHARED_LIBS ON)
 find_package(Boost 1.70.0 COMPONENTS unit_test_framework program_options REQUIRED)
 
+find_package(folly REQUIRED)
 
 if(EXISTS $ENV{CETLIB_LIB})
 # UPS
@@ -49,7 +52,7 @@ point_build_to( apps )
 include_directories(${CMAKE_SOURCE_DIR}/appfwk/include)
 
 add_executable(daq_application apps/daq_application.cxx)
-target_link_libraries(daq_application appfwk  pthread ers ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(daq_application appfwk  Threads::Threads ers ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 point_build_to( doc )
 # (No action taken, doc/CMakeLists.txt was empty)
@@ -72,7 +75,7 @@ file(GLOB source_files src/*.cpp)
 
 list(FILTER source_files EXCLUDE REGEX "QueryResponseCommandFacility.cpp")
 add_library(appfwk SHARED ${source_files})
-target_link_libraries(appfwk ${CETLIB} ${CETLIB_EXCEPT})
+target_link_libraries(appfwk ${CETLIB} ${CETLIB_EXCEPT} Folly::folly)
 
 
 add_library(appfwk_QueryResponseCommandFacility_duneCommandFacility src/QueryResponseCommandFacility.cpp)
@@ -83,6 +86,7 @@ macro(MakeDataTypeLibraries)
 
    configure_file(src/FanOutDAQModule.cpp.in src/${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cpp)
    add_library(${MAKE_DATATYPE_PREFIX}FanOutDAQModule_duneDAQModule SHARED src/${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cpp)
+   target_link_libraries(${MAKE_DATATYPE_PREFIX}FanOutDAQModule_duneDAQModule Folly::folly)
 
 endmacro()
 
@@ -96,21 +100,24 @@ set(Boost_NO_BOOST_CMAKE ON)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check pthread ${Boost_PROGRAM_OPTIONS_LIBRARY} )
+target_link_libraries(queue_IO_check Threads::Threads ${Boost_PROGRAM_OPTIONS_LIBRARY} Folly::folly )
 
 
 add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
+target_link_libraries(appfwk_DebugLoggingDAQModule_duneDAQModule Folly::folly)
 add_library(appfwk_FakeDataConsumerDAQModule_duneDAQModule test/FakeDataConsumerDAQModule.cpp)
+target_link_libraries(appfwk_FakeDataConsumerDAQModule_duneDAQModule Folly::folly)
 add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducerDAQModule.cpp)
+target_link_libraries(appfwk_FakeDataProducerDAQModule_duneDAQModule Folly::folly)
 
 add_executable(echo_test_app test/echo_test_app.cxx)
-target_link_libraries(echo_test_app appfwk appfwk_DebugLoggingDAQModule_duneDAQModule pthread ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(echo_test_app appfwk appfwk_DebugLoggingDAQModule_duneDAQModule Threads::Threads ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 add_executable(producer_consumer_test_app test/producer_consumer_test_app.cxx)
-target_link_libraries(producer_consumer_test_app appfwk appfwk_FakeDataProducerDAQModule_duneDAQModule ers appfwk_FakeDataConsumerDAQModule_duneDAQModule pthread  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(producer_consumer_test_app appfwk appfwk_FakeDataProducerDAQModule_duneDAQModule ers appfwk_FakeDataConsumerDAQModule_duneDAQModule Threads::Threads  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 add_executable(daq_sink_source test/daq_sink_source.cxx)
-target_link_libraries(daq_sink_source appfwk pthread ers)
+target_link_libraries(daq_sink_source appfwk Threads::Threads ers)
 
 point_build_to( unittest )
 
@@ -121,14 +128,18 @@ if(Boost_FOUND)
     add_executable(StdDeQueue_test unittest/StdDeQueue_test.cxx)
     add_test(NAME StdDeQueue_test COMMAND StdDeQueue_test)
 
+    add_executable(FollyQueue_test unittest/FollyQueue_test.cxx)
+    add_test(NAME FollyQueue_test COMMAND FollyQueue_test)
+    target_link_libraries(FollyQueue_test Folly::folly)
+
     add_executable(FanOutDAQModule_test unittest/FanOutDAQModule_test.cxx)
-    target_link_libraries(FanOutDAQModule_test appfwk ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread ers)
+    target_link_libraries(FanOutDAQModule_test appfwk ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Threads::Threads ers)
     target_compile_definitions(FanOutDAQModule_test PRIVATE "BOOST_TEST_DYN_LINK=1")
     target_include_directories(FanOutDAQModule_test PRIVATE ${Boost_INCLUDE_DIRS})
     add_test(NAME FanOutDAQModule_test COMMAND FanOutDAQModule_test ers)
 
 add_executable(DAQModuleThreadHelper_test unittest/DAQModuleThreadHelper_test.cxx)
-target_link_libraries(DAQModuleThreadHelper_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread)
+target_link_libraries(DAQModuleThreadHelper_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Threads::Threads)
 target_compile_definitions(DAQModuleThreadHelper_test PRIVATE "BOOST_TEST_DYN_LINK=1")
 target_include_directories(DAQModuleThreadHelper_test PRIVATE ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/appfwk-base/include)
 add_test(NAME DAQModuleThreadHelper_test COMMAND DAQModuleThreadHelper_test)
