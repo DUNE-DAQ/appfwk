@@ -12,6 +12,7 @@
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
 
+#include "ers/Issue.h"
 #include <nlohmann/json.hpp>
 
 #include <fstream>
@@ -23,7 +24,8 @@
  */
 using json = nlohmann::json;
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+namespace appfwk {
 /**
  * @brief ModuleList for daq_application
  */
@@ -70,7 +72,16 @@ public:
 private:
   json config_;
 };
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+
+/**
+ * @brief NoConfiguration ERS Issue
+ */
+ERS_DECLARE_ISSUE(appfwk,          // namespace
+                  NoConfiguration, // issue class name
+                  "No configuration file given to daq_application; re-run with daq_application -h to see options!", // message
+)
+} // namespace dunedaq
 
 /**
  * @brief Entry point for daq_application
@@ -93,39 +104,7 @@ main(int argc, char* argv[])
     std::ifstream ifile(args.applicaitonConfigurationFile);
     ifile >> json_config;
   } else {
-    json_config = R"(
-        {
-            "queues": {
-                "producerToFanOut": {"size": 10, "kind": "StdDeQueue"},
-                "fanOutToConsumer1": {"size": 5, "kind": "StdDeQueue"},
-                "fanOutToConsumer2":{"size": 5, "kind": "StdDeQueue"}
-            },
-            "modules": {
-                "producer": {
-                    "user_module_type": "FakeDataProducerDAQModule",
-                    "output": "producerToFanOut"
-                },
-                "fanOut": {
-                    "user_module_type": "VectorIntFanOutDAQModule",
-                    "input": "producerToFanOut",
-                    "outputs": ["fanOutToConsumer1", "fanOutToConsumer2" ],
-                    "fanout_mode": "RoundRobin"
-                },
-                "consumer1": {
-                    "user_module_type": "FakeDataConsumerDAQModule",
-                    "input": "fanOutToConsumer1"
-                },
-                "consumer2": {
-                    "user_module_type": "FakeDataConsumerDAQModule",
-                    "input": "fanOutToConsumer2"
-                }
-            },
-            "commands": {
-                "start": [ "consumer1", "consumer2", "fanOut", "producer" ],
-                "stop": [ "producer" ]
-            }
-        }
-    )"_json;
+    throw dunedaq::appfwk::NoConfiguration(ERS_HERE);
   }
 
   dunedaq::appfwk::daq_application_constructor gc(json_config);
