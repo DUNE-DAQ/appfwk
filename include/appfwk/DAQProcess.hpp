@@ -64,8 +64,7 @@ public:
    * that list in the order specified. Then, any remaining DAQModules will
    * receive the command in an unspecified order.
    */
-  void execute_command(std::string const& cmd,
-                       std::vector<std::string> const& args = {});
+  void execute_command(std::string const& cmd, std::vector<std::string> const& args = {});
   /**
    * @brief Start the CommandFacility listener
    * @return Return code from listener
@@ -76,13 +75,10 @@ public:
    */
   int listen();
 
-  DAQProcess(const DAQProcess&) =
-    delete; ///< DAQProcess is not copy-constuctible
-  DAQProcess& operator=(const DAQProcess&) =
-    delete;                          ///< DAQProcess is not copy-assignable
-  DAQProcess(DAQProcess&&) = delete; ///< DAQProcess is not move-constructible
-  DAQProcess& operator=(DAQProcess&&) =
-    delete; ///< DAQProcess is not move-assignable
+  DAQProcess(const DAQProcess&) = delete;            ///< DAQProcess is not copy-constuctible
+  DAQProcess& operator=(const DAQProcess&) = delete; ///< DAQProcess is not copy-assignable
+  DAQProcess(DAQProcess&&) = delete;                 ///< DAQProcess is not move-constructible
+  DAQProcess& operator=(DAQProcess&&) = delete;      ///< DAQProcess is not move-assignable
 
 protected:
   /**
@@ -91,9 +87,7 @@ protected:
    * @param cmd Command name
    * @param args Command arguments
    */
-  void call_command_on_module(DAQModule& module,
-                              const std::string& cmd,
-                              std::vector<std::string> const& args);
+  void call_command_on_module(DAQModule& module, const std::string& cmd, std::vector<std::string> const& args);
 
 private:
   DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule
@@ -104,7 +98,7 @@ private:
 /**
  * @brief DAQ Process generic Issue
  */
-ERS_DECLARE_ISSUE(appfwk,            ///< Namespace
+ERS_DECLARE_ISSUE(appfwk,                     ///< Namespace
                   DAQProcessIssue,            ///< Type of the Issue
                   "General DAQProcess Issue", ///< Message for Issue
                   ERS_EMPTY)
@@ -112,24 +106,21 @@ ERS_DECLARE_ISSUE(appfwk,            ///< Namespace
 /**
  * @brief Issue thrown when the ordering for commands is not specified
  */
-ERS_DECLARE_ISSUE_BASE(
-  appfwk,          ///< Namespace
-  CommandOrderNotSpecified, ///< Class Name for Issue
-  DAQProcessIssue,          ///< Base class for issue
-  "Command "
-    << cmd
-    << " does not have a specified propagation order ", ///< Message for Issue
-  ERS_EMPTY,
-  ((std::string)cmd))
+ERS_DECLARE_ISSUE_BASE(appfwk,                                                               ///< Namespace
+                       CommandOrderNotSpecified,                                             ///< Class Name for Issue
+                       DAQProcessIssue,                                                      ///< Base class for issue
+                       "Command " << cmd << " does not have a specified propagation order ", ///< Message for
+                                                                                             ///< Issue
+                       ERS_EMPTY,
+                       ((std::string)cmd))
 
 /**
  * @brief Issue thrown when an unknown exception is thrown from a command
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,    ///< Namespace
+ERS_DECLARE_ISSUE_BASE(appfwk,             ///< Namespace
                        ModuleThrowUnknown, ///< Class Name for Issue
                        DAQProcessIssue,    ///< Base class for issue
-                       "Module " << mod_name
-                                 << " threw an unknown exception after command "
+                       "Module " << mod_name << " threw an unknown exception after command "
                                  << cmd, ///< Message for Issue
                        ERS_EMPTY,
                        ((std::string)mod_name)((std::string)cmd))
@@ -137,12 +128,10 @@ ERS_DECLARE_ISSUE_BASE(appfwk,    ///< Namespace
 /**
  * @brief Issue thrown when a std::exception is thrown from a command
  */
-ERS_DECLARE_ISSUE_BASE(appfwk, ///< Namespace
+ERS_DECLARE_ISSUE_BASE(appfwk,          ///< Namespace
                        ModuleThowStd,   ///< Class Name for Issue
                        DAQProcessIssue, ///< Base class for issue
-                       "Module " << mod_name
-                                 << " threw an std::exception after command "
-                                 << cmd, ///< Message for Issue
+                       "Module " << mod_name << " threw an std::exception after command " << cmd, ///< Message for Issue
                        ERS_EMPTY,
                        ((std::string)mod_name)((std::string)cmd))
 

@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE(FanOutDAQModule_test)
 
 /**
  * @brief Initializes the QueueRegistry for use by the FanOutDAQModule test
-*/
+ */
 struct FanOutDAQModuleTestFixture
 {
   FanOutDAQModuleTestFixture() {}
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   foum.execute_command("stop");
 
   BOOST_REQUIRE_EQUAL(outputbuf1.can_pop(), true);
-  dunedaq::appfwk::NonCopyableType res(0) ;
+  dunedaq::appfwk::NonCopyableType res(0);
   outputbuf1.pop(res, queue_timeout);
   BOOST_REQUIRE_EQUAL(res.data, 1);
 

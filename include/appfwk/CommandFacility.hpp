@@ -20,8 +20,8 @@
 #include <vector>
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
-#define EXTERN_C_FUNC_DECLARE_START                                            \
-  extern "C"                                                                   \
+#define EXTERN_C_FUNC_DECLARE_START                                                                                    \
+  extern "C"                                                                                                           \
   {
 #endif
 
@@ -29,12 +29,12 @@
  * @brief Declare the function that will be called by the plugin loader
  * @param klass Class to be defined as a DUNE Command Facility
  */
-#define DEFINE_DUNE_COMMAND_FACILITY(klass)                                    \
-  EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::unique_ptr<dunedaq::appfwk::CommandFacility> make()                        \
-  {                                                                            \
-    return std::unique_ptr<dunedaq::appfwk::CommandFacility>(new klass());        \
-  }                                                                            \
+#define DEFINE_DUNE_COMMAND_FACILITY(klass)                                                                            \
+  EXTERN_C_FUNC_DECLARE_START                                                                                          \
+  std::unique_ptr<dunedaq::appfwk::CommandFacility> make()                                                             \
+  {                                                                                                                    \
+    return std::unique_ptr<dunedaq::appfwk::CommandFacility>(new klass());                                             \
+  }                                                                                                                    \
   }
 
 namespace dunedaq::appfwk {
@@ -61,10 +61,7 @@ public:
    * @brief Set the pointer returned by the handle() function
    * @param handle Handle to a loaded CommandFacility plugin
    */
-  static void setHandle(std::unique_ptr<CommandFacility>&& handle)
-  {
-    handle_ = std::move(handle);
-  }
+  static void setHandle(std::unique_ptr<CommandFacility>&& handle) { handle_ = std::move(handle); }
   /**
    * @brief Perform basic setup actions needed by the CommandFacility, using
    * command-line arguments and environment variables
@@ -88,15 +85,14 @@ protected:
   CommandFacility() {}
 
 private:
-  static std::unique_ptr<CommandFacility>
-    handle_; ///< Singleton pattern, handle to CommandFacility
+  static std::unique_ptr<CommandFacility> handle_; ///< Singleton pattern, handle to CommandFacility
 };
 
 /**
  * @brief Instantiate a CommandFacility from a plugin
  * @param facility_name Name of the CommandFacility plugin to load
  * @return Pointer to loaded CommandFacility from plugin
-*/
+ */
 inline std::unique_ptr<CommandFacility>
 makeCommandFacility(std::string const& facility_name)
 {

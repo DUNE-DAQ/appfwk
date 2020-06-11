@@ -23,10 +23,9 @@ namespace dunedaq {
  * @brief Define an ERS Issue for when DAQSource is unable to retrieve its Queue
  * handle
  */
-ERS_DECLARE_ISSUE(appfwk,                     // namespace
-                  DAQSourceConstructionFailed, // issue class name
-                  "Failed to construct DAQSource \"" << name
-                                                     << "\"", // no message
+ERS_DECLARE_ISSUE(appfwk,                                             // namespace
+                  DAQSourceConstructionFailed,                        // issue class name
+                  "Failed to construct DAQSource \"" << name << "\"", // no message
                   ((std::string)name))
 
 namespace appfwk {
@@ -51,8 +50,7 @@ DAQSource<T>::DAQSource(const std::string& name)
 {
   try {
     queue_ = QueueRegistry::get().get_queue<T>(name);
-    TLOG(TLVL_TRACE, "DAQSource")
-      << "Queue " << name << " is at " << queue_.get();
+    TLOG(TLVL_TRACE, "DAQSource") << "Queue " << name << " is at " << queue_.get();
   } catch (QueueTypeMismatch& ex) {
     throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
   }

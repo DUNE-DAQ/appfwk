@@ -75,11 +75,12 @@ public:
   /**
    * @brief Determine if the thread is currently running
    * @return Whether the thread is currently running
-  */
+   */
   bool thread_running() const { return thread_running_.load(); }
 
   DAQModuleThreadHelper(const DAQModuleThreadHelper&) = delete; ///< DAQModuleThreadHelper is not copy-constructible
-  DAQModuleThreadHelper& operator=(const DAQModuleThreadHelper&) = delete; ///< DAQModuleThreadHelper is not copy-assginable
+  DAQModuleThreadHelper& operator=(const DAQModuleThreadHelper&) =
+    delete;                                                ///< DAQModuleThreadHelper is not copy-assginable
   DAQModuleThreadHelper(DAQModuleThreadHelper&&) = delete; ///< DAQModuleThreadHelper is not move-constructible
   DAQModuleThreadHelper& operator=(DAQModuleThreadHelper&&) = delete; ///< DAQModuleThreadHelper is not move-assignable
 

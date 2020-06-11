@@ -35,25 +35,26 @@ template<class T>
 class Queue : public NamedObject
 {
 public:
-  using value_type = T; ///< Type stored in the Queue
+  using value_type = T;                            ///< Type stored in the Queue
   using duration_type = std::chrono::milliseconds; ///< Base duration type for timeouts
 
   /**
    * @brief Queue Constructor
    * @param name Name of the Queue instance
-  */
-  explicit Queue(const std::string & name)
+   */
+  explicit Queue(const std::string& name)
     : NamedObject(name)
   {}
 
   /**
    * @brief Push a value onto the Queue.
    * @param val Value to push (rvalue)
-   * @param timeout Timeout for the push operation. 
+   * @param timeout Timeout for the push operation.
    *
    * This is a pure virtual function.
-   * If push takes longer than the timeout, implementations should throw an exception.
-  */
+   * If push takes longer than the timeout, implementations should throw an
+   * exception.
+   */
   virtual void push(T&& val, const duration_type& timeout) = 0;
 
   /**
@@ -61,7 +62,7 @@ public:
    * @return True if the queue is not full, false if it is
    *
    * This is a pure virtual function
-  */
+   */
   virtual bool can_push() const noexcept = 0;
 
   /**
@@ -70,16 +71,17 @@ public:
    * @return Value popped from the Queue
    *
    * This is a pure virtual function
-   * If pop takes longer than the timeout, implementations should throw an exception
-  */
-  virtual bool pop( T & val, const duration_type& timeout) = 0;
+   * If pop takes longer than the timeout, implementations should throw an
+   * exception
+   */
+  virtual bool pop(T& val, const duration_type& timeout) = 0;
 
   /**
    * @brief Determine whether the Queue may be popped from
    * @return True if the queue is not empty, false if it is
    *
-   * This is a pure virtual function 
-  */
+   * This is a pure virtual function
+   */
   virtual bool can_pop() const noexcept = 0;
 
 private:

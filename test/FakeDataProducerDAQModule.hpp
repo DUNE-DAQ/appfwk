@@ -32,11 +32,10 @@ public:
   /**
    * @brief FakeDataProducerDAQModule Constructor
    * @param name Instance name for this FakeDataProducerDAQModule instance
-  */
-  explicit FakeDataProducerDAQModule( const std::string & name);
+   */
+  explicit FakeDataProducerDAQModule(const std::string& name);
 
-  void execute_command(const std::string& cmd,
-                       const std::vector<std::string>& args = {}) override;
+  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
 
   FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) =
     delete; ///< FakeDataProducerDAQModule is not copy-constructible

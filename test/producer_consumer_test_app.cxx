@@ -23,12 +23,11 @@
 namespace dunedaq::appfwk {
 /**
  * @brief ModuleList for the producer_consumer_test_app
-*/
-class producer_consumer_test_app_constructor : public GraphConstructor 
+ */
+class producer_consumer_test_app_constructor : public GraphConstructor
 {
   // Inherited via ModuleList
-  void ConstructGraph(DAQModuleMap& user_module_map,
-                      CommandOrderMap& command_order_map) override
+  void ConstructGraph(DAQModuleMap& user_module_map, CommandOrderMap& command_order_map) override
   {
 
     std::map<std::string, QueueConfig> queue_configuration;
@@ -48,17 +47,14 @@ class producer_consumer_test_app_constructor : public GraphConstructor
 
     user_module_map["producer"].reset(new FakeDataProducerDAQModule("prod"));
     user_module_map["producer"]->configure(producerConfig);
-    user_module_map["fanOut"].reset(
-      new FanOutDAQModule<std::vector<int>>("fanOut"));
+    user_module_map["fanOut"].reset(new FanOutDAQModule<std::vector<int>>("fanOut"));
     user_module_map["fanOut"]->configure(fanOutConfig);
     user_module_map["consumer1"].reset(new FakeDataConsumerDAQModule("C1"));
     user_module_map["consumer1"]->configure(consumer1Config);
     user_module_map["consumer2"].reset(new FakeDataConsumerDAQModule("C2"));
     user_module_map["consumer2"]->configure(consumer2Config);
 
-    command_order_map["start"] = {
-      "consumer1", "consumer2", "fanOut", "producer"
-    };
+    command_order_map["start"] = { "consumer1", "consumer2", "fanOut", "producer" };
     command_order_map["stop"] = { "producer" };
   }
 };
@@ -73,13 +69,12 @@ class producer_consumer_test_app_constructor : public GraphConstructor
 int
 main(int argc, char* argv[])
 {
-  auto args =
-    dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+  auto args = dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
   dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
   dunedaq::appfwk::producer_consumer_test_app_constructor gc;
-  theDAQProcess.register_modules( gc );
+  theDAQProcess.register_modules(gc);
 
   return theDAQProcess.listen();
 }

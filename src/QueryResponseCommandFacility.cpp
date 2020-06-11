@@ -1,5 +1,6 @@
 /**
- * @file QueryResponseCommandFacility.cpp QueryResponseCommandFacility class Implementation
+ * @file QueryResponseCommandFacility.cpp QueryResponseCommandFacility class
+ * Implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -30,7 +31,7 @@ QueryResponseCommandFacility::listen(DAQProcess* process)
         process->execute_command(comm);
       }
     }
-  } catch (...)  // NOLINT
+  } catch (...) // NOLINT
   {
     return -1;
   }
