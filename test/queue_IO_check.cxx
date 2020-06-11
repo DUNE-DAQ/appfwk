@@ -315,9 +315,9 @@ main(int argc, char* argv[])
   }
 
   push_distribution.reset(new std::uniform_int_distribution<int>(
-    0, 2 * 1000 * avg_milliseconds_between_pushes));
+    0, 2 * avg_milliseconds_between_pushes));
   pop_distribution.reset(new std::uniform_int_distribution<int>(
-    0, 2 * 1000 * avg_milliseconds_between_pops));
+    0, 2 * avg_milliseconds_between_pops));
 
   TLOG(TLVL_INFO)
     << n_adding_threads << " thread(s) pushing " << nelements
