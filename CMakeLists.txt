@@ -112,6 +112,8 @@ target_link_libraries(producer_consumer_test_app appfwk appfwk_FakeDataProducerD
 add_executable(daq_sink_source test/daq_sink_source.cxx)
 target_link_libraries(daq_sink_source appfwk pthread ers)
 
+file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
+
 point_build_to( unittest )
 
 if(Boost_FOUND)
