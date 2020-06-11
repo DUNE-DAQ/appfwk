@@ -32,44 +32,46 @@ namespace dunedaq::appfwk {
 /**
  * @brief A Queue Implementation that uses a std::deque as its backend
  * @tparam T Data Type to be stored in the std::deque
-*/
-template<class T>
-class StdDeQueue : public Queue<T>
-{
+ */
+template <class T> class StdDeQueue : public Queue<T> {
 public:
   using value_type = T; ///< Type of data stored in the StdDeQueue
-  using duration_type = typename Queue<T>::duration_type; ///< Type used for expressing timeouts
+  using duration_type =
+      typename Queue<T>::duration_type; ///< Type used for expressing timeouts
 
   /**
    * @brief StdDeQueue Constructor
    * @param name Name of this StdDeQueue instance
-  */
-  explicit StdDeQueue(const std::string& name);
+   */
+  explicit StdDeQueue(const std::string &name);
 
   bool can_pop() const noexcept override { return fSize.load() > 0; }
-  bool pop( value_type & val, const duration_type&)
-    override; // Throws std::runtime_error if a timeout occurs
+  bool pop(value_type &val, const duration_type &)
+      override; // Throws std::runtime_error if a timeout occurs
 
   bool can_push() const noexcept override { return fSize.load() < fMaxSize; }
-  void push(value_type&&, const duration_type&)
-    override; // Throws std::runtime_error if a timeout occurs
+  void push(value_type &&, const duration_type &)
+      override; // Throws std::runtime_error if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
 
-  StdDeQueue(const StdDeQueue&) = delete; ///< StdDeQueue is not copy-constructible
-  StdDeQueue& operator=(const StdDeQueue&) = delete; ///< StdDeQueue is not copy-assignable
-  StdDeQueue(StdDeQueue&&) = delete; ///< StdDeQueue is not move-constructible
-  StdDeQueue& operator=(StdDeQueue&&) = delete; ///< StdDeQueue is not move-assignable
+  StdDeQueue(const StdDeQueue &) =
+      delete; ///< StdDeQueue is not copy-constructible
+  StdDeQueue &
+  operator=(const StdDeQueue &) = delete; ///< StdDeQueue is not copy-assignable
+  StdDeQueue(StdDeQueue &&) = delete; ///< StdDeQueue is not move-constructible
+  StdDeQueue &
+  operator=(StdDeQueue &&) = delete; ///< StdDeQueue is not move-assignable
 
   /**
    * @brief Set the size of the StdDeQueue
    * @param sz Maximum size for the StdDeQueue
-  */
+   */
   void SetSize(size_t sz) { fMaxSize = sz; }
 
 private:
-  void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
+  void try_lock_for(std::unique_lock<std::mutex> &, const duration_type &);
 
   size_t fMaxSize;
 

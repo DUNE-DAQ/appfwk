@@ -22,24 +22,21 @@ namespace dunedaq::appfwk {
  * @brief DebugLoggingDAQModule logs that it has received a command from
  * DAQProcess
  */
-class DebugLoggingDAQModule : public DAQModule
-{
+class DebugLoggingDAQModule : public DAQModule {
 public:
   /**
    * @brief DebugLoggingDAQModule Constructor
    * @param name Instance name for this DebugLoggingDAQModule
-  */
-  explicit DebugLoggingDAQModule( const std::string & name)
-    : DAQModule(name)
-  {}
+   */
+  explicit DebugLoggingDAQModule(const std::string &name) : DAQModule(name) {}
 
   /**
    * @brief Execute a command from DAQProcess
    * @param cmd Command from DAQProcess
    * @param args Arguments for the command from DAQProcess
    */
-  void execute_command(const std::string& cmd,
-                       const std::vector<std::string>& args = {}) override;
+  void execute_command(const std::string &cmd,
+                       const std::vector<std::string> &args = {}) override;
 };
 } // namespace dunedaq::appfwk
 

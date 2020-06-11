@@ -23,8 +23,7 @@ namespace dunedaq::appfwk {
  * @brief DAQModuleThreadHelper contains a thread which runs the do_work()
  * function
  */
-class DAQModuleThreadHelper
-{
+class DAQModuleThreadHelper {
 public:
   /**
    * @brief DAQModuleThreadHelper Constructor
@@ -33,17 +32,13 @@ public:
    * This constructor sets the defaults for the thread control variables
    */
   explicit DAQModuleThreadHelper(std::function<void()> do_work)
-    : thread_running_(false)
-    , working_thread_(nullptr)
-    , do_work_(do_work)
-  {}
+      : thread_running_(false), working_thread_(nullptr), do_work_(do_work) {}
 
   /**
    * @brief Start the working thread (which executes the do_work() function)
    * @throws std::runtime_error if the thread is already running
    */
-  void start_working_thread_()
-  {
+  void start_working_thread_() {
     if (thread_running()) {
       throw std::runtime_error("Attempted to start DAQModule working thread "
                                "when it is already running!");
@@ -56,8 +51,7 @@ public:
    * @throws std::runtime_error If the thread has not yet been started
    * @throws std::runtime_error If the thread is not in the joinable state
    */
-  void stop_working_thread_()
-  {
+  void stop_working_thread_() {
     if (!thread_running()) {
       throw std::runtime_error("Attempted to stop DAQModule working thread "
                                "when it is not running!");
@@ -75,13 +69,17 @@ public:
   /**
    * @brief Determine if the thread is currently running
    * @return Whether the thread is currently running
-  */
+   */
   bool thread_running() const { return thread_running_.load(); }
 
-  DAQModuleThreadHelper(const DAQModuleThreadHelper&) = delete; ///< DAQModuleThreadHelper is not copy-constructible
-  DAQModuleThreadHelper& operator=(const DAQModuleThreadHelper&) = delete; ///< DAQModuleThreadHelper is not copy-assginable
-  DAQModuleThreadHelper(DAQModuleThreadHelper&&) = delete; ///< DAQModuleThreadHelper is not move-constructible
-  DAQModuleThreadHelper& operator=(DAQModuleThreadHelper&&) = delete; ///< DAQModuleThreadHelper is not move-assignable
+  DAQModuleThreadHelper(const DAQModuleThreadHelper &) =
+      delete; ///< DAQModuleThreadHelper is not copy-constructible
+  DAQModuleThreadHelper &operator=(const DAQModuleThreadHelper &) =
+      delete; ///< DAQModuleThreadHelper is not copy-assginable
+  DAQModuleThreadHelper(DAQModuleThreadHelper &&) =
+      delete; ///< DAQModuleThreadHelper is not move-constructible
+  DAQModuleThreadHelper &operator=(DAQModuleThreadHelper &&) =
+      delete; ///< DAQModuleThreadHelper is not move-assignable
 
 private:
   std::atomic<bool> thread_running_;

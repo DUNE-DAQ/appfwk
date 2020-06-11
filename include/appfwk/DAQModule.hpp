@@ -23,17 +23,15 @@
 
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
-#include <nlohmann/json.hpp>
 #include <ers/Issue.h>
+#include <nlohmann/json.hpp>
 
 #include <memory>
 #include <string>
 #include <vector>
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
-#define EXTERN_C_FUNC_DECLARE_START                                            \
-  extern "C"                                                                   \
-  {
+#define EXTERN_C_FUNC_DECLARE_START extern "C" {
 #endif
 
 /**
@@ -42,8 +40,7 @@
  */
 #define DEFINE_DUNE_DAQ_MODULE(klass)                                          \
   EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::shared_ptr<dunedaq::appfwk::DAQModule> make(std::string n)              \
-  {                                                                            \
+  std::shared_ptr<dunedaq::appfwk::DAQModule> make(std::string n) {            \
     return std::shared_ptr<dunedaq::appfwk::DAQModule>(new klass(n));          \
   }                                                                            \
   }
@@ -66,16 +63,13 @@ namespace appfwk {
  * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
-class DAQModule : public NamedObject
-{
+class DAQModule : public NamedObject {
 public:
   /**
    * @brief DAQModule Constructor
    * @param name Name of the DAQModule
    */
-  explicit DAQModule(std::string name)
-    : NamedObject(name)
-  {}
+  explicit DAQModule(std::string name) : NamedObject(name) {}
 
   /**
    * @brief Set the configuration for the DAQModule
@@ -99,8 +93,8 @@ public:
    *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
-  virtual void execute_command(const std::string& cmd,
-                               const std::vector<std::string>& args) = 0;
+  virtual void execute_command(const std::string &cmd,
+                               const std::vector<std::string> &args) = 0;
 
 protected:
   json configuration_; ///< JSON configuration for the DAQModule
@@ -114,9 +108,8 @@ protected:
  * DebugLogger1
  * @return shared_ptr to created DAQModule instance
  */
-inline std::shared_ptr<DAQModule>
-makeModule(std::string const& plugin_name, std::string const& instance_name)
-{
+inline std::shared_ptr<DAQModule> makeModule(std::string const &plugin_name,
+                                             std::string const &instance_name) {
   static cet::BasicPluginFactory bpf("duneDAQModule", "make");
 
   return bpf.makePlugin<std::shared_ptr<DAQModule>>(plugin_name, instance_name);
@@ -127,33 +120,31 @@ makeModule(std::string const& plugin_name, std::string const& instance_name)
 /**
  * @brief A generic DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE(appfwk,
-                  GeneralDAQModuleIssue,
-                  "General DAQModule Issue",
+ERS_DECLARE_ISSUE(appfwk, GeneralDAQModuleIssue, "General DAQModule Issue",
                   ERS_EMPTY)
 
 /**
  * @brief The UnknownCommand DAQModule ERS Issue
  */
 ERS_DECLARE_ISSUE_BASE(
-  appfwk,                                    ///< Namespace
-  UnknownCommand,                            ///< Type of the issue
-  GeneralDAQModuleIssue,                     ///< Base class of the issue
-  "Command " << cmd << " is not recognised", ///< Log Message from the issue
-  ERS_EMPTY,                                 ///< End of variable declarations
-  ((std::string)cmd))                        ///< Variables to capture
+    appfwk,                                    ///< Namespace
+    UnknownCommand,                            ///< Type of the issue
+    GeneralDAQModuleIssue,                     ///< Base class of the issue
+    "Command " << cmd << " is not recognised", ///< Log Message from the issue
+    ERS_EMPTY,                                 ///< End of variable declarations
+    ((std::string)cmd))                        ///< Variables to capture
 
 /**
  * @brief The CommandFailed DAQModule ERS Issue
  */
 ERS_DECLARE_ISSUE_BASE(
-  appfwk,               ///< Namespace
-  CommandFailed,        ///< Type of the Issue
-  GeneralDAQModuleIssue, ///< Base class of the Issue
-  "Command " << cmd << " failed to execute for reason "
-             << reason,                    ///< Log Message from the issue
-  ERS_EMPTY,                               ///< End of variable declarations
-  ((std::string)cmd)((std::string)reason)) ///< Variables to capture
+    appfwk,                ///< Namespace
+    CommandFailed,         ///< Type of the Issue
+    GeneralDAQModuleIssue, ///< Base class of the Issue
+    "Command " << cmd << " failed to execute for reason "
+               << reason,                    ///< Log Message from the issue
+    ERS_EMPTY,                               ///< End of variable declarations
+    ((std::string)cmd)((std::string)reason)) ///< Variables to capture
 } // namespace dunedaq
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_

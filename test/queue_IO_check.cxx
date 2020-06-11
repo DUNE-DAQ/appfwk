@@ -42,56 +42,60 @@ std::string queue_type = "StdDeQueue";
 
 auto timeout = std::chrono::milliseconds(100); ///< Queue's timeout
 
-
 /**
  * @brief Queue instance for test
-*/
+ */
 std::unique_ptr<dunedaq::appfwk::StdDeQueue<int>> queue = nullptr;
 
-constexpr int nelements = 100; ///< Number of elements to push to the Queue (total)
-int n_adding_threads = 1; ///< Number of threads which will call push
+constexpr int nelements =
+    100;                    ///< Number of elements to push to the Queue (total)
+int n_adding_threads = 1;   ///< Number of threads which will call push
 int n_removing_threads = 1; ///< Number of threads which will call pop
 
 int avg_milliseconds_between_pushes = 5; ///< Target average rate of pushes
-int avg_milliseconds_between_pops = 5; ///< Target average rate of pops
+int avg_milliseconds_between_pops = 5;   ///< Target average rate of pops
 
-std::atomic<size_t> queue_size = 0; ///< Queue's current size
+std::atomic<size_t> queue_size = 0;     ///< Queue's current size
 std::atomic<size_t> max_queue_size = 0; ///< Queue's maximum size
 
 std::atomic<int> push_attempts = 0; ///< Number of push attempts in the test
-std::atomic<int> pop_attempts = 0; ///< Number of pop attempts in the test
-std::atomic<int> successful_pushes = 0; ///< Number of successful pushes in the test
+std::atomic<int> pop_attempts = 0;  ///< Number of pop attempts in the test
+std::atomic<int> successful_pushes =
+    0; ///< Number of successful pushes in the test
 std::atomic<int> successful_pops = 0; ///< Number of successful pops in the test
-std::atomic<int> timeout_pushes = 0; ///< Number of pushes which timed out
-std::atomic<int> timeout_pops = 0; ///< Number of pops which timed out
-std::atomic<int> throw_pushes = 0; ///< Number of pushes which threw an exception
+std::atomic<int> timeout_pushes = 0;  ///< Number of pushes which timed out
+std::atomic<int> timeout_pops = 0;    ///< Number of pops which timed out
+std::atomic<int> throw_pushes =
+    0;                           ///< Number of pushes which threw an exception
 std::atomic<int> throw_pops = 0; ///< Number of pops which threw an exception
 
-double initial_capacity_used = 0; ///< The initial portion of the Queue which was full.
+double initial_capacity_used =
+    0; ///< The initial portion of the Queue which was full.
 
 /**
  * @brief A time-based seed for the random number generators
-*/
+ */
 auto relatively_random_seed =
-  std::chrono::duration_cast<std::chrono::milliseconds>(
-    std::chrono::system_clock::now().time_since_epoch())
-    .count() %
-  1000;
-std::default_random_engine generator(relatively_random_seed); ///< Random number generator with time-based seed
-std::unique_ptr<std::uniform_int_distribution<int>> push_distribution = nullptr;///< Random number distribution to use for push waits
-std::unique_ptr<std::uniform_int_distribution<int>> pop_distribution = nullptr; ///< Random number distribution to use for pop waits
+    std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch())
+        .count() %
+    1000;
+std::default_random_engine generator(
+    relatively_random_seed); ///< Random number generator with time-based seed
+std::unique_ptr<std::uniform_int_distribution<int>> push_distribution =
+    nullptr; ///< Random number distribution to use for push waits
+std::unique_ptr<std::uniform_int_distribution<int>> pop_distribution =
+    nullptr; ///< Random number distribution to use for pop waits
 
 /**
  * @brief Put elements onto the queue
-*/
-void
-add_things()
-{
+ */
+void add_things() {
 
   for (int i = 0; i < nelements / n_adding_threads; ++i) {
 
     std::this_thread::sleep_for(
-      std::chrono::milliseconds((*push_distribution)(generator)));
+        std::chrono::milliseconds((*push_distribution)(generator)));
 
     while (!queue->can_push()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -109,9 +113,10 @@ add_things()
       auto starttime = std::chrono::steady_clock::now();
       queue->push(std::move(i), timeout);
       if (std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now() - starttime) < timeout) {
+              std::chrono::steady_clock::now() - starttime) < timeout) {
         successful_pushes++;
-        auto size = queue_size.fetch_add(1) + 1; // fetch_add returns previous value
+        auto size =
+            queue_size.fetch_add(1) + 1; // fetch_add returns previous value
         if (size > max_queue_size) {
           max_queue_size = size;
         }
@@ -122,7 +127,7 @@ add_things()
       msg << "Thread #" << std::this_thread::get_id() << ": completed push";
       TLOG(TLVL_DEBUG) << msg.str();
 
-    } catch (const std::runtime_error& err) {
+    } catch (const std::runtime_error &err) {
       TLOG(TLVL_WARNING) << "Exception thrown during push attempt: "
                          << err.what();
       throw_pushes++;
@@ -132,15 +137,13 @@ add_things()
 
 /**
  * @brief Pop elements off of the queue
-*/
-void
-remove_things()
-{
+ */
+void remove_things() {
 
   for (int i = 0; i < nelements / n_removing_threads; ++i) {
 
     std::this_thread::sleep_for(
-      std::chrono::milliseconds((*pop_distribution)(generator)));
+        std::chrono::milliseconds((*pop_distribution)(generator)));
 
     while (!queue->can_pop()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -164,66 +167,62 @@ remove_things()
       TLOG(TLVL_DEBUG) << msg.str();
 
       if (std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now() - starttime) < timeout) {
+              std::chrono::steady_clock::now() - starttime) < timeout) {
         successful_pops++;
         queue_size--;
       } else {
         timeout_pops++;
       }
-    } catch (const std::runtime_error& e) {
+    } catch (const std::runtime_error &e) {
       TLOG(TLVL_WARNING) << "Exception thrown during pop attempt: " << e.what();
       throw_pops++;
     }
   }
 }
 
-} // namespace ""
+} // namespace
 
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
 
   std::ostringstream descstr;
   descstr << argv[0] << " known arguments ";
 
   std::ostringstream push_threads_desc;
   push_threads_desc
-    << "# of threads you want pushing elements onto the queue (default is "
-    << n_adding_threads << ")";
+      << "# of threads you want pushing elements onto the queue (default is "
+      << n_adding_threads << ")";
 
   std::ostringstream pop_threads_desc;
   pop_threads_desc
-    << "# of threads you want popping elements off the queue (default is "
-    << n_removing_threads << ")";
+      << "# of threads you want popping elements off the queue (default is "
+      << n_removing_threads << ")";
 
   std::ostringstream push_pause_desc;
   push_pause_desc
-    << "average time in milliseconds between a thread's pushes (default is "
-    << avg_milliseconds_between_pushes << ")";
+      << "average time in milliseconds between a thread's pushes (default is "
+      << avg_milliseconds_between_pushes << ")";
 
   std::ostringstream pop_pause_desc;
   pop_pause_desc
-    << "average time in milliseconds between a thread's pops (default is "
-    << avg_milliseconds_between_pops << ")";
+      << "average time in milliseconds between a thread's pops (default is "
+      << avg_milliseconds_between_pops << ")";
 
   std::ostringstream capacity_used_desc;
   capacity_used_desc
-    << "fraction of the queue's capacity filled at start (default is "
-    << initial_capacity_used << ")";
+      << "fraction of the queue's capacity filled at start (default is "
+      << initial_capacity_used << ")";
 
   bpo::options_description desc(descstr.str());
-  desc.add_options()("queue_type",
-                     bpo::value<std::string>(),
+  desc.add_options()("queue_type", bpo::value<std::string>(),
                      "Type of queue instance you want to test (default is "
                      "StdDeQueue) (supported "
                      "types are: StdDeQueue)")(
-    "push_threads", bpo::value<int>(), push_threads_desc.str().c_str())(
-    "pop_threads", bpo::value<int>(), pop_threads_desc.str().c_str())(
-    "pause_between_pushes", bpo::value<int>(), push_pause_desc.str().c_str())(
-    "pause_between_pops", bpo::value<int>(), pop_pause_desc.str().c_str())(
-    "initial_capacity_used",
-    bpo::value<double>(),
-    capacity_used_desc.str().c_str())("help,h", "produce help message");
+      "push_threads", bpo::value<int>(), push_threads_desc.str().c_str())(
+      "pop_threads", bpo::value<int>(), pop_threads_desc.str().c_str())(
+      "pause_between_pushes", bpo::value<int>(), push_pause_desc.str().c_str())(
+      "pause_between_pops", bpo::value<int>(), pop_pause_desc.str().c_str())(
+      "initial_capacity_used", bpo::value<double>(),
+      capacity_used_desc.str().c_str())("help,h", "produce help message");
 
   bpo::variables_map vm;
   bpo::store(bpo::parse_command_line(argc, argv, desc), vm);
@@ -253,7 +252,7 @@ main(int argc, char* argv[])
 
     if (n_adding_threads <= 0) {
       throw std::domain_error(
-        "# of pushing threads must be a positive integer");
+          "# of pushing threads must be a positive integer");
     }
   }
 
@@ -262,7 +261,7 @@ main(int argc, char* argv[])
 
     if (n_removing_threads <= 0) {
       throw std::domain_error(
-        "# of popping threads must be a positive integer");
+          "# of popping threads must be a positive integer");
     }
   }
 
@@ -294,18 +293,18 @@ main(int argc, char* argv[])
   }
 
   push_distribution.reset(new std::uniform_int_distribution<int>(
-    0, 2 * 1000 * avg_milliseconds_between_pushes));
+      0, 2 * 1000 * avg_milliseconds_between_pushes));
   pop_distribution.reset(new std::uniform_int_distribution<int>(
-    0, 2 * 1000 * avg_milliseconds_between_pops));
+      0, 2 * 1000 * avg_milliseconds_between_pops));
 
   TLOG(TLVL_INFO)
-    << n_adding_threads << " thread(s) pushing " << nelements
-    << " elements between them, each thread has an average time of "
-    << avg_milliseconds_between_pushes << " milliseconds between pushes";
+      << n_adding_threads << " thread(s) pushing " << nelements
+      << " elements between them, each thread has an average time of "
+      << avg_milliseconds_between_pushes << " milliseconds between pushes";
   TLOG(TLVL_INFO)
-    << n_removing_threads << " thread(s) popping " << nelements
-    << " elements between them, each thread has an average time of "
-    << avg_milliseconds_between_pops << " milliseconds between pops";
+      << n_removing_threads << " thread(s) popping " << nelements
+      << " elements between them, each thread has an average time of "
+      << avg_milliseconds_between_pops << " milliseconds between pops";
 
 /**
  * \todo Add capacity constructor to Queue interface so that this code section
@@ -344,11 +343,11 @@ main(int argc, char* argv[])
     removers.emplace_back(remove_things);
   }
 
-  for (auto& adder : adders) {
+  for (auto &adder : adders) {
     adder.join();
   }
 
-  for (auto& remover : removers) {
+  for (auto &remover : removers) {
     remover.join();
   }
 

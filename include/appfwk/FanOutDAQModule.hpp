@@ -31,31 +31,29 @@ namespace dunedaq::appfwk {
 
 /**
  * @brief Struct used for FanOutDAQModule_test
-*/
-struct NonCopyableType
-{
+ */
+struct NonCopyableType {
   int data; ///< Integer data for NonCopyableType
   /**
    * @brief NonCopyableType Constructor
    * @param d Initialization for data member
-  */
-  explicit NonCopyableType(int d)
-    : data(d)
-  {}
-  NonCopyableType(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-constructible
+   */
+  explicit NonCopyableType(int d) : data(d) {}
+  NonCopyableType(NonCopyableType const &) =
+      delete; ///< NonCopyableType is not copy-constructible
   /**
    * @brief Move Constructor for NonCopyableType
    * @param i NonCopyableType rvalue to move from
-  */
-  NonCopyableType(NonCopyableType&& i) { data = i.data; }
-  NonCopyableType& operator=(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-assignable
+   */
+  NonCopyableType(NonCopyableType &&i) { data = i.data; }
+  NonCopyableType &operator=(NonCopyableType const &) =
+      delete; ///< NonCopyableType is not copy-assignable
   /**
    * @brief Move assignment operator for NonCopyableType
    * @param i NonCopyableType to move from
    * @return NonCopyableType instance
-  */
-  NonCopyableType& operator=(NonCopyableType&& i)
-  {
+   */
+  NonCopyableType &operator=(NonCopyableType &&i) {
     data = i.data;
     return *this;
   }
@@ -64,25 +62,24 @@ struct NonCopyableType
 /**
  * @brief FanOutDAQModule sends data to multiple Queues
  */
-template<typename ValueType>
-class FanOutDAQModule : public DAQModule
-{
+template <typename ValueType> class FanOutDAQModule : public DAQModule {
 public:
   /**
    * @brief FanOutDAQModule Constructor
    * @param name Name of this FanOutDAQModule instance
-  */
+   */
   explicit FanOutDAQModule(std::string name);
 
   /**
    * @brief Defines the possible modes for FanOutDAQModule
-  */
-  enum class FanOutMode
-  {
+   */
+  enum class FanOutMode {
     NotConfigured, ///< FanOutDAQModule is not configured
     Broadcast, ///< FanOutDAQModule will copy elements from input to all outputs
-    RoundRobin, ///< FanOutDAQModule will distribute elements from input to outputs in a round-robin fashion
-    FirstAvailable ///< FanOutDAQModule will distribute elements from input to the first available output
+    RoundRobin,    ///< FanOutDAQModule will distribute elements from input to
+                   ///< outputs in a round-robin fashion
+    FirstAvailable ///< FanOutDAQModule will distribute elements from input to
+                   ///< the first available output
   };
 
   /**
@@ -90,13 +87,17 @@ public:
    * @param cmd Command from DAQProcess
    * @param args Arguments for the command from DAQProcess
    */
-  void execute_command(const std::string& cmd,
-                       const std::vector<std::string>& args = {}) override;
+  void execute_command(const std::string &cmd,
+                       const std::vector<std::string> &args = {}) override;
 
-  FanOutDAQModule(const FanOutDAQModule&) = delete; ///< FanOutDAQModule is not copy-constructible
-  FanOutDAQModule& operator=(const FanOutDAQModule&) = delete; ///< FanOutDAQModule is not copy-assignable
-  FanOutDAQModule(FanOutDAQModule&&) = delete; ///< FanOutDAQModule is not move-constructible
-  FanOutDAQModule& operator=(FanOutDAQModule&&) = delete; ///< FanOutDAQModule is not move-assignable
+  FanOutDAQModule(const FanOutDAQModule &) =
+      delete; ///< FanOutDAQModule is not copy-constructible
+  FanOutDAQModule &operator=(const FanOutDAQModule &) =
+      delete; ///< FanOutDAQModule is not copy-assignable
+  FanOutDAQModule(FanOutDAQModule &&) =
+      delete; ///< FanOutDAQModule is not move-constructible
+  FanOutDAQModule &operator=(FanOutDAQModule &&) =
+      delete; ///< FanOutDAQModule is not move-assignable
 
 private:
   // Commands
@@ -108,23 +109,21 @@ private:
   // necessary, even though it's just an alias to this user module's
   // data type.
 
-  template<typename U = ValueType>
-  typename std::enable_if_t<!std::is_copy_constructible_v<U>> do_broadcast(
-    ValueType&) const
-  {
+  template <typename U = ValueType>
+  typename std::enable_if_t<!std::is_copy_constructible_v<U>>
+  do_broadcast(ValueType &) const {
     throw std::runtime_error(
-      "Broadcast mode cannot be used for non-copy-constructible types!");
+        "Broadcast mode cannot be used for non-copy-constructible types!");
   }
-  template<typename U = ValueType>
-  typename std::enable_if_t<std::is_copy_constructible_v<U>> do_broadcast(
-    ValueType& data) const
-  {
-    for (auto& o : outputQueues_) {
+  template <typename U = ValueType>
+  typename std::enable_if_t<std::is_copy_constructible_v<U>>
+  do_broadcast(ValueType &data) const {
+    for (auto &o : outputQueues_) {
       auto starttime = std::chrono::steady_clock::now();
       o->push(ValueType(data), queueTimeout_);
       auto endtime = std::chrono::steady_clock::now();
       if (std::chrono::duration_cast<decltype(queueTimeout_)>(
-            endtime - starttime) > queueTimeout_) {
+              endtime - starttime) > queueTimeout_) {
         TLOG(TLVL_WARNING) << "Timeout occurred trying to broadcast data to "
                               "output queue; data may be lost if it doesn't "
                               "make it into any other output queues, either";
