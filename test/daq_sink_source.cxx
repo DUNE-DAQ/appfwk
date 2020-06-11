@@ -40,7 +40,7 @@ main(int argc, char const* argv[])
   TLOG(TLVL_DEBUG) << "Expecting queue mismatch error";
   try {
     auto source = new DAQSource<int>("dummy");
-  } catch (dunedaq::appfwk::DAQSourceConstrutionFailed& e) {
+  } catch (dunedaq::appfwk::DAQSourceConstructionFailed& e) {
     ers::error(e);
     TLOG(TLVL_DEBUG) << "OK, got it. Carrying on";
   }
