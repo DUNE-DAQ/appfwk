@@ -21,7 +21,8 @@ namespace dunedaq::appfwk {
  * @brief QueryResponseCommandFacility is a CommandFacility plugin for running a
  * DAQ Application in an interactive session
  */
-class QueryResponseCommandFacility : public CommandFacility {
+class QueryResponseCommandFacility : public CommandFacility
+{
 public:
   /**
    * @brief Listen for commands from stdin, and pass them to the attached
@@ -31,7 +32,7 @@ public:
    * @return Status code. 0 if terminated by quit command, -1 if an exception
    * occurs
    */
-  int listen(DAQProcess *theProcess) override;
+  int listen(DAQProcess* theProcess) override;
   virtual ~QueryResponseCommandFacility();
 };
 } // namespace dunedaq::appfwk

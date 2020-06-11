@@ -15,11 +15,11 @@
 #include <iostream>
 
 namespace dunedaq::appfwk {
-void DebugLoggingDAQModule::execute_command(
-    const std::string &cmd, const std::vector<std::string> &args) {
-  TLOG(TLVL_INFO) << get_name() << ": Executing command: " << cmd << " with "
-                  << args.size() << " args";
-  for (auto &a : args) {
+void
+DebugLoggingDAQModule::execute_command(const std::string& cmd, const std::vector<std::string>& args)
+{
+  TLOG(TLVL_INFO) << get_name() << ": Executing command: " << cmd << " with " << args.size() << " args";
+  for (auto& a : args) {
     TLOG(TLVL_INFO) << a;
   }
   return;

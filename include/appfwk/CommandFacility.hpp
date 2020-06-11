@@ -20,18 +20,21 @@
 #include <vector>
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
-#define EXTERN_C_FUNC_DECLARE_START extern "C" {
+#define EXTERN_C_FUNC_DECLARE_START                                                                                    \
+  extern "C"                                                                                                           \
+  {
 #endif
 
 /**
  * @brief Declare the function that will be called by the plugin loader
  * @param klass Class to be defined as a DUNE Command Facility
  */
-#define DEFINE_DUNE_COMMAND_FACILITY(klass)                                    \
-  EXTERN_C_FUNC_DECLARE_START                                                  \
-  std::unique_ptr<dunedaq::appfwk::CommandFacility> make() {                   \
-    return std::unique_ptr<dunedaq::appfwk::CommandFacility>(new klass());     \
-  }                                                                            \
+#define DEFINE_DUNE_COMMAND_FACILITY(klass)                                                                            \
+  EXTERN_C_FUNC_DECLARE_START                                                                                          \
+  std::unique_ptr<dunedaq::appfwk::CommandFacility> make()                                                             \
+  {                                                                                                                    \
+    return std::unique_ptr<dunedaq::appfwk::CommandFacility>(new klass());                                             \
+  }                                                                                                                    \
   }
 
 namespace dunedaq::appfwk {
@@ -40,13 +43,15 @@ class DAQProcess; // forward declaration
 /**
  * @brief Interface needed by Application Framework for CCM command handling
  */
-class CommandFacility {
+class CommandFacility
+{
 public:
   /**
    * @brief Singleton pattern; get a handle to the CommandFacility
    * @return Reference to the CommandFacility
    */
-  static CommandFacility &handle() {
+  static CommandFacility& handle()
+  {
     if (!handle_)
       handle_.reset(new CommandFacility());
     return *handle_;
@@ -56,9 +61,7 @@ public:
    * @brief Set the pointer returned by the handle() function
    * @param handle Handle to a loaded CommandFacility plugin
    */
-  static void setHandle(std::unique_ptr<CommandFacility> &&handle) {
-    handle_ = std::move(handle);
-  }
+  static void setHandle(std::unique_ptr<CommandFacility>&& handle) { handle_ = std::move(handle); }
   /**
    * @brief Perform basic setup actions needed by the CommandFacility, using
    * command-line arguments and environment variables
@@ -73,7 +76,7 @@ public:
    * This function should block for the lifetime of the DAQ Application, calling
    * DAQProcess::execute_command as necessary
    */
-  virtual int listen(DAQProcess *process) { return 0; }
+  virtual int listen(DAQProcess* process) { return 0; }
 
 protected:
   /**
@@ -82,8 +85,7 @@ protected:
   CommandFacility() {}
 
 private:
-  static std::unique_ptr<CommandFacility>
-      handle_; ///< Singleton pattern, handle to CommandFacility
+  static std::unique_ptr<CommandFacility> handle_; ///< Singleton pattern, handle to CommandFacility
 };
 
 /**
@@ -92,7 +94,8 @@ private:
  * @return Pointer to loaded CommandFacility from plugin
  */
 inline std::unique_ptr<CommandFacility>
-makeCommandFacility(std::string const &facility_name) {
+makeCommandFacility(std::string const& facility_name)
+{
   static cet::BasicPluginFactory bpf("duneCommandFacility", "make");
 
   return bpf.makePlugin<std::unique_ptr<CommandFacility>>(facility_name);

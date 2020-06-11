@@ -20,51 +20,42 @@
 
 namespace {
 
-void DoSomething() {
+void
+DoSomething()
+{
   int nseconds = 5;
-  BOOST_TEST_MESSAGE("This function will just sleep for "
-                     << nseconds << " second(s) and then return");
+  BOOST_TEST_MESSAGE("This function will just sleep for " << nseconds << " second(s) and then return");
   std::this_thread::sleep_for(std::chrono::seconds(nseconds));
 }
 
 } // namespace
 
-BOOST_AUTO_TEST_CASE(sanity_checks) {
+BOOST_AUTO_TEST_CASE(sanity_checks)
+{
 
   std::unique_ptr<dunedaq::appfwk::DAQModuleThreadHelper> umth_ptr = nullptr;
 
   auto starttime = std::chrono::steady_clock::now();
-  BOOST_REQUIRE_NO_THROW(
-      umth_ptr = std::make_unique<dunedaq::appfwk::DAQModuleThreadHelper>(
-          DoSomething));
+  BOOST_REQUIRE_NO_THROW(umth_ptr = std::make_unique<dunedaq::appfwk::DAQModuleThreadHelper>(DoSomething));
   auto construction_time_in_ms =
-      std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::steady_clock::now() - starttime)
-          .count();
-  BOOST_TEST_MESSAGE("Construction time was " << construction_time_in_ms
-                                              << " ms");
+    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - starttime).count();
+  BOOST_TEST_MESSAGE("Construction time was " << construction_time_in_ms << " ms");
 
   starttime = std::chrono::steady_clock::now();
   BOOST_REQUIRE_NO_THROW(umth_ptr->start_working_thread_());
-  auto start_time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                              std::chrono::steady_clock::now() - starttime)
-                              .count();
-  BOOST_TEST_MESSAGE(
-      "Time to call DAQModuleThreadHelper::start_working_thread_() was "
-      << start_time_in_ms << " ms");
+  auto start_time_in_ms =
+    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - starttime).count();
+  BOOST_TEST_MESSAGE("Time to call DAQModuleThreadHelper::start_working_thread_() was " << start_time_in_ms << " ms");
 
   starttime = std::chrono::steady_clock::now();
   BOOST_REQUIRE_NO_THROW(umth_ptr->stop_working_thread_());
-  auto stop_time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                             std::chrono::steady_clock::now() - starttime)
-                             .count();
-  BOOST_TEST_MESSAGE(
-      "Time to call DAQModuleThreadHelper::stop_working_thread_() was "
-      << stop_time_in_ms << " ms");
+  auto stop_time_in_ms =
+    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - starttime).count();
+  BOOST_TEST_MESSAGE("Time to call DAQModuleThreadHelper::stop_working_thread_() was " << stop_time_in_ms << " ms");
 }
 
-BOOST_AUTO_TEST_CASE(inappropriate_transitions,
-                     *boost::unit_test::depends_on("sanity_checks")) {
+BOOST_AUTO_TEST_CASE(inappropriate_transitions, *boost::unit_test::depends_on("sanity_checks"))
+{
 
   dunedaq::appfwk::DAQModuleThreadHelper umth(DoSomething);
   BOOST_REQUIRE_THROW(umth.stop_working_thread_(), std::runtime_error);
@@ -79,14 +70,15 @@ BOOST_AUTO_TEST_CASE(inappropriate_transitions,
 // You'll want this to test case to execute last, for reasons that are obvious
 // if you look at its checks
 
-BOOST_AUTO_TEST_CASE(
-    abort_checks, *boost::unit_test::depends_on("inappropriate_transitions")) {
+BOOST_AUTO_TEST_CASE(abort_checks, *boost::unit_test::depends_on("inappropriate_transitions"))
+{
 
-  { dunedaq::appfwk::DAQModuleThreadHelper umth(DoSomething); }
-  BOOST_TEST(
-      true,
-      "DAQModuleThreadHelper without having start_working_thread_() thread "
-      "called destructs without aborting the program, as expected");
+  {
+    dunedaq::appfwk::DAQModuleThreadHelper umth(DoSomething);
+  }
+  BOOST_TEST(true,
+             "DAQModuleThreadHelper without having start_working_thread_() thread "
+             "called destructs without aborting the program, as expected");
 
   // BOOST_TEST_MESSAGE(
   //     "You should *expect* the program to abort in a moment, since we're "

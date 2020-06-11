@@ -14,7 +14,9 @@
 
 namespace dunedaq::appfwk {
 
-int QueryResponseCommandFacility::listen(DAQProcess *process) {
+int
+QueryResponseCommandFacility::listen(DAQProcess* process)
+{
   try {
     bool keepGoing = true;
     while (keepGoing) {
