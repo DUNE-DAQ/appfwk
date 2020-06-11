@@ -21,19 +21,18 @@
 
 namespace dunedaq::appfwk {
 typedef std::map<std::string, std::shared_ptr<DAQModule>>
-  DAQModuleMap; ///< DAQModules indexed by name
+    DAQModuleMap; ///< DAQModules indexed by name
 typedef std::map<std::string, std::list<std::string>>
-  CommandOrderMap; ///< Defined DAQModule orders for commands
+    CommandOrderMap; ///< Defined DAQModule orders for commands
 
 /**
- * @brief The GraphConstructor class is the representation of a DAQModule and Queue
- * graph
+ * @brief The GraphConstructor class is the representation of a DAQModule and
+ * Queue graph
  *
  * The ConstructGraph method is responsible for configuring all Queues and
  * DAQModules for a DAQ Application
  */
-class GraphConstructor
-{
+class GraphConstructor {
 public:
   /**
    * @brief Construct the DAQModules and retrieve Queue configurations
@@ -46,8 +45,8 @@ public:
    * Queue and DAQModule instances in a DAQ Application. Additionally, any
    * requirements on command order for DAQModules should be defined here.
    */
-  virtual void ConstructGraph(DAQModuleMap& daq_module_map,
-                              CommandOrderMap& command_order_map) = 0;
+  virtual void ConstructGraph(DAQModuleMap &daq_module_map,
+                              CommandOrderMap &command_order_map) = 0;
 };
 } // namespace dunedaq::appfwk
 

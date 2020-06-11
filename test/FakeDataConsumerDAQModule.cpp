@@ -1,5 +1,6 @@
 /**
- * @file FakeDataConsumerDAQModule.cxx FakeDataConsumerDAQModule class implementation
+ * @file FakeDataConsumerDAQModule.cxx FakeDataConsumerDAQModule class
+ * implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -19,18 +20,13 @@
 #include <thread>
 
 dunedaq::appfwk::FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(
-  const std::string & name)
-  : DAQModule(name)
-  , queueTimeout_(100)
-  , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
-  , inputQueue_(nullptr)
-{}
+    const std::string &name)
+    : DAQModule(name), queueTimeout_(100),
+      thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this)),
+      inputQueue_(nullptr) {}
 
-void
-dunedaq::appfwk::FakeDataConsumerDAQModule::execute_command(
-  const std::string& cmd,
-  const std::vector<std::string>& args)
-{
+void dunedaq::appfwk::FakeDataConsumerDAQModule::execute_command(
+    const std::string &cmd, const std::vector<std::string> &args) {
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
   } else if (cmd == "start" || cmd == "Start") {
@@ -42,11 +38,9 @@ dunedaq::appfwk::FakeDataConsumerDAQModule::execute_command(
   }
 }
 
-std::string
-dunedaq::appfwk::FakeDataConsumerDAQModule::do_configure()
-{
+std::string dunedaq::appfwk::FakeDataConsumerDAQModule::do_configure() {
   inputQueue_.reset(new DAQSource<std::vector<int>>(
-    configuration_["input"].get<std::string>()));
+      configuration_["input"].get<std::string>()));
 
   nIntsPerVector_ = configuration_.value<int>("nIntsPerVector", 10);
   starting_int_ = configuration_.value<int>("starting_int", -4);
@@ -55,16 +49,12 @@ dunedaq::appfwk::FakeDataConsumerDAQModule::do_configure()
   return "Success";
 }
 
-std::string
-dunedaq::appfwk::FakeDataConsumerDAQModule::do_start()
-{
+std::string dunedaq::appfwk::FakeDataConsumerDAQModule::do_start() {
   thread_.start_working_thread_();
   return "Success";
 }
 
-std::string
-dunedaq::appfwk::FakeDataConsumerDAQModule::do_stop()
-{
+std::string dunedaq::appfwk::FakeDataConsumerDAQModule::do_stop() {
   thread_.stop_working_thread_();
   return "Success";
 }
@@ -74,13 +64,11 @@ dunedaq::appfwk::FakeDataConsumerDAQModule::do_stop()
  * @param t TraceStreamer Instance
  * @param ints Vector to format
  * @return TraceStreamer Instance
-*/
-TraceStreamer&
-operator<<(TraceStreamer& t, std::vector<int> ints)
-{
+ */
+TraceStreamer &operator<<(TraceStreamer &t, std::vector<int> ints) {
   t << "{";
   bool first = true;
-  for (auto& i : ints) {
+  for (auto &i : ints) {
     if (!first)
       t << ", ";
     first = false;
@@ -89,9 +77,7 @@ operator<<(TraceStreamer& t, std::vector<int> ints)
   return t << "}";
 }
 
-void
-dunedaq::appfwk::FakeDataConsumerDAQModule::do_work()
-{
+void dunedaq::appfwk::FakeDataConsumerDAQModule::do_work() {
   int current_int = starting_int_;
   int counter = 0;
   int fail_count = 0;
@@ -112,7 +98,7 @@ dunedaq::appfwk::FakeDataConsumerDAQModule::do_work()
                            << err.what() << "\"";
         continue;
       }
-
+      
       TLOG(TLVL_DEBUG) << get_name() << ": Received vector of size "
                        << vec.size();
 
@@ -122,13 +108,13 @@ dunedaq::appfwk::FakeDataConsumerDAQModule::do_work()
       TLOG(TLVL_INFO) << get_name() << ": Received vector " << counter << ": "
                       << vec;
       size_t ii = 0;
-      for (auto& point : vec) {
+      for (auto &point : vec) {
         if (point != current_int) {
           if (ii != 0) {
             TLOG(TLVL_WARNING)
-              << get_name() << ": Error in received vector " << counter
-              << ", position " << ii << ": Expected " << current_int
-              << ", received " << point;
+                << get_name() << ": Error in received vector " << counter
+                << ", position " << ii << ": Expected " << current_int
+                << ", received " << point;
             failed = true;
           } else {
             TLOG(TLVL_INFO) << get_name() << ": Jump detected!";

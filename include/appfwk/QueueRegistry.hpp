@@ -25,13 +25,11 @@ namespace appfwk {
  * @brief The QueueConfig class encapsulates the basic configuration common to
  * all Queue types
  */
-struct QueueConfig
-{
+struct QueueConfig {
   /**
    * @brief Enumeration of all possible types of Queue
    */
-  enum queue_kind
-  {
+  enum queue_kind {
     kUnknown = -1,
     kStdDeQueue = 1 ///< The StdDeQueue
   };
@@ -41,19 +39,19 @@ struct QueueConfig
    * @param name Name of the Queue Type
    * @return Queue type corresponding to the name. Currently only std_deque.
    */
-  static queue_kind stoqk(const std::string& name);
+  static queue_kind stoqk(const std::string &name);
 
   QueueConfig::queue_kind kind =
-    queue_kind::kUnknown; ///< The kind of Queue represented by this QueueConfig
-  size_t size = 0;        ///< The size of the queue
+      queue_kind::kUnknown; ///< The kind of Queue represented by this
+                            ///< QueueConfig
+  size_t size = 0;          ///< The size of the queue
 };
 
 /**
  * @brief The QueueRegistry class manages all Queue instances and gives out
  * handles to the Queues upon request
  */
-class QueueRegistry
-{
+class QueueRegistry {
 public:
   /**
    * @brief QueueRegistry destructor
@@ -64,7 +62,7 @@ public:
    * @brief Get a handle to the QueueRegistry
    * @return QueueRegistry handle
    */
-  static QueueRegistry& get();
+  static QueueRegistry &get();
 
   /**
    * @brief Get a handle to a Queue
@@ -72,39 +70,38 @@ public:
    * @param name Name of the Queue
    * @return std::shared_ptr to generic queue pointer
    */
-  template<typename T>
-  std::shared_ptr<Queue<T>> get_queue(const std::string& name);
+  template <typename T>
+  std::shared_ptr<Queue<T>> get_queue(const std::string &name);
 
   /**
    * @brief Configure the QueueRegistry
    * @param configmap Map relating Queue names to their configurations
    */
-  void configure(const std::map<std::string, QueueConfig>& configmap);
+  void configure(const std::map<std::string, QueueConfig> &configmap);
 
 private:
-  struct QueueEntry
-  {
-    const std::type_info* type;
+  struct QueueEntry {
+    const std::type_info *type;
     std::shared_ptr<NamedObject> instance;
   };
 
   QueueRegistry();
 
-  template<typename T>
+  template <typename T>
   std::shared_ptr<NamedObject> create_queue(std::string name,
-                                            const QueueConfig& config);
+                                            const QueueConfig &config);
 
   std::map<std::string, QueueEntry> queue_registry_;
   std::map<std::string, QueueConfig> queue_configmap_;
 
   bool configured_;
 
-  static QueueRegistry* me_;
+  static QueueRegistry *me_;
 
-  QueueRegistry(const QueueRegistry&) = delete;
-  QueueRegistry& operator=(const QueueRegistry&) = delete;
-  QueueRegistry(QueueRegistry&&) = delete;
-  QueueRegistry& operator=(QueueRegistry&&) = delete;
+  QueueRegistry(const QueueRegistry &) = delete;
+  QueueRegistry &operator=(const QueueRegistry &) = delete;
+  QueueRegistry(QueueRegistry &&) = delete;
+  QueueRegistry &operator=(QueueRegistry &&) = delete;
 };
 
 } // namespace appfwk
@@ -112,13 +109,14 @@ private:
 /**
  * @brief QueueTypeMismatch ERS Issue
  */
-ERS_DECLARE_ISSUE(
-  appfwk,            // namespace
-  QueueTypeMismatch, // issue class name
-  "Requested queue \"" << queue_name << "\" of type '" << target_type
-                       << "' already declared as type '" << source_type
-                       << "'", // message
-  ((std::string)queue_name)((std::string)source_type)((std::string)target_type))
+ERS_DECLARE_ISSUE(appfwk,            // namespace
+                  QueueTypeMismatch, // issue class name
+                  "Requested queue \""
+                      << queue_name << "\" of type '" << target_type
+                      << "' already declared as type '" << source_type
+                      << "'", // message
+                  ((std::string)queue_name)((std::string)source_type)(
+                      (std::string)target_type))
 
 /**
  * @brief QueueKindUnknown ERS Issue

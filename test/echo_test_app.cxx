@@ -16,15 +16,13 @@
 namespace dunedaq::appfwk {
 /**
  * @brief ModuleList for the echo_test_app
-*/
-class echo_test_app_contructor : public GraphConstructor
-{
+ */
+class echo_test_app_contructor : public GraphConstructor {
   // Inherited via ModuleList
-  void ConstructGraph(DAQModuleMap& user_module_map,
-                      CommandOrderMap& command_order_map) override
-  {
+  void ConstructGraph(DAQModuleMap &user_module_map,
+                      CommandOrderMap &command_order_map) override {
     user_module_map["debugLogger"].reset(
-      new DebugLoggingDAQModule("debugLogger"));
+        new DebugLoggingDAQModule("debugLogger"));
   }
 };
 } // namespace dunedaq::appfwk
@@ -34,12 +32,11 @@ class echo_test_app_contructor : public GraphConstructor
  * @param argc Number of arguments
  * @param argv Arguments
  * @return Status code from DAQProcess::listen
-*/
-int
-main(int argc, char* argv[])
-{
+ */
+int main(int argc, char *argv[]) {
   auto args =
-    dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+      dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc,
+                                                                         argv);
 
   dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
