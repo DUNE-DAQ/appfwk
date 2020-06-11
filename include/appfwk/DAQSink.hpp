@@ -26,7 +26,7 @@ namespace dunedaq {
  * handle
  */
 ERS_DECLARE_ISSUE(appfwk,          // namespace
-                  DAQSinkConstrutionFailed, // issue class name
+                  DAQSinkConstructionFailed, // issue class name
                   "Failed to construct DAQSink \"" << name
                                                    << "\"", // no message
                   ((std::string)name))
@@ -56,7 +56,7 @@ DAQSink<T>::DAQSink( const std::string & name)
     TLOG(TLVL_TRACE, "DAQSink")
       << "Queue " << name << " is at " << queue_.get();
   } catch (QueueTypeMismatch& ex) {
-    throw DAQSinkConstrutionFailed(ERS_HERE, name, ex);
+    throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
 }
 

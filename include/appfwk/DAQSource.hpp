@@ -24,7 +24,7 @@ namespace dunedaq {
  * handle
  */
 ERS_DECLARE_ISSUE(appfwk,                     // namespace
-                  DAQSourceConstrutionFailed, // issue class name
+                  DAQSourceConstructionFailed, // issue class name
                   "Failed to construct DAQSource \"" << name
                                                      << "\"", // no message
                   ((std::string)name))
@@ -54,7 +54,7 @@ DAQSource<T>::DAQSource(const std::string& name)
     TLOG(TLVL_TRACE, "DAQSource")
       << "Queue " << name << " is at " << queue_.get();
   } catch (QueueTypeMismatch& ex) {
-    throw DAQSourceConstrutionFailed(ERS_HERE, name, ex);
+    throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
   }
 }
 
