@@ -1,14 +1,20 @@
 
-template <typename ValueType>
+template<typename ValueType>
 dunedaq::appfwk::FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
-    : DAQModule(name), mode_(FanOutMode::NotConfigured), queueTimeout_(100),
-      thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this)),
-      wait_interval_us_(std::numeric_limits<size_t>::max()),
-      inputQueue_(nullptr), outputQueues_() {}
+  : DAQModule(name)
+  , mode_(FanOutMode::NotConfigured)
+  , queueTimeout_(100)
+  , thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this))
+  , wait_interval_us_(std::numeric_limits<size_t>::max())
+  , inputQueue_(nullptr)
+  , outputQueues_()
+{}
 
-template <typename ValueType>
-void dunedaq::appfwk::FanOutDAQModule<ValueType>::execute_command(
-    const std::string &cmd, const std::vector<std::string> & /*args*/) {
+template<typename ValueType>
+void
+dunedaq::appfwk::FanOutDAQModule<ValueType>::execute_command(const std::string& cmd,
+                                                             const std::vector<std::string>& /*args*/)
+{
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
   }
@@ -20,8 +26,10 @@ void dunedaq::appfwk::FanOutDAQModule<ValueType>::execute_command(
   }
 }
 
-template <typename ValueType>
-std::string dunedaq::appfwk::FanOutDAQModule<ValueType>::do_configure() {
+template<typename ValueType>
+std::string
+dunedaq::appfwk::FanOutDAQModule<ValueType>::do_configure()
+{
   if (configuration_.contains("fanout_mode")) {
     auto modeString = configuration_["fanout_mode"].get<std::string>();
     if (modeString.find("roadcast") != std::string::npos) {
@@ -42,31 +50,35 @@ std::string dunedaq::appfwk::FanOutDAQModule<ValueType>::do_configure() {
   wait_interval_us_ = configuration_.value<int>("wait_interval", 1000000);
 
   auto inputName = configuration_["input"].get<std::string>();
-  TLOG(TLVL_DEBUG, "FanOutDAQModule")
-      << get_name() << ": Getting queue with name " << inputName << " as input";
+  TLOG(TLVL_DEBUG, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName << " as input";
   inputQueue_.reset(new DAQSource<ValueType>(inputName));
-  for (auto &output : configuration_["outputs"]) {
-    outputQueues_.emplace_back(
-        new DAQSink<ValueType>(output.get<std::string>()));
+  for (auto& output : configuration_["outputs"]) {
+    outputQueues_.emplace_back(new DAQSink<ValueType>(output.get<std::string>()));
   }
 
   return "Success";
 }
 
-template <typename ValueType>
-std::string dunedaq::appfwk::FanOutDAQModule<ValueType>::do_start() {
+template<typename ValueType>
+std::string
+dunedaq::appfwk::FanOutDAQModule<ValueType>::do_start()
+{
   thread_.start_working_thread_();
   return "Success";
 }
 
-template <typename ValueType>
-std::string dunedaq::appfwk::FanOutDAQModule<ValueType>::do_stop() {
+template<typename ValueType>
+std::string
+dunedaq::appfwk::FanOutDAQModule<ValueType>::do_stop()
+{
   thread_.stop_working_thread_();
   return "Success";
 }
 
-template <typename ValueType>
-void dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work() {
+template<typename ValueType>
+void
+dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work()
+{
   auto roundRobinNext = outputQueues_.begin();
 
   // unique_ptr needed since there's no guarantee ValueType has a no-argument
@@ -77,9 +89,7 @@ void dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work() {
     if (inputQueue_->can_pop()) {
 
       if (!inputQueue_->pop(*data_ptr, queueTimeout_)) {
-        TLOG(TLVL_WARNING)
-            << get_name()
-            << ": Tried but failed to pop a value from an inputQueue";
+        TLOG(TLVL_WARNING) << get_name() << ": Tried but failed to pop a value from an inputQueue";
         continue;
       }
 
@@ -88,27 +98,24 @@ void dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work() {
       } else if (mode_ == FanOutMode::FirstAvailable) {
         auto sent = false;
         while (!sent) {
-          for (auto &o : outputQueues_) {
+          for (auto& o : outputQueues_) {
             if (o->can_push()) {
               auto starttime = std::chrono::steady_clock::now();
               o->push(std::move(*data_ptr), queueTimeout_);
               auto endtime = std::chrono::steady_clock::now();
 
-              if (std::chrono::duration_cast<decltype(queueTimeout_)>(
-                      endtime - starttime) < queueTimeout_) {
+              if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) < queueTimeout_) {
                 sent = true;
                 break;
               } else {
-                TLOG(TLVL_WARNING)
-                    << get_name()
-                    << ": A timeout occurred trying to push data "
-                       "onto an outputqueue; data has been lost";
+                TLOG(TLVL_WARNING) << get_name()
+                                   << ": A timeout occurred trying to push data "
+                                      "onto an outputqueue; data has been lost";
               }
             }
           }
           if (!sent) {
-            std::this_thread::sleep_for(
-                std::chrono::microseconds(wait_interval_us_));
+            std::this_thread::sleep_for(std::chrono::microseconds(wait_interval_us_));
           }
         }
       } else if (mode_ == FanOutMode::RoundRobin) {
@@ -119,8 +126,7 @@ void dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work() {
             (*roundRobinNext)->push(std::move(*data_ptr), queueTimeout_);
             auto endtime = std::chrono::steady_clock::now();
 
-            if (std::chrono::duration_cast<decltype(queueTimeout_)>(
-                    endtime - starttime) >= queueTimeout_) {
+            if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) >= queueTimeout_) {
               TLOG(TLVL_WARNING) << get_name()
                                  << ": A timeout occurred trying to push data "
                                     "onto an outputqueue; data has been lost";
@@ -131,8 +137,7 @@ void dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work() {
               roundRobinNext = outputQueues_.begin();
             break;
           } else {
-            std::this_thread::sleep_for(
-                std::chrono::microseconds(wait_interval_us_));
+            std::this_thread::sleep_for(std::chrono::microseconds(wait_interval_us_));
           }
         }
       }

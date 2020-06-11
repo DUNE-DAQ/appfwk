@@ -26,25 +26,25 @@ namespace dunedaq::appfwk {
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
  */
-class FakeDataProducerDAQModule : public DAQModule {
+class FakeDataProducerDAQModule : public DAQModule
+{
 public:
   /**
    * @brief FakeDataProducerDAQModule Constructor
    * @param name Instance name for this FakeDataProducerDAQModule instance
    */
-  explicit FakeDataProducerDAQModule(const std::string &name);
+  explicit FakeDataProducerDAQModule(const std::string& name);
 
-  void execute_command(const std::string &cmd,
-                       const std::vector<std::string> &args = {}) override;
+  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
 
-  FakeDataProducerDAQModule(const FakeDataProducerDAQModule &) =
-      delete; ///< FakeDataProducerDAQModule is not copy-constructible
-  FakeDataProducerDAQModule &operator=(const FakeDataProducerDAQModule &) =
-      delete; ///< FakeDataProducerDAQModule is not copy-assignable
-  FakeDataProducerDAQModule(FakeDataProducerDAQModule &&) =
-      delete; ///< FakeDataProducerDAQModule is not move-constructible
-  FakeDataProducerDAQModule &operator=(FakeDataProducerDAQModule &&) =
-      delete; ///< FakeDataProducerDAQModule is not move-assignable
+  FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) =
+    delete; ///< FakeDataProducerDAQModule is not copy-constructible
+  FakeDataProducerDAQModule& operator=(const FakeDataProducerDAQModule&) =
+    delete; ///< FakeDataProducerDAQModule is not copy-assignable
+  FakeDataProducerDAQModule(FakeDataProducerDAQModule&&) =
+    delete; ///< FakeDataProducerDAQModule is not move-constructible
+  FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) =
+    delete; ///< FakeDataProducerDAQModule is not move-assignable
 
 private:
   // Commands

@@ -31,17 +31,20 @@ namespace dunedaq::appfwk {
  * Note that while the Queue class itself is not templated on a data type (so
  * it can be included in generic containers), all implementations should be.
  */
-template <class T> class Queue : public NamedObject {
+template<class T>
+class Queue : public NamedObject
+{
 public:
-  using value_type = T; ///< Type stored in the Queue
-  using duration_type =
-      std::chrono::milliseconds; ///< Base duration type for timeouts
+  using value_type = T;                            ///< Type stored in the Queue
+  using duration_type = std::chrono::milliseconds; ///< Base duration type for timeouts
 
   /**
    * @brief Queue Constructor
    * @param name Name of the Queue instance
    */
-  explicit Queue(const std::string &name) : NamedObject(name) {}
+  explicit Queue(const std::string& name)
+    : NamedObject(name)
+  {}
 
   /**
    * @brief Push a value onto the Queue.
@@ -52,7 +55,7 @@ public:
    * If push takes longer than the timeout, implementations should throw an
    * exception.
    */
-  virtual void push(T &&val, const duration_type &timeout) = 0;
+  virtual void push(T&& val, const duration_type& timeout) = 0;
 
   /**
    * @brief Determine whether the Queue may be pushed onto
@@ -71,7 +74,7 @@ public:
    * If pop takes longer than the timeout, implementations should throw an
    * exception
    */
-  virtual bool pop(T &val, const duration_type &timeout) = 0;
+  virtual bool pop(T& val, const duration_type& timeout) = 0;
 
   /**
    * @brief Determine whether the Queue may be popped from
@@ -82,10 +85,10 @@ public:
   virtual bool can_pop() const noexcept = 0;
 
 private:
-  Queue(const Queue &) = delete;
-  Queue &operator=(const Queue &) = delete;
-  Queue(Queue &&) = default;
-  Queue &operator=(Queue &&) = default;
+  Queue(const Queue&) = delete;
+  Queue& operator=(const Queue&) = delete;
+  Queue(Queue&&) = default;
+  Queue& operator=(Queue&&) = default;
 };
 
 } // namespace dunedaq::appfwk

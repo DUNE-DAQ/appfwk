@@ -20,11 +20,9 @@
 
 namespace {
 
-constexpr int max_testable_capacity =
-    1000000000; ///< The maximum capacity this test will attempt to check
-constexpr double fractional_timeout_tolerance =
-    0.1; ///< The fraction of the timeout which the timing is allowed to be off
-         ///< by
+constexpr int max_testable_capacity = 1000000000;    ///< The maximum capacity this test will attempt to check
+constexpr double fractional_timeout_tolerance = 0.1; ///< The fraction of the timeout which the timing is allowed to be
+                                                     ///< off by
 
 /**
  * @brief Timeout to use for tests
@@ -36,11 +34,9 @@ constexpr auto timeout = std::chrono::milliseconds(1);
 /**
  * @brief Timeout expressed in microseconds
  */
-constexpr auto timeout_in_us =
-    std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
+constexpr auto timeout_in_us = std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-dunedaq::appfwk::StdDeQueue<int>
-    Queue("StdDeQueue"); ///< Queue instance for the test
+dunedaq::appfwk::StdDeQueue<int> Queue("StdDeQueue"); ///< Queue instance for the test
 
 /**
  * \todo StdDeQueue no longer exposes size or capacity methods. This section
@@ -76,7 +72,8 @@ struct CapacityChecker
 // This test case should run first. Make sure all other test cases depend on
 // this.
 
-BOOST_AUTO_TEST_CASE(sanity_checks) {
+BOOST_AUTO_TEST_CASE(sanity_checks)
+{
   Queue.SetSize(10);
 
   BOOST_REQUIRE(!Queue.can_pop());
@@ -86,15 +83,12 @@ BOOST_AUTO_TEST_CASE(sanity_checks) {
   auto push_time = std::chrono::steady_clock::now() - starttime;
 
   if (push_time > timeout) {
-    auto push_time_in_us =
-        std::chrono::duration_cast<std::chrono::microseconds>(push_time)
-            .count();
+    auto push_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(push_time).count();
 
-    BOOST_TEST_REQUIRE(false, "Test failure: pushing element onto empty Queue "
-                              "resulted in a timeout (function exited after "
-                                  << push_time_in_us
-                                  << " microseconds, timeout is "
-                                  << timeout_in_us << " microseconds)");
+    BOOST_TEST_REQUIRE(false,
+                       "Test failure: pushing element onto empty Queue "
+                       "resulted in a timeout (function exited after "
+                         << push_time_in_us << " microseconds, timeout is " << timeout_in_us << " microseconds)");
   }
 
   BOOST_REQUIRE(Queue.can_pop());
@@ -105,31 +99,30 @@ BOOST_AUTO_TEST_CASE(sanity_checks) {
   auto pop_time = std::chrono::steady_clock::now() - starttime;
 
   if (pop_time > timeout) {
-    auto pop_time_in_us =
-        std::chrono::duration_cast<std::chrono::microseconds>(pop_time).count();
-    BOOST_TEST_REQUIRE(false, "Test failure: popping element off Queue "
-                              "resulted in a timeout (function exited after "
-                                  << pop_time_in_us
-                                  << " microseconds, timeout is "
-                                  << timeout_in_us << " microseconds)");
+    auto pop_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(pop_time).count();
+    BOOST_TEST_REQUIRE(false,
+                       "Test failure: popping element off Queue "
+                       "resulted in a timeout (function exited after "
+                         << pop_time_in_us << " microseconds, timeout is " << timeout_in_us << " microseconds)");
   }
 
   BOOST_REQUIRE_EQUAL(popped_value, 999);
 }
 
-BOOST_AUTO_TEST_CASE(empty_checks,
-                     *boost::unit_test::depends_on("sanity_checks")) {
+BOOST_AUTO_TEST_CASE(empty_checks, *boost::unit_test::depends_on("sanity_checks"))
+{
 
   try {
     while (Queue.can_pop()) {
       int popped_value;
       if (!Queue.pop(popped_value, timeout)) {
-        BOOST_TEST(false, "False returned in call to StdDeQueue::pop(); unable "
-                          "to empty the Queue");
+        BOOST_TEST(false,
+                   "False returned in call to StdDeQueue::pop(); unable "
+                   "to empty the Queue");
         break;
       }
     }
-  } catch (const std::runtime_error &err) {
+  } catch (const std::runtime_error& err) {
     BOOST_WARN_MESSAGE(true, err.what());
   }
 
@@ -145,10 +138,8 @@ BOOST_AUTO_TEST_CASE(empty_checks,
 
   const double fraction_of_pop_timeout_used = pop_duration / timeout;
 
-  BOOST_CHECK_GT(fraction_of_pop_timeout_used,
-                 1 - fractional_timeout_tolerance);
-  BOOST_CHECK_LT(fraction_of_pop_timeout_used,
-                 1 + fractional_timeout_tolerance);
+  BOOST_CHECK_GT(fraction_of_pop_timeout_used, 1 - fractional_timeout_tolerance);
+  BOOST_CHECK_LT(fraction_of_pop_timeout_used, 1 + fractional_timeout_tolerance);
 }
 
 /**

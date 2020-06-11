@@ -22,9 +22,11 @@ BOOST_AUTO_TEST_SUITE(FanOutDAQModule_test)
 /**
  * @brief Initializes the QueueRegistry for use by the FanOutDAQModule test
  */
-struct FanOutDAQModuleTestFixture {
+struct FanOutDAQModuleTestFixture
+{
   FanOutDAQModuleTestFixture() {}
-  void setup() {
+  void setup()
+  {
 
     std::map<std::string, QueueConfig> queue_config;
     queue_config["input"].kind = QueueConfig::queue_kind::kStdDeQueue;
@@ -40,13 +42,14 @@ struct FanOutDAQModuleTestFixture {
 
 BOOST_TEST_GLOBAL_FIXTURE(FanOutDAQModuleTestFixture);
 
-BOOST_AUTO_TEST_CASE(Construct) {
+BOOST_AUTO_TEST_CASE(Construct)
+{
   dunedaq::appfwk::FanOutDAQModule<int> foum("test");
 }
 
-BOOST_AUTO_TEST_CASE(Configure) {
-  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum(
-      "test");
+BOOST_AUTO_TEST_CASE(Configure)
+{
+  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
 
   auto config = R"({"input": "input"})"_json;
   foum.configure(config);
@@ -54,9 +57,9 @@ BOOST_AUTO_TEST_CASE(Configure) {
   foum.execute_command("configure");
 }
 
-BOOST_AUTO_TEST_CASE(NonCopyableTypeTest) {
-  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum(
-      "test");
+BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
+{
+  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
 
   nlohmann::json module_config = R"(
         {
