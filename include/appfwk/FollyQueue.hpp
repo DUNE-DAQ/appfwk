@@ -1,5 +1,5 @@
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_FOLLYQUEUE_HH_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_FOLLYQUEUE_HH_
+#ifndef APPFWK_INCLUDE_APPFWK_FOLLYQUEUE_HPP_
+#define APPFWK_INCLUDE_APPFWK_FOLLYQUEUE_HPP_
 
 /**
  *
@@ -19,13 +19,12 @@
 
 #include "folly/concurrency/DynamicBoundedQueue.h"
 
+#include <utility> // For std::move
+#include <string>
+
 namespace dunedaq::appfwk {
 
-// TODO: I'd really like FollyQueueType to have a `T` in it somewhere,
-// so we can't instantiate this class with a folly queue containing a
-// type other than T, but I can't work out the necessary C++
-// incantation, so this way it is, for now
-template<class T, class FollyQueueType>
+template<class T, template <typename, bool> class FollyQueueType>
 class FollyQueue : public Queue<T>
 {
 public:
@@ -72,18 +71,18 @@ public:
 
 private:
   size_t fMaxSize;
-  FollyQueueType fQueue;
+  FollyQueueType<T, false> fQueue;
 };
 
 template<typename T>
-using FollySPSCQueue = FollyQueue<T, folly::DSPSCQueue<T, false>>;
+using FollySPSCQueue = FollyQueue<T, folly::DSPSCQueue>;
 
 template<typename T>
-using FollyMPMCQueue = FollyQueue<T, folly::DMPMCQueue<T, false>>;
+using FollyMPMCQueue = FollyQueue<T, folly::DMPMCQueue>;
 
-} // namespace appframework
+} // namespace dunedaq::appfwk
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUES_FOLLYQUEUE_HH_
+#endif // APPFWK_INCLUDE_APPFWK_FOLLYQUEUE_HPP_
 
 
 // Local Variables:
