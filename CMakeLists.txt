@@ -1,23 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 project(appfwk)
 
-set(CMAKE_CXX_STANDARD 17)
-
-find_package(TRACE 3.15.0 REQUIRED)
-
-find_package(nlohmann_json 3.2.0)
-if(NOT ${nlohmann_json_FOUND})
-  message("nlohmann_json NOT FOUND! Downloading single-header from GitHub!")
-  file(DOWNLOAD https://github.com/nlohmann/json/raw/develop/single_include/nlohmann/json.hpp nlohmann/json.hpp)
-  include_directories(${CMAKE_BINARY_DIR})
-endif()
-
-
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_NO_BOOST_CMAKE ON)
-set(BUILD_SHARED_LIBS ON)
-find_package(Boost 1.70.0 COMPONENTS unit_test_framework program_options REQUIRED)
-
 
 if(EXISTS $ENV{CETLIB_LIB})
 # UPS
@@ -32,10 +15,6 @@ else()
 	set(CETLIB_EXCEPT cetlib_except)
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/appfwk/include)
-
-include_directories(${CMAKE_SOURCE_DIR}/ers)
-
 function( point_build_to output_dir )
 
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${output_dir} PARENT_SCOPE)
@@ -46,7 +25,6 @@ endfunction()
 
 point_build_to( apps )
 
-include_directories(${CMAKE_SOURCE_DIR}/appfwk/include)
 
 add_executable(daq_application apps/daq_application.cxx)
 target_link_libraries(daq_application appfwk  pthread ers ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
@@ -92,9 +70,6 @@ MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyabl
 
 point_build_to( test )
 
-set(Boost_NO_BOOST_CMAKE ON)
-find_package(Boost COMPONENTS program_options REQUIRED)
-
 add_executable(queue_IO_check test/queue_IO_check.cxx)
 target_link_libraries(queue_IO_check pthread ${Boost_PROGRAM_OPTIONS_LIBRARY} )
 
@@ -114,18 +89,16 @@ target_link_libraries(daq_sink_source appfwk pthread ers)
 
 point_build_to( unittest )
 
-if(Boost_FOUND)
+add_executable(StdDeQueue_test unittest/StdDeQueue_test.cxx)
+add_test(NAME StdDeQueue_test COMMAND StdDeQueue_test)
 
-    include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
 
-    add_executable(StdDeQueue_test unittest/StdDeQueue_test.cxx)
-    add_test(NAME StdDeQueue_test COMMAND StdDeQueue_test)
-
-    add_executable(FanOutDAQModule_test unittest/FanOutDAQModule_test.cxx)
-    target_link_libraries(FanOutDAQModule_test appfwk ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread ers)
-    target_compile_definitions(FanOutDAQModule_test PRIVATE "BOOST_TEST_DYN_LINK=1")
-    target_include_directories(FanOutDAQModule_test PRIVATE ${Boost_INCLUDE_DIRS})
-    add_test(NAME FanOutDAQModule_test COMMAND FanOutDAQModule_test ers)
+add_executable(FanOutDAQModule_test unittest/FanOutDAQModule_test.cxx)
+target_link_libraries(FanOutDAQModule_test appfwk ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread ers)
+target_compile_definitions(FanOutDAQModule_test PRIVATE "BOOST_TEST_DYN_LINK=1")
+target_include_directories(FanOutDAQModule_test PRIVATE ${Boost_INCLUDE_DIRS})
+add_test(NAME FanOutDAQModule_test COMMAND FanOutDAQModule_test ers)
 
 add_executable(DAQModuleThreadHelper_test unittest/DAQModuleThreadHelper_test.cxx)
 target_link_libraries(DAQModuleThreadHelper_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread)
@@ -133,5 +106,4 @@ target_compile_definitions(DAQModuleThreadHelper_test PRIVATE "BOOST_TEST_DYN_LI
 target_include_directories(DAQModuleThreadHelper_test PRIVATE ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/appfwk-base/include)
 add_test(NAME DAQModuleThreadHelper_test COMMAND DAQModuleThreadHelper_test)
 
-endif()
 
