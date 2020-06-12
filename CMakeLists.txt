@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(appfwk)
 
-
 if(EXISTS $ENV{CETLIB_LIB})
-# UPS
+ # UPS
   include_directories($ENV{CETLIB_INC})
   include_directories($ENV{CETLIB_EXCEPT_INC})
   find_library(CETLIB NAMES libcetlib.so)
@@ -15,19 +14,13 @@ else()
 	set(CETLIB_EXCEPT cetlib_except)
 endif()
 
-function( point_build_to output_dir )
-
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${output_dir} PARENT_SCOPE)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${output_dir} PARENT_SCOPE)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${output_dir} PARENT_SCOPE)
-
-endfunction()
+set(DAQ_LIBRARIES_PACKAGE ${CETLIB} ${CETLIB_EXCEPT} appfwk)
 
 point_build_to( apps )
 
 
 add_executable(daq_application apps/daq_application.cxx)
-target_link_libraries(daq_application appfwk  pthread ers ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(daq_application ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE})
 
 point_build_to( doc )
 # (No action taken, doc/CMakeLists.txt was empty)
@@ -48,10 +41,11 @@ point_build_to( src )
 
 file(GLOB source_files src/*.cpp)
 
-list(FILTER source_files EXCLUDE REGEX "QueryResponseCommandFacility.cpp")
-add_library(appfwk SHARED ${source_files})
-target_link_libraries(appfwk ${CETLIB} ${CETLIB_EXCEPT})
+add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp)
 
+set( APPFWK_LIBRARIES ${DAQ_LIBRARIES_PACKAGE} )
+list(REMOVE_ITEM APPFWK_LIBRARIES appfwk)
+target_link_libraries(appfwk ${APPFWK_LIBRARIES})
 
 add_library(appfwk_QueryResponseCommandFacility_duneCommandFacility src/QueryResponseCommandFacility.cpp)
 
@@ -71,39 +65,27 @@ MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyabl
 point_build_to( test )
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check pthread ${Boost_PROGRAM_OPTIONS_LIBRARY} )
+target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE} )
 
 
 add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
 add_library(appfwk_FakeDataConsumerDAQModule_duneDAQModule test/FakeDataConsumerDAQModule.cpp)
 add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducerDAQModule.cpp)
 
-add_executable(echo_test_app test/echo_test_app.cxx)
-target_link_libraries(echo_test_app appfwk appfwk_DebugLoggingDAQModule_duneDAQModule pthread ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+# Curious to hear people's take on this format style which aligns the target across lines...
+add_executable        (echo_test_app test/echo_test_app.cxx)
+target_link_libraries (echo_test_app ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE} appfwk_DebugLoggingDAQModule_duneDAQModule)
 
-add_executable(producer_consumer_test_app test/producer_consumer_test_app.cxx)
-target_link_libraries(producer_consumer_test_app appfwk appfwk_FakeDataProducerDAQModule_duneDAQModule ers appfwk_FakeDataConsumerDAQModule_duneDAQModule pthread  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+add_executable        (producer_consumer_test_app test/producer_consumer_test_app.cxx)
+target_link_libraries (producer_consumer_test_app ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE} appfwk_FakeDataProducerDAQModule_duneDAQModule appfwk_FakeDataConsumerDAQModule_duneDAQModule)
 
-add_executable(daq_sink_source test/daq_sink_source.cxx)
-target_link_libraries(daq_sink_source appfwk pthread ers)
+add_executable        (daq_sink_source test/daq_sink_source.cxx)
+target_link_libraries (daq_sink_source ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE})
 
 point_build_to( unittest )
 
-add_executable(StdDeQueue_test unittest/StdDeQueue_test.cxx)
-add_test(NAME StdDeQueue_test COMMAND StdDeQueue_test)
-
-include_directories(${Boost_INCLUDE_DIRS})
-
-add_executable(FanOutDAQModule_test unittest/FanOutDAQModule_test.cxx)
-target_link_libraries(FanOutDAQModule_test appfwk ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread ers)
-target_compile_definitions(FanOutDAQModule_test PRIVATE "BOOST_TEST_DYN_LINK=1")
-target_include_directories(FanOutDAQModule_test PRIVATE ${Boost_INCLUDE_DIRS})
-add_test(NAME FanOutDAQModule_test COMMAND FanOutDAQModule_test ers)
-
-add_executable(DAQModuleThreadHelper_test unittest/DAQModuleThreadHelper_test.cxx)
-target_link_libraries(DAQModuleThreadHelper_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread)
-target_compile_definitions(DAQModuleThreadHelper_test PRIVATE "BOOST_TEST_DYN_LINK=1")
-target_include_directories(DAQModuleThreadHelper_test PRIVATE ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/appfwk-base/include)
-add_test(NAME DAQModuleThreadHelper_test COMMAND DAQModuleThreadHelper_test)
+add_unit_test(StdDeQueue_test)
+add_unit_test(FanOutDAQModule_test)
+add_unit_test(DAQModuleThreadHelper_test)
 
 
