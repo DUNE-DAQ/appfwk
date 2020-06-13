@@ -1,30 +1,22 @@
 cmake_minimum_required(VERSION 3.12)
 project(appfwk)
 
-if(EXISTS $ENV{CETLIB_LIB})
- # UPS
-  include_directories($ENV{CETLIB_INC})
-  include_directories($ENV{CETLIB_EXCEPT_INC})
-  find_library(CETLIB NAMES libcetlib.so)
-  find_library(CETLIB_EXCEPT NAMES libcetlib_except.so)
-else()
-	# Spack
-	find_package(cetlib REQUIRED)
-	set(CETLIB cetlib)
-	set(CETLIB_EXCEPT cetlib_except)
-endif()
+find_package(cetlib REQUIRED)
 
 set(DAQ_LIBRARIES_PACKAGE ${CETLIB} ${CETLIB_EXCEPT} appfwk)
 
+##############################################################################
 point_build_to( apps )
 
 
 add_executable(daq_application apps/daq_application.cxx)
 target_link_libraries(daq_application ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE})
 
+##############################################################################
 point_build_to( doc )
 # (No action taken, doc/CMakeLists.txt was empty)
 
+##############################################################################
 point_build_to( include )  
 
 install(DIRECTORY include DESTINATION include)
@@ -35,11 +27,8 @@ set(PATH_DIRS ${CMAKE_CURRENT_BINARY_DIR}/scripts:${CMAKE_CURRENT_BINARY_DIR}/ap
 set(LIB_DIRS ${CMAKE_CURRENT_BINARY_DIR}/src:${CMAKE_CURRENT_BINARY_DIR}/test)
 configure_file(scripts/setupForRunning.sh.in scripts/setupForRunning.sh @ONLY)
 
-
+##############################################################################
 point_build_to( src )
-
-
-file(GLOB source_files src/*.cpp)
 
 add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp)
 
@@ -62,6 +51,7 @@ MakeDataTypeLibraries(CPPTYPE std::vector<int> PREFIX VectorInt)
 MakeDataTypeLibraries(CPPTYPE std::string PREFIX String)
 MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyableType)
 
+##############################################################################
 point_build_to( test )
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
@@ -82,6 +72,8 @@ target_link_libraries (producer_consumer_test_app ${DAQ_LIBRARIES_UNIVERSAL_EXE}
 add_executable        (daq_sink_source test/daq_sink_source.cxx)
 target_link_libraries (daq_sink_source ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE})
 
+
+##############################################################################
 point_build_to( unittest )
 
 add_unit_test(StdDeQueue_test)
