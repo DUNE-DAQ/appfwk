@@ -119,7 +119,7 @@ private:
   {
     for (auto& o : outputQueues_) {
       auto starttime = std::chrono::steady_clock::now();
-      o->push(ValueType(data), queueTimeout_);
+      o->push( data, queueTimeout_);
       auto endtime = std::chrono::steady_clock::now();
       if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) > queueTimeout_) {
         TLOG(TLVL_WARNING) << "Timeout occurred trying to broadcast data to "

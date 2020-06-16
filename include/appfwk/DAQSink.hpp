@@ -41,6 +41,7 @@ public:
 
   explicit DAQSink(const std::string& name);
   void push(T&& element, const duration_type& timeout = duration_type::zero());
+  void push(const T& element, const duration_type& timeout = duration_type::zero());
   bool can_push();
 
 private:
@@ -63,6 +64,13 @@ void
 DAQSink<T>::push(T&& element, const duration_type& timeout)
 {
   queue_->push(std::move(element), timeout);
+}
+
+template<typename T>
+void
+DAQSink<T>::push(const T& element, const duration_type& timeout)
+{
+  queue_->push( T(element), timeout);
 }
 
 template<typename T>
