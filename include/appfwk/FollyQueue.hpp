@@ -42,8 +42,17 @@ public:
   value_type pop( const duration_type& dur) override
   {
     std::unique_ptr<T> sp ;  
-    fQueue.try_dequeue_for( sp, dur);
-    return std::move(*sp) ;
+    if ( fQueue.try_dequeue_for( sp, dur) ) 
+      return std::move(*sp) ;
+    else {
+      std::stringstream errmsg;
+      errmsg
+	<< "In FollyQueue::pop_wait_for: unable to pop since queue is "
+	"empty (timeout period was "
+	<< std::chrono::duration_cast<std::chrono::milliseconds>(dur).count()
+	<< " milliseconds)";
+      throw std::runtime_error(errmsg.str());
+    }
   }
 
   bool can_push() const noexcept override
