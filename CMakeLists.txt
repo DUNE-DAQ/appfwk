@@ -99,8 +99,8 @@ point_build_to( test )
 set(Boost_NO_BOOST_CMAKE ON)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
-add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check Threads::Threads ${Boost_PROGRAM_OPTIONS_LIBRARY} Folly::folly )
+#add_executable(queue_IO_check test/queue_IO_check.cxx)
+#target_link_libraries(queue_IO_check Threads::Threads ${Boost_PROGRAM_OPTIONS_LIBRARY} Folly::folly )
 
 
 add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)

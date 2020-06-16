@@ -19,6 +19,7 @@
 
 #include "folly/concurrency/DynamicBoundedQueue.h"
 
+#include <memory>  // for unique_ptr
 #include <utility> // For std::move
 #include <string>
 
@@ -38,9 +39,12 @@ public:
   {}
 
   bool can_pop() const noexcept override { return !fQueue.empty(); }
-  bool pop( value_type & val, const duration_type& dur) override
+  value_type pop( const duration_type& dur) override
   {
-    return fQueue.try_dequeue_for(val, dur);
+    T* p = nullptr ;
+    fQueue.try_dequeue_for( p, dur);
+    std::unique_ptr<T> sp = p ;
+    return std::move(*sp) ;
   }
 
   bool can_push() const noexcept override
@@ -51,7 +55,7 @@ public:
   void push(value_type&& t, const duration_type& dur)  override
   {
     // Is the std::move actually necessary here?
-    if(!fQueue.try_enqueue_for(std::move(t), dur)){
+    if(!fQueue.try_enqueue_for( new T( t ) , dur)){
       throw std::runtime_error("In FollyQueue::push: unable to push since queue is full");
     }
   }
@@ -75,10 +79,10 @@ private:
 };
 
 template<typename T>
-using FollySPSCQueue = FollyQueue<T, folly::DSPSCQueue>;
+using FollySPSCQueue = FollyQueue<T*, folly::DSPSCQueue>;
 
 template<typename T>
-using FollyMPMCQueue = FollyQueue<T, folly::DMPMCQueue>;
+using FollyMPMCQueue = FollyQueue<T*, folly::DMPMCQueue>;
 
 } // namespace dunedaq::appfwk
 
