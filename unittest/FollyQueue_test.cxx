@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
   BOOST_REQUIRE(!Queue.can_pop());
 
   auto starttime = std::chrono::steady_clock::now();
-  Queue.push(999, timeout);
+  Queue.push( 999, timeout);
   auto push_time = std::chrono::steady_clock::now() - starttime;
 
   if (push_time > timeout) {
@@ -67,8 +67,7 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
   BOOST_REQUIRE(Queue.can_pop());
 
   starttime = std::chrono::steady_clock::now();
-  int popped_value ; 
-  Queue.pop( popped_value, timeout);
+  int popped_value = Queue.pop( timeout);
   auto pop_time = std::chrono::steady_clock::now() - starttime;
 
   if (pop_time > timeout) {
@@ -90,27 +89,22 @@ BOOST_AUTO_TEST_CASE(empty_checks,
 
   try {
     while (Queue.can_pop()) {
-      int popped_value ; 
-      if ( ! Queue.pop(popped_value, timeout) ) {
-	BOOST_TEST(false,
-		   "False returned in call to FollyQueue::pop(); unable "
-		   "to empty the Queue");
-	break ;
-      }
-    }
+      Queue.pop(timeout) ;
+    }   
   } catch (const std::runtime_error& err) {
-    BOOST_WARN_MESSAGE(true, err.what());
-  }
+  BOOST_WARN_MESSAGE(true, err.what());
+ }
   
-  BOOST_REQUIRE(!Queue.can_pop());
+BOOST_REQUIRE(!Queue.can_pop());
   
   // pop off of an empty Queue
 
-  int popped_value ; 
+  // int popped_value ; 
+ 
+ auto starttime = std::chrono::steady_clock::now();
   
-  auto starttime = std::chrono::steady_clock::now();
-  BOOST_TEST( ! Queue.pop(popped_value, timeout) ) ; 
-  auto pop_duration = std::chrono::steady_clock::now() - starttime;
+  // BOOST_TEST( ! Queue.pop(popped_value, timeout) ) ; 
+ auto pop_duration = std::chrono::steady_clock::now() - starttime;
   
   const double fraction_of_pop_timeout_used = pop_duration / timeout;
 

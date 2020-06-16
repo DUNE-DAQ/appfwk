@@ -41,9 +41,8 @@ public:
   bool can_pop() const noexcept override { return !fQueue.empty(); }
   value_type pop( const duration_type& dur) override
   {
-    T* p = nullptr ;
-    fQueue.try_dequeue_for( p, dur);
-    std::unique_ptr<T> sp = p ;
+    std::unique_ptr<T> sp ;  
+    fQueue.try_dequeue_for( sp, dur);
     return std::move(*sp) ;
   }
 
@@ -55,7 +54,7 @@ public:
   void push(value_type&& t, const duration_type& dur)  override
   {
     // Is the std::move actually necessary here?
-    if(!fQueue.try_enqueue_for( new T( t ) , dur)){
+    if(!fQueue.try_enqueue_for( std::move( std::unique_ptr<T>( new T (std::move(t) ) ) ), dur)){
       throw std::runtime_error("In FollyQueue::push: unable to push since queue is full");
     }
   }
@@ -75,14 +74,14 @@ public:
 
 private:
   size_t fMaxSize;
-  FollyQueueType<T, false> fQueue;
+  FollyQueueType<std::unique_ptr<T>, false> fQueue;
 };
 
 template<typename T>
-using FollySPSCQueue = FollyQueue<T*, folly::DSPSCQueue>;
+using FollySPSCQueue = FollyQueue<T, folly::DSPSCQueue>;
 
 template<typename T>
-using FollyMPMCQueue = FollyQueue<T*, folly::DMPMCQueue>;
+using FollyMPMCQueue = FollyQueue<T, folly::DMPMCQueue>;
 
 } // namespace dunedaq::appfwk
 
