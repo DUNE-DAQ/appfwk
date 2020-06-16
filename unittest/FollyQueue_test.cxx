@@ -86,31 +86,31 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
 BOOST_AUTO_TEST_CASE(empty_checks,
                      *boost::unit_test::depends_on("sanity_checks"))
 {
-
   try {
     while (Queue.can_pop()) {
       Queue.pop(timeout) ;
     }   
   } catch (const std::runtime_error& err) {
-  BOOST_WARN_MESSAGE(true, err.what());
- }
+    BOOST_WARN_MESSAGE(true, err.what());
+  }
   
-BOOST_REQUIRE(!Queue.can_pop());
+  BOOST_REQUIRE(!Queue.can_pop());
   
   // pop off of an empty Queue
 
   // int popped_value ; 
- 
- auto starttime = std::chrono::steady_clock::now();
   
-  // BOOST_TEST( ! Queue.pop(popped_value, timeout) ) ; 
- auto pop_duration = std::chrono::steady_clock::now() - starttime;
+  auto starttime = std::chrono::steady_clock::now();
+  
+  BOOST_CHECK_THROW(Queue.pop(timeout), std::runtime_error);
+  
+  auto pop_duration = std::chrono::steady_clock::now() - starttime;
   
   const double fraction_of_pop_timeout_used = pop_duration / timeout;
-
+  
   BOOST_CHECK_GT(fraction_of_pop_timeout_used,
-                 1 - fractional_timeout_tolerance);
+		 1 - fractional_timeout_tolerance);
   BOOST_CHECK_LT(fraction_of_pop_timeout_used,
-                 1 + fractional_timeout_tolerance);
+		 1 + fractional_timeout_tolerance);
 }
 
