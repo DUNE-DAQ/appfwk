@@ -18,9 +18,26 @@ endif()
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_NO_BOOST_CMAKE ON)
 set(BUILD_SHARED_LIBS ON)
-find_package(Boost 1.70.0 COMPONENTS unit_test_framework program_options REQUIRED)
+find_package(Boost 1.70.0
+  COMPONENTS
+    context
+    filesystem
+    program_options
+    regex
+    system
+    thread
+    unit_test_framework
+  REQUIRED
+)
+
 
 find_package(folly REQUIRED)
+find_package(double-conversion CONFIG REQUIRED)
+find_package(glog CONFIG REQUIRED)
+find_package(Libevent CONFIG REQUIRED)
+find_package(OpenSSL MODULE REQUIRED)
+find_package(BZip2 MODULE REQUIRED)
+find_package(LibLZMA MODULE REQUIRED)
 
 if(EXISTS $ENV{CETLIB_LIB})
 # UPS
