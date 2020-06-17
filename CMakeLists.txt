@@ -106,9 +106,6 @@ add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducer
 add_executable(echo_test_app test/echo_test_app.cxx)
 target_link_libraries(echo_test_app appfwk appfwk_DebugLoggingDAQModule_duneDAQModule pthread ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
-add_executable(producer_consumer_test_app test/producer_consumer_test_app.cxx)
-target_link_libraries(producer_consumer_test_app appfwk appfwk_FakeDataProducerDAQModule_duneDAQModule ers appfwk_FakeDataConsumerDAQModule_duneDAQModule pthread  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
 add_executable(daq_sink_source test/daq_sink_source.cxx)
 target_link_libraries(daq_sink_source appfwk pthread ers)
 
