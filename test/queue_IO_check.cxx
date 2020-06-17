@@ -2,8 +2,7 @@
  *
  * @file queue_IO_check.cxx
  *
- * A low-level test of queue classes which inherit both from
- * QueueSource and QueueSink where we have a user-settable number
+ * A low-level test of queue classes where we have a user-settable number
  * of threads writing elements to a queue while a user-settable
  * number of threads reads from the queue
  *
@@ -16,6 +15,7 @@
 
 #include "appfwk/StdDeQueue.hpp"
 #include "appfwk/FollyQueue.hpp"
+#include "appfwk/FollyQueuePopT.hpp"
 
 #include "TRACE/trace.h"
 
@@ -41,20 +41,25 @@ namespace {
  */
 std::string queue_type = "StdDeQueue";
 
-auto timeout = std::chrono::milliseconds(100); ///< Queue's timeout
+auto timeout = std::chrono::milliseconds(1); ///< Queue's timeout
 
+  const bool pushes_only = false;
+  const bool pops_only = false;
+
+  static_assert( ! ( pushes_only && pops_only ));
+
+constexpr int nelements = 10000000; ///< Number of elements to push to the Queue (total)
 
 /**
  * @brief Queue instance for test
 */
-std::unique_ptr<dunedaq::appfwk::Queue<int>> queue = nullptr;
+  std::unique_ptr<dunedaq::appfwk::Queue<int>> queue = nullptr;
 
-constexpr int nelements = 100; ///< Number of elements to push to the Queue (total)
 int n_adding_threads = 1; ///< Number of threads which will call push
 int n_removing_threads = 1; ///< Number of threads which will call pop
 
-int avg_milliseconds_between_pushes = 5; ///< Target average rate of pushes
-int avg_milliseconds_between_pops = 5; ///< Target average rate of pops
+int avg_milliseconds_between_pushes = 0; ///< Target average rate of pushes
+int avg_milliseconds_between_pops = 0; ///< Target average rate of pops
 
 std::atomic<size_t> queue_size = 0; ///< Queue's current size
 std::atomic<size_t> max_queue_size = 0; ///< Queue's maximum size
@@ -91,10 +96,13 @@ add_things()
 
   for (int i = 0; i < nelements / n_adding_threads; ++i) {
 
-    std::this_thread::sleep_for(
-      std::chrono::milliseconds((*push_distribution)(generator)));
+    if (avg_milliseconds_between_pushes > 0) {
+      std::this_thread::sleep_for(
+				  std::chrono::milliseconds((*push_distribution)(generator)));
+    }
 
     while (!queue->can_push()) {
+      TLOG(TLVL_INFO) << "queue->can_push() found to be false, performing external sleep of 100 ms before checking again";
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
@@ -140,10 +148,13 @@ remove_things()
 
   for (int i = 0; i < nelements / n_removing_threads; ++i) {
 
-    std::this_thread::sleep_for(
-      std::chrono::milliseconds((*pop_distribution)(generator)));
+    if (avg_milliseconds_between_pops > 0) {
+      std::this_thread::sleep_for(
+				  std::chrono::milliseconds((*pop_distribution)(generator)));
+    }
 
     while (!queue->can_pop()) {
+      TLOG(TLVL_INFO) << "queue->can_pop() found to be false, performing external sleep of 100 ms before checking again";
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
@@ -157,7 +168,18 @@ remove_things()
       TLOG(TLVL_DEBUG) << msg.str();
 
       auto starttime = std::chrono::steady_clock::now();
-      val = queue->pop(timeout);
+
+      if (queue_type == "FollySPSCQueuePopT") {
+	dynamic_cast<dunedaq::appfwk::FollySPSCQueuePopT<int>*>(queue.get())->pop(val, timeout);
+      } else if (queue_type == "FollyMPMCQueuePopT") {
+	dynamic_cast<dunedaq::appfwk::FollyMPMCQueuePopT<int>*>(queue.get())->pop(val, timeout);
+      } else if (queue_type == "FollySPSCQueue") {
+	val = dynamic_cast<dunedaq::appfwk::FollySPSCQueue<int>*>(queue.get())->pop(timeout);
+      } else if (queue_type == "FollyMPMCQueue") {
+	val = dynamic_cast<dunedaq::appfwk::FollyMPMCQueue<int>*>(queue.get())->pop(timeout);
+      } else if (queue_type == "StdDeQueue") {
+	val = dynamic_cast<dunedaq::appfwk::StdDeQueue<int>*>(queue.get())->pop(timeout);
+      }
 
       msg.str(std::string());
       msg << "Thread #" << std::this_thread::get_id()
@@ -212,19 +234,20 @@ main(int argc, char* argv[])
     << "fraction of the queue's capacity filled at start (default is "
     << initial_capacity_used << ")";
 
+  std::ostringstream queue_used_desc;
+  queue_used_desc 
+    << "Type of queue instance you want to test (default is " << queue_type <<
+    ") (supported types are: StdDeQueue, FollySPSCQueue, FollyMPMCQueue, FollySPSCQueuePopT, FollyMPMCQueuePopT)";
+
   bpo::options_description desc(descstr.str());
   desc.add_options()("queue_type",
-                     bpo::value<std::string>(),
-                     "Type of queue instance you want to test (default is "
-                     "StdDeQueue) (supported "
-                     "types are: StdDeQueue, FollySPSCQueue, FollyMPMCQueue)")(
+                     bpo::value<std::string>(), queue_used_desc.str().c_str())(
     "push_threads", bpo::value<int>(), push_threads_desc.str().c_str())(
     "pop_threads", bpo::value<int>(), pop_threads_desc.str().c_str())(
     "pause_between_pushes", bpo::value<int>(), push_pause_desc.str().c_str())(
     "pause_between_pops", bpo::value<int>(), pop_pause_desc.str().c_str())(
-    "capacity", bpo::value<int>()->default_value(100), "queue capacity")(
-    "initial_capacity_used",
-    bpo::value<double>(),
+    "capacity", bpo::value<int>()->default_value(nelements*2), "queue capacity")(
+    "initial_capacity_used", bpo::value<double>(),
     capacity_used_desc.str().c_str())("help,h", "produce help message");
 
   bpo::variables_map vm;
@@ -244,23 +267,6 @@ main(int argc, char* argv[])
 
   size_t capacity=vm["capacity"].as<int>();
 
-  if (queue_type == "StdDeQueue") {
-    queue.reset(new dunedaq::appfwk::StdDeQueue<int>("StdDeQueue"));
-    dynamic_cast<dunedaq::appfwk::StdDeQueue<int>*>(queue.get())->SetSize(capacity);
-  }
-    else if (queue_type == "FollySPSCQueue") {
-    queue.reset(new dunedaq::appfwk::FollySPSCQueue<int>("FollySPSCQueue"));
-    dynamic_cast<dunedaq::appfwk::FollySPSCQueue<int>*>(queue.get())->SetSize(capacity);
-  }
-    else if (queue_type == "FollyMPMCQueue") {
-    queue.reset(new dunedaq::appfwk::FollyMPMCQueue<int>("FollyMPMCQueue"));
-    dynamic_cast<dunedaq::appfwk::FollyMPMCQueue<int>*>(queue.get())->SetSize(capacity);
-  } else {
-    TLOG(TLVL_ERROR) << "Unknown queue type \"" << queue_type
-                     << "\" requested for testing";
-    return 1;
-  }
-
   if (vm.count("push_threads")) {
     n_adding_threads = vm["push_threads"].as<int>();
 
@@ -268,7 +274,7 @@ main(int argc, char* argv[])
       throw std::domain_error(
         "# of pushing threads must be a positive integer");
     }
-    if (queue_type=="FollySPSCQueue" && n_adding_threads != 1) {
+    if ((queue_type=="FollySPSCQueue" || queue_type=="FollySPSCQueuePopT") && n_adding_threads != 1) {
       throw std::domain_error(
         "# of pushing threads must be 1 for SPSC queue");
     }
@@ -281,7 +287,7 @@ main(int argc, char* argv[])
       throw std::domain_error(
         "# of popping threads must be a positive integer");
     }
-    if (queue_type=="FollySPSCQueue" && n_removing_threads != 1) {
+    if ((queue_type=="FollySPSCQueue" || queue_type=="FollySPSCQueuePopT") && n_removing_threads != 1) {
       throw std::domain_error(
         "# of popping threads must be 1 for SPSC queue");
     }
@@ -319,58 +325,81 @@ main(int argc, char* argv[])
   pop_distribution.reset(new std::uniform_int_distribution<int>(
     0, 2 * avg_milliseconds_between_pops));
 
+  if (! pops_only ) {
   TLOG(TLVL_INFO)
     << n_adding_threads << " thread(s) pushing " << nelements
     << " elements between them, each thread has an average time of "
     << avg_milliseconds_between_pushes << " milliseconds between pushes";
+  }
+
+  if ( ! pushes_only ) {
   TLOG(TLVL_INFO)
     << n_removing_threads << " thread(s) popping " << nelements
     << " elements between them, each thread has an average time of "
     << avg_milliseconds_between_pops << " milliseconds between pops";
+  }
 
-/**
- * \todo Add capacity constructor to Queue interface so that this code section
- * makes sense
- *
- * ELF, May 19, 2020
- */
-#if 0
-  if (initial_capacity_used > 0) {
 
-    int max_capacity = 1000000;
+  if (queue_type == "StdDeQueue") {
+    queue.reset(new dunedaq::appfwk::StdDeQueue<int>("StdDeQueue"));
+    dynamic_cast<dunedaq::appfwk::StdDeQueue<int>*>(queue.get())->SetSize(capacity);
+  }
+    else if (queue_type == "FollySPSCQueue") {
+    queue.reset(new dunedaq::appfwk::FollySPSCQueue<int>("FollySPSCQueue"));
+    dynamic_cast<dunedaq::appfwk::FollySPSCQueue<int>*>(queue.get())->SetSize(capacity);
+  }
+    else if (queue_type == "FollyMPMCQueue") {
+    queue.reset(new dunedaq::appfwk::FollyMPMCQueue<int>("FollyMPMCQueue"));
+    dynamic_cast<dunedaq::appfwk::FollyMPMCQueue<int>*>(queue.get())->SetSize(capacity);
+  }
+    else if (queue_type == "FollySPSCQueuePopT") {
+    queue.reset(new dunedaq::appfwk::FollySPSCQueuePopT<int>("FollySPSCQueuePopT"));
+    dynamic_cast<dunedaq::appfwk::FollySPSCQueuePopT<int>*>(queue.get())->SetSize(capacity);
+  }
+    else if (queue_type == "FollyMPMCQueuePopT") {
+    queue.reset(new dunedaq::appfwk::FollyMPMCQueuePopT<int>("FollyMPMCQueuePopT"));
+    dynamic_cast<dunedaq::appfwk::FollyMPMCQueuePopT<int>*>(queue.get())->SetSize(capacity);
+  } else {
+    TLOG(TLVL_ERROR) << "Unknown queue type \"" << queue_type
+                     << "\" requested for testing";
+    return 1;
+  }
 
-    if (queue->capacity() <= max_capacity) {
-      int elements_to_begin_with =
-          static_cast<int>(initial_capacity_used * queue->capacity());
-      for (int i_e = 0; i_e < elements_to_begin_with; ++i_e) {
-        queue->push(-1, timeout);
-      }
-    } else {
-      std::ostringstream msg;
-      msg << "Since capacity of queue exceeds " << max_capacity
-          << ", the initial fractional used capacity of the queue must be 0";
-      throw std::domain_error(msg.str());
+  int elements_to_begin_with = static_cast<int>(initial_capacity_used * capacity);
+  if (elements_to_begin_with > 0) {
+    TLOG(TLVL_INFO) << elements_to_begin_with << " were requested to fill the queue before starting; will fill...";
+    for (int i_e = 0; i_e < elements_to_begin_with; ++i_e) {
+      queue->push(-1, timeout);
     }
   }
-#endif
+
+  TLOG(TLVL_INFO) << "Queue starting out containing " << elements_to_begin_with << " elements";
 
   std::vector<std::thread> adders;
   std::vector<std::thread> removers;
 
-  for (int i = 0; i < n_adding_threads; ++i) {
-    adders.emplace_back(add_things);
+  if (! pops_only ) {
+    for (int i = 0; i < n_adding_threads; ++i) {
+      adders.emplace_back(add_things);
+    }
   }
 
-  for (int i = 0; i < n_removing_threads; ++i) {
-    removers.emplace_back(remove_things);
+  if (! pushes_only ) {
+    for (int i = 0; i < n_removing_threads; ++i) {
+      removers.emplace_back(remove_things);
+    }
   }
 
-  for (auto& adder : adders) {
-    adder.join();
+  if (! pops_only ) {
+    for (auto& adder : adders) {
+      adder.join();
+    }
   }
 
-  for (auto& remover : removers) {
-    remover.join();
+  if (! pushes_only ) {
+    for (auto& remover : removers) {
+      remover.join();
+    }
   }
 
   TLOG(TLVL_INFO) << "Max queue size during running was " << max_queue_size;
