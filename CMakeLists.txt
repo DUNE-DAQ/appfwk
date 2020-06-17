@@ -18,7 +18,10 @@ point_build_to( doc )
 
 ##############################################################################
 point_build_to( include )  
-# (No action taken, though eventually we'll install the public headers out of this area)
+set(PATH_DIRS ${CMAKE_CURRENT_BINARY_DIR}/scripts:${CMAKE_CURRENT_BINARY_DIR}/apps:${CMAKE_CURRENT_BINARY_DIR}/test)
+set(LIB_DIRS ${CMAKE_CURRENT_BINARY_DIR}/src:${CMAKE_CURRENT_BINARY_DIR}/test)
+configure_file(scripts/setupForRunning.sh.in scripts/setupForRunning.sh @ONLY)
+
 
 ##############################################################################
 point_build_to( src )
