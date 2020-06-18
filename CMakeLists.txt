@@ -54,6 +54,7 @@ add_executable(queue_IO_check test/queue_IO_check.cxx)
 target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE} )
 
 
+add_library(appfwk_DummyModule_duneDAQModule test/DummyModule.cpp)
 add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
 add_library(appfwk_FakeDataConsumerDAQModule_duneDAQModule test/FakeDataConsumerDAQModule.cpp)
 add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducerDAQModule.cpp)

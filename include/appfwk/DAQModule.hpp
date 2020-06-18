@@ -29,6 +29,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <functional>
+
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
 #define EXTERN_C_FUNC_DECLARE_START                                                                                    \
@@ -54,6 +56,61 @@
 using json = nlohmann::json;
 
 namespace dunedaq {
+
+/**
+ * @brief A generic DAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE(appfwk,
+                  GeneralDAQModuleIssue,
+                  "General DAQModule Issue",
+                  ERS_EMPTY
+)
+
+/**
+ * @brief Generic command ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                                    ///< Namespace
+                       CommandIssue,                            ///< Type of the issue
+                       appfwk::GeneralDAQModuleIssue,                     ///< Base class of the issue
+                       ERS_EMPTY,                               ///< Log Message from the issue
+                       ERS_EMPTY,                                 ///< Base class attributes
+                       ((std::string)cmd)
+)                        ///< Attribute of this class
+
+/**
+ * @brief The CommandFailed DAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                                        ///< Namespace
+                       CommandRegistrationFailed,                     ///< Type of the Issue
+                       appfwk::CommandIssue,                          ///< Base class of the Issue
+                       "Command " << cmd << " registration failed.",  ///< Log Message from the issue
+                       ((std::string)cmd),                            ///< Base class attributes
+                       ERS_EMPTY                                      ///< Attribute of this class
+)
+
+/**
+ * @brief The UnknownCommand DAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                                    ///< Namespace
+                       UnknownCommand,                            ///< Issue class name
+                       appfwk::CommandIssue,                      ///< Base class of the issue
+                       "Command " << cmd << " is not recognised", ///< Log Message from the issue
+                       ((std::string)cmd),                        ///< Base class attributes
+                       ERS_EMPTY                                  ///< Attribute of this class
+)
+
+/**
+ * @brief The CommandFailed DAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                                            ///< Namespace
+                       CommandFailed,                                     ///< Type of the Issue
+                       appfwk::CommandIssue,                              ///< Base class of the Issue
+                       "Command " << cmd << " failed. Reason " << reason, ///< Log Message from the issue
+                       ((std::string)cmd),                                ///< Base class attributes
+                       ((std::string)reason)                              ///< Attribute of this class
+)
+
+
 namespace appfwk {
 /**
  * @brief The DAQModule class implementations are a set of code which performs
@@ -99,10 +156,34 @@ public:
    *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
-  virtual void execute_command(const std::string& cmd, const std::vector<std::string>& args) = 0;
+  void execute_command(const std::string& name, const std::vector<std::string>& args = {});
+
+  std::vector<std::string> get_commands() const;
+
+  bool has_command(const std::string name) const;
 
 protected:
+  /**
+   * @brief Registers a mdoule command under the name `cmd`.
+   * Returns whether the command was inserted (false meaning that command `cmd` already exists)
+   */
+  template <typename Child>
+  void
+  register_command(const std::string &name, void (Child::*f)(const std::vector<std::string>&)) {
+    using namespace std::placeholders;
+
+    bool done = commands_.emplace(name, std::bind(f, static_cast<Child*>(this), _1)).second;
+    if (!done) {
+      // Throw here
+      throw CommandRegistrationFailed(ERS_HERE, name);
+    }
+  }
+
   json configuration_; ///< JSON configuration for the DAQModule
+
+private:
+  using CommandMap_t = std::map<std::string, std::function<void(const std::vector<std::string> &)>>;
+  CommandMap_t commands_;
 };
 
 /**
@@ -123,30 +204,6 @@ makeModule(std::string const& plugin_name, std::string const& instance_name)
 
 } // namespace appfwk
 
-/**
- * @brief A generic DAQModule ERS Issue
- */
-ERS_DECLARE_ISSUE(appfwk, GeneralDAQModuleIssue, "General DAQModule Issue", ERS_EMPTY)
-
-/**
- * @brief The UnknownCommand DAQModule ERS Issue
- */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                    ///< Namespace
-                       UnknownCommand,                            ///< Type of the issue
-                       GeneralDAQModuleIssue,                     ///< Base class of the issue
-                       "Command " << cmd << " is not recognised", ///< Log Message from the issue
-                       ERS_EMPTY,                                 ///< End of variable declarations
-                       ((std::string)cmd))                        ///< Variables to capture
-
-/**
- * @brief The CommandFailed DAQModule ERS Issue
- */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                                          ///< Namespace
-                       CommandFailed,                                                   ///< Type of the Issue
-                       GeneralDAQModuleIssue,                                           ///< Base class of the Issue
-                       "Command " << cmd << " failed to execute for reason " << reason, ///< Log Message from the issue
-                       ERS_EMPTY,                               ///< End of variable declarations
-                       ((std::string)cmd)((std::string)reason)) ///< Variables to capture
 } // namespace dunedaq
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
