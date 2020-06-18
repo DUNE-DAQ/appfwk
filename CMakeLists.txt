@@ -126,11 +126,11 @@ if(Boost_FOUND)
     target_include_directories(FanOutDAQModule_test PRIVATE ${Boost_INCLUDE_DIRS})
     add_test(NAME FanOutDAQModule_test COMMAND FanOutDAQModule_test ers)
 
-add_executable(DAQModuleThreadHelper_test unittest/DAQModuleThreadHelper_test.cxx)
-target_link_libraries(DAQModuleThreadHelper_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} pthread)
-target_compile_definitions(DAQModuleThreadHelper_test PRIVATE "BOOST_TEST_DYN_LINK=1")
-target_include_directories(DAQModuleThreadHelper_test PRIVATE ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/appfwk-base/include)
-add_test(NAME DAQModuleThreadHelper_test COMMAND DAQModuleThreadHelper_test)
+add_executable(ThreadHelper_test unittest/ThreadHelper_test.cxx)
+target_link_libraries(ThreadHelper_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ers pthread)
+target_compile_definitions(ThreadHelper_test PRIVATE "BOOST_TEST_DYN_LINK=1")
+target_include_directories(ThreadHelper_test PRIVATE ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/appfwk-base/include)
+add_test(NAME ThreadHelper_test COMMAND ThreadHelper_test)
 
 endif()
 

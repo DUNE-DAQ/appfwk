@@ -13,7 +13,7 @@
 #define APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/DAQModuleThreadHelper.hpp"
+#include "appfwk/ThreadHelper.hpp"
 #include "appfwk/DAQSink.hpp"
 
 #include <future>
@@ -53,7 +53,7 @@ private:
   std::string do_stop();
 
   // Threading
-  DAQModuleThreadHelper thread_;
+  ThreadHelper thread_;
   void do_work();
 
   // Configuration
