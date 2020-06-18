@@ -40,7 +40,7 @@ public:
 
   bool can_pop() const noexcept override { return !fQueue.empty(); }
 
-  void pop( value_type t, const duration_type& dur) {
+  void pop( value_type& t, const duration_type& dur) {
     if ( !fQueue.try_dequeue_for( t, dur) ) {
       std::stringstream errmsg;
       errmsg
