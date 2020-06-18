@@ -33,6 +33,7 @@ public:
     : DAQModule(name)
   {}
 
+  void init() override {}
   /**
    * @brief Execute a command from DAQProcess
    * @param cmd Command from DAQProcess

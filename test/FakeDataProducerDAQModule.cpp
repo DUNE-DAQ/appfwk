@@ -19,7 +19,10 @@
  */
 #define TRACE_NAME "FakeDataProducer" // NOLINT
 
-dunedaq::appfwk::FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
+namespace dunedaq {
+namespace appfwk {
+
+FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
   : DAQModule(name)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
@@ -31,13 +34,13 @@ dunedaq::appfwk::FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std:
   register_command("stop",  &FakeDataProducerDAQModule::do_stop);
 }
 
+void FakeDataProducerDAQModule::init() {
+  outputQueue_.reset(new DAQSink<std::vector<int>>(configuration_["output"].get<std::string>()));
+}
 
 void
-dunedaq::appfwk::FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& args)
+FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& args)
 {
-
-  outputQueue_.reset(new DAQSink<std::vector<int>>(configuration_["output"].get<std::string>()));
-
   nIntsPerVector_ = configuration_.value<int>("nIntsPerVector", 10);
   starting_int_ = configuration_.value<int>("starting_int", -4);
   ending_int_ = configuration_.value<int>("ending_int", 14);
@@ -45,13 +48,13 @@ dunedaq::appfwk::FakeDataProducerDAQModule::do_configure(const std::vector<std::
 }
 
 void
-dunedaq::appfwk::FakeDataProducerDAQModule::do_start(const std::vector<std::string>& args)
+FakeDataProducerDAQModule::do_start(const std::vector<std::string>& args)
 {
   thread_.start_working_thread_();
 }
 
 void
-dunedaq::appfwk::FakeDataProducerDAQModule::do_stop(const std::vector<std::string>& args)
+FakeDataProducerDAQModule::do_stop(const std::vector<std::string>& args)
 {
   thread_.stop_working_thread_();
 }
@@ -77,7 +80,7 @@ operator<<(TraceStreamer& t, std::vector<int> ints)
 }
 
 void
-dunedaq::appfwk::FakeDataProducerDAQModule::do_work()
+FakeDataProducerDAQModule::do_work()
 {
   int current_int = starting_int_;
   size_t counter = 0;
@@ -109,5 +112,8 @@ dunedaq::appfwk::FakeDataProducerDAQModule::do_work()
     counter++;
   }
 }
+
+} // namespace appfwk 
+} // namespace dunedaq
 
 DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::FakeDataProducerDAQModule)

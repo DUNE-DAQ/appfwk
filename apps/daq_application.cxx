@@ -35,7 +35,7 @@ public:
   /**
    * @brief Constructor for the daq_application_ModuleList
    * @param config_json Configuration file to be used to create the DAQModule
-   * graph
+   * graph`
    */
   explicit daq_application_constructor(const json& config_json)
     : config_(config_json)
@@ -51,12 +51,16 @@ public:
       qc.size = queue.value()["size"].get<size_t>();
       queue_configuration[queue.key()] = qc;
     }
+    
     QueueRegistry::get().configure(queue_configuration);
 
     for (auto& module : config_["modules"].items()) {
-
-      user_module_map[module.key()] = makeModule(module.value()["user_module_type"], module.key());
-      user_module_map[module.key()]->configure(module.value());
+      auto [ modit, done] = user_module_map.emplace(module.value(), makeModule(module.value()["user_module_type"], module.key()));
+      if (!done) {
+        // throw 
+      }
+      modit->second->load_configuration(module.value());
+      modit->second->init();
     }
 
     for (auto& command : config_["commands"].items()) {

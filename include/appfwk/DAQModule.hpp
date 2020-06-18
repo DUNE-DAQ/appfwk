@@ -50,10 +50,6 @@
   }                                                                                                                    \
   }
 
-/**
- * @brief Using of a namespace for convinience
- */
-using json = nlohmann::json;
 
 namespace dunedaq {
 
@@ -88,7 +84,14 @@ public:
    * will not continue to be part of the application framework. DAQModule
    * developers should not assume that it will be accessible in the future.
    */
-  void configure(json config) { configuration_ = config; }
+  void load_configuration(nlohmann::json config) { configuration_ = config; }
+
+  /**
+   * @brief      Initializes the module
+   * 
+   * Initialisation of the module. Abstract method to be overridden by derived classes.
+   */
+  virtual void init() = 0;
 
   /**
    * @brief Execute a command in this DAQModule
@@ -117,7 +120,7 @@ protected:
   void
   register_command(const std::string &name, void (Child::*f)(const std::vector<std::string>&));
 
-  json configuration_; ///< JSON configuration for the DAQModule
+  nlohmann::json configuration_; ///< JSON configuration for the DAQModule
 
 private:
   using CommandMap_t = std::map<std::string, std::function<void(const std::vector<std::string> &)>>;
