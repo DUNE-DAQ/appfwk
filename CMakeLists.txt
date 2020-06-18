@@ -74,7 +74,7 @@ point_build_to( unittest )
 add_unit_test(ThreadHelper_test)
 add_unit_test(DAQSink_DAQSource_test)
 add_unit_test(StdDeQueue_test)
-# add_unit_test(FanOutDAQModule_test)
+add_unit_test(FanOutDAQModule_test)
 
 
 

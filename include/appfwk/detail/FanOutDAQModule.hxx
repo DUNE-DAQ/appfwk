@@ -21,21 +21,21 @@ template<typename ValueType>
 void
 FanOutDAQModule<ValueType>::init() {
 
-  auto inputName = configuration_["input"].get<std::string>();
+  auto inputName = get_config()["input"].get<std::string>();
   TLOG(TLVL_DEBUG, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName << " as input";
   inputQueue_.reset(new DAQSource<ValueType>(inputName));
-  for (auto& output : configuration_["outputs"]) {
+  for (auto& output : get_config()["outputs"]) {
     outputQueues_.emplace_back(new DAQSink<ValueType>(output.get<std::string>()));
   }
-  
+
 }
 
 template<typename ValueType>
 void
 FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& args)
 {
-  if (configuration_.contains("fanout_mode")) {
-    auto modeString = configuration_["fanout_mode"].get<std::string>();
+  if (get_config().contains("fanout_mode")) {
+    auto modeString = get_config()["fanout_mode"].get<std::string>();
     if (modeString.find("roadcast") != std::string::npos) {
 
       mode_ = FanOutMode::Broadcast;
@@ -51,12 +51,12 @@ FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& args)
     mode_ = FanOutMode::RoundRobin;
   }
 
-  wait_interval_us_ = configuration_.value<int>("wait_interval", 1000000);
+  wait_interval_us_ = get_config().value<int>("wait_interval", 1000000);
 
-  // auto inputName = configuration_["input"].get<std::string>();
+  // auto inputName = get_config()["input"].get<std::string>();
   // TLOG(TLVL_DEBUG, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName << " as input";
   // inputQueue_.reset(new DAQSource<ValueType>(inputName));
-  // for (auto& output : configuration_["outputs"]) {
+  // for (auto& output : get_config()["outputs"]) {
   //   outputQueues_.emplace_back(new DAQSink<ValueType>(output.get<std::string>()));
   // }
 }

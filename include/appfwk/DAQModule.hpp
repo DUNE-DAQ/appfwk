@@ -84,15 +84,14 @@ public:
    * will not continue to be part of the application framework. DAQModule
    * developers should not assume that it will be accessible in the future.
    */
-  void load_configuration(nlohmann::json config) { configuration_ = config; }
+  void set_config(const nlohmann::json& config) { configuration_ = config; }
 
-  /**
-   * @brief      Initializes the module
-   * 
-   * Initialisation of the module. Abstract method to be overridden by derived classes.
-   */
-  virtual void init() = 0;
+  const nlohmann::json& get_config() const {
+    return configuration_;
+  }
 
+  void do_init(const nlohmann::json& config);
+  
   /**
    * @brief Execute a command in this DAQModule
    * @param cmd The command from CCM
@@ -112,6 +111,13 @@ public:
   bool has_command(const std::string name) const;
 
 protected:
+    /**
+   * @brief      Initializes the module
+   * 
+   * Initialisation of the module. Abstract method to be overridden by derived classes.
+   */
+  virtual void init() = 0;
+
   /**
    * @brief Registers a mdoule command under the name `cmd`.
    * Returns whether the command was inserted (false meaning that command `cmd` already exists)
@@ -120,11 +126,12 @@ protected:
   void
   register_command(const std::string &name, void (Child::*f)(const std::vector<std::string>&));
 
-  nlohmann::json configuration_; ///< JSON configuration for the DAQModule
 
 private:
   using CommandMap_t = std::map<std::string, std::function<void(const std::vector<std::string> &)>>;
   CommandMap_t commands_;
+
+  nlohmann::json configuration_; ///< JSON configuration for the DAQModule
 };
 
 /**

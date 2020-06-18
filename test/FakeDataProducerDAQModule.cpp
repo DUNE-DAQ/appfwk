@@ -35,16 +35,16 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
 }
 
 void FakeDataProducerDAQModule::init() {
-  outputQueue_.reset(new DAQSink<std::vector<int>>(configuration_["output"].get<std::string>()));
+  outputQueue_.reset(new DAQSink<std::vector<int>>(get_config()["output"].get<std::string>()));
 }
 
 void
 FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& args)
 {
-  nIntsPerVector_ = configuration_.value<int>("nIntsPerVector", 10);
-  starting_int_ = configuration_.value<int>("starting_int", -4);
-  ending_int_ = configuration_.value<int>("ending_int", 14);
-  wait_between_sends_ms_ = configuration_.value<int>("wait_between_sends_ms", 1000);
+  nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
+  starting_int_ = get_config().value<int>("starting_int", -4);
+  ending_int_ = get_config().value<int>("ending_int", 14);
+  wait_between_sends_ms_ = get_config().value<int>("wait_between_sends_ms", 1000);
 }
 
 void

@@ -51,7 +51,7 @@ public:
       qc.size = queue.value()["size"].get<size_t>();
       queue_configuration[queue.key()] = qc;
     }
-    
+
     QueueRegistry::get().configure(queue_configuration);
 
     for (auto& module : config_["modules"].items()) {
@@ -59,8 +59,7 @@ public:
       if (!done) {
         // throw 
       }
-      modit->second->load_configuration(module.value());
-      modit->second->init();
+      modit->second->do_init(module.value());
     }
 
     for (auto& command : config_["commands"].items()) {

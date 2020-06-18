@@ -35,7 +35,7 @@ FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
 
 void
 FakeDataConsumerDAQModule::init() {
-  inputQueue_.reset(new DAQSource<std::vector<int>>(configuration_["input"].get<std::string>()));
+  inputQueue_.reset(new DAQSource<std::vector<int>>(get_config()["input"].get<std::string>()));
 }
 
 
@@ -43,9 +43,9 @@ void
 FakeDataConsumerDAQModule::do_configure(const std::vector<std::string>& args)
 {
 
-  nIntsPerVector_ = configuration_.value<int>("nIntsPerVector", 10);
-  starting_int_ = configuration_.value<int>("starting_int", -4);
-  ending_int_ = configuration_.value<int>("ending_int", 14);
+  nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
+  starting_int_ = get_config().value<int>("starting_int", -4);
+  ending_int_ = get_config().value<int>("ending_int", 14);
 
 }
 
