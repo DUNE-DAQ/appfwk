@@ -106,9 +106,6 @@ add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducer
 add_executable(echo_test_app test/echo_test_app.cxx)
 target_link_libraries(echo_test_app appfwk appfwk_DebugLoggingDAQModule_duneDAQModule pthread ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
-add_executable(daq_sink_source test/daq_sink_source.cxx)
-target_link_libraries(daq_sink_source appfwk pthread ers)
-
 file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
 
 point_build_to( unittest )
@@ -131,6 +128,12 @@ target_link_libraries(DAQModuleThreadHelper_test ${Boost_UNIT_TEST_FRAMEWORK_LIB
 target_compile_definitions(DAQModuleThreadHelper_test PRIVATE "BOOST_TEST_DYN_LINK=1")
 target_include_directories(DAQModuleThreadHelper_test PRIVATE ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/appfwk-base/include)
 add_test(NAME DAQModuleThreadHelper_test COMMAND DAQModuleThreadHelper_test)
+
+add_executable(DAQSink_DAQSource_test unittest/DAQSink_DAQSource_test.cxx)
+target_link_libraries(DAQSink_DAQSource_test appfwk ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ers pthread)
+target_compile_definitions(DAQSink_DAQSource_test PRIVATE "BOOST_TEST_DYN_LINK=1")
+target_include_directories(DAQSink_DAQSource_test PRIVATE ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/appfwk-base/include)
+add_test(NAME DAQSink_DAQSource_test COMMAND DAQSink_DAQSource_test)
 
 endif()
 
