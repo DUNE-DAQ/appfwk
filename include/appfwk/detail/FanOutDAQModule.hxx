@@ -83,25 +83,25 @@ dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work()
 
   // unique_ptr needed since there's no guarantee ValueType has a no-argument
   // constructor
-  std::unique_ptr<ValueType> data_ptr = nullptr;
+  ValueType data ;
 
   while (thread_.thread_running()) {
     if (inputQueue_->can_pop()) {
 
-      if (!inputQueue_->pop(*data_ptr, queueTimeout_)) {
+      if (!inputQueue_->pop( data, queueTimeout_)) {
         TLOG(TLVL_WARNING) << get_name() << ": Tried but failed to pop a value from an inputQueue";
         continue;
       }
 
       if (mode_ == FanOutMode::Broadcast) {
-        do_broadcast(*data_ptr);
+        do_broadcast( data );
       } else if (mode_ == FanOutMode::FirstAvailable) {
         auto sent = false;
         while (!sent) {
           for (auto& o : outputQueues_) {
             if (o->can_push()) {
               auto starttime = std::chrono::steady_clock::now();
-              o->push(std::move(*data_ptr), queueTimeout_);
+              o->push(std::move( data ), queueTimeout_);
               auto endtime = std::chrono::steady_clock::now();
 
               if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) < queueTimeout_) {
@@ -123,7 +123,7 @@ dunedaq::appfwk::FanOutDAQModule<ValueType>::do_work()
           if ((*roundRobinNext)->can_push()) {
 
             auto starttime = std::chrono::steady_clock::now();
-            (*roundRobinNext)->push(std::move(*data_ptr), queueTimeout_);
+            (*roundRobinNext)->push(std::move( data ), queueTimeout_);
             auto endtime = std::chrono::steady_clock::now();
 
             if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) >= queueTimeout_) {

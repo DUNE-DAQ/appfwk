@@ -29,40 +29,11 @@
 
 namespace dunedaq::appfwk {
 
-/**
- * @brief Struct used for FanOutDAQModule_test
- */
-struct NonCopyableType
-{
-  int data; ///< Integer data for NonCopyableType
-  /**
-   * @brief NonCopyableType Constructor
-   * @param d Initialization for data member
-   */
-  explicit NonCopyableType(int d)
-    : data(d)
-  {}
-  NonCopyableType(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-constructible
-  /**
-   * @brief Move Constructor for NonCopyableType
-   * @param i NonCopyableType rvalue to move from
-   */
-  NonCopyableType(NonCopyableType&& i) { data = i.data; }
-  NonCopyableType& operator=(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-assignable
-  /**
-   * @brief Move assignment operator for NonCopyableType
-   * @param i NonCopyableType to move from
-   * @return NonCopyableType instance
-   */
-  NonCopyableType& operator=(NonCopyableType&& i)
-  {
-    data = i.data;
-    return *this;
-  }
-};
 
 /**
  * @brief FanOutDAQModule sends data to multiple Queues
+ * The memory that can be transported via a FanOut Moduele
+ * requires an empty constructor
  */
 template<typename ValueType>
 class FanOutDAQModule : public DAQModule
@@ -141,6 +112,50 @@ private:
   std::list<std::unique_ptr<DAQSink<ValueType>>> outputQueues_;
   size_t wait_interval_us_;
 };
+
+
+/**
+ * @brief Struct used for FanOutDAQModule_test
+ */
+struct NonCopyableType
+{
+  int data; ///< Integer data for NonCopyableType
+  /**
+   * @brief NonCopyableType Constructor
+   * @param d Initialization for data member
+   */
+  explicit NonCopyableType(int d)
+    : data(d)
+  {}
+  NonCopyableType(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-constructible
+  /**
+   * @brief Move Constructor for NonCopyableType
+   * @param i NonCopyableType rvalue to move from
+   */
+  NonCopyableType(NonCopyableType&& i) { data = i.data; }
+  NonCopyableType& operator=(NonCopyableType const&) = delete; ///< NonCopyableType is not copy-assignable
+  /**
+   * @brief Move assignment operator for NonCopyableType
+   * @param i NonCopyableType to move from
+   * @return NonCopyableType instance
+   */
+  NonCopyableType& operator=(NonCopyableType&& i)
+  {
+    data = i.data;
+    return *this;
+  }
+
+private:
+  NonCopyableType() 
+    : data(0) 
+  {}
+  
+  friend class FanOutDAQModule<NonCopyableType> ;
+};
+
+
+
+
 } // namespace dunedaq::appfwk
 
 #include "detail/FanOutDAQModule.hxx"
