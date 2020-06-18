@@ -51,7 +51,7 @@ MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyabl
 point_build_to( test )
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check pthread ers ${Boost_PROGRAM_OPTIONS_LIBRARY} )
+target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE} )
 
 
 add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
