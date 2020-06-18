@@ -46,7 +46,7 @@ DAQProcess::execute_command(std::string const& cmd, std::vector<std::string> con
     daq_module_list.insert(dm.first);
   }
 
-  TLOG(TLVL_DEBUG) << "Executing Command " << cmd << " for DAQModules defined in the CommandOrderMap";
+  TLOG(TLVL_TRACE) << "Executing Command " << cmd << " for DAQModules defined in the CommandOrderMap";
 
   if (commandOrderMap_.count(cmd)) {
     for (auto& moduleName : commandOrderMap_[cmd]) {
@@ -62,7 +62,7 @@ DAQProcess::execute_command(std::string const& cmd, std::vector<std::string> con
     ers::warning(CommandOrderNotSpecified(ERS_HERE, cmd));
   }
 
-  TLOG(TLVL_DEBUG) << "Executing Command " << cmd << " for all remaining DAQModules";
+  TLOG(TLVL_TRACE) << "Executing Command " << cmd << " for all remaining DAQModules";
   for (auto const& moduleName : daq_module_list) {
 
     call_command_on_module(*daqModuleMap_[moduleName], cmd, args);

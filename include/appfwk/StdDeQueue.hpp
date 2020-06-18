@@ -14,6 +14,8 @@
 
 #include "appfwk/Queue.hpp"
 
+#include <ers/Issue.h>
+
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -28,7 +30,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+namespace appfwk {
 /**
  * @brief A Queue Implementation that uses a std::deque as its backend
  * @tparam T Data Type to be stored in the std::deque
@@ -79,8 +82,19 @@ private:
   std::condition_variable fNoLongerEmpty;
 };
 
-#include "detail/StdDeQueue.hxx"
+} // namespace appfwk
 
-} // namespace dunedaq::appfwk
+/**
+ * @brief DequeTimeoutExpired ERS Issue
+ */
+ERS_DECLARE_ISSUE(appfwk,              // namespace
+                  DequeTimeoutExpired, // issue class name
+                  "Unable to " << func_name << " within timeout period (timeout period was " << timeout
+                               << " milliseconds)", // message
+                  ((std::string)func_name)((int)timeout))
+
+} // namespace dunedaq
+
+#include "detail/StdDeQueue.hxx"
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_

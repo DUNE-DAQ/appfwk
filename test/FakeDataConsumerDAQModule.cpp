@@ -98,18 +98,18 @@ dunedaq::appfwk::FakeDataConsumerDAQModule::do_work()
   while (thread_.thread_running()) {
     if (inputQueue_->can_pop()) {
 
-      TLOG(TLVL_DEBUG) << get_name() << ": Going to receive data from inputQueue";
+      TLOG(TLVL_TRACE) << get_name() << ": Going to receive data from inputQueue";
 
       if (!inputQueue_->pop(vec, queueTimeout_)) {
         TLOG(TLVL_WARNING) << get_name() << ": Tried but failed to pop a value from an inputQueue";
         continue;
       }
 
-      TLOG(TLVL_DEBUG) << get_name() << ": Received vector of size " << vec.size();
+      TLOG(TLVL_TRACE) << get_name() << ": Received vector of size " << vec.size();
 
       bool failed = false;
 
-      TLOG(TLVL_DEBUG) << get_name() << ": Starting processing loop";
+      TLOG(TLVL_TRACE) << get_name() << ": Starting processing loop";
       TLOG(TLVL_INFO) << get_name() << ": Received vector " << counter << ": " << vec;
       size_t ii = 0;
       for (auto& point : vec) {
@@ -128,7 +128,7 @@ dunedaq::appfwk::FakeDataConsumerDAQModule::do_work()
           current_int = starting_int_;
         ++ii;
       }
-      TLOG(TLVL_DEBUG) << get_name() << ": Done with processing loop, failed=" << failed;
+      TLOG(TLVL_TRACE) << get_name() << ": Done with processing loop, failed=" << failed;
       if (failed)
         fail_count++;
 

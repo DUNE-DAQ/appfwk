@@ -96,7 +96,7 @@ set(Boost_NO_BOOST_CMAKE ON)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check pthread ${Boost_PROGRAM_OPTIONS_LIBRARY} )
+target_link_libraries(queue_IO_check pthread ers ${Boost_PROGRAM_OPTIONS_LIBRARY} )
 
 
 add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
@@ -115,6 +115,9 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 
     add_executable(StdDeQueue_test unittest/StdDeQueue_test.cxx)
+    target_link_libraries(StdDeQueue_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ers pthread)
+    target_compile_definitions(StdDeQueue_test PRIVATE "BOOST_TEST_DYN_LINK=1")
+    target_include_directories(StdDeQueue_test PRIVATE ${Boost_INCLUDE_DIRS})
     add_test(NAME StdDeQueue_test COMMAND StdDeQueue_test)
 
     add_executable(FanOutDAQModule_test unittest/FanOutDAQModule_test.cxx)

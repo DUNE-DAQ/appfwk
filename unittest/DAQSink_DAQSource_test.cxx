@@ -96,9 +96,9 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   }
 
   BOOST_REQUIRE(!sink.can_push());
-  BOOST_REQUIRE_EXCEPTION(sink.push("bbBbbb"), std::runtime_error, [&](std::runtime_error) {
+  BOOST_REQUIRE_EXCEPTION(    sink.push("bbBbbb"), dunedaq::appfwk::DequeTimeoutExpired, [&](dunedaq::appfwk::DequeTimeoutExpired) {
     return true;
-  }); // TODO: Change to ERS Issue and improve check
+  }); // TODO: Improve check
 }
 
 BOOST_AUTO_TEST_SUITE_END()
