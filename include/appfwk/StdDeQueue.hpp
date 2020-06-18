@@ -79,8 +79,8 @@ private:
   std::condition_variable fNoLongerEmpty;
 };
 
-#include "detail/StdDeQueue.hxx"
-
 } // namespace dunedaq::appfwk
+
+#include "detail/StdDeQueue.hxx"
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_
