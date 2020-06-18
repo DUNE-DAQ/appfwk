@@ -13,7 +13,7 @@
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/DAQModuleThreadHelper.hpp"
+#include "appfwk/ThreadHelper.hpp"
 #include "appfwk/DAQSink.hpp"
 #include "appfwk/DAQSource.hpp"
 
@@ -131,7 +131,7 @@ private:
 
   // Threading
   void do_work();
-  DAQModuleThreadHelper thread_;
+  ThreadHelper thread_;
 
   // Configuration
   FanOutMode mode_;

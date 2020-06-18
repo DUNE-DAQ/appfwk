@@ -13,7 +13,7 @@
 #define APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/DAQModuleThreadHelper.hpp"
+#include "appfwk/ThreadHelper.hpp"
 #include "appfwk/DAQSource.hpp"
 
 #include <future>
@@ -54,7 +54,7 @@ private:
 
   // Threading
   void do_work();
-  DAQModuleThreadHelper thread_;
+  ThreadHelper thread_;
 
   // Configuration (for validation)
   size_t nIntsPerVector_;
