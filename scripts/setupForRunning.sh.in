@@ -1,9 +1,3 @@
-source @SPACK_ROOT@/share/spack/setup-env.sh
-
-spack load gcc
-spack load cmake
-spack load trace
-spack load cetlib
 
 export PATH=@PATH_DIRS@:$PATH
 export CET_PLUGIN_PATH=@LIB_DIRS@${CET_PLUGIN_PATH:+\:$CET_PLUGIN_PATH}
