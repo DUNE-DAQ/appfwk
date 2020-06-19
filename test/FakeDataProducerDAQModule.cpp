@@ -24,9 +24,9 @@ namespace appfwk {
 
 FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
   : DAQModule(name)
-  , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
   , outputQueue_(nullptr)
+  , queueTimeout_(100)
 {
 
   register_command("configure", &FakeDataProducerDAQModule::do_configure);
@@ -39,7 +39,7 @@ void FakeDataProducerDAQModule::init() {
 }
 
 void
-FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& args)
+FakeDataProducerDAQModule::do_configure([[maybe_unused]] const std::vector<std::string>& args)
 {
   nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
   starting_int_ = get_config().value<int>("starting_int", -4);
@@ -48,25 +48,25 @@ FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& args)
 }
 
 void
-FakeDataProducerDAQModule::do_start(const std::vector<std::string>& args)
+FakeDataProducerDAQModule::do_start([[maybe_unused]] const std::vector<std::string>& args)
 {
   thread_.start_working_thread_();
 }
 
 void
-FakeDataProducerDAQModule::do_stop(const std::vector<std::string>& args)
+FakeDataProducerDAQModule::do_stop([[maybe_unused]] const std::vector<std::string>& args)
 {
   thread_.stop_working_thread_();
 }
 
 /**
- * @brief Format a std::vector<int> for TRACE
- * @param t TraceStreamer Instance
+ * @brief Format a std::vector<int> to a stream
+ * @param t ostream Instance
  * @param ints Vector to format
- * @return TraceStreamer Instance
+ * @return ostream Instance
  */
-TraceStreamer&
-operator<<(TraceStreamer& t, std::vector<int> ints)
+std::ostream&
+operator<<(std::ostream& t, std::vector<int> ints)
 {
   t << "{";
   bool first = true;
@@ -84,31 +84,30 @@ FakeDataProducerDAQModule::do_work()
 {
   int current_int = starting_int_;
   size_t counter = 0;
+  std::ostringstream oss;
+
   while (thread_.thread_running()) {
-    TLOG(TLVL_DEBUG) << get_name() << ": Creating output vector";
+    TLOG(TLVL_TRACE) << get_name() << ": Creating output vector";
     std::vector<int> output(nIntsPerVector_);
 
-    TLOG(TLVL_DEBUG) << get_name() << ": Start of fill loop";
-    for (auto ii = 0; ii < nIntsPerVector_; ++ii) {
+    TLOG(TLVL_TRACE) << get_name() << ": Start of fill loop";
+    for (size_t ii = 0; ii < nIntsPerVector_; ++ii) {
       output[ii] = current_int;
       ++current_int;
       if (current_int > ending_int_)
         current_int = starting_int_;
     }
-    TLOG(TLVL_INFO) << get_name() << ": Produced vector " << counter << " with contents " << output << " and size "
+    oss << "Produced vector " << counter << " with contents " << output << " and size "
                     << output.size();
+    ers::debug(ProducerProgressUpdate(ERS_HERE, get_name(), oss.str()));
+    oss.str("");
 
-    TLOG(TLVL_DEBUG) << get_name() << ": Pushing vector into outputQueue";
-    auto starttime = std::chrono::steady_clock::now();
+    TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
     outputQueue_->push(std::move(output), queueTimeout_);
-    auto endtime = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) > queueTimeout_) {
-      TLOG(TLVL_WARNING) << get_name() << ": Timeout attempting to push vector onto outputQueue";
-    }
 
-    TLOG(TLVL_DEBUG) << get_name() << ": Start of sleep between sends";
+    TLOG(TLVL_TRACE) << get_name() << ": Start of sleep between sends";
     std::this_thread::sleep_for(std::chrono::milliseconds(wait_between_sends_ms_));
-    TLOG(TLVL_DEBUG) << get_name() << ": End of do_work loop";
+    TLOG(TLVL_TRACE) << get_name() << ": End of do_work loop";
     counter++;
   }
 }

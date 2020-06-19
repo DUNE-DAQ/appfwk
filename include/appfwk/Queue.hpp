@@ -16,13 +16,16 @@
 
 #include "appfwk/NamedObject.hpp"
 
+#include <ers/Issue.h>
+
 #include <chrono>
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+namespace appfwk {
 
 /**
  * @brief Implementations of the Queue class are responsible for relaying data
@@ -91,6 +94,15 @@ private:
   Queue& operator=(Queue&&) = default;
 };
 
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+/**
+ * @brief QueueTimeoutExpired ERS Issue
+ */
+ERS_DECLARE_ISSUE(appfwk,              // namespace
+                  QueueTimeoutExpired, // issue class name
+                  name << ": Unable to " << func_name << " within timeout period (timeout period was " << timeout
+                               << " milliseconds)", // message
+                  ((std::string)name)((std::string)func_name)((int)timeout))
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_

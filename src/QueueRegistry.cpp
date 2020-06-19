@@ -33,7 +33,7 @@ void
 QueueRegistry::configure(const std::map<std::string, QueueConfig>& configmap)
 {
   if (configured_) {
-    throw std::runtime_error("QueueRegistry already configured");
+    throw QueueRegistryConfigured(ERS_HERE);
   }
 
   queue_configmap_ = configmap;

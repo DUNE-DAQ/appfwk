@@ -28,7 +28,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+namespace appfwk {
 /**
  * @brief A Queue Implementation that uses a std::deque as its backend
  * @tparam T Data Type to be stored in the std::deque
@@ -79,7 +80,9 @@ private:
   std::condition_variable fNoLongerEmpty;
 };
 
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+
+} // namespace dunedaq
 
 #include "detail/StdDeQueue.hxx"
 

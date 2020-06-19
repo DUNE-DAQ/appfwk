@@ -21,7 +21,8 @@
 #include <string>
 #include <vector>
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+namespace appfwk {
 /**
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
@@ -64,6 +65,14 @@ private:
 
   size_t wait_between_sends_ms_;
 };
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       ProducerProgressUpdate,
+                       appfwk::GeneralDAQModuleIssue,
+                       name << ": " << message,
+                       ERS_EMPTY,
+                       ((std::string)name)((std::string)message))
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_

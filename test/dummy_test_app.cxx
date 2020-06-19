@@ -17,12 +17,12 @@ namespace dunedaq::appfwk {
 /**
  * @brief ModuleList for the echo_test_app
  */
-class echo_test_app_contructor : public GraphConstructor
+class dummy_test_app_contructor : public GraphConstructor
 {
   // Inherited via ModuleList
-  void ConstructGraph(DAQModuleMap& user_module_map, CommandOrderMap& command_order_map) override
+  void ConstructGraph(DAQModuleMap& user_module_map, [[maybe_unused]] CommandOrderMap& command_order_map) override
   {
-    user_module_map["dummy"].reset(new DummyModule("bugger"));
+    user_module_map["dummy"].reset(new DummyModule("test_dummy"));
   }
 };
 } // namespace dunedaq::appfwk
@@ -40,7 +40,7 @@ main(int argc, char* argv[])
 
   dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
-  dunedaq::appfwk::echo_test_app_contructor gc;
+  dunedaq::appfwk::dummy_test_app_contructor gc;
   theDAQProcess.register_modules(gc);
 
   return theDAQProcess.listen();

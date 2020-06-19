@@ -43,14 +43,14 @@ BOOST_AUTO_TEST_CASE(Construct)
   DAQSink<std::string> sink("dummy");
   DAQSource<std::string> source("dummy");
 
-  DAQSink<int>* badsink;
+  [[maybe_unused]] DAQSink<int>* badsink;
 
   BOOST_REQUIRE_EXCEPTION(badsink = new DAQSink<int>("dummy"),
                           dunedaq::appfwk::DAQSinkConstructionFailed,
                           [&](dunedaq::appfwk::DAQSinkConstructionFailed) { return true; });
 
 
-  DAQSource<int>* badsource;
+  [[maybe_unused]] DAQSource<int>* badsource;
 
   BOOST_REQUIRE_EXCEPTION(badsource = new DAQSource<int>("dummy"),
                           dunedaq::appfwk::DAQSourceConstructionFailed,
@@ -96,9 +96,11 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   }
 
   BOOST_REQUIRE(!sink.can_push());
-  BOOST_REQUIRE_EXCEPTION(sink.push("bbBbbb"), std::runtime_error, [&](std::runtime_error) {
+  BOOST_REQUIRE_EXCEPTION(sink.push("bbBbbb"),
+                          dunedaq::appfwk::QueueTimeoutExpired,
+                          [&](dunedaq::appfwk::QueueTimeoutExpired) {
     return true;
-  }); // TODO: Change to ERS Issue and improve check
+  }); // TODO: Improve check
 }
 
 BOOST_AUTO_TEST_SUITE_END()
