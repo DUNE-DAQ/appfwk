@@ -11,6 +11,12 @@
 namespace dunedaq::appfwk {
 
 void 
+DAQModule::do_init(const nlohmann::json& config) {
+    this->set_config(config);
+    this->init();
+}
+
+void 
 DAQModule::execute_command(const std::string& name, const std::vector<std::string>& args) {
    if (auto cmd = commands_.find(name); cmd != commands_.end()) {
       std::invoke(cmd->second, args);

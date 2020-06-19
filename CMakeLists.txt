@@ -50,21 +50,14 @@ MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyabl
 ##############################################################################
 point_build_to( test )
 
-add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE} )
-add_executable(dummy_test_app test/dummy_test_app.cxx)
-target_link_libraries(dummy_test_app appfwk appfwk_DummyModule_duneDAQModule pthread ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-
-
-
 add_library(appfwk_DummyModule_duneDAQModule test/DummyModule.cpp)
-add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
 add_library(appfwk_FakeDataConsumerDAQModule_duneDAQModule test/FakeDataConsumerDAQModule.cpp)
 add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducerDAQModule.cpp)
 
-# Curious to hear people's take on this format style which aligns the target across lines...
-add_executable        (echo_test_app test/echo_test_app.cxx)
-target_link_libraries (echo_test_app ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE} appfwk_DebugLoggingDAQModule_duneDAQModule)
+add_executable       (queue_IO_check test/queue_IO_check.cxx)
+target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE} )
+add_executable       (dummy_test_app test/dummy_test_app.cxx)
+target_link_libraries(dummy_test_app appfwk appfwk_DummyModule_duneDAQModule pthread ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
 
@@ -74,7 +67,7 @@ point_build_to( unittest )
 add_unit_test(ThreadHelper_test)
 add_unit_test(DAQSink_DAQSource_test)
 add_unit_test(StdDeQueue_test)
-# add_unit_test(FanOutDAQModule_test)
+add_unit_test(FanOutDAQModule_test)
 
 
 

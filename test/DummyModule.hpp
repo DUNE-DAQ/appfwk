@@ -13,6 +13,7 @@ public:
     register_command("stuff", &DummyParentModule::do_stuff);
   }
 
+  void init() final {}
 
   virtual void do_stuff(const std::vector<std::string>& args) {
     std::cout << "Parent stuff" << std::endl;
