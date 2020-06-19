@@ -66,7 +66,7 @@ DAQProcess::execute_command(std::string const& cmd, std::vector<std::string> con
     }
   } else {
 
-    ers::warning(CommandOrderNotSpecified(ERS_HERE, cmd));
+    ers::debug(CommandOrderNotSpecified(ERS_HERE, cmd));
   }
 
   TLOG(TLVL_TRACE) << "Executing Command " << cmd << " for all remaining DAQModules";
