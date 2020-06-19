@@ -15,7 +15,8 @@ public:
 
   void init() final {}
 
-  virtual void do_stuff(const std::vector<std::string>& args) {
+  virtual void do_stuff([[maybe_unused]] const std::vector<std::string>& args)
+  {
     std::cout << "Parent stuff" << std::endl;
   };
 
@@ -29,7 +30,7 @@ public:
   }
 
 
-  virtual void do_stuff(const std::vector<std::string>& args) override {
+  virtual void do_stuff([[maybe_unused]] const std::vector<std::string>& args) override {
     std::cout << "Dummy stuff" << std::endl;
   };
 

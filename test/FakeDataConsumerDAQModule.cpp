@@ -10,6 +10,8 @@
 #include "FakeDataConsumerDAQModule.hpp"
 
 #include "TRACE/trace.h"
+#include <ers/ers.h>
+
 /**
  * @brief Name used by TRACE TLOG calls from this source file
  */
@@ -23,40 +25,39 @@ namespace dunedaq::appfwk {
 
 FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
   : DAQModule(name)
-  , queueTimeout_(100)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
+  , queueTimeout_(100)
   , inputQueue_(nullptr)
 {
 
   register_command("configure", &FakeDataConsumerDAQModule::do_configure);
-  register_command("start",  &FakeDataConsumerDAQModule::do_start);
-  register_command("stop",  &FakeDataConsumerDAQModule::do_stop);
+  register_command("start", &FakeDataConsumerDAQModule::do_start);
+  register_command("stop", &FakeDataConsumerDAQModule::do_stop);
 }
 
 void
-FakeDataConsumerDAQModule::init() {
+FakeDataConsumerDAQModule::init()
+{
   inputQueue_.reset(new DAQSource<std::vector<int>>(get_config()["input"].get<std::string>()));
 }
 
-
 void
-FakeDataConsumerDAQModule::do_configure(const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_configure([[maybe_unused]] const std::vector<std::string>& args)
 {
 
   nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
   starting_int_ = get_config().value<int>("starting_int", -4);
   ending_int_ = get_config().value<int>("ending_int", 14);
-
 }
 
 void
-FakeDataConsumerDAQModule::do_start(const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_start([[maybe_unused]] const std::vector<std::string>& args)
 {
   thread_.start_working_thread_();
 }
 
 void
-FakeDataConsumerDAQModule::do_stop(const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_stop([[maybe_unused]] const std::vector<std::string>& args)
 {
   thread_.stop_working_thread_();
 }
@@ -95,7 +96,6 @@ FakeDataConsumerDAQModule::do_work()
       TLOG(TLVL_TRACE) << get_name() << ": Going to receive data from inputQueue";
 
       if (!inputQueue_->pop(vec, queueTimeout_)) {
-        TLOG(TLVL_WARNING) << get_name() << ": Tried but failed to pop a value from an inputQueue";
         continue;
       }
 
@@ -104,16 +104,16 @@ FakeDataConsumerDAQModule::do_work()
       bool failed = false;
 
       TLOG(TLVL_TRACE) << get_name() << ": Starting processing loop";
-      TLOG(TLVL_INFO) << get_name() << ": Received vector " << counter << ": " << vec;
+      TLOG(TLVL_TRACE) << get_name() << ": Received vector " << counter << ": " << vec;
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
           if (ii != 0) {
-            TLOG(TLVL_WARNING) << get_name() << ": Error in received vector " << counter << ", position " << ii
-                               << ": Expected " << current_int << ", received " << point;
+            ers::warning(ConsumerErrorDetected(ERS_HERE, get_name(), counter, ii, current_int, point));
             failed = true;
           } else {
-            TLOG(TLVL_INFO) << get_name() << ": Jump detected!";
+            ers::info(
+              ConsumerProgressUpdate(ERS_HERE, get_name(), std::string("Jump detected at ") + std::to_string(counter)));
           }
           current_int = point;
         }
@@ -132,7 +132,9 @@ FakeDataConsumerDAQModule::do_work()
     }
   }
 
-  TLOG(TLVL_INFO) << get_name() << ": Processed " << counter << " vectors with " << fail_count << " failures.";
+  std::ostringstream oss;
+  oss << ": Processed " << counter << " vectors with " << fail_count << " failures.";
+  ers::info(ConsumerProgressUpdate(ERS_HERE, get_name(), oss.str()));
 }
 
 } // namespace dunedaq::appfwk

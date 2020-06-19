@@ -43,14 +43,14 @@ BOOST_AUTO_TEST_CASE(Construct)
   DAQSink<std::string> sink("dummy");
   DAQSource<std::string> source("dummy");
 
-  DAQSink<int>* badsink;
+  [[maybe_unused]] DAQSink<int>* badsink;
 
   BOOST_REQUIRE_EXCEPTION(badsink = new DAQSink<int>("dummy"),
                           dunedaq::appfwk::DAQSinkConstructionFailed,
                           [&](dunedaq::appfwk::DAQSinkConstructionFailed) { return true; });
 
 
-  DAQSource<int>* badsource;
+  [[maybe_unused]] DAQSource<int>* badsource;
 
   BOOST_REQUIRE_EXCEPTION(badsource = new DAQSource<int>("dummy"),
                           dunedaq::appfwk::DAQSourceConstructionFailed,

@@ -13,26 +13,26 @@ FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
 {
 
   register_command("configure", &FanOutDAQModule<ValueType>::do_configure);
-  register_command("start",  &FanOutDAQModule<ValueType>::do_start);
-  register_command("stop",  &FanOutDAQModule<ValueType>::do_stop);
+  register_command("start", &FanOutDAQModule<ValueType>::do_start);
+  register_command("stop", &FanOutDAQModule<ValueType>::do_stop);
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::init() {
+FanOutDAQModule<ValueType>::init()
+{
 
   auto inputName = get_config()["input"].get<std::string>();
-  TLOG(TLVL_DEBUG, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName << " as input";
+  TLOG(TLVL_TRACE, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName << " as input";
   inputQueue_.reset(new DAQSource<ValueType>(inputName));
   for (auto& output : get_config()["outputs"]) {
     outputQueues_.emplace_back(new DAQSink<ValueType>(output.get<std::string>()));
   }
-
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_configure([[maybe_unused]] const std::vector<std::string>& args)
 {
   if (get_config().contains("fanout_mode")) {
     auto modeString = get_config()["fanout_mode"].get<std::string>();
@@ -52,25 +52,18 @@ FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& args)
   }
 
   wait_interval_us_ = get_config().value<int>("wait_interval", 1000000);
-
-  // auto inputName = get_config()["input"].get<std::string>();
-  // TLOG(TLVL_DEBUG, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName << " as input";
-  // inputQueue_.reset(new DAQSource<ValueType>(inputName));
-  // for (auto& output : get_config()["outputs"]) {
-  //   outputQueues_.emplace_back(new DAQSink<ValueType>(output.get<std::string>()));
-  // }
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_start(const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_start([[maybe_unused]] const std::vector<std::string>& args)
 {
   thread_.start_working_thread_();
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_stop(const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_stop([[maybe_unused]] const std::vector<std::string>& args)
 {
   thread_.stop_working_thread_();
 }
@@ -81,37 +74,24 @@ FanOutDAQModule<ValueType>::do_work()
 {
   auto roundRobinNext = outputQueues_.begin();
 
-  // unique_ptr needed since there's no guarantee ValueType has a no-argument
-  // constructor
-  ValueType data ;
+  ValueType data;
 
   while (thread_.thread_running()) {
     if (inputQueue_->can_pop()) {
 
-      if (!inputQueue_->pop( data, queueTimeout_)) {
-        TLOG(TLVL_WARNING) << get_name() << ": Tried but failed to pop a value from an inputQueue";
+      if (!inputQueue_->pop(data, queueTimeout_)) {
         continue;
       }
 
       if (mode_ == FanOutMode::Broadcast) {
-        do_broadcast( data );
+        do_broadcast(data);
       } else if (mode_ == FanOutMode::FirstAvailable) {
         auto sent = false;
         while (!sent) {
           for (auto& o : outputQueues_) {
             if (o->can_push()) {
-              auto starttime = std::chrono::steady_clock::now();
-              o->push(std::move( data ), queueTimeout_);
-              auto endtime = std::chrono::steady_clock::now();
-
-              if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) < queueTimeout_) {
-                sent = true;
-                break;
-              } else {
-                TLOG(TLVL_WARNING) << get_name()
-                                   << ": A timeout occurred trying to push data "
-                                      "onto an outputqueue; data has been lost";
-              }
+              o->push(std::move(data), queueTimeout_);
+              sent = true;
             }
           }
           if (!sent) {
@@ -122,15 +102,7 @@ FanOutDAQModule<ValueType>::do_work()
         while (true) {
           if ((*roundRobinNext)->can_push()) {
 
-            auto starttime = std::chrono::steady_clock::now();
-            (*roundRobinNext)->push(std::move( data ), queueTimeout_);
-            auto endtime = std::chrono::steady_clock::now();
-
-            if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) >= queueTimeout_) {
-              TLOG(TLVL_WARNING) << get_name()
-                                 << ": A timeout occurred trying to push data "
-                                    "onto an outputqueue; data has been lost";
-            }
+            (*roundRobinNext)->push(std::move(data), queueTimeout_);
 
             ++roundRobinNext;
             if (roundRobinNext == outputQueues_.end())
@@ -149,4 +121,3 @@ FanOutDAQModule<ValueType>::do_work()
 }
 
 } // namespace dunedaq::appfwk
-
