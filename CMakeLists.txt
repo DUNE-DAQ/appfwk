@@ -26,7 +26,7 @@ configure_file(scripts/setupForRunning.sh.in scripts/setupForRunning.sh @ONLY)
 ##############################################################################
 point_build_to( src )
 
-add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp)
+add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp src/DAQModule.cpp)
 
 set( APPFWK_LIBRARIES ${DAQ_LIBRARIES_PACKAGE} )
 list(REMOVE_ITEM APPFWK_LIBRARIES appfwk)
@@ -52,9 +52,13 @@ MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyabl
 point_build_to( test )
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE}  Folly::folly)
+target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE} Folly::folly)
+add_executable(dummy_test_app test/dummy_test_app.cxx)
+target_link_libraries(dummy_test_app appfwk appfwk_DummyModule_duneDAQModule pthread ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 
+
+add_library(appfwk_DummyModule_duneDAQModule test/DummyModule.cpp)
 add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
 target_link_libraries(appfwk_DebugLoggingDAQModule_duneDAQModule Folly::folly)
 add_library(appfwk_FakeDataConsumerDAQModule_duneDAQModule test/FakeDataConsumerDAQModule.cpp)
@@ -75,5 +79,5 @@ add_unit_test(ThreadHelper_test)
 add_unit_test(DAQSink_DAQSource_test)
 add_unit_test(StdDeQueue_test)
 add_unit_test(FollyQueue_test)
-add_unit_test(FanOutDAQModule_test)
+# add_unit_test(FanOutDAQModule_test)
 

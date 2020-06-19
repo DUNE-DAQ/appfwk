@@ -24,25 +24,16 @@ dunedaq::appfwk::FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std:
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
   , outputQueue_(nullptr)
-{}
-
-void
-dunedaq::appfwk::FakeDataProducerDAQModule::execute_command(const std::string& cmd,
-                                                            const std::vector<std::string>& args)
 {
-  if (cmd == "configure" || cmd == "Configure") {
-    do_configure();
-  } else if (cmd == "start" || cmd == "Start") {
-    do_start();
-  } else if (cmd == "stop" || cmd == "Stop") {
-    do_stop();
-  } else {
-    throw UnknownCommand(ERS_HERE, cmd);
-  }
+
+  register_command("configure", &FakeDataProducerDAQModule::do_configure);
+  register_command("start",  &FakeDataProducerDAQModule::do_start);
+  register_command("stop",  &FakeDataProducerDAQModule::do_stop);
 }
 
-std::string
-dunedaq::appfwk::FakeDataProducerDAQModule::do_configure()
+
+void
+dunedaq::appfwk::FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& args)
 {
 
   outputQueue_.reset(new DAQSink<std::vector<int>>(configuration_["output"].get<std::string>()));
@@ -51,22 +42,18 @@ dunedaq::appfwk::FakeDataProducerDAQModule::do_configure()
   starting_int_ = configuration_.value<int>("starting_int", -4);
   ending_int_ = configuration_.value<int>("ending_int", 14);
   wait_between_sends_ms_ = configuration_.value<int>("wait_between_sends_ms", 1000);
-
-  return "Success";
 }
 
-std::string
-dunedaq::appfwk::FakeDataProducerDAQModule::do_start()
+void
+dunedaq::appfwk::FakeDataProducerDAQModule::do_start(const std::vector<std::string>& args)
 {
   thread_.start_working_thread_();
-  return "Success";
 }
 
-std::string
-dunedaq::appfwk::FakeDataProducerDAQModule::do_stop()
+void
+dunedaq::appfwk::FakeDataProducerDAQModule::do_stop(const std::vector<std::string>& args)
 {
   thread_.stop_working_thread_();
-  return "Success";
 }
 
 /**

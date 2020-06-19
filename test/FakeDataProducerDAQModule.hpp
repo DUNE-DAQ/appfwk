@@ -35,8 +35,6 @@ public:
    */
   explicit FakeDataProducerDAQModule(const std::string& name);
 
-  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
-
   FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) =
     delete; ///< FakeDataProducerDAQModule is not copy-constructible
   FakeDataProducerDAQModule& operator=(const FakeDataProducerDAQModule&) =
@@ -48,9 +46,9 @@ public:
 
 private:
   // Commands
-  std::string do_configure();
-  std::string do_start();
-  std::string do_stop();
+  void do_configure(const std::vector<std::string>& args);
+  void do_start(const std::vector<std::string>& args);
+  void do_stop(const std::vector<std::string>& args);
 
   // Threading
   ThreadHelper thread_;
