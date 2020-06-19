@@ -35,7 +35,7 @@ public:
   /**
    * @brief Constructor for the daq_application_ModuleList
    * @param config_json Configuration file to be used to create the DAQModule
-   * graph`
+   * graph
    */
   explicit daq_application_constructor(const json& config_json)
     : config_(config_json)
