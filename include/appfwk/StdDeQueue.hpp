@@ -82,6 +82,7 @@ private:
   std::condition_variable fNoLongerEmpty;
 };
 
+<<<<<<< HEAD
 } // namespace appfwk
 
 /**
@@ -94,6 +95,11 @@ ERS_DECLARE_ISSUE(appfwk,              // namespace
                   ((std::string)func_name)((int)timeout))
 
 } // namespace dunedaq
+
+#include "detail/StdDeQueue.hxx"
+=======
+} // namespace dunedaq::appfwk
+>>>>>>> develop
 
 #include "detail/StdDeQueue.hxx"
 

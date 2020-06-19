@@ -75,7 +75,7 @@ public:
    * @param cmd Command from DAQProcess
    * @param args Arguments for the command from DAQProcess
    */
-  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
+  // void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
 
   FanOutDAQModule(const FanOutDAQModule&) = delete;            ///< FanOutDAQModule is not copy-constructible
   FanOutDAQModule& operator=(const FanOutDAQModule&) = delete; ///< FanOutDAQModule is not copy-assignable
@@ -84,9 +84,9 @@ public:
 
 private:
   // Commands
-  std::string do_configure();
-  std::string do_start();
-  std::string do_stop();
+  void do_configure(const std::vector<std::string>& args);
+  void do_start(const std::vector<std::string>& args);
+  void do_stop(const std::vector<std::string>& args);
 
   // Type traits handling. Yes, the "U" template parameter is actually
   // necessary, even though it's just an alias to this user module's
