@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(Configure)
 {
   dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
 
-  auto config = R"({"input": "input", "fanout_mode": "RoundRobin", "outputs": []})"_json;
+  auto module_config = R"({"input": "input", "fanout_mode": "RoundRobin", "outputs": []})"_json;
   foum.do_init(module_config);
 
   foum.execute_command("configure");
