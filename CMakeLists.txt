@@ -26,7 +26,7 @@ configure_file(scripts/setupForRunning.sh.in scripts/setupForRunning.sh @ONLY)
 ##############################################################################
 point_build_to( src )
 
-add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp)
+add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp src/DAQModule.cpp)
 
 set( APPFWK_LIBRARIES ${DAQ_LIBRARIES_PACKAGE} )
 list(REMOVE_ITEM APPFWK_LIBRARIES appfwk)
@@ -74,7 +74,7 @@ point_build_to( unittest )
 add_unit_test(ThreadHelper_test)
 add_unit_test(DAQSink_DAQSource_test)
 add_unit_test(StdDeQueue_test)
-add_unit_test(FanOutDAQModule_test)
+# add_unit_test(FanOutDAQModule_test)
 
 
 
