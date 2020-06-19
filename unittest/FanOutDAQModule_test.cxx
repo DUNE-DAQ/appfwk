@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(Configure)
 {
   dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
 
-  auto config = R"({"input": "input"})"_json;
+  auto config = R"({"input": "input", "fanout_mode": "RoundRobin", "outputs": []})"_json;
   foum.set_config(config);
   foum.init();
 
@@ -70,6 +70,7 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
         }
     )"_json;
   foum.set_config(module_config);
+  foum.init();
 
   // This test assumes RoundRobin mode. Once configurability is implemented,
   // we'll have to configure it appropriately.
