@@ -33,7 +33,9 @@ struct QueueConfig
   enum queue_kind
   {
     kUnknown = -1,
-    kStdDeQueue = 1 ///< The StdDeQueue
+    kStdDeQueue = 1, ///< The StdDeQueue
+    kFollySPSCQueue = 2,
+    kFollyMPMCQueue = 3,
   };
 
   /**
