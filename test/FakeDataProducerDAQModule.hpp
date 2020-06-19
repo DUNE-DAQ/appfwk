@@ -44,6 +44,7 @@ public:
   FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) =
     delete; ///< FakeDataProducerDAQModule is not move-assignable
 
+  void init() override;
 private:
   // Commands
   void do_configure(const std::vector<std::string>& args);

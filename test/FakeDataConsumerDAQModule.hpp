@@ -44,7 +44,10 @@ public:
   FakeDataConsumerDAQModule& operator=(FakeDataConsumerDAQModule&&) =
     delete; ///< FakeDataConsumerDAQModule is not move-assignable
 
+  void init() override;
+
 private:
+
   // Commands
   void do_configure(const std::vector<std::string>& args);
   void do_start(const std::vector<std::string>& args);
