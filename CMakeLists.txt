@@ -9,7 +9,7 @@ set(DAQ_LIBRARIES_PACKAGE ${CETLIB} ${CETLIB_EXCEPT} appfwk)
 point_build_to( apps )
 
 add_executable(daq_application apps/daq_application.cxx)
-target_link_libraries(daq_application ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE})
+target_link_libraries(daq_application ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE} Folly::folly)
 
 ##############################################################################
 point_build_to( doc )
@@ -29,7 +29,7 @@ add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp)
 
 set( APPFWK_LIBRARIES ${DAQ_LIBRARIES_PACKAGE} )
 list(REMOVE_ITEM APPFWK_LIBRARIES appfwk)
-target_link_libraries(appfwk ${APPFWK_LIBRARIES})
+target_link_libraries(appfwk ${APPFWK_LIBRARIES}  Folly::folly)
 
 add_library(appfwk_QueryResponseCommandFacility_duneCommandFacility src/QueryResponseCommandFacility.cpp)
 
@@ -51,7 +51,7 @@ MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyabl
 point_build_to( test )
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE} )
+target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE}  Folly::folly)
 
 
 add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
@@ -63,7 +63,7 @@ target_link_libraries(appfwk_FakeDataProducerDAQModule_duneDAQModule Folly::foll
 
 # Curious to hear people's take on this format style which aligns the target across lines...
 add_executable        (echo_test_app test/echo_test_app.cxx)
-target_link_libraries (echo_test_app ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE} appfwk_DebugLoggingDAQModule_duneDAQModule)
+target_link_libraries (echo_test_app ${DAQ_LIBRARIES_UNIVERSAL_EXE} ${DAQ_LIBRARIES_PACKAGE} appfwk_DebugLoggingDAQModule_duneDAQModule  Folly::folly)
 
 file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
 
