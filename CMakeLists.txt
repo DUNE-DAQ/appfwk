@@ -52,6 +52,9 @@ point_build_to( test )
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
 target_link_libraries(queue_IO_check ${DAQ_LIBRARIES_UNIVERSAL_EXE} )
+add_executable(dummy_test_app test/dummy_test_app.cxx)
+target_link_libraries(dummy_test_app appfwk appfwk_DummyModule_duneDAQModule pthread ers  ${CETLIB} ${CETLIB_EXCEPT} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
 
 
 add_library(appfwk_DummyModule_duneDAQModule test/DummyModule.cpp)
