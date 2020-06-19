@@ -25,10 +25,9 @@ namespace dunedaq {
  * @brief Define an ERS Issue for when DAQSink is unable to retrieve its Queue
  * handle
  */
-ERS_DECLARE_ISSUE(appfwk,          // namespace
-                  DAQSinkConstrutionFailed, // issue class name
-                  "Failed to construct DAQSink \"" << name
-                                                   << "\"", // no message
+ERS_DECLARE_ISSUE(appfwk,                                           // namespace
+                  DAQSinkConstructionFailed,                        // issue class name
+                  "Failed to construct DAQSink \"" << name << "\"", // no message
                   ((std::string)name))
 
 namespace appfwk {
@@ -40,8 +39,9 @@ public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
-  explicit DAQSink(const std::string & name);
+  explicit DAQSink(const std::string& name);
   void push(T&& element, const duration_type& timeout = duration_type::zero());
+  void push(const T& element, const duration_type& timeout = duration_type::zero());
   bool can_push();
 
 private:
@@ -49,14 +49,13 @@ private:
 };
 
 template<typename T>
-DAQSink<T>::DAQSink( const std::string & name)
+DAQSink<T>::DAQSink(const std::string& name)
 {
   try {
     queue_ = QueueRegistry::get().get_queue<T>(name);
-    TLOG(TLVL_TRACE, "DAQSink")
-      << "Queue " << name << " is at " << queue_.get();
+    TLOG(TLVL_TRACE, "DAQSink") << "Queue " << name << " is at " << queue_.get();
   } catch (QueueTypeMismatch& ex) {
-    throw DAQSinkConstrutionFailed(ERS_HERE, name, ex);
+    throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
 }
 
@@ -65,6 +64,13 @@ void
 DAQSink<T>::push(T&& element, const duration_type& timeout)
 {
   queue_->push(std::move(element), timeout);
+}
+
+template<typename T>
+void
+DAQSink<T>::push(const T& element, const duration_type& timeout)
+{
+  queue_->push( T(element), timeout);
 }
 
 template<typename T>

@@ -45,9 +45,9 @@ struct QueueConfig
    */
   static queue_kind stoqk(const std::string& name);
 
-  QueueConfig::queue_kind kind =
-    queue_kind::kUnknown; ///< The kind of Queue represented by this QueueConfig
-  size_t size = 0;        ///< The size of the queue
+  QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
+                                                       ///< QueueConfig
+  size_t size = 0;                                     ///< The size of the queue
 };
 
 /**
@@ -93,8 +93,7 @@ private:
   QueueRegistry();
 
   template<typename T>
-  std::shared_ptr<NamedObject> create_queue(std::string name,
-                                            const QueueConfig& config);
+  std::shared_ptr<NamedObject> create_queue(std::string name, const QueueConfig& config);
 
   std::map<std::string, QueueEntry> queue_registry_;
   std::map<std::string, QueueConfig> queue_configmap_;
@@ -114,13 +113,11 @@ private:
 /**
  * @brief QueueTypeMismatch ERS Issue
  */
-ERS_DECLARE_ISSUE(
-  appfwk,            // namespace
-  QueueTypeMismatch, // issue class name
-  "Requested queue \"" << queue_name << "\" of type '" << target_type
-                       << "' already declared as type '" << source_type
-                       << "'", // message
-  ((std::string)queue_name)((std::string)source_type)((std::string)target_type))
+ERS_DECLARE_ISSUE(appfwk,            // namespace
+                  QueueTypeMismatch, // issue class name
+                  "Requested queue \"" << queue_name << "\" of type '" << target_type << "' already declared as type '"
+                                       << source_type << "'", // message
+                  ((std::string)queue_name)((std::string)source_type)((std::string)target_type))
 
 /**
  * @brief QueueKindUnknown ERS Issue

@@ -12,6 +12,7 @@
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
 
+#include "ers/Issue.h"
 #include <nlohmann/json.hpp>
 
 #include <fstream>
@@ -23,24 +24,25 @@
  */
 using json = nlohmann::json;
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+namespace appfwk {
 /**
  * @brief ModuleList for daq_application
  */
-class daq_application_constructor : public GraphConstructor 
+class daq_application_constructor : public GraphConstructor
 {
 public:
   /**
    * @brief Constructor for the daq_application_ModuleList
-   * @param config_json Configuration file to be used to create the DAQModule graph
+   * @param config_json Configuration file to be used to create the DAQModule
+   * graph
    */
-  explicit daq_application_constructor( const json & config_json)
+  explicit daq_application_constructor(const json& config_json)
     : config_(config_json)
   {}
 
   // Inherited via ModuleList
-  void ConstructGraph(DAQModuleMap& user_module_map,
-		      CommandOrderMap& command_order_map) override
+  void ConstructGraph(DAQModuleMap& user_module_map, CommandOrderMap& command_order_map) override
   {
     std::map<std::string, QueueConfig> queue_configuration;
     for (auto& queue : config_["queues"].items()) {
@@ -53,8 +55,7 @@ public:
 
     for (auto& module : config_["modules"].items()) {
 
-      user_module_map[module.key()] =
-        makeModule(module.value()["user_module_type"], module.key());
+      user_module_map[module.key()] = makeModule(module.value()["user_module_type"], module.key());
       user_module_map[module.key()]->configure(module.value());
     }
 
@@ -70,20 +71,29 @@ public:
 private:
   json config_;
 };
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+
+/**
+ * @brief NoConfiguration ERS Issue
+ */
+ERS_DECLARE_ISSUE(appfwk,          // namespace
+                  NoConfiguration, // issue class name
+                  "No configuration file given to daq_application; re-run with "
+                  "daq_application -h to see options!", // message
+)
+} // namespace dunedaq
 
 /**
  * @brief Entry point for daq_application
  * @param argc Number of arguments
  * @param argv Arguments
  * @return Status Code
-*/
+ */
 int
 main(int argc, char* argv[])
 {
 
-  auto args =
-    dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+  auto args = dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
   dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
@@ -93,43 +103,11 @@ main(int argc, char* argv[])
     std::ifstream ifile(args.applicaitonConfigurationFile);
     ifile >> json_config;
   } else {
-    json_config = R"(
-        {
-            "queues": {
-                "producerToFanOut": {"size": 10, "kind": "StdDeQueue"},
-                "fanOutToConsumer1": {"size": 5, "kind": "StdDeQueue"},
-                "fanOutToConsumer2":{"size": 5, "kind": "StdDeQueue"}
-            },
-            "modules": {
-                "producer": {
-                    "user_module_type": "FakeDataProducerDAQModule",
-                    "output": "producerToFanOut"
-                },
-                "fanOut": {
-                    "user_module_type": "VectorIntFanOutDAQModule",
-                    "input": "producerToFanOut",
-                    "outputs": ["fanOutToConsumer1", "fanOutToConsumer2" ],
-                    "fanout_mode": "RoundRobin"
-                },
-                "consumer1": {
-                    "user_module_type": "FakeDataConsumerDAQModule",
-                    "input": "fanOutToConsumer1"
-                },
-                "consumer2": {
-                    "user_module_type": "FakeDataConsumerDAQModule",
-                    "input": "fanOutToConsumer2"
-                }
-            },
-            "commands": {
-                "start": [ "consumer1", "consumer2", "fanOut", "producer" ],
-                "stop": [ "producer" ]
-            }
-        }
-    )"_json;
+    throw dunedaq::appfwk::NoConfiguration(ERS_HERE);
   }
 
   dunedaq::appfwk::daq_application_constructor gc(json_config);
-  theDAQProcess.register_modules( gc );
+  theDAQProcess.register_modules(gc);
 
   return theDAQProcess.listen();
 }
