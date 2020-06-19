@@ -1,4 +1,4 @@
-
+namespace dunedaq::appfwk {
 
 template<class T>
 StdDeQueue<T>::StdDeQueue(const std::string& name)
@@ -104,3 +104,6 @@ StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_typ
     throw std::runtime_error(errmsg.str());
   }
 }
+
+} // namespace dunedaq::appfwk
+
