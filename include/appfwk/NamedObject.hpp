@@ -26,14 +26,11 @@ public:
   explicit NamedObject(const std::string& name)
     : name_(name)
   {}
-  NamedObject(NamedObject const&) =
-    delete; ///< NamedObject is not copy-constructible
-  NamedObject(NamedObject&&) = default; ///< NamedObject is move-constructible
-  NamedObject& operator=(NamedObject const&) =
-    delete; ///< NamedObject is not copy-assignable
-  NamedObject& operator=(NamedObject&&) =
-    default;                        ///< NamedObject is move-assignable
-  virtual ~NamedObject() = default; ///< Default virtual destructor
+  NamedObject(NamedObject const&) = delete;            ///< NamedObject is not copy-constructible
+  NamedObject(NamedObject&&) = default;                ///< NamedObject is move-constructible
+  NamedObject& operator=(NamedObject const&) = delete; ///< NamedObject is not copy-assignable
+  NamedObject& operator=(NamedObject&&) = default;     ///< NamedObject is move-assignable
+  virtual ~NamedObject() = default;                    ///< Default virtual destructor
 
   /**
    * @brief Get the name of this NamedObejct

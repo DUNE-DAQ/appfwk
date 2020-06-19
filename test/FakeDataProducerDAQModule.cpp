@@ -1,5 +1,6 @@
 /**
- * @file FakeDataProducerDAQModule.cc FakeDataProducerDAQModule class implementation
+ * @file FakeDataProducerDAQModule.cc FakeDataProducerDAQModule class
+ * implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -18,8 +19,7 @@
  */
 #define TRACE_NAME "FakeDataProducer" // NOLINT
 
-dunedaq::appfwk::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
-  const std::string & name)
+dunedaq::appfwk::FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
   : DAQModule(name)
   , queueTimeout_(100)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
@@ -27,9 +27,8 @@ dunedaq::appfwk::FakeDataProducerDAQModule::FakeDataProducerDAQModule(
 {}
 
 void
-dunedaq::appfwk::FakeDataProducerDAQModule::execute_command(
-  const std::string& cmd,
-  const std::vector<std::string>& args)
+dunedaq::appfwk::FakeDataProducerDAQModule::execute_command(const std::string& cmd,
+                                                            const std::vector<std::string>& args)
 {
   if (cmd == "configure" || cmd == "Configure") {
     do_configure();
@@ -46,14 +45,12 @@ std::string
 dunedaq::appfwk::FakeDataProducerDAQModule::do_configure()
 {
 
-  outputQueue_.reset(
-    new DAQSink<std::vector<int>>(configuration_["output"].get<std::string>()));
+  outputQueue_.reset(new DAQSink<std::vector<int>>(configuration_["output"].get<std::string>()));
 
   nIntsPerVector_ = configuration_.value<int>("nIntsPerVector", 10);
   starting_int_ = configuration_.value<int>("starting_int", -4);
   ending_int_ = configuration_.value<int>("ending_int", 14);
-  wait_between_sends_ms_ =
-    configuration_.value<int>("wait_between_sends_ms", 1000);
+  wait_between_sends_ms_ = configuration_.value<int>("wait_between_sends_ms", 1000);
 
   return "Success";
 }
@@ -108,23 +105,19 @@ dunedaq::appfwk::FakeDataProducerDAQModule::do_work()
       if (current_int > ending_int_)
         current_int = starting_int_;
     }
-    TLOG(TLVL_INFO) << get_name() << ": Produced vector " << counter
-                    << " with contents " << output << " and size "
+    TLOG(TLVL_INFO) << get_name() << ": Produced vector " << counter << " with contents " << output << " and size "
                     << output.size();
 
     TLOG(TLVL_DEBUG) << get_name() << ": Pushing vector into outputQueue";
     auto starttime = std::chrono::steady_clock::now();
     outputQueue_->push(std::move(output), queueTimeout_);
     auto endtime = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<decltype(queueTimeout_)>(
-          endtime - starttime) > queueTimeout_) {
-      TLOG(TLVL_WARNING)
-        << get_name() << ": Timeout attempting to push vector onto outputQueue";
+    if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) > queueTimeout_) {
+      TLOG(TLVL_WARNING) << get_name() << ": Timeout attempting to push vector onto outputQueue";
     }
 
     TLOG(TLVL_DEBUG) << get_name() << ": Start of sleep between sends";
-    std::this_thread::sleep_for(
-      std::chrono::milliseconds(wait_between_sends_ms_));
+    std::this_thread::sleep_for(std::chrono::milliseconds(wait_between_sends_ms_));
     TLOG(TLVL_DEBUG) << get_name() << ": End of do_work loop";
     counter++;
   }

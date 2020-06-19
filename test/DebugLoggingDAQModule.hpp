@@ -28,8 +28,8 @@ public:
   /**
    * @brief DebugLoggingDAQModule Constructor
    * @param name Instance name for this DebugLoggingDAQModule
-  */
-  explicit DebugLoggingDAQModule( const std::string & name)
+   */
+  explicit DebugLoggingDAQModule(const std::string& name)
     : DAQModule(name)
   {}
 
@@ -38,8 +38,7 @@ public:
    * @param cmd Command from DAQProcess
    * @param args Arguments for the command from DAQProcess
    */
-  void execute_command(const std::string& cmd,
-                       const std::vector<std::string>& args = {}) override;
+  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
 };
 } // namespace dunedaq::appfwk
 

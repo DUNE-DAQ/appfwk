@@ -13,7 +13,7 @@
 #define APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/DAQModuleThreadHelper.hpp"
+#include "appfwk/ThreadHelper.hpp"
 #include "appfwk/DAQSink.hpp"
 
 #include <future>
@@ -32,11 +32,10 @@ public:
   /**
    * @brief FakeDataProducerDAQModule Constructor
    * @param name Instance name for this FakeDataProducerDAQModule instance
-  */
-  explicit FakeDataProducerDAQModule( const std::string & name);
+   */
+  explicit FakeDataProducerDAQModule(const std::string& name);
 
-  void execute_command(const std::string& cmd,
-                       const std::vector<std::string>& args = {}) override;
+  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
 
   FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) =
     delete; ///< FakeDataProducerDAQModule is not copy-constructible
@@ -54,7 +53,7 @@ private:
   std::string do_stop();
 
   // Threading
-  DAQModuleThreadHelper thread_;
+  ThreadHelper thread_;
   void do_work();
 
   // Configuration

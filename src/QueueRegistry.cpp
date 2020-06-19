@@ -1,5 +1,5 @@
 /**
- * @file QueueRegistry.cpp 
+ * @file QueueRegistry.cpp
  *
  * The QueueRegistry class implementation
  *
@@ -20,7 +20,7 @@ QueueRegistry::QueueRegistry()
 
 QueueRegistry::~QueueRegistry() {}
 
-QueueRegistry & 
+QueueRegistry&
 QueueRegistry::get()
 {
   if (!me_) {
