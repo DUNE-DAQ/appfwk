@@ -60,13 +60,13 @@ FakeDataProducerDAQModule::do_stop([[maybe_unused]] const std::vector<std::strin
 }
 
 /**
- * @brief Format a std::vector<int> for TRACE
- * @param t TraceStreamer Instance
+ * @brief Format a std::vector<int> to a stream
+ * @param t ostream Instance
  * @param ints Vector to format
- * @return TraceStreamer Instance
+ * @return ostream Instance
  */
-TraceStreamer&
-operator<<(TraceStreamer& t, std::vector<int> ints)
+std::ostream&
+operator<<(std::ostream& t, std::vector<int> ints)
 {
   t << "{";
   bool first = true;
@@ -84,6 +84,8 @@ FakeDataProducerDAQModule::do_work()
 {
   int current_int = starting_int_;
   size_t counter = 0;
+  std::ostringstream oss;
+
   while (thread_.thread_running()) {
     TLOG(TLVL_TRACE) << get_name() << ": Creating output vector";
     std::vector<int> output(nIntsPerVector_);
@@ -95,8 +97,10 @@ FakeDataProducerDAQModule::do_work()
       if (current_int > ending_int_)
         current_int = starting_int_;
     }
-    TLOG(TLVL_TRACE) << get_name() << ": Produced vector " << counter << " with contents " << output << " and size "
+    oss << "Produced vector " << counter << " with contents " << output << " and size "
                     << output.size();
+    ers::debug(ProducerProgressUpdate(ERS_HERE, get_name(), oss.str()));
+    oss.str("");
 
     TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
     outputQueue_->push(std::move(output), queueTimeout_);

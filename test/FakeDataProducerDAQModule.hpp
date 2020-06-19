@@ -66,6 +66,13 @@ private:
   size_t wait_between_sends_ms_;
 };
 } // namespace appfwk
+
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       ProducerProgressUpdate,
+                       appfwk::GeneralDAQModuleIssue,
+                       name << ": " << message,
+                       ERS_EMPTY,
+                       ((std::string)name)((std::string)message))
 } // namespace dunedaq
 
 #endif // APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_

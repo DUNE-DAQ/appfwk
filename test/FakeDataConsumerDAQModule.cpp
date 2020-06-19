@@ -63,13 +63,13 @@ FakeDataConsumerDAQModule::do_stop([[maybe_unused]] const std::vector<std::strin
 }
 
 /**
- * @brief Format a std::vector<int> for TRACE
- * @param t TraceStreamer Instance
+ * @brief Format a std::vector<int> to a stream
+ * @param t ostream Instance
  * @param ints Vector to format
- * @return TraceStreamer Instance
+ * @return ostream Instance
  */
-TraceStreamer&
-operator<<(TraceStreamer& t, std::vector<int> ints)
+std::ostream&
+operator<<(std::ostream& t, std::vector<int> ints)
 {
   t << "{";
   bool first = true;
@@ -89,6 +89,7 @@ FakeDataConsumerDAQModule::do_work()
   int counter = 0;
   int fail_count = 0;
   std::vector<int> vec;
+  std::ostringstream oss;
 
   while (thread_.thread_running()) {
     if (inputQueue_->can_pop()) {
@@ -104,7 +105,10 @@ FakeDataConsumerDAQModule::do_work()
       bool failed = false;
 
       TLOG(TLVL_TRACE) << get_name() << ": Starting processing loop";
-      TLOG(TLVL_TRACE) << get_name() << ": Received vector " << counter << ": " << vec;
+      oss << "Received vector " << counter << ": " << vec;
+      ers::debug(ConsumerProgressUpdate(ERS_HERE,get_name(), oss.str()));
+      oss.str("");
+
       size_t ii = 0;
       for (auto& point : vec) {
         if (point != current_int) {
@@ -132,7 +136,6 @@ FakeDataConsumerDAQModule::do_work()
     }
   }
 
-  std::ostringstream oss;
   oss << ": Processed " << counter << " vectors with " << fail_count << " failures.";
   ers::info(ConsumerProgressUpdate(ERS_HERE, get_name(), oss.str()));
 }

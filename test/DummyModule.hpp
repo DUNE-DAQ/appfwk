@@ -2,9 +2,21 @@
 #ifndef APP_FRAMEWORK_TEST_APP_FRAMEWORK_DUMMYMODULE_HPP_
 #define APP_FRAMEWORK_TEST_APP_FRAMEWORK_DUMMYMODULE_HPP_
 
-
 #include "appfwk/DAQModule.hpp"
-namespace dunedaq::appfwk {
+
+#include <ers/ers.h>
+
+namespace dunedaq {
+
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       DummyModuleUpdate,
+                       appfwk::GeneralDAQModuleIssue,
+                       name << ": " << message,
+                       ERS_EMPTY,
+                       ((std::string)name)((std::string)message))
+
+
+namespace appfwk {
 
 class DummyParentModule : public DAQModule
 {
@@ -17,7 +29,7 @@ public:
 
   virtual void do_stuff([[maybe_unused]] const std::vector<std::string>& args)
   {
-    std::cout << "Parent stuff" << std::endl;
+    ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyParentModule do_stuff"));
   };
 
 };
@@ -30,12 +42,14 @@ public:
   }
 
 
-  virtual void do_stuff([[maybe_unused]] const std::vector<std::string>& args) override {
-    std::cout << "Dummy stuff" << std::endl;
+  virtual void do_stuff([[maybe_unused]] const std::vector<std::string>& args) override
+  {
+    ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_stuff"));
   };
 
 };
 
-}
+} // namespace appfwk
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_TEST_APP_FRAMEWORK_DUMMYMODULE_HPP_

@@ -32,7 +32,8 @@ StdDeQueue<T>::push(value_type&& object_to_push, const duration_type& timeout)
     fSize++;
     fNoLongerEmpty.notify_one();
   } else {
-    throw DequeTimeoutExpired(ERS_HERE, "push", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
+    throw QueueTimeoutExpired(
+      ERS_HERE, NamedObject::get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
 
@@ -59,7 +60,10 @@ StdDeQueue<T>::pop(T& val, const duration_type& timeout)
     fNoLongerFull.notify_one();
     return true;
   } else {
-    ers::warning(      DequeTimeoutExpired(ERS_HERE, "pop", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()));
+    ers::warning(QueueTimeoutExpired(ERS_HERE,
+                                     NamedObject::get_name(),
+                                     "pop",
+                                     std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()));
     return false;
   }
 }
@@ -93,7 +97,10 @@ StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_typ
   }
 
   if (!lk.owns_lock()) {
-    throw DequeTimeoutExpired(      ERS_HERE, "lock mutex", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
+    throw QueueTimeoutExpired(ERS_HERE,
+                              NamedObject::get_name(),
+                              "lock mutex",
+                              std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
 

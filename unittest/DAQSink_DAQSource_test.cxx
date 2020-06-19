@@ -96,7 +96,9 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   }
 
   BOOST_REQUIRE(!sink.can_push());
-  BOOST_REQUIRE_EXCEPTION(    sink.push("bbBbbb"), dunedaq::appfwk::DequeTimeoutExpired, [&](dunedaq::appfwk::DequeTimeoutExpired) {
+  BOOST_REQUIRE_EXCEPTION(sink.push("bbBbbb"),
+                          dunedaq::appfwk::QueueTimeoutExpired,
+                          [&](dunedaq::appfwk::QueueTimeoutExpired) {
     return true;
   }); // TODO: Improve check
 }

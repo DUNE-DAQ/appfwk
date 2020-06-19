@@ -14,8 +14,6 @@
 
 #include "appfwk/Queue.hpp"
 
-#include <ers/Issue.h>
-
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -83,15 +81,6 @@ private:
 };
 
 } // namespace appfwk
-
-/**
- * @brief DequeTimeoutExpired ERS Issue
- */
-ERS_DECLARE_ISSUE(appfwk,              // namespace
-                  DequeTimeoutExpired, // issue class name
-                  "Unable to " << func_name << " within timeout period (timeout period was " << timeout
-                               << " milliseconds)", // message
-                  ((std::string)func_name)((int)timeout))
 
 } // namespace dunedaq
 
