@@ -1,13 +1,11 @@
-@PACKAGE_INIT@
-
-include(CMakeFindDependencyMacro)
-find_dependency(folly)
-find_dependency(TRACE)
-find_dependency(ers)
-
-####################################################################
-# TODO: This is a straight copy of Findcetlib.cmake. Need to find a
-# way to not repeat ourselves
+# cetlib has a cetlibConfig.cmake file, but that file references
+# cetbuildtools modules, which cmake is having trouble finding. We
+# probably would need to go the whole hog and make a
+# cetbuildtools-style package. Plus, cetlib doesn't export any targets
+# nicely, so we steal this bit of code from daq-buildtools and do it
+# ourselves
+if(EXISTS $ENV{CETLIB_LIB})
+ # UPS
   find_library(CETLIB NAMES libcetlib.so)
   find_library(CETLIB_EXCEPT NAMES libcetlib_except.so)
 
@@ -31,7 +29,10 @@ set_target_properties(cetlib::cetlib PROPERTIES
   INTERFACE_LINK_LIBRARIES "cetlib_except::cetlib_except"
   IMPORTED_LOCATION "${CETLIB}"
 )
-####################################################################
 
-include("${CMAKE_CURRENT_LIST_DIR}/@targets_export_name@.cmake")
-check_required_components("@PROJECT_NAME@")
+else()
+	# Spack
+	find_package(cetlib REQUIRED)
+	set(CETLIB cetlib)
+	set(CETLIB_EXCEPT cetlib_except)
+endif()
