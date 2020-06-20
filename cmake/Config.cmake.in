@@ -4,34 +4,8 @@ include(CMakeFindDependencyMacro)
 find_dependency(folly)
 find_dependency(TRACE)
 find_dependency(ers)
-
-####################################################################
-# TODO: This is a straight copy of Findcetlib.cmake. Need to find a
-# way to not repeat ourselves
-  find_library(CETLIB NAMES libcetlib.so)
-  find_library(CETLIB_EXCEPT NAMES libcetlib_except.so)
-
-  message(STATUS "cetlib is ${CETLIB}")
-  message(STATUS "cetlib_except is ${CETLIB_EXCEPT}")
-# Create imported target 
-add_library(cetlib_except::cetlib_except SHARED IMPORTED)
-
-set_target_properties(cetlib_except::cetlib_except PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "$ENV{CETLIB_EXCEPT_INC}"
-  # TODO: maybe we need to link against cetlib_except's dependencies too?
-  # INTERFACE_LINK_LIBRARIES "$"
-  IMPORTED_LOCATION "${CETLIB_EXCEPT}"
-)
-
-# Create imported target 
-add_library(cetlib::cetlib SHARED IMPORTED)
-
-set_target_properties(cetlib::cetlib PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "$ENV{CETLIB_INC}"
-  INTERFACE_LINK_LIBRARIES "cetlib_except::cetlib_except"
-  IMPORTED_LOCATION "${CETLIB}"
-)
-####################################################################
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/Modules/")
+find_dependency(cetlib)
 
 include("${CMAKE_CURRENT_LIST_DIR}/@targets_export_name@.cmake")
 check_required_components("@PROJECT_NAME@")

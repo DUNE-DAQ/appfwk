@@ -10,9 +10,9 @@ set(BUILD_SHARED_LIBS on)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 include(DAQ)
 
-find_package(cetlib MODULE REQUIRED)
+find_package(cetlib MODULE REQUIRED) # MODULE because we use our own Findcetlib.cmake
 find_package(folly REQUIRED)
-find_package(ers)
+find_package(ers REQUIRED)
 find_package(Boost 1.70.0 COMPONENTS unit_test_framework program_options REQUIRED)
 find_package(TRACE 3.15.09 REQUIRED)
 
@@ -153,4 +153,8 @@ install(
     EXPORT "${targets_export_name}"
     NAMESPACE "${namespace}"
     DESTINATION "${config_install_dir}"
+)
+
+install(FILES cmake/DAQ.cmake cmake/Findcetlib.cmake
+  DESTINATION "${config_install_dir}/Modules"
 )
