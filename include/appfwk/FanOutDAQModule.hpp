@@ -13,11 +13,12 @@
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/ThreadHelper.hpp"
 #include "appfwk/DAQSink.hpp"
 #include "appfwk/DAQSource.hpp"
+#include "appfwk/ThreadHelper.hpp"
 
 #include "TRACE/trace.h"
+#include <ers/Issue.h>
 
 #include <limits>
 #include <list>
@@ -27,8 +28,19 @@
 #include <utility>
 #include <vector>
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
 
+/**
+ * @brief The BroadcastFailed FanOutDAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
+                       BroadcastFailed,       ///< Type of the Issue
+                       GeneralDAQModuleIssue, ///< Base class of the Issue
+                       "FanOutDAQModule Broadcast Error: " << reason, ///< Log Message from the issue
+                       ERS_EMPTY,                                            ///< End of variable declarations
+                       ((std::string)reason))                                ///< Variables to capture
+
+namespace appfwk {
 
 /**
  * @brief FanOutDAQModule sends data to multiple Queues
@@ -63,18 +75,20 @@ public:
    * @param cmd Command from DAQProcess
    * @param args Arguments for the command from DAQProcess
    */
-  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
+  // void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
 
   FanOutDAQModule(const FanOutDAQModule&) = delete;            ///< FanOutDAQModule is not copy-constructible
   FanOutDAQModule& operator=(const FanOutDAQModule&) = delete; ///< FanOutDAQModule is not copy-assignable
   FanOutDAQModule(FanOutDAQModule&&) = delete;                 ///< FanOutDAQModule is not move-constructible
   FanOutDAQModule& operator=(FanOutDAQModule&&) = delete;      ///< FanOutDAQModule is not move-assignable
 
+  void init() override;
+
 private:
   // Commands
-  std::string do_configure();
-  std::string do_start();
-  std::string do_stop();
+  void do_configure(const std::vector<std::string>& args);
+  void do_start(const std::vector<std::string>& args);
+  void do_stop(const std::vector<std::string>& args);
 
   // Type traits handling. Yes, the "U" template parameter is actually
   // necessary, even though it's just an alias to this user module's
@@ -83,19 +97,20 @@ private:
   template<typename U = ValueType>
   typename std::enable_if_t<!std::is_copy_constructible_v<U>> do_broadcast(ValueType&) const
   {
-    throw std::runtime_error("Broadcast mode cannot be used for non-copy-constructible types!");
+    throw BroadcastFailed(ERS_HERE, "Broadcast mode cannot be used for non-copy-constructible types!");
   }
   template<typename U = ValueType>
   typename std::enable_if_t<std::is_copy_constructible_v<U>> do_broadcast(ValueType& data) const
   {
     for (auto& o : outputQueues_) {
       auto starttime = std::chrono::steady_clock::now();
-      o->push( data, queueTimeout_);
+      o->push(data, queueTimeout_);
       auto endtime = std::chrono::steady_clock::now();
       if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) > queueTimeout_) {
-        TLOG(TLVL_WARNING) << "Timeout occurred trying to broadcast data to "
-                              "output queue; data may be lost if it doesn't "
-                              "make it into any other output queues, either";
+        ers::warning(BroadcastFailed(ERS_HERE,
+                                     "Timeout occurred trying to broadcast data to "
+                                     "output queue; data may be lost if it doesn't "
+                                     "make it into any other output queues, either"));
       }
     }
   }
@@ -112,7 +127,6 @@ private:
   std::list<std::unique_ptr<DAQSink<ValueType>>> outputQueues_;
   size_t wait_interval_us_;
 };
-
 
 /**
  * @brief Struct used for FanOutDAQModule_test
@@ -146,17 +160,15 @@ struct NonCopyableType
   }
 
 private:
-  NonCopyableType() 
-    : data(0) 
+  NonCopyableType()
+    : data(0)
   {}
-  
-  friend class FanOutDAQModule<NonCopyableType> ;
+
+  friend class FanOutDAQModule<NonCopyableType>;
 };
 
-
-
-
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+} // namespace dunedaq
 
 #include "detail/FanOutDAQModule.hxx"
 

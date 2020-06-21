@@ -12,7 +12,7 @@
 #ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_
 #define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_
 
-#include <TRACE/trace.h>
+#include <ers/ers.h>
 
 #include <boost/program_options.hpp>
 #include <string>
@@ -20,7 +20,14 @@
 
 namespace bpo = boost::program_options;
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+
+ERS_DECLARE_ISSUE(appfwk,                                                             // Namespace
+                  CommandLineIssue,                                                   // Class name
+                  "Command-line processing issue in " << app_name << ": " << message, // Message
+                  ((std::string)app_name)((std::string)message))                      // Args
+
+namespace appfwk {
 /**
  * @brief CommandLineInterpreter parses the command-line options given to the
  * application and stores the results as validated data members
@@ -39,7 +46,7 @@ public:
     CommandLineInterpreter output;
 
     std::ostringstream descstr;
-    descstr << argv[0]
+    descstr << *argv
             << " known arguments (additional arguments will be stored and "
                "passed on)";
     bpo::options_description desc(descstr.str());
@@ -56,9 +63,7 @@ public:
       bpo::store(parsed, vm);
       bpo::notify(vm);
     } catch (bpo::error const& e) {
-      TLOG_ERROR("CommandLineInterpreter")
-        << "Exception from command line processing in " << argv[0] << ": " << e.what() << "\n";
-      exit(-1);
+      throw CommandLineIssue(ERS_HERE, *argv, e.what());
     }
 
     if (vm.count("help")) {
@@ -69,8 +74,8 @@ public:
     if (vm.count("commandFacility")) {
       output.commandFacilityPluginName = vm["commandFacility"].as<std::string>();
     } else {
-      TLOG_ERROR("CommandLineInterpreter") << "CommandFacility not specified on command line! Exiting";
       std::cout << desc; // NOLINT
+      throw CommandLineIssue(ERS_HERE, *argv, "CommandFacility not specified on command line!");
       exit(-2);
     }
     if (vm.count("configManager")) {
@@ -95,6 +100,7 @@ public:
   std::vector<std::string> servicePluginNames; ///< Names of the Service plugins to load
   std::vector<std::string> otherOptions;       ///< Any other options which were passed and not recognized
 };
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_

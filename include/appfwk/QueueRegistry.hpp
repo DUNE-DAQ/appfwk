@@ -127,6 +127,21 @@ ERS_DECLARE_ISSUE(appfwk,           // namespace
                   "Queue kind \"" << queue_kind << "\" is unknown ",
                   ((std::string)queue_kind))
 
+/**
+ * @brief QueueNotFound ERS Issue
+ */
+ERS_DECLARE_ISSUE(appfwk,           // namespace
+                  QueueNotFound, // issue class name
+                  "Requested queue \"" << queue_name << "\" of type '" << target_type << "' could not be found.", // message
+                  ((std::string)queue_name)((std::string)target_type))
+
+/**
+ * @brief QueueRegistryConfigured ERS Issue
+ */
+ERS_DECLARE_ISSUE(appfwk,        // namespace
+                  QueueRegistryConfigured, // issue class name
+                  "QueueRegistry already configured",ERS_EMPTY)
+
 } // namespace dunedaq
 
 #include "detail/QueueRegistry.hxx"

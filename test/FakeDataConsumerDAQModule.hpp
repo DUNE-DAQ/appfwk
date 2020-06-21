@@ -13,15 +13,18 @@
 #define APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/ThreadHelper.hpp"
 #include "appfwk/DAQSource.hpp"
+#include "appfwk/ThreadHelper.hpp"
+
+#include <ers/Issue.h>
 
 #include <future>
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+namespace appfwk {
 /**
  * @brief FakeDataConsumerDAQModule creates vectors of ints and sends them
  * downstream
@@ -35,8 +38,6 @@ public:
    */
   explicit FakeDataConsumerDAQModule(const std::string& name);
 
-  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
-
   FakeDataConsumerDAQModule(const FakeDataConsumerDAQModule&) =
     delete; ///< FakeDataConsumerDAQModule is not copy-constructible
   FakeDataConsumerDAQModule& operator=(const FakeDataConsumerDAQModule&) =
@@ -46,11 +47,13 @@ public:
   FakeDataConsumerDAQModule& operator=(FakeDataConsumerDAQModule&&) =
     delete; ///< FakeDataConsumerDAQModule is not move-assignable
 
+  void init() override;
+
 private:
   // Commands
-  std::string do_configure();
-  std::string do_start();
-  std::string do_stop();
+  void do_configure(const std::vector<std::string>& args);
+  void do_start(const std::vector<std::string>& args);
+  void do_stop(const std::vector<std::string>& args);
 
   // Threading
   void do_work();
@@ -63,6 +66,21 @@ private:
   std::chrono::milliseconds queueTimeout_;
   std::unique_ptr<DAQSource<std::vector<int>>> inputQueue_;
 };
-} // namespace dunedaq::appfwk
+
+} // namespace appfwk
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       ConsumerErrorDetected,
+                       appfwk::GeneralDAQModuleIssue,
+                       name << ": Error in received vector " << counter << " at position " << position << ": Expected "
+                            << expected << ", received " << received,
+                       ERS_EMPTY,
+                       ((std::string)name)((int)counter)((int)position)((int)expected)((int)received))
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       ConsumerProgressUpdate,
+                       appfwk::GeneralDAQModuleIssue,
+                       name << ": " << message,
+    ERS_EMPTY,
+                       ((std::string)name)((std::string)message))
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_

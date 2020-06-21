@@ -1,4 +1,7 @@
 
+#include "ers/ers.h"
+
+namespace dunedaq::appfwk {
 
 template<class T>
 StdDeQueue<T>::StdDeQueue(const std::string& name)
@@ -29,11 +32,8 @@ StdDeQueue<T>::push(value_type&& object_to_push, const duration_type& timeout)
     fSize++;
     fNoLongerEmpty.notify_one();
   } else {
-    std::stringstream errmsg;
-    errmsg << "In StdDeQueue::push: unable to push since queue is full (" << fSize.load()
-           << " elements) (timeout period was "
-           << std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count() << " milliseconds)";
-    throw std::runtime_error(errmsg.str());
+    throw QueueTimeoutExpired(
+      ERS_HERE, NamedObject::get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
 
@@ -60,10 +60,10 @@ StdDeQueue<T>::pop(T& val, const duration_type& timeout)
     fNoLongerFull.notify_one();
     return true;
   } else {
-    std::stringstream errmsg;
-    errmsg << "In StdDeQueue::pop_wait_for: unable to pop since queue is "
-              "empty (timeout period was "
-           << std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count() << " milliseconds)";
+    ers::warning(QueueTimeoutExpired(ERS_HERE,
+                                     NamedObject::get_name(),
+                                     "pop",
+                                     std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()));
     return false;
   }
 }
@@ -97,10 +97,11 @@ StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_typ
   }
 
   if (!lk.owns_lock()) {
-    std::ostringstream errmsg;
-    errmsg << "Unable to lock the StdDeQueue's mutex "
-              "within the timeout period of "
-           << std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count() << " milliseconds";
-    throw std::runtime_error(errmsg.str());
+    throw QueueTimeoutExpired(ERS_HERE,
+                              NamedObject::get_name(),
+                              "lock mutex",
+                              std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
+
+} // namespace dunedaq::appfwk

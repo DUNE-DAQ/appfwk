@@ -51,12 +51,15 @@ public:
       qc.size = queue.value()["size"].get<size_t>();
       queue_configuration[queue.key()] = qc;
     }
+
     QueueRegistry::get().configure(queue_configuration);
 
     for (auto& module : config_["modules"].items()) {
-
-      user_module_map[module.key()] = makeModule(module.value()["user_module_type"], module.key());
-      user_module_map[module.key()]->configure(module.value());
+      auto [ modit, done] = user_module_map.emplace(module.key(), makeModule(module.value()["user_module_type"], module.key()));
+      if (!done) {
+        // throw 
+      }
+      modit->second->do_init(module.value());
     }
 
     for (auto& command : config_["commands"].items()) {

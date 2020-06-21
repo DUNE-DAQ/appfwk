@@ -45,7 +45,9 @@ QueueRegistry::get_queue(const std::string& name)
     return std::dynamic_pointer_cast<Queue<T>>(entry.instance);
 
   } else {
-    throw std::runtime_error("Queue not found");
+    int status;
+    std::string realname_target = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
+    throw QueueNotFound(ERS_HERE, name, realname_target);
   }
 }
 
@@ -70,7 +72,7 @@ QueueRegistry::create_queue(std::string name, const QueueConfig& config)
       break;
 
     default:
-      throw std::runtime_error("Unknown queue kind");
+      throw QueueKindUnknown(ERS_HERE, std::to_string(config.kind));
   }
 
   return queue;

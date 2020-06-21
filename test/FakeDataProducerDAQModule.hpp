@@ -21,7 +21,8 @@
 #include <string>
 #include <vector>
 
-namespace dunedaq::appfwk {
+namespace dunedaq {
+namespace appfwk {
 /**
  * @brief FakeDataProducerDAQModule creates vectors of ints and sends them
  * downstream
@@ -35,8 +36,6 @@ public:
    */
   explicit FakeDataProducerDAQModule(const std::string& name);
 
-  void execute_command(const std::string& cmd, const std::vector<std::string>& args = {}) override;
-
   FakeDataProducerDAQModule(const FakeDataProducerDAQModule&) =
     delete; ///< FakeDataProducerDAQModule is not copy-constructible
   FakeDataProducerDAQModule& operator=(const FakeDataProducerDAQModule&) =
@@ -46,11 +45,12 @@ public:
   FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) =
     delete; ///< FakeDataProducerDAQModule is not move-assignable
 
+  void init() override;
 private:
   // Commands
-  std::string do_configure();
-  std::string do_start();
-  std::string do_stop();
+  void do_configure(const std::vector<std::string>& args);
+  void do_start(const std::vector<std::string>& args);
+  void do_stop(const std::vector<std::string>& args);
 
   // Threading
   ThreadHelper thread_;
@@ -65,6 +65,14 @@ private:
 
   size_t wait_between_sends_ms_;
 };
-} // namespace dunedaq::appfwk
+} // namespace appfwk
+
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       ProducerProgressUpdate,
+                       appfwk::GeneralDAQModuleIssue,
+                       name << ": " << message,
+                       ERS_EMPTY,
+                       ((std::string)name)((std::string)message))
+} // namespace dunedaq
 
 #endif // APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_

@@ -85,7 +85,7 @@ public:
     if (working_thread_->joinable()) {
       try {
         working_thread_->join();
-      } catch (std::system_error e) {
+      } catch (std::system_error const& e) {
         throw ThreadingIssue(ERS_HERE, std::string("Error while joining thread, ") + e.what());
       }
     } else {

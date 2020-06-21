@@ -36,7 +36,7 @@ point_build_to( include )
 ##############################################################################
 point_build_to( src )
 
-add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp)
+add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp  src/DAQModule.cpp)
 target_link_libraries(appfwk PUBLIC Folly::folly ers::ers cetlib::cetlib)
 target_include_directories(appfwk
   PUBLIC
@@ -44,6 +44,7 @@ target_include_directories(appfwk
   $<INSTALL_INTERFACE:include>
 )
 message(STATUS "CMAKE_CURRENT_SOURCE_DIR/include is ${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 add_library(appfwk_QueryResponseCommandFacility_duneCommandFacility src/QueryResponseCommandFacility.cpp)
 target_link_libraries(appfwk_QueryResponseCommandFacility_duneCommandFacility appfwk)
 
@@ -67,17 +68,19 @@ point_build_to( test )
 add_executable(queue_IO_check test/queue_IO_check.cxx)
 target_link_libraries(queue_IO_check appfwk)
 
-
-add_library(appfwk_DebugLoggingDAQModule_duneDAQModule test/DebugLoggingDAQModule.cpp)
-target_link_libraries(appfwk_DebugLoggingDAQModule_duneDAQModule appfwk)
 add_library(appfwk_FakeDataConsumerDAQModule_duneDAQModule test/FakeDataConsumerDAQModule.cpp)
 target_link_libraries(appfwk_FakeDataConsumerDAQModule_duneDAQModule appfwk)
+add_library(appfwk_DummyModule_duneDAQModule test/DummyModule.cpp)
+target_link_libraries(appfwk_DummyModule_duneDAQModule appfwk)
+
 add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducerDAQModule.cpp)
 target_link_libraries(appfwk_FakeDataProducerDAQModule_duneDAQModule appfwk)
 
-# Curious to hear people's take on this format style which aligns the target across lines...
 add_executable        (echo_test_app test/echo_test_app.cxx)
-target_link_libraries (echo_test_app appfwk_DebugLoggingDAQModule_duneDAQModule appfwk)
+target_link_libraries (echo_test_app  appfwk)
+
+add_executable(dummy_test_app test/dummy_test_app.cxx)
+target_link_libraries(dummy_test_app appfwk appfwk_DummyModule_duneDAQModule)
 
 file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
 
