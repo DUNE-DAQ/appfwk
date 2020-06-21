@@ -145,6 +145,11 @@ install(
 )
 
 install(
+    DIRECTORY include/nlohmann
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+
+install(
     FILES "${project_config}" "${version_config}"
     DESTINATION "${config_install_dir}"
 )
