@@ -76,9 +76,6 @@ target_link_libraries(appfwk_DummyModule_duneDAQModule appfwk)
 add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducerDAQModule.cpp)
 target_link_libraries(appfwk_FakeDataProducerDAQModule_duneDAQModule appfwk)
 
-add_executable        (echo_test_app test/echo_test_app.cxx)
-target_link_libraries (echo_test_app  appfwk)
-
 add_executable(dummy_test_app test/dummy_test_app.cxx)
 target_link_libraries(dummy_test_app appfwk appfwk_DummyModule_duneDAQModule)
 
