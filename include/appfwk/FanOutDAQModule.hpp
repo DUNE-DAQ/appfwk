@@ -116,7 +116,7 @@ private:
   }
 
   // Threading
-  void do_work();
+  void do_work(std::atomic<bool>&);
   ThreadHelper thread_;
 
   // Configuration
