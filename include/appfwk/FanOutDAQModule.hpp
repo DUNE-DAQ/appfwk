@@ -40,6 +40,16 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
                        ERS_EMPTY,                                            ///< End of variable declarations
                        ((std::string)reason))                                ///< Variables to capture
 
+/**
+ * @brief The ConfigureFailed FanOutDAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
+                       ConfigureFailed,       ///< Type of the Issue
+                       GeneralDAQModuleIssue, ///< Base class of the Issue
+                       "FanOutDAQModule Configure Error: " << reason, ///< Log Message from the issue
+                       ERS_EMPTY,                                            ///< End of variable declarations
+                       ((std::string)reason))                                ///< Variables to capture
+
 namespace appfwk {
 
 /**
