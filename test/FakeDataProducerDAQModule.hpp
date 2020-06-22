@@ -54,7 +54,7 @@ private:
 
   // Threading
   ThreadHelper thread_;
-  void do_work();
+  void do_work(std::atomic<bool>& running_flag);
 
   // Configuration
   std::unique_ptr<DAQSink<std::vector<int>>> outputQueue_;

@@ -24,7 +24,7 @@ namespace appfwk {
 
 FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
   : DAQModule(name)
-  , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this))
+  , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this, std::placeholders::_1))
   , outputQueue_(nullptr)
   , queueTimeout_(100)
 {
@@ -50,13 +50,13 @@ FakeDataProducerDAQModule::do_configure([[maybe_unused]] const std::vector<std::
 void
 FakeDataProducerDAQModule::do_start([[maybe_unused]] const std::vector<std::string>& args)
 {
-  thread_.start_working_thread_();
+  thread_.start_working_thread();
 }
 
 void
 FakeDataProducerDAQModule::do_stop([[maybe_unused]] const std::vector<std::string>& args)
 {
-  thread_.stop_working_thread_();
+  thread_.stop_working_thread();
 }
 
 /**
@@ -80,13 +80,13 @@ operator<<(std::ostream& t, std::vector<int> ints)
 }
 
 void
-FakeDataProducerDAQModule::do_work()
+FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
 {
   int current_int = starting_int_;
   size_t counter = 0;
   std::ostringstream oss;
 
-  while (thread_.thread_running()) {
+  while (running_flag.load()) {
     TLOG(TLVL_TRACE) << get_name() << ": Creating output vector";
     std::vector<int> output(nIntsPerVector_);
 

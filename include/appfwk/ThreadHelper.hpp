@@ -38,6 +38,36 @@ namespace appfwk {
 /**
  * @brief ThreadHelper contains a thread which runs the do_work()
  * function
+ *
+ * ThreadHelper runs a given function in a std::thread and allows that
+ * work function to be started and stopped via the
+ * start_working_thread() and stop_working_thread() methods,
+ * respectively. The work function takes a std::atomic<bool>&  which
+ * indicates whether the thread should continue running, so a typical
+ * implementation of a work function is:
+ * 
+ * @code
+ * void do_work(std::atomic<bool>& running_flag){
+ *   while(running_flag.load()){
+ *    // do something ...
+ *   }
+ * }
+ * @endcode
+ * 
+ * If your do_work function is a class member, you will need to wrap
+ * it with std::bind or a lambda to bind the implicit 'this' argument,
+ * eg
+ *
+ * @code
+ * class MyClass {
+ * public:
+ *   MyClass()
+ *     : helper_(std::bind(MyClass::do_work, this, std::placeholders::_1))
+ *   {}
+ *   void do_work(std::atomic<bool>& running_flag) { ... }
+ *   ThreadHelper helper_;
+ * };
+ * @endcode
  */
 class ThreadHelper
 {
@@ -48,7 +78,7 @@ public:
    *
    * This constructor sets the defaults for the thread control variables
    */
-  explicit ThreadHelper(std::function<void()> do_work)
+    explicit ThreadHelper(std::function<void(std::atomic<bool>&)> do_work)
     : thread_running_(false)
     , working_thread_(nullptr)
     , do_work_(do_work)
@@ -58,14 +88,14 @@ public:
    * @brief Start the working thread (which executes the do_work() function)
    * @throws ThreadingIssue if the thread is already running
    */
-  void start_working_thread_()
+  void start_working_thread()
   {
     if (thread_running()) {
       throw ThreadingIssue(ERS_HERE, "Attempted to start working thread "
                            "when it is already running!");
     }
     thread_running_ = true;
-    working_thread_.reset(new std::thread([&] { do_work_(); }));
+    working_thread_.reset(new std::thread([&] { do_work_(std::ref(thread_running_)); }));
   }
   /**
    * @brief Stop the working thread
@@ -73,7 +103,7 @@ public:
    * @throws ThreadingIssue If the thread is not in the joinable state
    * @throws ThreadingIssue If an exception occurs during thread join
    */
-  void stop_working_thread_()
+  void stop_working_thread()
   {
     if (!thread_running()) {
       throw ThreadingIssue(ERS_HERE,
@@ -108,7 +138,7 @@ public:
 private:
   std::atomic<bool> thread_running_;
   std::unique_ptr<std::thread> working_thread_;
-  std::function<void()> do_work_;
+  std::function<void(std::atomic<bool>&)> do_work_;
 };
 } // namespace dunedaq::appfwk
 
