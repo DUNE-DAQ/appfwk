@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(empty_checks)
   BOOST_TEST(!Queue.pop(popped_value, timeout));
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
 
-  const double fraction_of_pop_timeout_used = pop_duration / timeout;
+  const double fraction_of_pop_timeout_used = pop_duration / std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
 
   BOOST_CHECK_GT(fraction_of_pop_timeout_used, 1 - fractional_timeout_tolerance);
   BOOST_CHECK_LT(fraction_of_pop_timeout_used, 1 + fractional_timeout_tolerance);
