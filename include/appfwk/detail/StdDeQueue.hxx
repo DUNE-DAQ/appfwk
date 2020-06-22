@@ -60,10 +60,6 @@ StdDeQueue<T>::pop(T& val, const duration_type& timeout)
     fNoLongerFull.notify_one();
     return true;
   } else {
-    ers::warning(QueueTimeoutExpired(ERS_HERE,
-                                     NamedObject::get_name(),
-                                     "pop",
-                                     std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()));
     return false;
   }
 }
