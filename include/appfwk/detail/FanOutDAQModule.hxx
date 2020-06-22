@@ -32,7 +32,7 @@ FanOutDAQModule<ValueType>::init()
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_configure([[maybe_unused]] const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& /*args*/)
 {
   if (get_config().contains("fanout_mode")) {
     auto modeString = get_config()["fanout_mode"].get<std::string>();
@@ -56,14 +56,14 @@ FanOutDAQModule<ValueType>::do_configure([[maybe_unused]] const std::vector<std:
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_start([[maybe_unused]] const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_start(const std::vector<std::string>& /*args*/)
 {
   thread_.start_working_thread_();
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_stop([[maybe_unused]] const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_stop(const std::vector<std::string>& /*args*/)
 {
   thread_.stop_working_thread_();
 }
