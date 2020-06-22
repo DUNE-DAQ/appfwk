@@ -31,10 +31,9 @@ public:
   using value_type = T;
   using duration_type = typename Queue<T>::duration_type;
 
-  explicit FollyQueue(const std::string& name)
-    : Queue<T>(name),
-      fMaxSize(0),
-      fQueue(fMaxSize)
+  explicit FollyQueue(const std::string& name, size_t capacity)
+    : Queue<T>(name, capacity),
+      fQueue(this->GetCapacity())
   {}
 
   bool can_pop() const noexcept override { return !fQueue.empty(); }
@@ -45,7 +44,7 @@ public:
 
   bool can_push() const noexcept override
   {
-    return fQueue.size()<fMaxSize;
+    return fQueue.size()<this->GetCapacity();
   }
 
   void push(value_type&& t, const duration_type& dur)  override
@@ -57,12 +56,6 @@ public:
     }
   }
 
-  /**
-   * @brief Set the size of the FollyQueue
-   * @param sz Maximum size for the FollyQueue
-  */
-  void SetSize(size_t sz) { fMaxSize = sz; fQueue.reset_capacity(fMaxSize); }
-
    
   // Delete the copy and move operations
   FollyQueue(const FollyQueue&) = delete;
@@ -71,7 +64,6 @@ public:
   FollyQueue& operator=(FollyQueue&&) = delete;
 
 private:
-  size_t fMaxSize;
   FollyQueueType<T, false> fQueue;
 };
 

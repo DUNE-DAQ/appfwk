@@ -30,11 +30,11 @@ struct FanOutDAQModuleTestFixture
 
     std::map<std::string, QueueConfig> queue_config;
     queue_config["input"].kind = QueueConfig::queue_kind::kStdDeQueue;
-    queue_config["input"].size = 10;
+    queue_config["input"].capacity = 10;
     queue_config["output1"].kind = QueueConfig::queue_kind::kStdDeQueue;
-    queue_config["output1"].size = 5;
+    queue_config["output1"].capacity = 5;
     queue_config["output2"].kind = QueueConfig::queue_kind::kStdDeQueue;
-    queue_config["output2"].size = 5;
+    queue_config["output2"].capacity = 5;
 
     QueueRegistry::get().configure(queue_config);
   }

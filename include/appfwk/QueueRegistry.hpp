@@ -47,7 +47,7 @@ struct QueueConfig
 
   QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
                                                        ///< QueueConfig
-  size_t size = 0;                                     ///< The size of the queue
+  size_t capacity = 0;                                     ///< The maximum size of the queue
 };
 
 /**

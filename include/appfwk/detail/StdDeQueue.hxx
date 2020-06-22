@@ -4,12 +4,13 @@
 namespace dunedaq::appfwk {
 
 template<class T>
-StdDeQueue<T>::StdDeQueue(const std::string& name)
-  : Queue<T>(name)
-  , fMaxSize(0)
+StdDeQueue<T>::StdDeQueue(const std::string& name, size_t capacity)
+  : Queue<T>(name, capacity)
   , fDeque()
   , fSize(0)
-{}
+{
+  assert(fDeque.max_size() > this->GetCapacity());
+}
 
 template<class T>
 void

@@ -1,15 +1,15 @@
 {
   "queues": {
     "producerToFanOut": {
-      "size": 10,
+      "capacity": 10,
       "kind": "StdDeQueue"
     },
     "fanOutToConsumer1": {
-      "size": 5,
+      "capacity": 5,
       "kind": "StdDeQueue"
     },
     "fanOutToConsumer2": {
-      "size": 5,
+      "capacity": 5,
       "kind": "StdDeQueue"
     }
   },

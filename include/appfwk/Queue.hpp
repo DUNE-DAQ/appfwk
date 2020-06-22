@@ -45,8 +45,9 @@ public:
    * @brief Queue Constructor
    * @param name Name of the Queue instance
    */
-  explicit Queue(const std::string& name)
-    : NamedObject(name)
+  explicit Queue(const std::string& name, size_t capacity)
+    : NamedObject(name),
+      capacity_(capacity)
   {}
 
   /**
@@ -87,11 +88,16 @@ public:
    */
   virtual bool can_pop() const noexcept = 0;
 
+protected:
+  size_t GetCapacity() const { return capacity_; }
+
 private:
   Queue(const Queue&) = delete;
   Queue& operator=(const Queue&) = delete;
   Queue(Queue&&) = default;
   Queue& operator=(Queue&&) = default;
+
+  size_t capacity_;
 };
 
 } // namespace appfwk
