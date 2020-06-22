@@ -27,7 +27,7 @@ public:
 
   void init() final {}
 
-  virtual void do_stuff([[maybe_unused]] const std::vector<std::string>& args)
+  virtual void do_stuff(const std::vector<std::string>& /*args*/)
   {
     ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyParentModule do_stuff"));
   };
@@ -42,7 +42,7 @@ public:
   }
 
 
-  virtual void do_stuff([[maybe_unused]] const std::vector<std::string>& args) override
+  virtual void do_stuff(const std::vector<std::string>& /*args*/) override
   {
     ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_stuff"));
   };

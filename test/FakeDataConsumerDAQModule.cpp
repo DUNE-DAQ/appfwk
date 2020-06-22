@@ -42,7 +42,7 @@ FakeDataConsumerDAQModule::init()
 }
 
 void
-FakeDataConsumerDAQModule::do_configure([[maybe_unused]] const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_configure(const std::vector<std::string>& /*args*/)
 {
 
   nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
@@ -51,13 +51,13 @@ FakeDataConsumerDAQModule::do_configure([[maybe_unused]] const std::vector<std::
 }
 
 void
-FakeDataConsumerDAQModule::do_start([[maybe_unused]] const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_start(const std::vector<std::string>& /*args*/)
 {
   thread_.start_working_thread();
 }
 
 void
-FakeDataConsumerDAQModule::do_stop([[maybe_unused]] const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_stop(const std::vector<std::string>& /*args*/)
 {
   thread_.stop_working_thread();
 }
