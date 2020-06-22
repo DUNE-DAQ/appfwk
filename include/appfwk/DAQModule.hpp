@@ -161,7 +161,7 @@ ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
 ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
                        CommandIssue,                  ///< Type of the issue
                        appfwk::GeneralDAQModuleIssue, ///< Base class of the issue
-                       ERS_EMPTY,                     ///< Log Message from the issue
+                       " Command " << cmd,                     ///< Log Message from the issue
                        ((std::string)name),           ///< Base class attributes
                        ((std::string)cmd))            ///< Attribute of this class
 
@@ -171,7 +171,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
 ERS_DECLARE_ISSUE_BASE(appfwk,                                       ///< Namespace
                        CommandRegistrationFailed,                    ///< Type of the Issue
                        appfwk::CommandIssue,                         ///< Base class of the Issue
-                       "Command " << cmd << " registration failed.", ///< Log Message from the issue
+                       "Command registration failed.", ///< Log Message from the issue
                        ((std::string)cmd)((std::string)name),                           ///< Base class attributes
                        ERS_EMPTY                                     ///< Attribute of this class
 )
@@ -182,7 +182,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                       ///< Namesp
 ERS_DECLARE_ISSUE_BASE(appfwk,                                    ///< Namespace
                        UnknownCommand,                            ///< Issue class name
                        appfwk::CommandIssue,                      ///< Base class of the issue
-                       "Command " << cmd << " is not recognised", ///< Log Message from the issue
+                       "Command is not recognised", ///< Log Message from the issue
                        ((std::string)cmd)((std::string)name),     ///< Base class attributes
                        ERS_EMPTY                                  ///< Attribute of this class
 )
@@ -193,7 +193,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                    ///< Namespace
 ERS_DECLARE_ISSUE_BASE(appfwk,                                            ///< Namespace
                        CommandFailed,                                     ///< Type of the Issue
                        appfwk::CommandIssue,                              ///< Base class of the Issue
-                       "Command " << cmd << " failed. Reason " << reason, ///< Log Message from the issue
+                       "Command Failed. Reason " << reason, ///< Log Message from the issue
                        ((std::string)cmd)((std::string)name),             ///< Base class attributes
                        ((std::string)reason)                              ///< Attribute of this class
 )

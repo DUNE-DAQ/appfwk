@@ -23,7 +23,7 @@ DAQModule::execute_command(const std::string& name, const std::vector<std::strin
       return;
     }
 
-    throw UnknownCommand(ERS_HERE, name, get_name());
+    throw UnknownCommand(ERS_HERE, get_name(), name);
 }
 
 std::vector<std::string> 
