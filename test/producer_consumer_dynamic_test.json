@@ -22,7 +22,7 @@
       "user_module_type": "VectorIntFanOutDAQModule",
       "input": "producerToFanOut",
       "outputs": [ "fanOutToConsumer1", "fanOutToConsumer2" ],
-      "fanout_mode": "RoundRobin"
+      "fanout_mode": "round_robin"
     },
     "consumer1": {
       "user_module_type": "FakeDataConsumerDAQModule",
