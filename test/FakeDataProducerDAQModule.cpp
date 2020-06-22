@@ -50,13 +50,13 @@ FakeDataProducerDAQModule::do_configure([[maybe_unused]] const std::vector<std::
 void
 FakeDataProducerDAQModule::do_start([[maybe_unused]] const std::vector<std::string>& args)
 {
-  thread_.start_working_thread_();
+  thread_.start_working_thread();
 }
 
 void
 FakeDataProducerDAQModule::do_stop([[maybe_unused]] const std::vector<std::string>& args)
 {
-  thread_.stop_working_thread_();
+  thread_.stop_working_thread();
 }
 
 /**

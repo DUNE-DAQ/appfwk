@@ -58,7 +58,7 @@ public:
    * @brief Start the working thread (which executes the do_work() function)
    * @throws ThreadingIssue if the thread is already running
    */
-  void start_working_thread_()
+  void start_working_thread()
   {
     if (thread_running()) {
       throw ThreadingIssue(ERS_HERE, "Attempted to start working thread "
@@ -73,7 +73,7 @@ public:
    * @throws ThreadingIssue If the thread is not in the joinable state
    * @throws ThreadingIssue If an exception occurs during thread join
    */
-  void stop_working_thread_()
+  void stop_working_thread()
   {
     if (!thread_running()) {
       throw ThreadingIssue(ERS_HERE,

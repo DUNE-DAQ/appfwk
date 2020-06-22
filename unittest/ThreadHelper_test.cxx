@@ -42,29 +42,29 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
   BOOST_TEST_MESSAGE("Construction time was " << construction_time_in_ms << " ms");
 
   starttime = std::chrono::steady_clock::now();
-  BOOST_REQUIRE_NO_THROW(umth_ptr->start_working_thread_());
+  BOOST_REQUIRE_NO_THROW(umth_ptr->start_working_thread());
   auto start_time_in_ms =
     std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - starttime).count();
-  BOOST_TEST_MESSAGE("Time to call ThreadHelper::start_working_thread_() was " << start_time_in_ms << " ms");
+  BOOST_TEST_MESSAGE("Time to call ThreadHelper::start_working_thread() was " << start_time_in_ms << " ms");
 
   starttime = std::chrono::steady_clock::now();
-  BOOST_REQUIRE_NO_THROW(umth_ptr->stop_working_thread_());
+  BOOST_REQUIRE_NO_THROW(umth_ptr->stop_working_thread());
   auto stop_time_in_ms =
     std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - starttime).count();
-  BOOST_TEST_MESSAGE("Time to call ThreadHelper::stop_working_thread_() was " << stop_time_in_ms << " ms");
+  BOOST_TEST_MESSAGE("Time to call ThreadHelper::stop_working_thread() was " << stop_time_in_ms << " ms");
 }
 
 BOOST_AUTO_TEST_CASE(inappropriate_transitions, *boost::unit_test::depends_on("sanity_checks"))
 {
 
   dunedaq::appfwk::ThreadHelper umth(DoSomething);
-  BOOST_REQUIRE_THROW(umth.stop_working_thread_(), dunedaq::appfwk::ThreadingIssue);
+  BOOST_REQUIRE_THROW(umth.stop_working_thread(), dunedaq::appfwk::ThreadingIssue);
 
-  umth.start_working_thread_();
+  umth.start_working_thread();
 
-  BOOST_REQUIRE_THROW(umth.start_working_thread_(), dunedaq::appfwk::ThreadingIssue);
+  BOOST_REQUIRE_THROW(umth.start_working_thread(), dunedaq::appfwk::ThreadingIssue);
 
-  umth.stop_working_thread_();
+  umth.stop_working_thread();
 }
 
 // You'll want this to test case to execute last, for reasons that are obvious
@@ -77,16 +77,16 @@ BOOST_AUTO_TEST_CASE(abort_checks, *boost::unit_test::depends_on("inappropriate_
     dunedaq::appfwk::ThreadHelper umth(DoSomething);
   }
   BOOST_TEST(true,
-             "ThreadHelper without having start_working_thread_() thread "
+             "ThreadHelper without having start_working_thread() thread "
              "called destructs without aborting the program, as expected");
 
   // BOOST_TEST_MESSAGE(
   //     "You should *expect* the program to abort in a moment, since we're "
   //     "destructing a ThreadHelper instance after calling "
-  //     "start_working_thread_() but before calling stop_working_thread_()");
+  //     "start_working_thread() but before calling stop_working_thread_()");
 
   // {
   //   dunedaq::appfwk::ThreadHelper umth(DoSomething);
-  //   umth.start_working_thread_();
+  //   umth.start_working_thread();
   // }
 }
