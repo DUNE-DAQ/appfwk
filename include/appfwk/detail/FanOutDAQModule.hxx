@@ -36,15 +36,17 @@ FanOutDAQModule<ValueType>::do_configure([[maybe_unused]] const std::vector<std:
 {
   if (get_config().contains("fanout_mode")) {
     auto modeString = get_config()["fanout_mode"].get<std::string>();
-    if (modeString.find("roadcast") != std::string::npos) {
+    if (modeString=="broadcast") {
 
       mode_ = FanOutMode::Broadcast;
-    } else if (modeString.find("irst") != std::string::npos) {
+    } else if (modeString=="first_available") {
 
       mode_ = FanOutMode::FirstAvailable;
-    } else {
-      // RoundRobin by default
+    } else if (modeString=="round_robin") {
       mode_ = FanOutMode::RoundRobin;
+    }
+    else{
+      throw ConfigureFailed(ERS_HERE, std::string("given unknown fanout_mode ")+modeString);
     }
   } else {
     // RoundRobin by default
