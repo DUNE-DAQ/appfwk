@@ -46,7 +46,7 @@ FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& /*args*
       mode_ = FanOutMode::RoundRobin;
     }
     else{
-      throw ConfigureFailed(ERS_HERE, std::string("given unknown fanout_mode ")+modeString);
+      throw ConfigureFailed(ERS_HERE, get_name(), std::string("given unknown fanout_mode ") + modeString);
     }
   } else {
     // RoundRobin by default

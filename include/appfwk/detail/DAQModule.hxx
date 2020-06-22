@@ -8,7 +8,7 @@ DAQModule::register_command(const std::string &name, void (Child::*f)(const std:
   bool done = commands_.emplace(name, std::bind(f, dynamic_cast<Child*>(this), _1)).second;
   if (!done) {
     // Throw here
-    throw CommandRegistrationFailed(ERS_HERE, name);
+    throw CommandRegistrationFailed(ERS_HERE, name, get_name());
   }
 }
 

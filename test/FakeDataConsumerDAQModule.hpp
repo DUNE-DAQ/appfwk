@@ -71,16 +71,17 @@ private:
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        ConsumerErrorDetected,
                        appfwk::GeneralDAQModuleIssue,
-                       name << ": Error in received vector " << counter << " at position " << position << ": Expected "
+                      
+    "Error in received vector " << counter << " at position " << position << ": Expected "
                             << expected << ", received " << received,
-                       ERS_EMPTY,
-                       ((std::string)name)((int)counter)((int)position)((int)expected)((int)received))
+                       ((std::string)name),
+                       ((int)counter)((int)position)((int)expected)((int)received))
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        ConsumerProgressUpdate,
                        appfwk::GeneralDAQModuleIssue,
-                       name << ": " << message,
-    ERS_EMPTY,
-                       ((std::string)name)((std::string)message))
+                       message,
+                       ((std::string)name),
+                       ((std::string)message))
 } // namespace dunedaq
 
 #endif // APP_FRAMEWORK_TEST_FAKEDATACONSUMERDAQMODULE_HH_
