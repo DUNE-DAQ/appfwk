@@ -76,7 +76,8 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
         {
                     "input": "input",
                     "outputs": ["output1", "output2" ],
-                    "fanout_mode": "round_robin"
+                    "fanout_mode": "round_robin",
+                    "wait_interval": 10000
         }
     )"_json;
   foum.do_init(module_config);
@@ -90,12 +91,29 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   DAQSource<NonCopyableType> outputbuf1("output1");
   DAQSource<NonCopyableType> outputbuf2("output2");
 
+  auto start_push = std::chrono::steady_clock::now();
   inputbuf.push(dunedaq::appfwk::NonCopyableType(1), queue_timeout);
   inputbuf.push(dunedaq::appfwk::NonCopyableType(2), queue_timeout);
+  auto after_push = std::chrono::steady_clock::now();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  while (!outputbuf1.can_pop() && !outputbuf2.can_pop()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - after_push).count() >
+        2500) {
+      BOOST_TEST_REQUIRE(false,
+                         "Test failure: It should not take more than 2.5 seconds for FanOutDAQModule to process 2 "
+                         "instances of NonCopyableType!");
+    }
+  }
+  auto after_sleep = std::chrono::steady_clock::now();
 
   foum.execute_command("stop");
+  BOOST_TEST_MESSAGE(
+    "It took " << std::chrono::duration_cast<std::chrono::milliseconds>(after_push - start_push).count()
+               << " ms to push values onto the input queue");
+  BOOST_TEST_MESSAGE(
+    "It took " << std::chrono::duration_cast<std::chrono::milliseconds>(after_sleep - after_push).count()
+               << " ms for FanOutDAQModule to process input");
 
   BOOST_REQUIRE_EQUAL(outputbuf1.can_pop(), true);
   dunedaq::appfwk::NonCopyableType res(0);
