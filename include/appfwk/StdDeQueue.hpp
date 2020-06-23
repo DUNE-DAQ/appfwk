@@ -51,7 +51,7 @@ public:
   void pop(value_type& val, const duration_type&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
   bool can_push() const noexcept override { return fSize.load() < this->GetCapacity(); }
-  void push(value_type&&, const duration_type&) override; // Throws std::runtime_error if a timeout occurs
+  void push(value_type&&, const duration_type&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
