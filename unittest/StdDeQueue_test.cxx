@@ -38,7 +38,7 @@ constexpr auto timeout = std::chrono::milliseconds(2);
  */
 constexpr auto timeout_in_us = std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-dunedaq::appfwk::StdDeQueue<int> Queue("StdDeQueue"); ///< Queue instance for the test
+  dunedaq::appfwk::StdDeQueue<int> Queue("StdDeQueue", 10); ///< Queue instance for the test
 } // namespace ""
 
 // This test case should run first. Make sure all other test cases depend on
@@ -46,7 +46,6 @@ dunedaq::appfwk::StdDeQueue<int> Queue("StdDeQueue"); ///< Queue instance for th
 
 BOOST_AUTO_TEST_CASE(sanity_checks)
 {
-  Queue.SetSize(10);
 
   BOOST_REQUIRE(!Queue.can_pop());
 
@@ -103,7 +102,9 @@ BOOST_AUTO_TEST_CASE(empty_checks)
   BOOST_TEST(!Queue.pop(popped_value, timeout));
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
 
-  const double fraction_of_pop_timeout_used = pop_duration / std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
+  const double fraction_of_pop_timeout_used = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(pop_duration).count())/std::chrono::duration_cast<std::chrono::nanoseconds>(timeout).count();
+
+  BOOST_TEST_MESSAGE("Attempted pop_duration divided by timeout is " << fraction_of_pop_timeout_used);
 
   BOOST_CHECK_GT(fraction_of_pop_timeout_used, 1 - fractional_timeout_tolerance);
   BOOST_CHECK_LT(fraction_of_pop_timeout_used, 1 + fractional_timeout_tolerance);

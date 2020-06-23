@@ -45,12 +45,12 @@ public:
    * @brief StdDeQueue Constructor
    * @param name Name of this StdDeQueue instance
    */
-  explicit StdDeQueue(const std::string& name);
+  explicit StdDeQueue(const std::string& name, size_t capacity);
 
   bool can_pop() const noexcept override { return fSize.load() > 0; }
   bool pop(value_type& val, const duration_type&) override; // Throws std::runtime_error if a timeout occurs
 
-  bool can_push() const noexcept override { return fSize.load() < fMaxSize; }
+  bool can_push() const noexcept override { return fSize.load() < this->GetCapacity(); }
   void push(value_type&&, const duration_type&) override; // Throws std::runtime_error if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
@@ -61,16 +61,9 @@ public:
   StdDeQueue(StdDeQueue&&) = delete;                 ///< StdDeQueue is not move-constructible
   StdDeQueue& operator=(StdDeQueue&&) = delete;      ///< StdDeQueue is not move-assignable
 
-  /**
-   * @brief Set the size of the StdDeQueue
-   * @param sz Maximum size for the StdDeQueue
-   */
-  void SetSize(size_t sz) { fMaxSize = sz; }
 
 private:
   void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
-
-  size_t fMaxSize;
 
   std::deque<value_type> fDeque;
   std::atomic<size_t> fSize = 0;
