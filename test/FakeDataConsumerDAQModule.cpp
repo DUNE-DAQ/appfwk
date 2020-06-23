@@ -96,7 +96,12 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 
       TLOG(TLVL_TRACE) << get_name() << ": Going to receive data from inputQueue";
 
-      if (!inputQueue_->pop(vec, queueTimeout_)) {
+      try
+      {
+        inputQueue_->pop(vec, queueTimeout_);
+      }
+      catch (dunedaq::appfwk::QueueTimeoutExpired& excpt)
+      {
         continue;
       }
 
