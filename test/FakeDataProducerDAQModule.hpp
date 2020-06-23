@@ -13,8 +13,8 @@
 #define APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/ThreadHelper.hpp"
 #include "appfwk/DAQSink.hpp"
+#include "appfwk/ThreadHelper.hpp"
 
 #include <future>
 #include <memory>
@@ -46,6 +46,7 @@ public:
     delete; ///< FakeDataProducerDAQModule is not move-assignable
 
   void init() override;
+
 private:
   // Commands
   void do_configure(const std::vector<std::string>& args);
@@ -70,9 +71,9 @@ private:
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        ProducerProgressUpdate,
                        appfwk::GeneralDAQModuleIssue,
-                       name << ": " << message,
-                       ERS_EMPTY,
-                       ((std::string)name)((std::string)message))
+                       message,
+                       ((std::string)name),
+                       ((std::string)message))
 } // namespace dunedaq
 
 #endif // APP_FRAMEWORK_TEST_FAKEDATAPRODUCERDAQMODULE_HPP_

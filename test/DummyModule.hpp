@@ -11,9 +11,9 @@ namespace dunedaq {
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        DummyModuleUpdate,
                        appfwk::GeneralDAQModuleIssue,
-                       name << ": " << message,
-                       ERS_EMPTY,
-                       ((std::string)name)((std::string)message))
+                       message,
+                       ((std::string)name),
+                       ((std::string)message))
 
 
 namespace appfwk {

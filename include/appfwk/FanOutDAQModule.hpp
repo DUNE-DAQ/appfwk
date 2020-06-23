@@ -37,7 +37,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
                        BroadcastFailed,       ///< Type of the Issue
                        GeneralDAQModuleIssue, ///< Base class of the Issue
                        "FanOutDAQModule Broadcast Error: " << reason, ///< Log Message from the issue
-                       ERS_EMPTY,                                            ///< End of variable declarations
+                       ((std::string)name),                                            ///< End of variable declarations
                        ((std::string)reason))                                ///< Variables to capture
 
 /**
@@ -47,7 +47,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
                        ConfigureFailed,       ///< Type of the Issue
                        GeneralDAQModuleIssue, ///< Base class of the Issue
                        "FanOutDAQModule Configure Error: " << reason, ///< Log Message from the issue
-                       ERS_EMPTY,                                            ///< End of variable declarations
+                       ((std::string)name),                           ///< End of variable declarations
                        ((std::string)reason))                                ///< Variables to capture
 
 namespace appfwk {
@@ -107,7 +107,7 @@ private:
   template<typename U = ValueType>
   typename std::enable_if_t<!std::is_copy_constructible_v<U>> do_broadcast(ValueType&) const
   {
-    throw BroadcastFailed(ERS_HERE, "Broadcast mode cannot be used for non-copy-constructible types!");
+    throw BroadcastFailed(ERS_HERE, get_name(), "Broadcast mode cannot be used for non-copy-constructible types!");
   }
   template<typename U = ValueType>
   typename std::enable_if_t<std::is_copy_constructible_v<U>> do_broadcast(ValueType& data) const
@@ -118,6 +118,7 @@ private:
       auto endtime = std::chrono::steady_clock::now();
       if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) > queueTimeout_) {
         ers::warning(BroadcastFailed(ERS_HERE,
+                                     get_name(),
                                      "Timeout occurred trying to broadcast data to "
                                      "output queue; data may be lost if it doesn't "
                                      "make it into any other output queues, either"));

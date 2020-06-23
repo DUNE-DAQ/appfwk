@@ -44,12 +44,12 @@ BOOST_TEST_GLOBAL_FIXTURE(FanOutDAQModuleTestFixture);
 
 BOOST_AUTO_TEST_CASE(Construct)
 {
-  dunedaq::appfwk::FanOutDAQModule<int> foum("test");
+  dunedaq::appfwk::FanOutDAQModule<int> foum("construct_test");
 }
 
 BOOST_AUTO_TEST_CASE(Configure)
 {
-  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
+  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("configure_test");
 
   auto module_config = R"({"input": "input", "fanout_mode": "round_robin", "outputs": []})"_json;
   foum.do_init(module_config);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(Configure)
 
 BOOST_AUTO_TEST_CASE(InvalidConfigure)
 {
-  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
+  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("invalid_configure_test");
 
   // Wrongly-capitalized fanout_mode
   auto module_config = R"({"input": "input", "fanout_mode": "Round_robin", "outputs": []})"_json;
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(InvalidConfigure)
 
 BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
 {
-  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
+  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("noncopyable_test");
 
   nlohmann::json module_config = R"(
         {
