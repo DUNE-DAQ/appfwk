@@ -71,9 +71,9 @@ private:
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        ConsumerErrorDetected,
                        appfwk::GeneralDAQModuleIssue,
-                      
-    "Error in received vector " << counter << " at position " << position << ": Expected "
-                            << expected << ", received " << received,
+
+                       "Error in received vector " << counter << " at position " << position << ": Expected "
+                                                   << expected << ", received " << received,
                        ((std::string)name),
                        ((int)counter)((int)position)((int)expected)((int)received))
 ERS_DECLARE_ISSUE_BASE(appfwk,

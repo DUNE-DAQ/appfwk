@@ -46,8 +46,8 @@ public:
    * @param name Name of the Queue instance
    */
   explicit Queue(const std::string& name, size_t capacity)
-    : NamedObject(name),
-      capacity_(capacity)
+    : NamedObject(name)
+    , capacity_(capacity)
   {}
 
   /**
@@ -107,7 +107,7 @@ private:
 ERS_DECLARE_ISSUE(appfwk,              // namespace
                   QueueTimeoutExpired, // issue class name
                   name << ": Unable to " << func_name << " within timeout period (timeout period was " << timeout
-                               << " milliseconds)", // message
+                       << " milliseconds)", // message
                   ((std::string)name)((std::string)func_name)((int)timeout))
 } // namespace dunedaq
 

@@ -55,9 +55,10 @@ public:
     QueueRegistry::get().configure(queue_configuration);
 
     for (auto& module : config_["modules"].items()) {
-      auto [ modit, done] = user_module_map.emplace(module.key(), makeModule(module.value()["user_module_type"], module.key()));
+      auto [modit, done] =
+        user_module_map.emplace(module.key(), makeModule(module.value()["user_module_type"], module.key()));
       if (!done) {
-        // throw 
+        // throw
       }
       modit->second->do_init(module.value());
     }

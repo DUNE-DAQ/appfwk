@@ -96,12 +96,9 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 
       TLOG(TLVL_TRACE) << get_name() << ": Going to receive data from inputQueue";
 
-      try
-      {
+      try {
         inputQueue_->pop(vec, queueTimeout_);
-      }
-      catch (const dunedaq::appfwk::QueueTimeoutExpired& excpt)
-      {
+      } catch (const dunedaq::appfwk::QueueTimeoutExpired& excpt) {
         continue;
       }
 
@@ -111,7 +108,7 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 
       TLOG(TLVL_TRACE) << get_name() << ": Starting processing loop";
       oss << "Received vector " << counter << ": " << vec;
-      ers::debug(ConsumerProgressUpdate(ERS_HERE,get_name(), oss.str()));
+      ers::debug(ConsumerProgressUpdate(ERS_HERE, get_name(), oss.str()));
       oss.str("");
 
       size_t ii = 0;

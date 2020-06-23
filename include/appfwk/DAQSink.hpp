@@ -70,7 +70,7 @@ template<typename T>
 void
 DAQSink<T>::push(const T& element, const duration_type& timeout)
 {
-  queue_->push( T(element), timeout);
+  queue_->push(T(element), timeout);
 }
 
 template<typename T>

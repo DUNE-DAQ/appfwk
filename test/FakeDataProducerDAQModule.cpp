@@ -30,11 +30,13 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
 {
 
   register_command("configure", &FakeDataProducerDAQModule::do_configure);
-  register_command("start",  &FakeDataProducerDAQModule::do_start);
-  register_command("stop",  &FakeDataProducerDAQModule::do_stop);
+  register_command("start", &FakeDataProducerDAQModule::do_start);
+  register_command("stop", &FakeDataProducerDAQModule::do_stop);
 }
 
-void FakeDataProducerDAQModule::init() {
+void
+FakeDataProducerDAQModule::init()
+{
   outputQueue_.reset(new DAQSink<std::vector<int>>(get_config()["output"].get<std::string>()));
 }
 
@@ -97,8 +99,7 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
       if (current_int > ending_int_)
         current_int = starting_int_;
     }
-    oss << "Produced vector " << counter << " with contents " << output << " and size "
-                    << output.size();
+    oss << "Produced vector " << counter << " with contents " << output << " and size " << output.size();
     ers::debug(ProducerProgressUpdate(ERS_HERE, get_name(), oss.str()));
     oss.str("");
 
@@ -112,7 +113,7 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
   }
 }
 
-} // namespace appfwk 
+} // namespace appfwk
 } // namespace dunedaq
 
 DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::FakeDataProducerDAQModule)

@@ -47,7 +47,7 @@ struct QueueConfig
 
   QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
                                                        ///< QueueConfig
-  size_t capacity = 0;                                     ///< The maximum size of the queue
+  size_t capacity = 0;                                 ///< The maximum size of the queue
 };
 
 /**
@@ -130,17 +130,19 @@ ERS_DECLARE_ISSUE(appfwk,           // namespace
 /**
  * @brief QueueNotFound ERS Issue
  */
-ERS_DECLARE_ISSUE(appfwk,           // namespace
+ERS_DECLARE_ISSUE(appfwk,        // namespace
                   QueueNotFound, // issue class name
-                  "Requested queue \"" << queue_name << "\" of type '" << target_type << "' could not be found.", // message
+                  "Requested queue \"" << queue_name << "\" of type '" << target_type
+                                       << "' could not be found.", // message
                   ((std::string)queue_name)((std::string)target_type))
 
 /**
  * @brief QueueRegistryConfigured ERS Issue
  */
-ERS_DECLARE_ISSUE(appfwk,        // namespace
+ERS_DECLARE_ISSUE(appfwk,                  // namespace
                   QueueRegistryConfigured, // issue class name
-                  "QueueRegistry already configured",ERS_EMPTY)
+                  "QueueRegistry already configured",
+                  ERS_EMPTY)
 
 } // namespace dunedaq
 

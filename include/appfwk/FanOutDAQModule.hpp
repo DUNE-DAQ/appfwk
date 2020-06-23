@@ -33,22 +33,22 @@ namespace dunedaq {
 /**
  * @brief The BroadcastFailed FanOutDAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
-                       BroadcastFailed,       ///< Type of the Issue
-                       GeneralDAQModuleIssue, ///< Base class of the Issue
+ERS_DECLARE_ISSUE_BASE(appfwk,                                        ///< Namespace
+                       BroadcastFailed,                               ///< Type of the Issue
+                       GeneralDAQModuleIssue,                         ///< Base class of the Issue
                        "FanOutDAQModule Broadcast Error: " << reason, ///< Log Message from the issue
-                       ((std::string)name),                                            ///< End of variable declarations
-                       ((std::string)reason))                                ///< Variables to capture
+                       ((std::string)name),                           ///< End of variable declarations
+                       ((std::string)reason))                         ///< Variables to capture
 
 /**
  * @brief The ConfigureFailed FanOutDAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
-                       ConfigureFailed,       ///< Type of the Issue
-                       GeneralDAQModuleIssue, ///< Base class of the Issue
+ERS_DECLARE_ISSUE_BASE(appfwk,                                        ///< Namespace
+                       ConfigureFailed,                               ///< Type of the Issue
+                       GeneralDAQModuleIssue,                         ///< Base class of the Issue
                        "FanOutDAQModule Configure Error: " << reason, ///< Log Message from the issue
                        ((std::string)name),                           ///< End of variable declarations
-                       ((std::string)reason))                                ///< Variables to capture
+                       ((std::string)reason))                         ///< Variables to capture
 
 namespace appfwk {
 

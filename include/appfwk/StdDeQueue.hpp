@@ -61,7 +61,6 @@ public:
   StdDeQueue(StdDeQueue&&) = delete;                 ///< StdDeQueue is not move-constructible
   StdDeQueue& operator=(StdDeQueue&&) = delete;      ///< StdDeQueue is not move-assignable
 
-
 private:
   void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
 

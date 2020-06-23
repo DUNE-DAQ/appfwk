@@ -15,13 +15,14 @@ ERS_DECLARE_ISSUE_BASE(appfwk,
                        ((std::string)name),
                        ((std::string)message))
 
-
 namespace appfwk {
 
 class DummyParentModule : public DAQModule
 {
 public:
-  explicit DummyParentModule(const std::string& name) : DAQModule(name) {
+  explicit DummyParentModule(const std::string& name)
+    : DAQModule(name)
+  {
     register_command("stuff", &DummyParentModule::do_stuff);
   }
 
@@ -31,22 +32,19 @@ public:
   {
     ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyParentModule do_stuff"));
   };
-
 };
-
 
 class DummyModule : public DummyParentModule
 {
 public:
-  explicit DummyModule(const std::string& name) : DummyParentModule(name) {
-  }
-
+  explicit DummyModule(const std::string& name)
+    : DummyParentModule(name)
+  {}
 
   virtual void do_stuff(const std::vector<std::string>& /*args*/) override
   {
     ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_stuff"));
   };
-
 };
 
 } // namespace appfwk

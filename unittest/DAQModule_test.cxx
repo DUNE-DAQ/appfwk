@@ -41,7 +41,7 @@ public:
 class GoodDAQModule : public DAQModule
 {
 public:
-      explicit GoodDAQModule(std::string const& name)
+  explicit GoodDAQModule(std::string const& name)
     : DAQModule(name)
   {
     register_command("stuff", &GoodDAQModule::do_stuff);
@@ -59,7 +59,8 @@ BOOST_AUTO_TEST_CASE(Construct)
   BOOST_REQUIRE_THROW(daqmoduletest::BadDAQModule bdm("construct_test_bad"), CommandRegistrationFailed);
 }
 
-BOOST_AUTO_TEST_CASE(Commands) {
+BOOST_AUTO_TEST_CASE(Commands)
+{
 
   daqmoduletest::GoodDAQModule gdm("command_test");
 
