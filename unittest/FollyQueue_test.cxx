@@ -66,7 +66,8 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
 
   starttime = std::chrono::steady_clock::now();
   int popped_value ; 
-  Queue.pop( popped_value, timeout);
+  try {Queue.pop( popped_value, timeout);}
+  catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {}
   auto pop_time = std::chrono::steady_clock::now() - starttime;
 
   if (pop_time > timeout) {
@@ -89,9 +90,12 @@ BOOST_AUTO_TEST_CASE(empty_checks,
   try {
     while (Queue.can_pop()) {
       int popped_value ; 
-      if ( ! Queue.pop(popped_value, timeout) ) {
+      try {
+        Queue.pop(popped_value, timeout);
+      }
+      catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
 	BOOST_TEST(false,
-		   "False returned in call to FollyQueue::pop(); unable "
+		   "Exception thrown in call to FollyQueue::pop(); unable "
 		   "to empty the Queue");
 	break ;
       }
@@ -107,7 +111,7 @@ BOOST_AUTO_TEST_CASE(empty_checks,
   int popped_value ; 
   
   auto starttime = std::chrono::steady_clock::now();
-  BOOST_TEST( ! Queue.pop(popped_value, timeout) ) ; 
+  BOOST_CHECK_THROW(Queue.pop(popped_value, timeout), dunedaq::appfwk::QueueTimeoutExpired ) ; 
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
   
   const double fraction_of_pop_timeout_used = pop_duration / timeout;

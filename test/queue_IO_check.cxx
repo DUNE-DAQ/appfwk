@@ -120,7 +120,7 @@ add_things()
       msg << "Thread #" << std::this_thread::get_id() << ": completed push";
       TLOG(TLVL_DEBUG) << msg.str();
 
-    } catch (const QueueTimeoutExpired & err) {
+    } catch (const dunedaq::appfwk::QueueTimeoutExpired & err) {
       TLOG(TLVL_WARNING) << "Exception thrown during push attempt: " << err.what();
       throw_pushes++;
     }
@@ -164,7 +164,7 @@ remove_things()
       } else {
         timeout_pops++;
       }
-    } catch (const QueueTimeoutExpired & e) {
+    } catch (const dunedaq::appfwk::QueueTimeoutExpired& e) {
       TLOG(TLVL_WARNING) << "Exception thrown during pop attempt: " << e.what();
       throw_pops++;
     }
