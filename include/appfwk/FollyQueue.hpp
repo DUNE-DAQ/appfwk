@@ -19,12 +19,12 @@
 
 #include "folly/concurrency/DynamicBoundedQueue.h"
 
-#include <utility> // For std::move
 #include <string>
+#include <utility> // For std::move
 
 namespace dunedaq::appfwk {
 
-template<class T, template <typename, bool> class FollyQueueType>
+template<class T, template<typename, bool> class FollyQueueType>
 class FollyQueue : public Queue<T>
 {
 public:
@@ -32,26 +32,22 @@ public:
   using duration_type = typename Queue<T>::duration_type;
 
   explicit FollyQueue(const std::string& name, size_t capacity)
-    : Queue<T>(name, capacity),
-      fQueue(this->GetCapacity())
+    : Queue<T>(name, capacity)
+    , fQueue(this->GetCapacity())
   {}
 
   bool can_pop() const noexcept override { return !fQueue.empty(); }
-  void pop( value_type & val, const duration_type& dur) override
+  void pop(value_type& val, const duration_type& dur) override
   {
-    if (!fQueue.try_dequeue_for(val, dur))
-    {
+    if (!fQueue.try_dequeue_for(val, dur)) {
       throw QueueTimeoutExpired(
         ERS_HERE, NamedObject::get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
   }
 
-  bool can_push() const noexcept override
-  {
-    return fQueue.size()<this->GetCapacity();
-  }
+  bool can_push() const noexcept override { return fQueue.size() < this->GetCapacity(); }
 
-  void push(value_type&& t, const duration_type& dur)  override
+  void push(value_type&& t, const duration_type& dur) override
   {
     // Is the std::move actually necessary here?
     if (!fQueue.try_enqueue_for(std::move(t), dur)) {
@@ -60,7 +56,6 @@ public:
     }
   }
 
-   
   // Delete the copy and move operations
   FollyQueue(const FollyQueue&) = delete;
   FollyQueue& operator=(const FollyQueue&) = delete;
@@ -80,7 +75,6 @@ using FollyMPMCQueue = FollyQueue<T, folly::DMPMCQueue>;
 } // namespace dunedaq::appfwk
 
 #endif // APPFWK_INCLUDE_APPFWK_FOLLYQUEUE_HPP_
-
 
 // Local Variables:
 // c-basic-offset: 2

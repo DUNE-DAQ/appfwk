@@ -12,14 +12,15 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_DAQPROCESS_HPP_
+#define APPFWK_INCLUDE_APPFWK_DAQPROCESS_HPP_
 
 #include "appfwk/CommandLineInterpreter.hpp"
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/GraphConstructor.hpp"
 
 #include <string>
+#include <vector>
 
 namespace dunedaq {
 namespace appfwk {
@@ -136,4 +137,4 @@ ERS_DECLARE_ISSUE_BASE(appfwk,          ///< Namespace
                        ((std::string)mod_name)((std::string)cmd))
 
 } // namespace dunedaq
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_DAQPROCESS_HPP_

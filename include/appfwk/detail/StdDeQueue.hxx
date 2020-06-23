@@ -33,8 +33,10 @@ StdDeQueue<T>::push(value_type&& object_to_push, const duration_type& timeout)
     fSize++;
     fNoLongerEmpty.notify_one();
   } else {
-    throw QueueTimeoutExpired(
-      ERS_HERE, NamedObject::get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
+    throw QueueTimeoutExpired(ERS_HERE,
+                              NamedObject::get_name(),
+                              "push",
+                              std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
 

@@ -16,8 +16,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
+#define APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 
 #include "appfwk/NamedObject.hpp"
 
@@ -27,6 +27,7 @@
 #include <nlohmann/json.hpp>
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -161,45 +162,45 @@ ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
 ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
                        CommandIssue,                  ///< Type of the issue
                        appfwk::GeneralDAQModuleIssue, ///< Base class of the issue
-                       " Command " << cmd,                     ///< Log Message from the issue
+                       " Command " << cmd,            ///< Log Message from the issue
                        ((std::string)name),           ///< Base class attributes
                        ((std::string)cmd))            ///< Attribute of this class
 
 /**
  * @brief The CommandFailed DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                       ///< Namespace
-                       CommandRegistrationFailed,                    ///< Type of the Issue
-                       appfwk::CommandIssue,                         ///< Base class of the Issue
-                       "Command registration failed.", ///< Log Message from the issue
-                       ((std::string)cmd)((std::string)name),                           ///< Base class attributes
-                       ERS_EMPTY                                     ///< Attribute of this class
+ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
+                       CommandRegistrationFailed,             ///< Type of the Issue
+                       appfwk::CommandIssue,                  ///< Base class of the Issue
+                       "Command registration failed.",        ///< Log Message from the issue
+                       ((std::string)cmd)((std::string)name), ///< Base class attributes
+                       ERS_EMPTY                              ///< Attribute of this class
 )
 
 /**
  * @brief The UnknownCommand DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                    ///< Namespace
-                       UnknownCommand,                            ///< Issue class name
-                       appfwk::CommandIssue,                      ///< Base class of the issue
-                       "Command is not recognised", ///< Log Message from the issue
-                       ((std::string)cmd)((std::string)name),     ///< Base class attributes
-                       ERS_EMPTY                                  ///< Attribute of this class
+ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
+                       UnknownCommand,                        ///< Issue class name
+                       appfwk::CommandIssue,                  ///< Base class of the issue
+                       "Command is not recognised",           ///< Log Message from the issue
+                       ((std::string)cmd)((std::string)name), ///< Base class attributes
+                       ERS_EMPTY                              ///< Attribute of this class
 )
 
 /**
  * @brief The CommandFailed DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                            ///< Namespace
-                       CommandFailed,                                     ///< Type of the Issue
-                       appfwk::CommandIssue,                              ///< Base class of the Issue
-                       "Command Failed. Reason " << reason, ///< Log Message from the issue
-                       ((std::string)cmd)((std::string)name),             ///< Base class attributes
-                       ((std::string)reason)                              ///< Attribute of this class
+ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
+                       CommandFailed,                         ///< Type of the Issue
+                       appfwk::CommandIssue,                  ///< Base class of the Issue
+                       "Command Failed. Reason " << reason,   ///< Log Message from the issue
+                       ((std::string)cmd)((std::string)name), ///< Base class attributes
+                       ((std::string)reason)                  ///< Attribute of this class
 )
 
 } // namespace dunedaq
 
 #include "detail/DAQModule.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_

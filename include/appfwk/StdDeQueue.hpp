@@ -1,5 +1,5 @@
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_STDDEQUEUE_HPP_
+#define APPFWK_INCLUDE_APPFWK_STDDEQUEUE_HPP_
 
 /**
  *
@@ -61,7 +61,6 @@ public:
   StdDeQueue(StdDeQueue&&) = delete;                 ///< StdDeQueue is not move-constructible
   StdDeQueue& operator=(StdDeQueue&&) = delete;      ///< StdDeQueue is not move-assignable
 
-
 private:
   void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
 
@@ -79,4 +78,4 @@ private:
 
 #include "detail/StdDeQueue.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_STDDEQUEUE_HPP_

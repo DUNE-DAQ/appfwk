@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
+#define APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
@@ -73,4 +73,4 @@ DAQSource<T>::can_pop()
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_

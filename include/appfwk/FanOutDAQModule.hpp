@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_FANOUTDAQMODULE_HPP_
+#define APPFWK_INCLUDE_APPFWK_FANOUTDAQMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/DAQSink.hpp"
@@ -33,22 +33,22 @@ namespace dunedaq {
 /**
  * @brief The BroadcastFailed FanOutDAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
-                       BroadcastFailed,       ///< Type of the Issue
-                       GeneralDAQModuleIssue, ///< Base class of the Issue
+ERS_DECLARE_ISSUE_BASE(appfwk,                                        ///< Namespace
+                       BroadcastFailed,                               ///< Type of the Issue
+                       GeneralDAQModuleIssue,                         ///< Base class of the Issue
                        "FanOutDAQModule Broadcast Error: " << reason, ///< Log Message from the issue
-                       ((std::string)name),                                            ///< End of variable declarations
-                       ((std::string)reason))                                ///< Variables to capture
+                       ((std::string)name),                           ///< End of variable declarations
+                       ((std::string)reason))                         ///< Variables to capture
 
 /**
  * @brief The ConfigureFailed FanOutDAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
-                       ConfigureFailed,       ///< Type of the Issue
-                       GeneralDAQModuleIssue, ///< Base class of the Issue
+ERS_DECLARE_ISSUE_BASE(appfwk,                                        ///< Namespace
+                       ConfigureFailed,                               ///< Type of the Issue
+                       GeneralDAQModuleIssue,                         ///< Base class of the Issue
                        "FanOutDAQModule Configure Error: " << reason, ///< Log Message from the issue
                        ((std::string)name),                           ///< End of variable declarations
-                       ((std::string)reason))                                ///< Variables to capture
+                       ((std::string)reason))                         ///< Variables to capture
 
 namespace appfwk {
 
@@ -183,4 +183,4 @@ private:
 
 #include "detail/FanOutDAQModule.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_FANOUTDAQMODULE_HPP_

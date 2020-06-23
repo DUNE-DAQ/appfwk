@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
+#define APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
 
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
@@ -70,7 +70,7 @@ template<typename T>
 void
 DAQSink<T>::push(const T& element, const duration_type& timeout)
 {
-  queue_->push( T(element), timeout);
+  queue_->push(T(element), timeout);
 }
 
 template<typename T>
@@ -83,4 +83,4 @@ DAQSink<T>::can_push()
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_

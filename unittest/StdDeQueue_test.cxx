@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_SUITE(StdDeQueue_test)
 
 namespace {
 
-constexpr int max_testable_capacity = 1000000000;    ///< The maximum capacity this test will attempt to check
+constexpr int max_testable_capacity = 1000000000; ///< The maximum capacity this test will attempt to check
 
 /**
  * @brief Timeout to use for tests
@@ -36,7 +36,7 @@ constexpr auto timeout = std::chrono::milliseconds(2);
  */
 constexpr auto timeout_in_us = std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-  dunedaq::appfwk::StdDeQueue<int> Queue("StdDeQueue", 10); ///< Queue instance for the test
+dunedaq::appfwk::StdDeQueue<int> Queue("StdDeQueue", 10); ///< Queue instance for the test
 } // namespace ""
 
 // This test case should run first. Make sure all other test cases depend on
@@ -64,8 +64,10 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
 
   starttime = std::chrono::steady_clock::now();
   int popped_value;
-  try {Queue.pop(popped_value, timeout);}
-  catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {}
+  try {
+    Queue.pop(popped_value, timeout);
+  } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+  }
   auto pop_time = std::chrono::steady_clock::now() - starttime;
 
   if (pop_time > timeout) {
@@ -81,18 +83,17 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
 
 BOOST_AUTO_TEST_CASE(empty_checks)
 {
-    while (Queue.can_pop()) {
-      int popped_value;
-      try {
-        Queue.pop(popped_value, timeout);
-      }
-      catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
-        BOOST_TEST(false,
-                   "Exception thrown in call to StdDeQueue::pop(); unable "
-                   "to empty the Queue");
-        break;
-      }
+  while (Queue.can_pop()) {
+    int popped_value;
+    try {
+      Queue.pop(popped_value, timeout);
+    } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+      BOOST_TEST(false,
+                 "Exception thrown in call to StdDeQueue::pop(); unable "
+                 "to empty the Queue");
+      break;
     }
+  }
 
   BOOST_REQUIRE(!Queue.can_pop());
 
@@ -102,11 +103,13 @@ BOOST_AUTO_TEST_CASE(empty_checks)
 
   auto starttime = std::chrono::steady_clock::now();
 
-  BOOST_CHECK_THROW(Queue.pop(popped_value, timeout), dunedaq::appfwk::QueueTimeoutExpired ) ; 
+  BOOST_CHECK_THROW(Queue.pop(popped_value, timeout), dunedaq::appfwk::QueueTimeoutExpired);
 
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
 
-  const double fraction_of_pop_timeout_used = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(pop_duration).count())/std::chrono::duration_cast<std::chrono::nanoseconds>(timeout).count();
+  const double fraction_of_pop_timeout_used =
+    static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(pop_duration).count()) /
+    std::chrono::duration_cast<std::chrono::nanoseconds>(timeout).count();
 
   BOOST_TEST_MESSAGE("Attempted pop_duration divided by timeout is " << fraction_of_pop_timeout_used);
 

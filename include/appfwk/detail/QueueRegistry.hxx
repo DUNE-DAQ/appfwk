@@ -1,5 +1,5 @@
-#include "appfwk/StdDeQueue.hpp"
 #include "appfwk/FollyQueue.hpp"
+#include "appfwk/StdDeQueue.hpp"
 
 #include <cxxabi.h>
 
@@ -7,7 +7,8 @@
 namespace dunedaq::appfwk {
 
 QueueConfig::queue_kind
-QueueConfig::stoqk( const std::string & name )   {
+QueueConfig::stoqk(const std::string& name)
+{
   if (name == "StdDeQueue" || name == "std_deque")
     return queue_kind::kStdDeQueue;
   else if (name == "FollySPSCQueue")
@@ -15,7 +16,7 @@ QueueConfig::stoqk( const std::string & name )   {
   else if (name == "FollyMPMCQueue")
     return queue_kind::kFollyMPMCQueue;
   else
-    throw QueueKindUnknown( ERS_HERE, name );
+    throw QueueKindUnknown(ERS_HERE, name);
 }
 
 template<typename T>
@@ -61,10 +62,10 @@ QueueRegistry::create_queue(std::string name, const QueueConfig& config)
     case QueueConfig::kStdDeQueue:
       queue = std::make_shared<StdDeQueue<T>>(name, config.capacity);
       break;
-    case QueueConfig::kFollySPSCQueue :
+    case QueueConfig::kFollySPSCQueue:
       queue = std::make_shared<FollySPSCQueue<T>>(name, config.capacity);
       break;
-    case QueueConfig::kFollyMPMCQueue :
+    case QueueConfig::kFollyMPMCQueue:
       queue = std::make_shared<FollyMPMCQueue<T>>(name, config.capacity);
       break;
 

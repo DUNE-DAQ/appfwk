@@ -14,6 +14,9 @@
 #include <boost/test/unit_test.hpp>
 #include <nlohmann/json.hpp>
 
+#include <map>
+#include <string>
+
 constexpr auto queue_timeout = std::chrono::milliseconds(10);
 using namespace dunedaq::appfwk;
 
@@ -117,13 +120,17 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
 
   BOOST_REQUIRE_EQUAL(outputbuf1.can_pop(), true);
   dunedaq::appfwk::NonCopyableType res(0);
-  try {outputbuf1.pop(res, queue_timeout);}
-  catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {}
+  try {
+    outputbuf1.pop(res, queue_timeout);
+  } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+  }
   BOOST_REQUIRE_EQUAL(res.data, 1);
 
   BOOST_REQUIRE_EQUAL(outputbuf2.can_pop(), true);
-  try {outputbuf2.pop(res, queue_timeout);}
-  catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {}
+  try {
+    outputbuf2.pop(res, queue_timeout);
+  } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+  }
   BOOST_REQUIRE_EQUAL(res.data, 2);
 }
 

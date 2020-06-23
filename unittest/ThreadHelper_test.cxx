@@ -15,8 +15,7 @@
 #include <boost/asio/signal_set.hpp>
 
 #include <chrono>
-#include <csignal>
-#include <thread>
+#include <memory>
 
 namespace {
 

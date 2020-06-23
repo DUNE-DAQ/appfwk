@@ -8,12 +8,13 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_QUEUEREGISTRY_HPP_
+#define APPFWK_INCLUDE_APPFWK_QUEUEREGISTRY_HPP_
 
 #include "appfwk/Queue.hpp"
 
 #include "ers/Issue.h"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -47,7 +48,7 @@ struct QueueConfig
 
   QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
                                                        ///< QueueConfig
-  size_t capacity = 0;                                     ///< The maximum size of the queue
+  size_t capacity = 0;                                 ///< The maximum size of the queue
 };
 
 /**
@@ -98,7 +99,7 @@ private:
   std::map<std::string, QueueEntry> queue_registry_;
   std::map<std::string, QueueConfig> queue_configmap_;
 
-  bool configured_;
+  bool configured_{ false };
 
   static QueueRegistry* me_;
 
@@ -130,20 +131,22 @@ ERS_DECLARE_ISSUE(appfwk,           // namespace
 /**
  * @brief QueueNotFound ERS Issue
  */
-ERS_DECLARE_ISSUE(appfwk,           // namespace
+ERS_DECLARE_ISSUE(appfwk,        // namespace
                   QueueNotFound, // issue class name
-                  "Requested queue \"" << queue_name << "\" of type '" << target_type << "' could not be found.", // message
+                  "Requested queue \"" << queue_name << "\" of type '" << target_type
+                                       << "' could not be found.", // message
                   ((std::string)queue_name)((std::string)target_type))
 
 /**
  * @brief QueueRegistryConfigured ERS Issue
  */
-ERS_DECLARE_ISSUE(appfwk,        // namespace
+ERS_DECLARE_ISSUE(appfwk,                  // namespace
                   QueueRegistryConfigured, // issue class name
-                  "QueueRegistry already configured",ERS_EMPTY)
+                  "QueueRegistry already configured",
+                  ERS_EMPTY)
 
 } // namespace dunedaq
 
 #include "detail/QueueRegistry.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_QUEUEREGISTRY_HPP_

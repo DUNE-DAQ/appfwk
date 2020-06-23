@@ -20,7 +20,9 @@
 #include "ers/ers.h"
 
 #include <memory>
+#include <string>
 #include <unordered_set>
+#include <vector>
 
 namespace dunedaq::appfwk {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;
@@ -44,13 +46,12 @@ DAQProcess::execute_command(std::string const& cmd, std::vector<std::string> con
   std::unordered_set<std::string> daq_module_list;
   for (auto const& dm : daqModuleMap_) {
     // TODO: works, but it's too simple. Needs better handling.
-    if (! dm.second->has_command(cmd)) {
+    if (!dm.second->has_command(cmd)) {
       ERS_INFO("Module " << dm.first << " does not have " << cmd);
       continue;
-    } 
+    }
 
     daq_module_list.insert(dm.first);
-
   }
 
   TLOG(TLVL_TRACE) << "Executing Command " << cmd << " for DAQModules defined in the CommandOrderMap";

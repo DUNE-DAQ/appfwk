@@ -14,6 +14,9 @@
 #include <boost/test/unit_test.hpp>
 #include <nlohmann/json.hpp>
 
+#include <string>
+#include <vector>
+
 constexpr auto queue_timeout = std::chrono::milliseconds(10);
 using namespace dunedaq::appfwk;
 
@@ -41,7 +44,7 @@ public:
 class GoodDAQModule : public DAQModule
 {
 public:
-      explicit GoodDAQModule(std::string const& name)
+  explicit GoodDAQModule(std::string const& name)
     : DAQModule(name)
   {
     register_command("stuff", &GoodDAQModule::do_stuff);
@@ -51,7 +54,7 @@ public:
 
   void do_stuff(std::vector<std::string> const& /*args*/) {}
 };
-}
+} // namespace daqmoduletest
 
 BOOST_AUTO_TEST_CASE(Construct)
 {
@@ -59,7 +62,8 @@ BOOST_AUTO_TEST_CASE(Construct)
   BOOST_REQUIRE_THROW(daqmoduletest::BadDAQModule bdm("construct_test_bad"), CommandRegistrationFailed);
 }
 
-BOOST_AUTO_TEST_CASE(Commands) {
+BOOST_AUTO_TEST_CASE(Commands)
+{
 
   daqmoduletest::GoodDAQModule gdm("command_test");
 

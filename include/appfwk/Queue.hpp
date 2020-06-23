@@ -11,8 +11,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
+#define APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
 
 #include "appfwk/NamedObject.hpp"
 
@@ -46,8 +46,8 @@ public:
    * @param name Name of the Queue instance
    */
   explicit Queue(const std::string& name, size_t capacity)
-    : NamedObject(name),
-      capacity_(capacity)
+    : NamedObject(name)
+    , capacity_(capacity)
   {}
 
   /**
@@ -107,8 +107,8 @@ private:
 ERS_DECLARE_ISSUE(appfwk,              // namespace
                   QueueTimeoutExpired, // issue class name
                   name << ": Unable to " << func_name << " within timeout period (timeout period was " << timeout
-                               << " milliseconds)", // message
+                       << " milliseconds)", // message
                   ((std::string)name)((std::string)func_name)((int)timeout))
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_QUEUE_HPP_

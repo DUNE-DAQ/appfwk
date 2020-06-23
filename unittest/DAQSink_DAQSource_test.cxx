@@ -17,6 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <map>
+#include <string>
+#include <utility>
+
 using namespace dunedaq::appfwk;
 
 BOOST_AUTO_TEST_SUITE(DAQSink_DAQSource_test)
@@ -49,13 +53,11 @@ BOOST_AUTO_TEST_CASE(Construct)
                           dunedaq::appfwk::DAQSinkConstructionFailed,
                           [&](dunedaq::appfwk::DAQSinkConstructionFailed) { return true; });
 
-
   [[maybe_unused]] DAQSource<int>* badsource;
 
   BOOST_REQUIRE_EXCEPTION(badsource = new DAQSource<int>("dummy"),
                           dunedaq::appfwk::DAQSourceConstructionFailed,
                           [&](dunedaq::appfwk::DAQSourceConstructionFailed) { return true; });
-
 }
 
 BOOST_AUTO_TEST_CASE(InitialConditions)
@@ -76,8 +78,10 @@ BOOST_AUTO_TEST_CASE(DataFlow)
 
   sink.push(std::move("hello"));
   std::string res("undefined");
-  try {source.pop(res);}
-  catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {}
+  try {
+    source.pop(res);
+  } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+  }
   BOOST_REQUIRE_EQUAL(res, "hello");
 }
 
@@ -89,7 +93,7 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   std::string res;
 
   BOOST_REQUIRE(!source.can_pop());
-  BOOST_CHECK_THROW(source.pop(res), dunedaq::appfwk::QueueTimeoutExpired ) ; 
+  BOOST_CHECK_THROW(source.pop(res), dunedaq::appfwk::QueueTimeoutExpired);
 
   for (int ii = 0; ii < 100; ++ii) {
     BOOST_REQUIRE(sink.can_push());
@@ -99,9 +103,7 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   BOOST_REQUIRE(!sink.can_push());
   BOOST_REQUIRE_EXCEPTION(sink.push("bbBbbb"),
                           dunedaq::appfwk::QueueTimeoutExpired,
-                          [&](dunedaq::appfwk::QueueTimeoutExpired) {
-    return true;
-  }); // TODO: Improve check
+                          [&](dunedaq::appfwk::QueueTimeoutExpired) { return true; });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
