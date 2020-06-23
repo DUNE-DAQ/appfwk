@@ -23,8 +23,6 @@ BOOST_AUTO_TEST_SUITE(StdDeQueue_test)
 namespace {
 
 constexpr int max_testable_capacity = 1000000000;    ///< The maximum capacity this test will attempt to check
-constexpr double fractional_timeout_tolerance = 0.1; ///< The fraction of the timeout which the timing is allowed to be
-                                                     ///< off by
 
 /**
  * @brief Timeout to use for tests
@@ -112,8 +110,8 @@ BOOST_AUTO_TEST_CASE(empty_checks)
 
   BOOST_TEST_MESSAGE("Attempted pop_duration divided by timeout is " << fraction_of_pop_timeout_used);
 
-  BOOST_CHECK_GT(fraction_of_pop_timeout_used, 1 - fractional_timeout_tolerance);
-  BOOST_CHECK_LT(fraction_of_pop_timeout_used, 1 + fractional_timeout_tolerance);
+  BOOST_CHECK_GT(fraction_of_pop_timeout_used, 1);
+  BOOST_CHECK_LT(fraction_of_pop_timeout_used, 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
