@@ -67,7 +67,7 @@ public:
    * command-line arguments and environment variables
    * @param args Command-line arguments to the CommandFacility
    */
-  virtual void setup([[maybe_unused]] std::vector<std::string> args) {}
+  virtual void setup(std::vector<std::string> /*args*/) {}
   /**
    * @brief Listen for commands and relay them to the given DAQProcess
    * @param process DAQProcess to relay commands to
@@ -76,7 +76,7 @@ public:
    * This function should block for the lifetime of the DAQ Application, calling
    * DAQProcess::execute_command as necessary
    */
-  virtual int listen([[maybe_unused]] DAQProcess* process) { return 0; }
+  virtual int listen(DAQProcess* /*process*/) { return 0; }
 
 protected:
   /**

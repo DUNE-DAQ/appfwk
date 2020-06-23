@@ -1,15 +1,15 @@
 {
   "queues": {
     "producerToFanOut": {
-      "size": 10,
+      "capacity": 10,
       "kind": "StdDeQueue"
     },
     "fanOutToConsumer1": {
-      "size": 5,
+      "capacity": 5,
       "kind": "StdDeQueue"
     },
     "fanOutToConsumer2": {
-      "size": 5,
+      "capacity": 5,
       "kind": "StdDeQueue"
     }
   },
@@ -22,7 +22,7 @@
       "user_module_type": "VectorIntFanOutDAQModule",
       "input": "producerToFanOut",
       "outputs": [ "fanOutToConsumer1", "fanOutToConsumer2" ],
-      "fanout_mode": "RoundRobin"
+      "fanout_mode": "round_robin"
     },
     "consumer1": {
       "user_module_type": "FakeDataConsumerDAQModule",

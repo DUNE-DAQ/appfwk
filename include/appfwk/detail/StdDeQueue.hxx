@@ -4,12 +4,13 @@
 namespace dunedaq::appfwk {
 
 template<class T>
-StdDeQueue<T>::StdDeQueue(const std::string& name)
-  : Queue<T>(name)
-  , fMaxSize(0)
+StdDeQueue<T>::StdDeQueue(const std::string& name, size_t capacity)
+  : Queue<T>(name, capacity)
   , fDeque()
   , fSize(0)
-{}
+{
+  assert(fDeque.max_size() > this->GetCapacity());
+}
 
 template<class T>
 void
@@ -60,10 +61,6 @@ StdDeQueue<T>::pop(T& val, const duration_type& timeout)
     fNoLongerFull.notify_one();
     return true;
   } else {
-    ers::warning(QueueTimeoutExpired(ERS_HERE,
-                                     NamedObject::get_name(),
-                                     "pop",
-                                     std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()));
     return false;
   }
 }

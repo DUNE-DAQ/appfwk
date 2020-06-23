@@ -36,7 +36,7 @@ constexpr auto timeout = std::chrono::milliseconds(1);
 constexpr auto timeout_in_us =
   std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-dunedaq::appfwk::FollySPSCQueue<int> Queue("FollyQueue"); ///< Queue instance for the test
+  dunedaq::appfwk::FollySPSCQueue<int> Queue("FollyQueue", 10); ///< Queue instance for the test
 
 } // namespace ""
 
@@ -45,8 +45,6 @@ dunedaq::appfwk::FollySPSCQueue<int> Queue("FollyQueue"); ///< Queue instance fo
 
 BOOST_AUTO_TEST_CASE(sanity_checks)
 {
-  Queue.SetSize(10);
-
   BOOST_REQUIRE(!Queue.can_pop());
 
   auto starttime = std::chrono::steady_clock::now();

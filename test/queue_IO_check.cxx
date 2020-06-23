@@ -230,16 +230,13 @@ main(int argc, char* argv[])
   size_t capacity=vm["capacity"].as<int>();
 
   if (queue_type == "StdDeQueue") {
-    queue.reset(new dunedaq::appfwk::StdDeQueue<int>("StdDeQueue"));
-    dynamic_cast<dunedaq::appfwk::StdDeQueue<int>*>(queue.get())->SetSize(capacity);
+    queue.reset(new dunedaq::appfwk::StdDeQueue<int>("StdDeQueue", capacity));
   }
     else if (queue_type == "FollySPSCQueue") {
-    queue.reset(new dunedaq::appfwk::FollySPSCQueue<int>("FollySPSCQueue"));
-    dynamic_cast<dunedaq::appfwk::FollySPSCQueue<int>*>(queue.get())->SetSize(capacity);
+      queue.reset(new dunedaq::appfwk::FollySPSCQueue<int>("FollySPSCQueue", capacity));
   }
     else if (queue_type == "FollyMPMCQueue") {
-    queue.reset(new dunedaq::appfwk::FollyMPMCQueue<int>("FollyMPMCQueue"));
-    dynamic_cast<dunedaq::appfwk::FollyMPMCQueue<int>*>(queue.get())->SetSize(capacity);
+      queue.reset(new dunedaq::appfwk::FollyMPMCQueue<int>("FollyMPMCQueue", capacity));
   } else {
     TLOG(TLVL_ERROR) << "Unknown queue type \"" << queue_type << "\" requested for testing";
     return 1;
