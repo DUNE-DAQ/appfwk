@@ -10,8 +10,10 @@
 #include "FakeDataProducerDAQModule.hpp"
 
 #include <chrono>
+#include <string>
 #include <thread>
 #include <utility>
+#include <vector>
 
 #include <TRACE/trace.h>
 /**

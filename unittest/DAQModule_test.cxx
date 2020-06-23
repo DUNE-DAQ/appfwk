@@ -14,6 +14,9 @@
 #include <boost/test/unit_test.hpp>
 #include <nlohmann/json.hpp>
 
+#include <string>
+#include <vector>
+
 constexpr auto queue_timeout = std::chrono::milliseconds(10);
 using namespace dunedaq::appfwk;
 
@@ -51,7 +54,7 @@ public:
 
   void do_stuff(std::vector<std::string> const& /*args*/) {}
 };
-}
+} // namespace daqmoduletest
 
 BOOST_AUTO_TEST_CASE(Construct)
 {

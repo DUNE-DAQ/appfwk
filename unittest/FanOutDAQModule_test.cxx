@@ -14,6 +14,9 @@
 #include <boost/test/unit_test.hpp>
 #include <nlohmann/json.hpp>
 
+#include <map>
+#include <string>
+
 constexpr auto queue_timeout = std::chrono::milliseconds(10);
 using namespace dunedaq::appfwk;
 

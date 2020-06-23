@@ -140,7 +140,7 @@ private:
   std::unique_ptr<std::thread> working_thread_;
   std::function<void(std::atomic<bool>&)> do_work_;
 };
-} // namespace dunedaq::appfwk
+} // namespace appfwk
 
 } // namespace dunedaq
 

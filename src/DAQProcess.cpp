@@ -20,7 +20,9 @@
 #include "ers/ers.h"
 
 #include <memory>
+#include <string>
 #include <unordered_set>
+#include <vector>
 
 namespace dunedaq::appfwk {
 std::unique_ptr<CommandFacility> CommandFacility::handle_ = nullptr;

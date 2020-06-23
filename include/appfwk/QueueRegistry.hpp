@@ -8,12 +8,13 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_QUEUEREGISTRY_HPP_
+#define APPFWK_INCLUDE_APPFWK_QUEUEREGISTRY_HPP_
 
 #include "appfwk/Queue.hpp"
 
 #include "ers/Issue.h"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -98,7 +99,7 @@ private:
   std::map<std::string, QueueEntry> queue_registry_;
   std::map<std::string, QueueConfig> queue_configmap_;
 
-  bool configured_;
+  bool configured_{ false };
 
   static QueueRegistry* me_;
 
@@ -148,4 +149,4 @@ ERS_DECLARE_ISSUE(appfwk,                  // namespace
 
 #include "detail/QueueRegistry.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUEREGISTRY_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_QUEUEREGISTRY_HPP_

@@ -10,13 +10,14 @@
 
 #include "appfwk/QueueRegistry.hpp"
 
+#include <map>
+#include <string>
+
 namespace dunedaq::appfwk {
 
 QueueRegistry* QueueRegistry::me_ = nullptr;
 
-QueueRegistry::QueueRegistry()
-  : configured_(false)
-{}
+QueueRegistry::QueueRegistry() {}
 
 QueueRegistry::~QueueRegistry() {}
 

@@ -17,6 +17,10 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <map>
+#include <string>
+#include <utility>
+
 using namespace dunedaq::appfwk;
 
 BOOST_AUTO_TEST_SUITE(DAQSink_DAQSource_test)
@@ -99,7 +103,7 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   BOOST_REQUIRE(!sink.can_push());
   BOOST_REQUIRE_EXCEPTION(sink.push("bbBbbb"),
                           dunedaq::appfwk::QueueTimeoutExpired,
-                          [&](dunedaq::appfwk::QueueTimeoutExpired) { return true; }); // TODO: Improve check
+                          [&](dunedaq::appfwk::QueueTimeoutExpired) { return true; });
 }
 
 BOOST_AUTO_TEST_SUITE_END()

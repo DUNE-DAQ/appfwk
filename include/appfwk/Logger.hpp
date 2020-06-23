@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_LOGGER_HPP_
+#define APPFWK_INCLUDE_APPFWK_LOGGER_HPP_
 
 #include <string>
 #include <vector>
@@ -28,4 +28,4 @@ public:
 };
 } // namespace dunedaq::appfwk
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_LOGGER_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_LOGGER_HPP_

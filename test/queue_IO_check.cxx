@@ -25,10 +25,14 @@ namespace bpo = boost::program_options;
 #include <chrono>
 #include <future>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 namespace {
 

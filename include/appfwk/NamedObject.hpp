@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_NAMEDOBJECT_HPP_
+#define APPFWK_INCLUDE_APPFWK_NAMEDOBJECT_HPP_
 
 #include <string>
 
@@ -42,4 +42,4 @@ private:
   std::string name_;
 };
 } // namespace dunedaq::appfwk
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_NAMEDOBJECT_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_NAMEDOBJECT_HPP_

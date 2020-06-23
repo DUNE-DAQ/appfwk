@@ -16,8 +16,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
+#define APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 
 #include "appfwk/NamedObject.hpp"
 
@@ -27,6 +27,7 @@
 #include <nlohmann/json.hpp>
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -202,4 +203,4 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
 
 #include "detail/DAQModule.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQMODULE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_

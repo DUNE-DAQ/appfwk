@@ -19,7 +19,9 @@
 
 #include <chrono>
 #include <functional>
+#include <string>
 #include <thread>
+#include <vector>
 
 namespace dunedaq::appfwk {
 

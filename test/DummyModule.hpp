@@ -1,10 +1,22 @@
+/**
+ * @file DummyModule.hpp
+ *
+ * DummyModule is a simple DAQModule implementation that responds to a "stuff" command with a log message.
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
+ */
 
-#ifndef APP_FRAMEWORK_TEST_APP_FRAMEWORK_DUMMYMODULE_HPP_
-#define APP_FRAMEWORK_TEST_APP_FRAMEWORK_DUMMYMODULE_HPP_
+#ifndef APPFWK_TEST_DUMMYMODULE_HPP_
+#define APPFWK_TEST_DUMMYMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
 
 #include <ers/ers.h>
+
+#include <string>
+#include <vector>
 
 namespace dunedaq {
 
@@ -41,7 +53,7 @@ public:
     : DummyParentModule(name)
   {}
 
-  virtual void do_stuff(const std::vector<std::string>& /*args*/) override
+  void do_stuff(const std::vector<std::string>& /*args*/) override
   {
     ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_stuff"));
   };
@@ -50,4 +62,4 @@ public:
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_TEST_APP_FRAMEWORK_DUMMYMODULE_HPP_
+#endif // APPFWK_TEST_DUMMYMODULE_HPP_

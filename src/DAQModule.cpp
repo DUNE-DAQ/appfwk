@@ -8,6 +8,9 @@
 
 #include "appfwk/DAQModule.hpp"
 
+#include <string>
+#include <vector>
+
 namespace dunedaq::appfwk {
 
 void

@@ -11,8 +11,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
+#define APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
 
 #include "appfwk/NamedObject.hpp"
 
@@ -111,4 +111,4 @@ ERS_DECLARE_ISSUE(appfwk,              // namespace
                   ((std::string)name)((std::string)func_name)((int)timeout))
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
