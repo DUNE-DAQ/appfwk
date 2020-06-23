@@ -100,7 +100,7 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
       {
         inputQueue_->pop(vec, queueTimeout_);
       }
-      catch (dunedaq::appfwk::QueueTimeoutExpired& excpt)
+      catch (const dunedaq::appfwk::QueueTimeoutExpired& excpt)
       {
         continue;
       }
