@@ -39,7 +39,7 @@ StdDeQueue<T>::push(value_type&& object_to_push, const duration_type& timeout)
 }
 
 template<class T>
-bool
+void
 StdDeQueue<T>::pop(T& val, const duration_type& timeout)
 {
 
@@ -59,9 +59,9 @@ StdDeQueue<T>::pop(T& val, const duration_type& timeout)
     fDeque.pop_front();
     fSize--;
     fNoLongerFull.notify_one();
-    return true;
   } else {
-    return false;
+    throw QueueTimeoutExpired(
+      ERS_HERE, NamedObject::get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
 
