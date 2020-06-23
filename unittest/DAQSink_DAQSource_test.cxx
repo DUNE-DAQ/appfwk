@@ -75,8 +75,9 @@ BOOST_AUTO_TEST_CASE(DataFlow)
   DAQSource<std::string> source("dummy");
 
   sink.push(std::move("hello"));
-  std::string res;
-  source.pop(res);
+  std::string res("undefined");
+  try {source.pop(res);}
+  catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {}
   BOOST_REQUIRE_EQUAL(res, "hello");
 }
 
@@ -88,7 +89,7 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   std::string res;
 
   BOOST_REQUIRE(!source.can_pop());
-  BOOST_REQUIRE(!source.pop(res));
+  BOOST_CHECK_THROW(source.pop(res), dunedaq::appfwk::QueueTimeoutExpired ) ; 
 
   for (int ii = 0; ii < 100; ++ii) {
     BOOST_REQUIRE(sink.can_push());

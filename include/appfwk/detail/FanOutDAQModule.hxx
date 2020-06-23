@@ -81,7 +81,12 @@ FanOutDAQModule<ValueType>::do_work(std::atomic<bool>& running_flag)
   while (running_flag.load()) {
     if (inputQueue_->can_pop()) {
 
-      if (!inputQueue_->pop(data, queueTimeout_)) {
+      try
+      {
+        inputQueue_->pop(data, queueTimeout_);
+      }
+      catch (const dunedaq::appfwk::QueueTimeoutExpired& excpt)
+      {
         continue;
       }
 

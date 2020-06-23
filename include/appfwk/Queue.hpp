@@ -71,14 +71,14 @@ public:
 
   /**
    * @brief Pop the first value off of the queue
+   * @param val Reference to the value that is popped from the queue
    * @param timeout Timeout for the pop operation
-   * @return Value popped from the Queue
    *
    * This is a pure virtual function
    * If pop takes longer than the timeout, implementations should throw an
    * exception
    */
-  virtual bool pop(T& val, const duration_type& timeout) = 0;
+  virtual void pop(T& val, const duration_type& timeout) = 0;
 
   /**
    * @brief Determine whether the Queue may be popped from

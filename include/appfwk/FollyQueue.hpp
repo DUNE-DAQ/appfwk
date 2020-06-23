@@ -37,9 +37,13 @@ public:
   {}
 
   bool can_pop() const noexcept override { return !fQueue.empty(); }
-  bool pop( value_type & val, const duration_type& dur) override
+  void pop( value_type & val, const duration_type& dur) override
   {
-    return fQueue.try_dequeue_for(val, dur);
+    if (!fQueue.try_dequeue_for(val, dur))
+    {
+      throw QueueTimeoutExpired(
+        ERS_HERE, NamedObject::get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
+    }
   }
 
   bool can_push() const noexcept override
