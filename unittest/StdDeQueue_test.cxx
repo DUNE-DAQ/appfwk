@@ -103,12 +103,9 @@ BOOST_AUTO_TEST_CASE(empty_checks)
   int popped_value;
 
   auto starttime = std::chrono::steady_clock::now();
-  try {
-    Queue.pop(popped_value, timeout);
-  }
-  catch (dunedaq::appfwk::QueueTimeoutExpired& ex) {
-    BOOST_TEST(false);
-  }
+
+  BOOST_CHECK_THROW(Queue.pop(timeout), dunedaq::appfwk::QueueTimeoutExpired ) ; 
+
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
 
   const double fraction_of_pop_timeout_used = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(pop_duration).count())/std::chrono::duration_cast<std::chrono::nanoseconds>(timeout).count();
