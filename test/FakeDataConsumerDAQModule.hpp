@@ -56,7 +56,7 @@ private:
   void do_stop(const std::vector<std::string>& args);
 
   // Threading
-  void do_work();
+  void do_work(std::atomic<bool>& running_flag);
   ThreadHelper thread_;
 
   // Configuration (for validation)

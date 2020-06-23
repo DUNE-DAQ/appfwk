@@ -30,11 +30,11 @@ struct FanOutDAQModuleTestFixture
 
     std::map<std::string, QueueConfig> queue_config;
     queue_config["input"].kind = QueueConfig::queue_kind::kStdDeQueue;
-    queue_config["input"].size = 10;
+    queue_config["input"].capacity = 10;
     queue_config["output1"].kind = QueueConfig::queue_kind::kStdDeQueue;
-    queue_config["output1"].size = 5;
+    queue_config["output1"].capacity = 5;
     queue_config["output2"].kind = QueueConfig::queue_kind::kStdDeQueue;
-    queue_config["output2"].size = 5;
+    queue_config["output2"].capacity = 5;
 
     QueueRegistry::get().configure(queue_config);
   }
@@ -51,10 +51,21 @@ BOOST_AUTO_TEST_CASE(Configure)
 {
   dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
 
-  auto module_config = R"({"input": "input", "fanout_mode": "RoundRobin", "outputs": []})"_json;
+  auto module_config = R"({"input": "input", "fanout_mode": "round_robin", "outputs": []})"_json;
   foum.do_init(module_config);
 
   foum.execute_command("configure");
+}
+
+BOOST_AUTO_TEST_CASE(InvalidConfigure)
+{
+  dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("test");
+
+  // Wrongly-capitalized fanout_mode
+  auto module_config = R"({"input": "input", "fanout_mode": "Round_robin", "outputs": []})"_json;
+  foum.do_init(module_config);
+
+  BOOST_REQUIRE_THROW(foum.execute_command("configure"), dunedaq::appfwk::ConfigureFailed);
 }
 
 BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
@@ -65,7 +76,7 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
         {
                     "input": "input",
                     "outputs": ["output1", "output2" ],
-                    "fanout_mode": "RoundRobin"
+                    "fanout_mode": "round_robin"
         }
     )"_json;
   foum.do_init(module_config);
@@ -82,7 +93,7 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
   inputbuf.push(dunedaq::appfwk::NonCopyableType(1), queue_timeout);
   inputbuf.push(dunedaq::appfwk::NonCopyableType(2), queue_timeout);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   foum.execute_command("stop");
 

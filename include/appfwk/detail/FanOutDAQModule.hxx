@@ -4,7 +4,7 @@ namespace dunedaq::appfwk {
 template<typename ValueType>
 FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
   : DAQModule(name)
-  , thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this))
+  , thread_(std::bind(&FanOutDAQModule<ValueType>::do_work, this, std::placeholders::_1))
   , mode_(FanOutMode::NotConfigured)
   , queueTimeout_(100)
   , inputQueue_(nullptr)
@@ -32,19 +32,21 @@ FanOutDAQModule<ValueType>::init()
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_configure([[maybe_unused]] const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& /*args*/)
 {
   if (get_config().contains("fanout_mode")) {
     auto modeString = get_config()["fanout_mode"].get<std::string>();
-    if (modeString.find("roadcast") != std::string::npos) {
+    if (modeString=="broadcast") {
 
       mode_ = FanOutMode::Broadcast;
-    } else if (modeString.find("irst") != std::string::npos) {
+    } else if (modeString=="first_available") {
 
       mode_ = FanOutMode::FirstAvailable;
-    } else {
-      // RoundRobin by default
+    } else if (modeString=="round_robin") {
       mode_ = FanOutMode::RoundRobin;
+    }
+    else{
+      throw ConfigureFailed(ERS_HERE, std::string("given unknown fanout_mode ")+modeString);
     }
   } else {
     // RoundRobin by default
@@ -56,27 +58,27 @@ FanOutDAQModule<ValueType>::do_configure([[maybe_unused]] const std::vector<std:
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_start([[maybe_unused]] const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_start(const std::vector<std::string>& /*args*/)
 {
-  thread_.start_working_thread_();
+  thread_.start_working_thread();
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_stop([[maybe_unused]] const std::vector<std::string>& args)
+FanOutDAQModule<ValueType>::do_stop(const std::vector<std::string>& /*args*/)
 {
-  thread_.stop_working_thread_();
+  thread_.stop_working_thread();
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_work()
+FanOutDAQModule<ValueType>::do_work(std::atomic<bool>& running_flag)
 {
   auto roundRobinNext = outputQueues_.begin();
 
   ValueType data;
 
-  while (thread_.thread_running()) {
+  while (running_flag.load()) {
     if (inputQueue_->can_pop()) {
 
       if (!inputQueue_->pop(data, queueTimeout_)) {

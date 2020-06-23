@@ -25,7 +25,7 @@ namespace dunedaq::appfwk {
 
 FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
   : DAQModule(name)
-  , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this))
+  , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this, std::placeholders::_1))
   , queueTimeout_(100)
   , inputQueue_(nullptr)
 {
@@ -42,7 +42,7 @@ FakeDataConsumerDAQModule::init()
 }
 
 void
-FakeDataConsumerDAQModule::do_configure([[maybe_unused]] const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_configure(const std::vector<std::string>& /*args*/)
 {
 
   nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
@@ -51,15 +51,15 @@ FakeDataConsumerDAQModule::do_configure([[maybe_unused]] const std::vector<std::
 }
 
 void
-FakeDataConsumerDAQModule::do_start([[maybe_unused]] const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_start(const std::vector<std::string>& /*args*/)
 {
-  thread_.start_working_thread_();
+  thread_.start_working_thread();
 }
 
 void
-FakeDataConsumerDAQModule::do_stop([[maybe_unused]] const std::vector<std::string>& args)
+FakeDataConsumerDAQModule::do_stop(const std::vector<std::string>& /*args*/)
 {
-  thread_.stop_working_thread_();
+  thread_.stop_working_thread();
 }
 
 /**
@@ -83,7 +83,7 @@ operator<<(std::ostream& t, std::vector<int> ints)
 }
 
 void
-FakeDataConsumerDAQModule::do_work()
+FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 {
   int current_int = starting_int_;
   int counter = 0;
@@ -91,7 +91,7 @@ FakeDataConsumerDAQModule::do_work()
   std::vector<int> vec;
   std::ostringstream oss;
 
-  while (thread_.thread_running()) {
+  while (running_flag.load()) {
     if (inputQueue_->can_pop()) {
 
       TLOG(TLVL_TRACE) << get_name() << ": Going to receive data from inputQueue";

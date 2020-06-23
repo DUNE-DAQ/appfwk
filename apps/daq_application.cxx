@@ -48,7 +48,7 @@ public:
     for (auto& queue : config_["queues"].items()) {
       QueueConfig qc;
       qc.kind = qc.stoqk(queue.value()["kind"].get<std::string>());
-      qc.size = queue.value()["size"].get<size_t>();
+      qc.capacity = queue.value()["capacity"].get<size_t>();
       queue_configuration[queue.key()] = qc;
     }
 
