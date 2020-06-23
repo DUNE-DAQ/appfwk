@@ -76,7 +76,8 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
         {
                     "input": "input",
                     "outputs": ["output1", "output2" ],
-                    "fanout_mode": "round_robin"
+                    "fanout_mode": "round_robin",
+                    "wait_interval": 10000
         }
     )"_json;
   foum.do_init(module_config);
@@ -97,6 +98,12 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
 
   while (!outputbuf1.can_pop() && !outputbuf2.can_pop()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - after_push).count() >
+        2500) {
+      BOOST_TEST_REQUIRE(false,
+                         "Test failure: It should not take more than 2.5 seconds for FanOutDAQModule to process 2 "
+                         "instances of NonCopyableType!");
+    }
   }
   auto after_sleep = std::chrono::steady_clock::now();
 
