@@ -31,7 +31,7 @@ ERS_DECLARE_ISSUE(appfwk,                                             // namespa
 namespace appfwk {
 
 template<typename T>
-class DAQSource
+class DAQSource : public Named
 {
 public:
   using value_type = T;
@@ -40,6 +40,7 @@ public:
   explicit DAQSource(const std::string& name);
   void pop(T&, const duration_type& timeout = duration_type::zero());
   bool can_pop() const noexcept;
+  const std::string& get_name() const final {return queue_->get_name(); }
 
 private:
   std::shared_ptr<Queue<T>> queue_;

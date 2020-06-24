@@ -33,7 +33,7 @@ ERS_DECLARE_ISSUE(appfwk,                                           // namespace
 namespace appfwk {
 
 template<typename T>
-class DAQSink
+class DAQSink : public Named
 {
 public:
   using value_type = T;
@@ -43,6 +43,7 @@ public:
   void push(T&& element, const duration_type& timeout = duration_type::zero());
   void push(const T& element, const duration_type& timeout = duration_type::zero());
   bool can_push() const noexcept;
+  const std::string& get_name() const final {return queue_->get_name(); }
 
 private:
   std::shared_ptr<Queue<T>> queue_;

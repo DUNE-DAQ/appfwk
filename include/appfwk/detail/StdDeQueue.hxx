@@ -34,7 +34,7 @@ StdDeQueue<T>::push(value_type&& object_to_push, const duration_type& timeout)
     fNoLongerEmpty.notify_one();
   } else {
     throw QueueTimeoutExpired(ERS_HERE,
-                              NamedObject::get_name(),
+                              this->get_name(),
                               "push",
                               std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
@@ -63,7 +63,7 @@ StdDeQueue<T>::pop(T& val, const duration_type& timeout)
     fNoLongerFull.notify_one();
   } else {
     throw QueueTimeoutExpired(
-      ERS_HERE, NamedObject::get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
+      ERS_HERE, this->get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
 
@@ -97,7 +97,7 @@ StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_typ
 
   if (!lk.owns_lock()) {
     throw QueueTimeoutExpired(ERS_HERE,
-                              NamedObject::get_name(),
+                              this->get_name(),
                               "lock mutex",
                               std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
