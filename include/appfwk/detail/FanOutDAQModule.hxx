@@ -93,8 +93,16 @@ FanOutDAQModule<ValueType>::do_work(std::atomic<bool>& running_flag)
         while (!sent) {
           for (auto& o : outputQueues_) {
             if (o->can_push()) {
-              o->push(std::move(data), queueTimeout_);
-              sent = true;
+	      try {
+		o->push(std::move(data), queueTimeout_);
+		sent = true;
+	      } catch(const dunedaq::appfwk::QueueTimeoutExpired& ) {
+		ers::warning(BroadcastFailed(ERS_HERE,
+					     get_name(),
+					     "Timeout occurred trying to broadcast data to "
+					     "output queue; data may be lost if it doesn't "
+					     "make it into any other output queues, either"));
+	      }
             }
           }
           if (!sent) {

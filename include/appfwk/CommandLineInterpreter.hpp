@@ -85,14 +85,14 @@ public:
       output.servicePluginNames = vm["service"].as<std::vector<std::string>>();
     }
     if (vm.count("configJson")) {
-      output.applicaitonConfigurationFile = vm["configJson"].as<std::string>();
+      output.applicationConfigurationFile = vm["configJson"].as<std::string>();
     }
     output.isValid = true;
     return output;
   }
 
   bool isValid{ false };                       ///< Whether the command line was successfully parsed
-  std::string applicaitonConfigurationFile;    ///< File that contains application
+  std::string applicationConfigurationFile;    ///< File that contains application
                                                ///< configuration (JSON)
   std::string commandFacilityPluginName;       ///< Name of the CommandFacility plugin to load
   std::string configurationManagerPluginName;  ///< Name of the ConfigurationManager

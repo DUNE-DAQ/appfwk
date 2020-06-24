@@ -15,7 +15,7 @@
 namespace dunedaq::appfwk {
 
 int
-QueryResponseCommandFacility::listen(DAQProcess* process)
+QueryResponseCommandFacility::listen(const DAQProcess& process) const
 {
   try {
     bool keepGoing = true;
@@ -28,7 +28,7 @@ QueryResponseCommandFacility::listen(DAQProcess* process)
         keepGoing = false;
         break;
       } else {
-        process->execute_command(comm);
+        process.execute_command(comm);
       }
     }
   } catch (...) // NOLINT

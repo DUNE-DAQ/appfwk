@@ -41,7 +41,7 @@ DAQModule::get_commands() const
 }
 
 bool
-DAQModule::has_command(const std::string name) const
+DAQModule::has_command(const std::string& name) const
 {
   return (commands_.find(name) != commands_.end());
 }

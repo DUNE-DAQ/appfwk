@@ -29,6 +29,11 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
   , thread_(std::bind(&FakeDataProducerDAQModule::do_work, this, std::placeholders::_1))
   , outputQueue_(nullptr)
   , queueTimeout_(100)
+  , nIntsPerVector_(999)
+  , starting_int_(-999)
+  , ending_int_(-999)
+  , wait_between_sends_ms_(999)
+    
 {
 
   register_command("configure", &FakeDataProducerDAQModule::do_configure);
@@ -106,7 +111,11 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
     oss.str("");
 
     TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
-    outputQueue_->push(std::move(output), queueTimeout_);
+    try {
+      outputQueue_->push(std::move(output), queueTimeout_);
+    } catch(const QueueTimeoutExpired& ex) {
+      TLOG(TLVL_TRACE) << "Push resulted in a timeout in FakeDataProducerDAQModule::do_work; data may be lost!";
+    }
 
     TLOG(TLVL_TRACE) << get_name() << ": Start of sleep between sends";
     std::this_thread::sleep_for(std::chrono::milliseconds(wait_between_sends_ms_));

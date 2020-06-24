@@ -95,7 +95,7 @@ public:
 
   std::vector<std::string> get_commands() const;
 
-  bool has_command(const std::string name) const;
+  bool has_command(const std::string& name) const;
 
 protected:
   /**

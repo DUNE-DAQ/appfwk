@@ -61,7 +61,7 @@ public:
   /**
    * @brief QueueRegistry destructor
    */
-  ~QueueRegistry();
+  ~QueueRegistry() = default;
 
   /**
    * @brief Get a handle to the QueueRegistry
@@ -91,17 +91,17 @@ private:
     std::shared_ptr<NamedObject> instance;
   };
 
-  QueueRegistry();
+  QueueRegistry() = default;
 
   template<typename T>
-  std::shared_ptr<NamedObject> create_queue(std::string name, const QueueConfig& config);
+  std::shared_ptr<NamedObject> create_queue(const std::string& name, const QueueConfig& config);
 
   std::map<std::string, QueueEntry> queue_registry_;
   std::map<std::string, QueueConfig> queue_configmap_;
 
   bool configured_{ false };
 
-  static QueueRegistry* me_;
+  static std::unique_ptr<QueueRegistry> me_;
 
   QueueRegistry(const QueueRegistry&) = delete;
   QueueRegistry& operator=(const QueueRegistry&) = delete;

@@ -39,7 +39,7 @@ public:
   const std::string& get_name() const { return name_; }
 
 private:
-  std::string name_;
+  const std::string name_;
 };
 } // namespace dunedaq::appfwk
 #endif // APPFWK_INCLUDE_APPFWK_NAMEDOBJECT_HPP_

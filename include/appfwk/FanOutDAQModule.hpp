@@ -113,10 +113,9 @@ private:
   typename std::enable_if_t<std::is_copy_constructible_v<U>> do_broadcast(ValueType& data) const
   {
     for (auto& o : outputQueues_) {
-      auto starttime = std::chrono::steady_clock::now();
-      o->push(data, queueTimeout_);
-      auto endtime = std::chrono::steady_clock::now();
-      if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) > queueTimeout_) {
+      try {
+	o->push(data, queueTimeout_);
+      } catch (const QueueTimeoutExpired& ex) {
         ers::warning(BroadcastFailed(ERS_HERE,
                                      get_name(),
                                      "Timeout occurred trying to broadcast data to "

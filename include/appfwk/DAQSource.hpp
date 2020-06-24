@@ -39,7 +39,7 @@ public:
 
   explicit DAQSource(const std::string& name);
   void pop(T&, const duration_type& timeout = duration_type::zero());
-  bool can_pop();
+  bool can_pop() const noexcept;
 
 private:
   std::shared_ptr<Queue<T>> queue_;
@@ -65,7 +65,7 @@ DAQSource<T>::pop(T& val, const duration_type& timeout)
 
 template<typename T>
 bool
-DAQSource<T>::can_pop()
+DAQSource<T>::can_pop() const noexcept
 {
   return queue_->can_pop();
 }

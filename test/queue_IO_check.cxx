@@ -52,12 +52,12 @@ auto timeout = std::chrono::milliseconds(100); ///< Queue's timeout
  */
 std::unique_ptr<dunedaq::appfwk::Queue<int>> queue = nullptr;
 
-constexpr int nelements = 100; ///< Number of elements to push to the Queue (total)
+int nelements = 10000000; ///< Number of elements to push to the Queue (total)
 int n_adding_threads = 1;      ///< Number of threads which will call push
 int n_removing_threads = 1;    ///< Number of threads which will call pop
 
-int avg_milliseconds_between_pushes = 5; ///< Target average rate of pushes
-int avg_milliseconds_between_pops = 5;   ///< Target average rate of pops
+int avg_milliseconds_between_pushes = 0; ///< Target average rate of pushes
+int avg_milliseconds_between_pops = 0;   ///< Target average rate of pops
 
 std::atomic<size_t> queue_size = 0;     ///< Queue's current size
 std::atomic<size_t> max_queue_size = 0; ///< Queue's maximum size
@@ -184,6 +184,9 @@ main(int argc, char* argv[])
   std::ostringstream descstr;
   descstr << argv[0] << " known arguments ";
 
+  std::ostringstream nelements_desc;
+  nelements_desc << "# of elements you want pushed and/or popped (default is " << nelements << ")";
+
   std::ostringstream push_threads_desc;
   push_threads_desc << "# of threads you want pushing elements onto the queue (default is " << n_adding_threads << ")";
 
@@ -207,11 +210,12 @@ main(int argc, char* argv[])
                      "Type of queue instance you want to test (default is "
                      "StdDeQueue) (supported "
                      "types are: StdDeQueue, FollySPSCQueue, FollyMPMCQueue)")(
+    "nelements", bpo::value<int>(), nelements_desc.str().c_str())(
     "push_threads", bpo::value<int>(), push_threads_desc.str().c_str())(
     "pop_threads", bpo::value<int>(), pop_threads_desc.str().c_str())(
     "pause_between_pushes", bpo::value<int>(), push_pause_desc.str().c_str())(
     "pause_between_pops", bpo::value<int>(), pop_pause_desc.str().c_str())(
-    "capacity", bpo::value<int>()->default_value(100), "queue capacity")(
+    "capacity", bpo::value<int>()->default_value(nelements*2), "queue capacity")(
     "initial_capacity_used", bpo::value<double>(), capacity_used_desc.str().c_str())("help,h", "produce help message");
 
   bpo::variables_map vm;
@@ -240,6 +244,14 @@ main(int argc, char* argv[])
   } else {
     TLOG(TLVL_ERROR) << "Unknown queue type \"" << queue_type << "\" requested for testing";
     return 1;
+  }
+
+  if (vm.count("nelements")) {
+    nelements = vm["nelements"].as<int>();
+
+    if (nelements <= 0) {
+      throw std::domain_error("# of elements must be a positive integer");
+    }
   }
 
   if (vm.count("push_threads")) {

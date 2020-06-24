@@ -28,6 +28,16 @@
 using json = nlohmann::json;
 
 namespace dunedaq {
+
+/**
+  * @brief InvalidConfiguration ERS Issue
+ */
+ERS_DECLARE_ISSUE(appfwk,               // namespace
+		  InvalidConfiguration, // issue class name
+		  "Invalid configuration detected in daq_application: module with name "
+                  << module_name << " could not be added to application graph!", // message
+		  ((std::string)module_name)) // parameters
+
 namespace appfwk {
 /**
  * @brief ModuleList for daq_application
@@ -45,7 +55,7 @@ public:
   {}
 
   // Inherited via ModuleList
-  void ConstructGraph(DAQModuleMap& user_module_map, CommandOrderMap& command_order_map) override
+  void ConstructGraph(DAQModuleMap& user_module_map, CommandOrderMap& command_order_map) const override
   {
     std::map<std::string, QueueConfig> queue_configuration;
     for (auto& queue : config_["queues"].items()) {
@@ -61,14 +71,14 @@ public:
       auto [modit, done] =
         user_module_map.emplace(module.key(), makeModule(module.value()["user_module_type"], module.key()));
       if (!done) {
-        // throw
+	throw dunedaq::appfwk::InvalidConfiguration(ERS_HERE, module.key());
       }
       modit->second->do_init(module.value());
     }
 
     for (auto& command : config_["commands"].items()) {
       std::list<std::string> command_order;
-      for (auto& comm : command.value()) {
+      for (const auto& comm : command.value()) {
         command_order.push_back(comm);
       }
       command_order_map[command.key()] = command_order;
@@ -76,7 +86,7 @@ public:
   }
 
 private:
-  json config_;
+  const json config_;
 };
 } // namespace appfwk
 
@@ -105,9 +115,9 @@ main(int argc, char* argv[])
   dunedaq::appfwk::DAQProcess theDAQProcess(args);
 
   json json_config;
-  if (args.applicaitonConfigurationFile != "") {
+  if (args.applicationConfigurationFile != "") {
 
-    std::ifstream ifile(args.applicaitonConfigurationFile);
+    std::ifstream ifile(args.applicationConfigurationFile);
     ifile >> json_config;
   } else {
     throw dunedaq::appfwk::NoConfiguration(ERS_HERE);

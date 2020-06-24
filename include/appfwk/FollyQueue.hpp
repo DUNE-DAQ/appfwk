@@ -49,7 +49,6 @@ public:
 
   void push(value_type&& t, const duration_type& dur) override
   {
-    // Is the std::move actually necessary here?
     if (!fQueue.try_enqueue_for(std::move(t), dur)) {
       throw QueueTimeoutExpired(
         ERS_HERE, NamedObject::get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
