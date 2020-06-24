@@ -31,7 +31,7 @@ ERS_DECLARE_ISSUE(appfwk,                                             // namespa
 namespace appfwk {
 
 template<typename T>
-class DAQSource : public NamedObject
+class DAQSource : public Named
 {
 public:
   using value_type = T;

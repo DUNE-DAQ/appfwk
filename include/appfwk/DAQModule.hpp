@@ -64,7 +64,7 @@ namespace appfwk {
  * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
-class DAQModule : public NamedObjectImpl
+class DAQModule : public NamedObject
 {
 public:
   /**
@@ -72,7 +72,7 @@ public:
    * @param name Name of the DAQModule
    */
   explicit DAQModule(std::string name)
-    : NamedObjectImpl(name)
+    : NamedObject(name)
   {}
 
   const nlohmann::json& get_config() const { return configuration_; }

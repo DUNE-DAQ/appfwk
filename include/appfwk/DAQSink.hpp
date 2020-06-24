@@ -33,7 +33,7 @@ ERS_DECLARE_ISSUE(appfwk,                                           // namespace
 namespace appfwk {
 
 template<typename T>
-class DAQSink : public NamedObject
+class DAQSink : public Named
 {
 public:
   using value_type = T;
