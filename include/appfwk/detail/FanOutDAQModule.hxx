@@ -52,7 +52,8 @@ FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& /*args*
     mode_ = FanOutMode::RoundRobin;
   }
 
-  wait_interval_us_ = get_config().value<int>("wait_interval", 10000);
+  wait_interval_us_ = get_config().value<int>("wait_interval_us", 10000);
+  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
 }
 
 template<typename ValueType>

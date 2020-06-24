@@ -50,6 +50,7 @@ FakeDataConsumerDAQModule::do_configure(const std::vector<std::string>& /*args*/
   nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
   starting_int_ = get_config().value<int>("starting_int", -4);
   ending_int_ = get_config().value<int>("ending_int", 14);
+  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
 }
 
 void
