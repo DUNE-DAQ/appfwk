@@ -42,7 +42,7 @@ public:
   explicit DAQSink(const std::string& name);
   void push(T&& element, const duration_type& timeout = duration_type::zero());
   void push(const T& element, const duration_type& timeout = duration_type::zero());
-  bool can_push();
+  bool can_push() const noexcept;
   const std::string& get_name() const final {return queue_->get_name(); }
 
 private:
@@ -55,7 +55,7 @@ DAQSink<T>::DAQSink(const std::string& name)
   try {
     queue_ = QueueRegistry::get().get_queue<T>(name);
     TLOG(TLVL_TRACE, "DAQSink") << "Queue " << name << " is at " << queue_.get();
-  } catch (QueueTypeMismatch& ex) {
+  } catch (const QueueTypeMismatch& ex) {
     throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
 }
@@ -76,7 +76,7 @@ DAQSink<T>::push(const T& element, const duration_type& timeout)
 
 template<typename T>
 bool
-DAQSink<T>::can_push()
+DAQSink<T>::can_push() const noexcept
 {
   return queue_->can_push();
 }

@@ -22,7 +22,7 @@ namespace {
 
 constexpr int max_testable_capacity = 1000000000; ///< The maximum capacity this test will attempt to check
 constexpr double fractional_timeout_tolerance =
-  0.1; ///< The fraction of the timeout which the timing is allowed to be off by
+  0.5; ///< The fraction of the timeout which the timing is allowed to be off by
 
 /**
  * @brief Timeout to use for tests
@@ -48,7 +48,14 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
   BOOST_REQUIRE(!Queue.can_pop());
 
   auto starttime = std::chrono::steady_clock::now();
-  Queue.push(999, timeout);
+  try {
+    Queue.push(42, timeout);
+  } catch(const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+    BOOST_TEST_REQUIRE(false, "Test failure: unexpected timeout exception throw from push");
+  } catch(...) { // NOLINT
+    BOOST_TEST_REQUIRE(false, "Test failure: unexpected exception (non-timeout-related) thrown");
+  }
+
   auto push_time = std::chrono::steady_clock::now() - starttime;
 
   if (push_time > timeout) {
@@ -63,54 +70,58 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
   BOOST_REQUIRE(Queue.can_pop());
 
   starttime = std::chrono::steady_clock::now();
-  int popped_value;
+  int popped_value = -999;
   try {
     Queue.pop(popped_value, timeout);
   } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+    BOOST_TEST_REQUIRE(false, "Test failure: unexpected timeout exception throw from pop");
+  } catch (...) { // NOLINT
+    BOOST_TEST_REQUIRE(false, "Test failure: unexpected exception (non-timeout-related) thrown");
   }
+
+
   auto pop_time = std::chrono::steady_clock::now() - starttime;
 
   if (pop_time > timeout) {
     auto pop_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(pop_time).count();
     BOOST_TEST_REQUIRE(false,
                        "Test failure: popping element off Queue "
-                       "resulted in a timeout (function exited after "
+                       "resulted in a timeout without an exception throw (function exited after "
                          << pop_time_in_us << " microseconds, timeout is " << timeout_in_us << " microseconds)");
   }
 
-  BOOST_REQUIRE_EQUAL(popped_value, 999);
+  BOOST_REQUIRE_EQUAL(popped_value, 42);
 }
 
 BOOST_AUTO_TEST_CASE(empty_checks, *boost::unit_test::depends_on("sanity_checks"))
 {
+  int popped_value = -999;
 
-  try {
-    while (Queue.can_pop()) {
-      int popped_value;
-      try {
-        Queue.pop(popped_value, timeout);
-      } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
-        BOOST_TEST(false,
-                   "Exception thrown in call to FollyQueue::pop(); unable "
-                   "to empty the Queue");
-        break;
-      }
+  while (Queue.can_pop()) {
+
+    try {
+      Queue.pop(popped_value, timeout);
+    } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+      BOOST_TEST(false,
+		 "Timeout exception thrown in call to FollyQueue::pop(); unable "
+		 "to empty the Queue");
+      break;
     }
-  } catch (const std::runtime_error& err) {
-    BOOST_WARN_MESSAGE(true, err.what());
   }
 
   BOOST_REQUIRE(!Queue.can_pop());
 
   // pop off of an empty Queue
 
-  int popped_value;
-
   auto starttime = std::chrono::steady_clock::now();
   BOOST_CHECK_THROW(Queue.pop(popped_value, timeout), dunedaq::appfwk::QueueTimeoutExpired);
   auto pop_duration = std::chrono::steady_clock::now() - starttime;
 
-  const double fraction_of_pop_timeout_used = pop_duration / timeout;
+  const double fraction_of_pop_timeout_used =
+    static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(pop_duration).count()) /
+    std::chrono::duration_cast<std::chrono::nanoseconds>(timeout).count();
+
+  BOOST_TEST_MESSAGE("Attempted pop_duration divided by timeout is " << fraction_of_pop_timeout_used);
 
   BOOST_CHECK_GT(fraction_of_pop_timeout_used, 1 - fractional_timeout_tolerance);
   BOOST_CHECK_LT(fraction_of_pop_timeout_used, 1 + fractional_timeout_tolerance);

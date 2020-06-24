@@ -32,7 +32,7 @@ public:
    * @return Status code. 0 if terminated by quit command, -1 if an exception
    * occurs
    */
-  int listen(DAQProcess* theProcess) override;
+  int listen(const DAQProcess& theProcess) const override;
   virtual ~QueryResponseCommandFacility();
 
   QueryResponseCommandFacility() = default;

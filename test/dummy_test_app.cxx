@@ -20,7 +20,7 @@ namespace dunedaq::appfwk {
 class dummy_test_app_contructor : public GraphConstructor
 {
   // Inherited via ModuleList
-  void ConstructGraph(DAQModuleMap& user_module_map, CommandOrderMap& /*command_order_map*/) override
+  void ConstructGraph(DAQModuleMap& user_module_map, CommandOrderMap& /*command_order_map*/) const override
   {
     user_module_map["dummy"].reset(new DummyModule("test_dummy"));
   }

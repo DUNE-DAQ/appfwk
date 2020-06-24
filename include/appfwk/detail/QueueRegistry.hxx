@@ -29,7 +29,8 @@ QueueRegistry::get_queue(const std::string& name)
     auto queuePtr = std::dynamic_pointer_cast<Queue<T>>(itQ->second.instance);
 
     if (!queuePtr) {
-      int status;
+      // TODO: John Freeman (jcfree@fnal.gov), Jun-23-2020. Add checks for demangling status. Timescale 2 weeks.
+      int status = -999;
       std::string realname_target = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
       std::string realname_source = abi::__cxa_demangle(itQ->second.type->name(), 0, 0, &status);
 
@@ -46,7 +47,8 @@ QueueRegistry::get_queue(const std::string& name)
     return std::dynamic_pointer_cast<Queue<T>>(entry.instance);
 
   } else {
-    int status;
+    // TODO: John Freeman (jcfree@fnal.gov), Jun-23-2020. Add checks for demangling status. Timescale 2 weeks.
+    int status = -999;
     std::string realname_target = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
     throw QueueNotFound(ERS_HERE, name, realname_target);
   }
@@ -54,7 +56,7 @@ QueueRegistry::get_queue(const std::string& name)
 
 template<typename T>
 std::shared_ptr<Named>
-QueueRegistry::create_queue(std::string name, const QueueConfig& config)
+QueueRegistry::create_queue(const std::string& name, const QueueConfig& config)
 {
 
   std::shared_ptr<Named> queue;

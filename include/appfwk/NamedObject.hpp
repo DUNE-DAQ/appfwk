@@ -26,21 +26,19 @@ public:
   // explicit Named(const std::string& name)
   //   : name_(name)
   // {}
-  Named() = default;                             ///< Named is default-constructible
+  Named() = default;                       ///< Named is default-constructible
   Named(Named const&) = delete;            ///< Named is not copy-constructible
   Named(Named&&) = default;                ///< Named is move-constructible
   Named& operator=(Named const&) = delete; ///< Named is not copy-assignable
   Named& operator=(Named&&) = default;     ///< Named is move-assignable
-  virtual ~Named() = default;                    ///< Default virtual destructor
+  virtual ~Named() = default;              ///< Default virtual destructor
 
   /**
    * @brief Get the name of this NamedObejct
    * @return The name of this Named
    */
   virtual const std::string& get_name() const = 0;
-
 };
-
 
 /**
  * @brief Implements the Named interface
@@ -56,16 +54,20 @@ public:
     : name_(name)
   {}
 
+  NamedObject(NamedObject const&) = delete;            ///< NamedObject is not copy-constructible
+  NamedObject(NamedObject&&) = default;                ///< NamedObject is move-constructible
+  NamedObject& operator=(NamedObject const&) = delete; ///< NamedObject is not copy-assignable
+  NamedObject& operator=(NamedObject&&) = default;     ///< NamedObject is move-assignable
   virtual ~NamedObject() = default;                    ///< Default virtual destructor
 
   /**
    * @brief Get the name of this NamedObejct
    * @return The name of this Named
    */
-  const std::string& get_name() const final {return name_; }
+  const std::string& get_name() const final { return name_; }
 
 private:
-  std::string name_;
+  const std::string name_;
 };
 
 } // namespace dunedaq::appfwk

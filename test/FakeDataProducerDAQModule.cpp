@@ -49,6 +49,7 @@ FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& /*args*/
   starting_int_ = get_config().value<int>("starting_int", -4);
   ending_int_ = get_config().value<int>("ending_int", 14);
   wait_between_sends_ms_ = get_config().value<int>("wait_between_sends_ms", 1000);
+  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
 }
 
 void
@@ -106,7 +107,11 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
     oss.str("");
 
     TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
-    outputQueue_->push(std::move(output), queueTimeout_);
+    try {
+      outputQueue_->push(std::move(output), queueTimeout_);
+    } catch(const QueueTimeoutExpired& ex) {
+      ers::warning(ex);
+    }
 
     TLOG(TLVL_TRACE) << get_name() << ": Start of sleep between sends";
     std::this_thread::sleep_for(std::chrono::milliseconds(wait_between_sends_ms_));

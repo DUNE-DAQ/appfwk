@@ -61,11 +61,11 @@ private:
   // Configuration
   std::unique_ptr<DAQSink<std::vector<int>>> outputQueue_;
   std::chrono::milliseconds queueTimeout_;
-  size_t nIntsPerVector_;
-  int starting_int_;
-  int ending_int_;
+  size_t nIntsPerVector_ = 999;
+  int starting_int_ = -999;
+  int ending_int_ = -999;
 
-  size_t wait_between_sends_ms_;
+  size_t wait_between_sends_ms_ = 999;
 };
 } // namespace appfwk
 

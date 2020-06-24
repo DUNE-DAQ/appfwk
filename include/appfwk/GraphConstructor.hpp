@@ -44,7 +44,7 @@ public:
    * Queue and DAQModule instances in a DAQ Application. Additionally, any
    * requirements on command order for DAQModules should be defined here.
    */
-  virtual void ConstructGraph(DAQModuleMap& daq_module_map, CommandOrderMap& command_order_map) = 0;
+  virtual void ConstructGraph(DAQModuleMap& daq_module_map, CommandOrderMap& command_order_map) const = 0;
 };
 } // namespace dunedaq::appfwk
 

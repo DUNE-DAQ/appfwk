@@ -76,7 +76,7 @@ public:
    * This function should block for the lifetime of the DAQ Application, calling
    * DAQProcess::execute_command as necessary
    */
-  virtual int listen(DAQProcess* /*process*/) { return 0; }
+  virtual int listen(const DAQProcess& /*process*/) const { return 0; }
 
 protected:
   /**
