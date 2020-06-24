@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 project(appfwk)
 
-find_package(cetlib REQUIRED)
-find_package(folly REQUIRED)
-
 set(DAQ_LIBRARIES_PACKAGE ${CETLIB} ${CETLIB_EXCEPT} appfwk)
 
 ##############################################################################
