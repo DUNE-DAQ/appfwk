@@ -14,8 +14,8 @@ include(DAQ)
 find_package(cetlib MODULE REQUIRED) # MODULE because we use our own Findcetlib.cmake
 find_package(folly REQUIRED)
 find_package(ers REQUIRED)
-find_package(Boost 1.70.0 COMPONENTS unit_test_framework program_options REQUIRED)
-find_package(TRACE 3.15.09 REQUIRED)
+find_package(Boost COMPONENTS unit_test_framework program_options REQUIRED)
+find_package(TRACE REQUIRED)
 
 ##############################################################################
 point_build_to( apps )
