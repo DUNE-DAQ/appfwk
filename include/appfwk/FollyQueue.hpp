@@ -41,7 +41,7 @@ public:
   {
     if (!fQueue.try_dequeue_for(val, dur)) {
       throw QueueTimeoutExpired(
-        ERS_HERE, NamedObject::get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
+        ERS_HERE, this->get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
   }
 
@@ -52,7 +52,7 @@ public:
     // Is the std::move actually necessary here?
     if (!fQueue.try_enqueue_for(std::move(t), dur)) {
       throw QueueTimeoutExpired(
-        ERS_HERE, NamedObject::get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
+        ERS_HERE, this->get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
   }
 

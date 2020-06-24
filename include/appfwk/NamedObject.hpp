@@ -23,9 +23,10 @@ public:
    * @brief NamedObject Constructor
    * @param name Name of this object
    */
-  explicit NamedObject(const std::string& name)
-    : name_(name)
-  {}
+  // explicit NamedObject(const std::string& name)
+  //   : name_(name)
+  // {}
+  NamedObject() = default;                             ///< NamedObject is default-constructible
   NamedObject(NamedObject const&) = delete;            ///< NamedObject is not copy-constructible
   NamedObject(NamedObject&&) = default;                ///< NamedObject is move-constructible
   NamedObject& operator=(NamedObject const&) = delete; ///< NamedObject is not copy-assignable
@@ -36,10 +37,36 @@ public:
    * @brief Get the name of this NamedObejct
    * @return The name of this NamedObject
    */
-  const std::string& get_name() const { return name_; }
+  virtual const std::string& get_name() const = 0;
+
+};
+
+
+/**
+ * @brief Implements the NamedObject interface
+ */
+class NamedObjectImpl : public NamedObject
+{
+public:
+  /**
+   * @brief NamedObjectImpl Constructor
+   * @param name Name of this object
+   */
+  explicit NamedObjectImpl(const std::string& name)
+    : name_(name)
+  {}
+
+  virtual ~NamedObjectImpl() = default;                    ///< Default virtual destructor
+
+  /**
+   * @brief Get the name of this NamedObejct
+   * @return The name of this NamedObject
+   */
+  const std::string& get_name() const final {return name_; }
 
 private:
   std::string name_;
 };
+
 } // namespace dunedaq::appfwk
 #endif // APPFWK_INCLUDE_APPFWK_NAMEDOBJECT_HPP_

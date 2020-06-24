@@ -35,7 +35,7 @@ namespace appfwk {
  * it can be included in generic containers), all implementations should be.
  */
 template<class T>
-class Queue : public NamedObject
+class Queue : public NamedObjectImpl
 {
 public:
   using value_type = T;                            ///< Type stored in the Queue
@@ -46,7 +46,7 @@ public:
    * @param name Name of the Queue instance
    */
   explicit Queue(const std::string& name, size_t capacity)
-    : NamedObject(name)
+    : NamedObjectImpl(name)
     , capacity_(capacity)
   {}
 
