@@ -60,9 +60,9 @@ private:
   ThreadHelper thread_;
 
   // Configuration (for validation)
-  size_t nIntsPerVector_;
-  int starting_int_;
-  int ending_int_;
+  size_t nIntsPerVector_ = 999;
+  int starting_int_ = -999;
+  int ending_int_ = -999;
   std::chrono::milliseconds queueTimeout_;
   std::unique_ptr<DAQSource<std::vector<int>>> inputQueue_;
 };

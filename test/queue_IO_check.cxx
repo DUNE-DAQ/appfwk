@@ -34,6 +34,13 @@ namespace bpo = boost::program_options;
 #include <utility>
 #include <vector>
 
+namespace dunedaq {
+ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
+                  ParameterDomainIssue,  ///< Issue class name
+                  "ParameterDomainIssue: \"" << ers_messg << "\"",
+		  ((std::string)ers_messg))
+} // namespace dunedaq
+
 namespace {
 
 /**
@@ -52,7 +59,7 @@ auto timeout = std::chrono::milliseconds(100); ///< Queue's timeout
  */
 std::unique_ptr<dunedaq::appfwk::Queue<int>> queue = nullptr;
 
-int nelements = 10000000; ///< Number of elements to push to the Queue (total)
+int nelements = 1000000; ///< Number of elements to push to the Queue (total)
 int n_adding_threads = 1;      ///< Number of threads which will call push
 int n_removing_threads = 1;    ///< Number of threads which will call pop
 
@@ -250,29 +257,29 @@ main(int argc, char* argv[])
     nelements = vm["nelements"].as<int>();
 
     if (nelements <= 0) {
-      throw std::domain_error("# of elements must be a positive integer");
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, "# of elements must be a positive integer");
     }
   }
 
   if (vm.count("push_threads")) {
     n_adding_threads = vm["push_threads"].as<int>();
 
-    if (n_adding_threads <= 0) {
-      throw std::domain_error("# of pushing threads must be a positive integer");
+    if (n_adding_threads < 0) {
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, "# of pushing threads must be non-negative");
     }
-    if (queue_type == "FollySPSCQueue" && n_adding_threads != 1) {
-      throw std::domain_error("# of pushing threads must be 1 for SPSC queue");
+    if (queue_type == "FollySPSCQueue" && n_adding_threads != 0 && n_adding_threads != 1) {
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, "# of pushing threads must 0 or 1 for SPSC queue");
     }
   }
 
   if (vm.count("pop_threads")) {
     n_removing_threads = vm["pop_threads"].as<int>();
 
-    if (n_removing_threads <= 0) {
-      throw std::domain_error("# of popping threads must be a positive integer");
+    if (n_removing_threads < 0) {
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, "# of popping threads must be non-negative");
     }
-    if (queue_type == "FollySPSCQueue" && n_removing_threads != 1) {
-      throw std::domain_error("# of popping threads must be 1 for SPSC queue");
+    if (queue_type == "FollySPSCQueue" && n_removing_threads != 0 && n_removing_threads != 1) {
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, "# of popping threads must 0 or 1 for SPSC queue");
     }
   }
 
@@ -280,8 +287,7 @@ main(int argc, char* argv[])
     avg_milliseconds_between_pushes = vm["pause_between_pushes"].as<int>();
 
     if (avg_milliseconds_between_pushes < 0) {
-      throw std::domain_error("Average # of milliseconds between pushes must "
-                              "not be a negative number");
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, "Average # of milliseconds between pushes must be non-negative");
     }
   }
 
@@ -289,8 +295,7 @@ main(int argc, char* argv[])
     avg_milliseconds_between_pops = vm["pause_between_pops"].as<int>();
 
     if (avg_milliseconds_between_pops < 0) {
-      throw std::domain_error("Average # of milliseconds between pops must not "
-                              "be a negative number");
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, "Average # of milliseconds between pops must be non-negative");
     }
   }
 
@@ -298,8 +303,7 @@ main(int argc, char* argv[])
     initial_capacity_used = vm["initial_capacity_used"].as<double>();
 
     if (initial_capacity_used < 0 || initial_capacity_used > 1) {
-      throw std::domain_error("Initial fractional capacity of queue which is "
-                              "used must lie in the range [0, 1]");
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, "Initial fractional capacity of queue which is used must lie in the range [0, 1]");
     }
   }
 
@@ -334,7 +338,7 @@ main(int argc, char* argv[])
       std::ostringstream msg;
       msg << "Since capacity of queue exceeds " << max_capacity
           << ", the initial fractional used capacity of the queue must be 0";
-      throw std::domain_error(msg.str());
+      throw dunedaq::appfwk::ParameterDomainIssue(ERS_HERE, msg.str());
     }
   }
 #endif

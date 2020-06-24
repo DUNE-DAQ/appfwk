@@ -28,9 +28,6 @@ namespace dunedaq::appfwk {
 FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
   : DAQModule(name)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this, std::placeholders::_1))
-  , nIntsPerVector_(999)
-  , starting_int_(-999)
-  , ending_int_(-999)
   , queueTimeout_(100)
   , inputQueue_(nullptr)
 {
