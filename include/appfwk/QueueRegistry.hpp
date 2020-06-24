@@ -88,13 +88,13 @@ private:
   struct QueueEntry
   {
     const std::type_info* type;
-    std::shared_ptr<NamedObject> instance;
+    std::shared_ptr<Named> instance;
   };
 
   QueueRegistry();
 
   template<typename T>
-  std::shared_ptr<NamedObject> create_queue(std::string name, const QueueConfig& config);
+  std::shared_ptr<Named> create_queue(std::string name, const QueueConfig& config);
 
   std::map<std::string, QueueEntry> queue_registry_;
   std::map<std::string, QueueConfig> queue_configmap_;
