@@ -84,8 +84,8 @@ point_build_to( unittest )
 add_unit_test(DAQModule_test          appfwk )
 add_unit_test(DAQSink_DAQSource_test  appfwk )
 add_unit_test(FanOutDAQModule_test    appfwk )
-add_unit_test(FollyQueue_test         appfwk )
-add_unit_test(StdDeQueue_test         appfwk )
-add_unit_test(ThreadHelper_test       appfwk )
+add_unit_test(FollyQueue_test         ers::ers Folly::folly)
+add_unit_test(StdDeQueue_test         ers::ers)
+add_unit_test(ThreadHelper_test       ers::ers)
 
 
