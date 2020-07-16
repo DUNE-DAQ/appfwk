@@ -26,8 +26,8 @@ set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly pthread
 point_build_to( src )
 
 add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp src/DAQModule.cpp)
-
 target_link_libraries(appfwk ${APPFWK_DEPENDENCIES})
+target_include_directories(appfwk PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 
 add_library(appfwk_QueryResponseCommandFacility_duneCommandFacility src/QueryResponseCommandFacility.cpp)
 target_link_libraries(appfwk_QueryResponseCommandFacility_duneCommandFacility appfwk)
@@ -88,4 +88,8 @@ add_unit_test(FollyQueue_test         ers::ers Folly::folly)
 add_unit_test(StdDeQueue_test         ers::ers)
 add_unit_test(ThreadHelper_test       ers::ers)
 
-
+daq_install( VERSION 1.0.0 
+	     TARGETS daq_application 
+                     appfwk 
+                     VectorIntFanOutDAQModule_duneDAQModule StringFanOutDAQModule_duneDAQModule NonCopyableTypeFanOutDAQModule_duneDAQModule
+	   )
