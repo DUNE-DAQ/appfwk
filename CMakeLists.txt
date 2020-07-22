@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(appfwk)
+project(appfwk VERSION 1.0.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../daq-buildtools/cmake ${CMAKE_MODULE_PATH})
 include(DAQ)
@@ -88,8 +88,7 @@ add_unit_test(FollyQueue_test         ers::ers Folly::folly)
 add_unit_test(StdDeQueue_test         ers::ers)
 add_unit_test(ThreadHelper_test       ers::ers)
 
-daq_install( VERSION 1.0.0 
-	     TARGETS daq_application 
-                     appfwk 
-                     VectorIntFanOutDAQModule_duneDAQModule StringFanOutDAQModule_duneDAQModule NonCopyableTypeFanOutDAQModule_duneDAQModule
+daq_install(TARGETS daq_application 
+                    appfwk 
+                    VectorIntFanOutDAQModule_duneDAQModule StringFanOutDAQModule_duneDAQModule NonCopyableTypeFanOutDAQModule_duneDAQModule
 	   )
