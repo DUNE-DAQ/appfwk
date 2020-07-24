@@ -23,7 +23,7 @@ endif()
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly pthread)
 
 ##############################################################################
-point_build_to( src )
+daq_point_build_to( src )
 
 add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp src/DAQModule.cpp)
 target_link_libraries(appfwk ${APPFWK_DEPENDENCIES})
@@ -48,17 +48,17 @@ MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyabl
 
 
 ##############################################################################
-point_build_to( apps )
+daq_point_build_to( apps )
 
 add_executable(daq_application apps/daq_application.cxx)
 target_link_libraries(daq_application ${Boost_PROGRAM_OPTIONS_LIBRARY} appfwk)
 
 ##############################################################################
-point_build_to( doc )
+daq_point_build_to( doc )
 # (No action taken, doc/ doesn't yet contain anything)
 
 ##############################################################################
-point_build_to( test )
+daq_point_build_to( test )
 
 add_library(appfwk_DummyModule_duneDAQModule test/DummyModule.cpp)
 target_link_libraries(appfwk_DummyModule_duneDAQModule appfwk)
@@ -79,14 +79,16 @@ target_link_libraries(dummy_test_app appfwk appfwk_DummyModule_duneDAQModule ${B
 file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
 
 ##############################################################################
-point_build_to( unittest )
+daq_point_build_to( unittest )
 
-add_unit_test(DAQModule_test          appfwk )
-add_unit_test(DAQSink_DAQSource_test  appfwk )
-add_unit_test(FanOutDAQModule_test    appfwk )
-add_unit_test(FollyQueue_test         ers::ers Folly::folly)
-add_unit_test(StdDeQueue_test         ers::ers)
-add_unit_test(ThreadHelper_test       ers::ers)
+daq_add_unit_test(DAQModule_test          appfwk )
+daq_add_unit_test(DAQSink_DAQSource_test  appfwk )
+daq_add_unit_test(FanOutDAQModule_test    appfwk )
+daq_add_unit_test(FollyQueue_test         ers::ers Folly::folly)
+daq_add_unit_test(StdDeQueue_test         ers::ers)
+daq_add_unit_test(ThreadHelper_test       ers::ers)
+
+##############################################################################
 
 daq_install(TARGETS daq_application 
                     appfwk 
