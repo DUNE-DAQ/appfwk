@@ -20,7 +20,7 @@ if(NOT ${nlohmann_json_FOUND})
   include_directories(${CMAKE_BINARY_DIR})
 endif()
 
-set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly pthread)
+set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly pthread nlohmann_json::nlohmann_json)
 
 ##############################################################################
 daq_point_build_to( src )
