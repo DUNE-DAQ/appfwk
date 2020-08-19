@@ -10,13 +10,7 @@ find_dependency(cetlib)
 find_dependency(folly)
 find_dependency(ers)
 
-find_package(nlohmann_json 3.8.0 )
-
-if(NOT ${nlohmann_json_FOUND})
-  message("nlohmann_json NOT FOUND! Downloading single-header from GitHub!")
-  file(DOWNLOAD https://github.com/nlohmann/json/raw/v3.8.0/single_include/nlohmann/json.hpp nlohmann/json.hpp)
-  include_directories(${CMAKE_BINARY_DIR})
-endif()
+find_package(nlohmann_json)
 
 set_and_check(targets_file ${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake)
 include(${targets_file})
