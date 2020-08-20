@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_FANOUTDAQMODULE_HPP_
+#define APPFWK_INCLUDE_APPFWK_FANOUTDAQMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/DAQSink.hpp"
@@ -33,22 +33,22 @@ namespace dunedaq {
 /**
  * @brief The BroadcastFailed FanOutDAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
-                       BroadcastFailed,       ///< Type of the Issue
-                       GeneralDAQModuleIssue, ///< Base class of the Issue
+ERS_DECLARE_ISSUE_BASE(appfwk,                                        ///< Namespace
+                       BroadcastFailed,                               ///< Type of the Issue
+                       GeneralDAQModuleIssue,                         ///< Base class of the Issue
                        "FanOutDAQModule Broadcast Error: " << reason, ///< Log Message from the issue
-                       ERS_EMPTY,                                            ///< End of variable declarations
-                       ((std::string)reason))                                ///< Variables to capture
+                       ((std::string)name),                           ///< End of variable declarations
+                       ((std::string)reason))                         ///< Variables to capture
 
 /**
  * @brief The ConfigureFailed FanOutDAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                ///< Namespace
-                       ConfigureFailed,       ///< Type of the Issue
-                       GeneralDAQModuleIssue, ///< Base class of the Issue
+ERS_DECLARE_ISSUE_BASE(appfwk,                                        ///< Namespace
+                       ConfigureFailed,                               ///< Type of the Issue
+                       GeneralDAQModuleIssue,                         ///< Base class of the Issue
                        "FanOutDAQModule Configure Error: " << reason, ///< Log Message from the issue
-                       ERS_EMPTY,                                            ///< End of variable declarations
-                       ((std::string)reason))                                ///< Variables to capture
+                       ((std::string)name),                           ///< End of variable declarations
+                       ((std::string)reason))                         ///< Variables to capture
 
 namespace appfwk {
 
@@ -107,17 +107,17 @@ private:
   template<typename U = ValueType>
   typename std::enable_if_t<!std::is_copy_constructible_v<U>> do_broadcast(ValueType&) const
   {
-    throw BroadcastFailed(ERS_HERE, "Broadcast mode cannot be used for non-copy-constructible types!");
+    throw BroadcastFailed(ERS_HERE, get_name(), "Broadcast mode cannot be used for non-copy-constructible types!");
   }
   template<typename U = ValueType>
   typename std::enable_if_t<std::is_copy_constructible_v<U>> do_broadcast(ValueType& data) const
   {
     for (auto& o : outputQueues_) {
-      auto starttime = std::chrono::steady_clock::now();
-      o->push(data, queueTimeout_);
-      auto endtime = std::chrono::steady_clock::now();
-      if (std::chrono::duration_cast<decltype(queueTimeout_)>(endtime - starttime) > queueTimeout_) {
+      try {
+	o->push(data, queueTimeout_);
+      } catch (const QueueTimeoutExpired& ex) {
         ers::warning(BroadcastFailed(ERS_HERE,
+                                     get_name(),
                                      "Timeout occurred trying to broadcast data to "
                                      "output queue; data may be lost if it doesn't "
                                      "make it into any other output queues, either"));
@@ -182,4 +182,4 @@ private:
 
 #include "detail/FanOutDAQModule.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_FANOUTDAQMODULE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_FANOUTDAQMODULE_HPP_

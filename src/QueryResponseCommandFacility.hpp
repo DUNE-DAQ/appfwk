@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
-#define APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
+#ifndef APPFWK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
+#define APPFWK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
 
 #include "appfwk/DAQProcess.hpp"
 
@@ -32,9 +32,17 @@ public:
    * @return Status code. 0 if terminated by quit command, -1 if an exception
    * occurs
    */
-  int listen(DAQProcess* theProcess) override;
+  int listen(const DAQProcess& theProcess) const override;
   virtual ~QueryResponseCommandFacility();
+
+  QueryResponseCommandFacility() = default;
+
+private:
+  QueryResponseCommandFacility(QueryResponseCommandFacility const&) = delete;
+  QueryResponseCommandFacility(QueryResponseCommandFacility&&) = delete;
+  QueryResponseCommandFacility& operator=(QueryResponseCommandFacility const&) = delete;
+  QueryResponseCommandFacility& operator=(QueryResponseCommandFacility&&) = delete;
 };
 } // namespace dunedaq::appfwk
 
-#endif // APP_FRAMEWORK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_
+#endif // APPFWK_SRC_QUERYRESPONSECOMMANDFACILITY_HPP_

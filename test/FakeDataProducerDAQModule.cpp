@@ -10,8 +10,10 @@
 #include "FakeDataProducerDAQModule.hpp"
 
 #include <chrono>
+#include <string>
 #include <thread>
 #include <utility>
+#include <vector>
 
 #include <TRACE/trace.h>
 /**
@@ -30,11 +32,13 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
 {
 
   register_command("configure", &FakeDataProducerDAQModule::do_configure);
-  register_command("start",  &FakeDataProducerDAQModule::do_start);
-  register_command("stop",  &FakeDataProducerDAQModule::do_stop);
+  register_command("start", &FakeDataProducerDAQModule::do_start);
+  register_command("stop", &FakeDataProducerDAQModule::do_stop);
 }
 
-void FakeDataProducerDAQModule::init() {
+void
+FakeDataProducerDAQModule::init()
+{
   outputQueue_.reset(new DAQSink<std::vector<int>>(get_config()["output"].get<std::string>()));
 }
 
@@ -45,6 +49,7 @@ FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& /*args*/
   starting_int_ = get_config().value<int>("starting_int", -4);
   ending_int_ = get_config().value<int>("ending_int", 14);
   wait_between_sends_ms_ = get_config().value<int>("wait_between_sends_ms", 1000);
+  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
 }
 
 void
@@ -97,13 +102,16 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
       if (current_int > ending_int_)
         current_int = starting_int_;
     }
-    oss << "Produced vector " << counter << " with contents " << output << " and size "
-                    << output.size();
+    oss << "Produced vector " << counter << " with contents " << output << " and size " << output.size();
     ers::debug(ProducerProgressUpdate(ERS_HERE, get_name(), oss.str()));
     oss.str("");
 
     TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
-    outputQueue_->push(std::move(output), queueTimeout_);
+    try {
+      outputQueue_->push(std::move(output), queueTimeout_);
+    } catch(const QueueTimeoutExpired& ex) {
+      ers::warning(ex);
+    }
 
     TLOG(TLVL_TRACE) << get_name() << ": Start of sleep between sends";
     std::this_thread::sleep_for(std::chrono::milliseconds(wait_between_sends_ms_));
@@ -112,7 +120,7 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
   }
 }
 
-} // namespace appfwk 
+} // namespace appfwk
 } // namespace dunedaq
 
 DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::FakeDataProducerDAQModule)

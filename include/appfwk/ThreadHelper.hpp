@@ -29,10 +29,10 @@ namespace dunedaq {
 /**
  * @brief An ERS Issue raised when a threading state error occurs
  */
-ERS_DECLARE_ISSUE(appfwk, // Namespace
-                  ThreadingIssue, // Issue Class Name
+ERS_DECLARE_ISSUE(appfwk,                              // Namespace
+                  ThreadingIssue,                      // Issue Class Name
                   "Threading Issue detected: " << err, // Message
-                  ((std::string)err)) // Message parameters
+                  ((std::string)err))                  // Message parameters
 
 namespace appfwk {
 /**
@@ -45,7 +45,7 @@ namespace appfwk {
  * respectively. The work function takes a std::atomic<bool>&  which
  * indicates whether the thread should continue running, so a typical
  * implementation of a work function is:
- * 
+ *
  * @code
  * void do_work(std::atomic<bool>& running_flag){
  *   while(running_flag.load()){
@@ -53,7 +53,7 @@ namespace appfwk {
  *   }
  * }
  * @endcode
- * 
+ *
  * If your do_work function is a class member, you will need to wrap
  * it with std::bind or a lambda to bind the implicit 'this' argument,
  * eg
@@ -78,7 +78,7 @@ public:
    *
    * This constructor sets the defaults for the thread control variables
    */
-    explicit ThreadHelper(std::function<void(std::atomic<bool>&)> do_work)
+  explicit ThreadHelper(std::function<void(std::atomic<bool>&)> do_work)
     : thread_running_(false)
     , working_thread_(nullptr)
     , do_work_(do_work)
@@ -91,7 +91,8 @@ public:
   void start_working_thread()
   {
     if (thread_running()) {
-      throw ThreadingIssue(ERS_HERE, "Attempted to start working thread "
+      throw ThreadingIssue(ERS_HERE,
+                           "Attempted to start working thread "
                            "when it is already running!");
     }
     thread_running_ = true;
@@ -108,7 +109,7 @@ public:
     if (!thread_running()) {
       throw ThreadingIssue(ERS_HERE,
                            "Attempted to stop working thread "
-                               "when it is not running!");
+                           "when it is not running!");
     }
     thread_running_ = false;
 
@@ -119,8 +120,7 @@ public:
         throw ThreadingIssue(ERS_HERE, std::string("Error while joining thread, ") + e.what());
       }
     } else {
-      throw ThreadingIssue(ERS_HERE,
-                           "Thread not in joinable state during working thread stop!");
+      throw ThreadingIssue(ERS_HERE, "Thread not in joinable state during working thread stop!");
     }
   }
 
@@ -140,8 +140,7 @@ private:
   std::unique_ptr<std::thread> working_thread_;
   std::function<void(std::atomic<bool>&)> do_work_;
 };
-} // namespace dunedaq::appfwk
-
+} // namespace appfwk
 
 } // namespace dunedaq
 

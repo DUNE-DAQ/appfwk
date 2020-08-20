@@ -11,8 +11,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
+#define APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
 
 #include "appfwk/NamedObject.hpp"
 
@@ -46,8 +46,8 @@ public:
    * @param name Name of the Queue instance
    */
   explicit Queue(const std::string& name, size_t capacity)
-    : NamedObject(name),
-      capacity_(capacity)
+    : NamedObject(name)
+    , capacity_(capacity)
   {}
 
   /**
@@ -71,14 +71,14 @@ public:
 
   /**
    * @brief Pop the first value off of the queue
+   * @param val Reference to the value that is popped from the queue
    * @param timeout Timeout for the pop operation
-   * @return Value popped from the Queue
    *
    * This is a pure virtual function
    * If pop takes longer than the timeout, implementations should throw an
    * exception
    */
-  virtual bool pop(T& val, const duration_type& timeout) = 0;
+  virtual void pop(T& val, const duration_type& timeout) = 0;
 
   /**
    * @brief Determine whether the Queue may be popped from
@@ -107,8 +107,8 @@ private:
 ERS_DECLARE_ISSUE(appfwk,              // namespace
                   QueueTimeoutExpired, // issue class name
                   name << ": Unable to " << func_name << " within timeout period (timeout period was " << timeout
-                               << " milliseconds)", // message
+                       << " milliseconds)", // message
                   ((std::string)name)((std::string)func_name)((int)timeout))
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_QUEUE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_QUEUE_HPP_

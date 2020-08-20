@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
+#define APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
 
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
@@ -33,7 +33,7 @@ ERS_DECLARE_ISSUE(appfwk,                                           // namespace
 namespace appfwk {
 
 template<typename T>
-class DAQSink
+class DAQSink : public Named
 {
 public:
   using value_type = T;
@@ -42,7 +42,8 @@ public:
   explicit DAQSink(const std::string& name);
   void push(T&& element, const duration_type& timeout = duration_type::zero());
   void push(const T& element, const duration_type& timeout = duration_type::zero());
-  bool can_push();
+  bool can_push() const noexcept;
+  const std::string& get_name() const final {return queue_->get_name(); }
 
 private:
   std::shared_ptr<Queue<T>> queue_;
@@ -54,7 +55,7 @@ DAQSink<T>::DAQSink(const std::string& name)
   try {
     queue_ = QueueRegistry::get().get_queue<T>(name);
     TLOG(TLVL_TRACE, "DAQSink") << "Queue " << name << " is at " << queue_.get();
-  } catch (QueueTypeMismatch& ex) {
+  } catch (const QueueTypeMismatch& ex) {
     throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
 }
@@ -70,12 +71,12 @@ template<typename T>
 void
 DAQSink<T>::push(const T& element, const duration_type& timeout)
 {
-  queue_->push( T(element), timeout);
+  queue_->push(T(element), timeout);
 }
 
 template<typename T>
 bool
-DAQSink<T>::can_push()
+DAQSink<T>::can_push() const noexcept
 {
   return queue_->can_push();
 }
@@ -83,4 +84,4 @@ DAQSink<T>::can_push()
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSINK_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_

@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_GRAPHCONSTRUCTOR_HPP_
+#define APPFWK_INCLUDE_APPFWK_GRAPHCONSTRUCTOR_HPP_
 
 #include "appfwk/DAQModule.hpp"
 
@@ -44,8 +44,8 @@ public:
    * Queue and DAQModule instances in a DAQ Application. Additionally, any
    * requirements on command order for DAQModules should be defined here.
    */
-  virtual void ConstructGraph(DAQModuleMap& daq_module_map, CommandOrderMap& command_order_map) = 0;
+  virtual void ConstructGraph(DAQModuleMap& daq_module_map, CommandOrderMap& command_order_map) const = 0;
 };
 } // namespace dunedaq::appfwk
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_GRAPHCONSTRUCTOR_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_GRAPHCONSTRUCTOR_HPP_

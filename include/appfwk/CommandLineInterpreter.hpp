@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
+#define APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
 
 #include <ers/ers.h>
 
@@ -85,14 +85,14 @@ public:
       output.servicePluginNames = vm["service"].as<std::vector<std::string>>();
     }
     if (vm.count("configJson")) {
-      output.applicaitonConfigurationFile = vm["configJson"].as<std::string>();
+      output.applicationConfigurationFile = vm["configJson"].as<std::string>();
     }
     output.isValid = true;
     return output;
   }
 
   bool isValid{ false };                       ///< Whether the command line was successfully parsed
-  std::string applicaitonConfigurationFile;    ///< File that contains application
+  std::string applicationConfigurationFile;    ///< File that contains application
                                                ///< configuration (JSON)
   std::string commandFacilityPluginName;       ///< Name of the CommandFacility plugin to load
   std::string configurationManagerPluginName;  ///< Name of the ConfigurationManager
@@ -103,4 +103,4 @@ public:
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDLINEINTERPRETER_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_

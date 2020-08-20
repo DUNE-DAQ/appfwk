@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_COMMANDFACILITY_HPP_
+#define APPFWK_INCLUDE_APPFWK_COMMANDFACILITY_HPP_
 
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
@@ -76,7 +76,7 @@ public:
    * This function should block for the lifetime of the DAQ Application, calling
    * DAQProcess::execute_command as necessary
    */
-  virtual int listen(DAQProcess* /*process*/) { return 0; }
+  virtual int listen(const DAQProcess& /*process*/) const { return 0; }
 
 protected:
   /**
@@ -103,4 +103,4 @@ makeCommandFacility(std::string const& facility_name)
 
 } // namespace dunedaq::appfwk
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_COMMANDFACILITY_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_COMMANDFACILITY_HPP_

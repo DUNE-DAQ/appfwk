@@ -12,14 +12,15 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_DAQPROCESS_HPP_
+#define APPFWK_INCLUDE_APPFWK_DAQPROCESS_HPP_
 
 #include "appfwk/CommandLineInterpreter.hpp"
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/GraphConstructor.hpp"
 
 #include <string>
+#include <vector>
 
 namespace dunedaq {
 namespace appfwk {
@@ -53,7 +54,7 @@ public:
    * needed by this DAQ Application. ConstructGraph also defines any ordering of
    * commands for DAQModules.
    */
-  void register_modules(GraphConstructor& gc);
+  void register_modules(const GraphConstructor& gc);
   /**
    * @brief Execute the specified command on the loaded DAQModules
    * @param cmd Command to execute
@@ -64,7 +65,7 @@ public:
    * that list in the order specified. Then, any remaining DAQModules will
    * receive the command in an unspecified order.
    */
-  void execute_command(std::string const& cmd, std::vector<std::string> const& args = {});
+  void execute_command(std::string const& cmd, std::vector<std::string> const& args = {}) const;
   /**
    * @brief Start the CommandFacility listener
    * @return Return code from listener
@@ -73,7 +74,7 @@ public:
    * should block for the duration of the DAQ Application, calling
    * execute_command as necessary.
    */
-  int listen();
+  int listen() const;
 
   DAQProcess(const DAQProcess&) = delete;            ///< DAQProcess is not copy-constuctible
   DAQProcess& operator=(const DAQProcess&) = delete; ///< DAQProcess is not copy-assignable
@@ -87,7 +88,7 @@ protected:
    * @param cmd Command name
    * @param args Command arguments
    */
-  void call_command_on_module(DAQModule& module, const std::string& cmd, std::vector<std::string> const& args);
+  void call_command_on_module(DAQModule& module, const std::string& cmd, std::vector<std::string> const& args) const;
 
 private:
   DAQModuleMap daqModuleMap_;       ///< String alias for each DAQModule
@@ -136,4 +137,4 @@ ERS_DECLARE_ISSUE_BASE(appfwk,          ///< Namespace
                        ((std::string)mod_name)((std::string)cmd))
 
 } // namespace dunedaq
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQPROCESS_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_DAQPROCESS_HPP_

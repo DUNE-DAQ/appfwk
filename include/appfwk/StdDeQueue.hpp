@@ -1,5 +1,5 @@
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_STDDEQUEUE_HPP_
+#define APPFWK_INCLUDE_APPFWK_STDDEQUEUE_HPP_
 
 /**
  *
@@ -48,10 +48,10 @@ public:
   explicit StdDeQueue(const std::string& name, size_t capacity);
 
   bool can_pop() const noexcept override { return fSize.load() > 0; }
-  bool pop(value_type& val, const duration_type&) override; // Throws std::runtime_error if a timeout occurs
+  void pop(value_type& val, const duration_type&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
   bool can_push() const noexcept override { return fSize.load() < this->GetCapacity(); }
-  void push(value_type&&, const duration_type&) override; // Throws std::runtime_error if a timeout occurs
+  void push(value_type&&, const duration_type&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
@@ -60,7 +60,6 @@ public:
   StdDeQueue& operator=(const StdDeQueue&) = delete; ///< StdDeQueue is not copy-assignable
   StdDeQueue(StdDeQueue&&) = delete;                 ///< StdDeQueue is not move-constructible
   StdDeQueue& operator=(StdDeQueue&&) = delete;      ///< StdDeQueue is not move-assignable
-
 
 private:
   void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
@@ -79,4 +78,4 @@ private:
 
 #include "detail/StdDeQueue.hxx"
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_STDDEQUEUE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_STDDEQUEUE_HPP_

@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#ifndef APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_
-#define APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
+#define APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
@@ -31,15 +31,16 @@ ERS_DECLARE_ISSUE(appfwk,                                             // namespa
 namespace appfwk {
 
 template<typename T>
-class DAQSource
+class DAQSource : public Named
 {
 public:
   using value_type = T;
   using duration_type = std::chrono::milliseconds;
 
   explicit DAQSource(const std::string& name);
-  bool pop(T&, const duration_type& timeout = duration_type::zero());
-  bool can_pop();
+  void pop(T&, const duration_type& timeout = duration_type::zero());
+  bool can_pop() const noexcept;
+  const std::string& get_name() const final {return queue_->get_name(); }
 
 private:
   std::shared_ptr<Queue<T>> queue_;
@@ -57,15 +58,15 @@ DAQSource<T>::DAQSource(const std::string& name)
 }
 
 template<typename T>
-bool
+void
 DAQSource<T>::pop(T& val, const duration_type& timeout)
 {
-  return queue_->pop(val, timeout);
+  queue_->pop(val, timeout);
 }
 
 template<typename T>
 bool
-DAQSource<T>::can_pop()
+DAQSource<T>::can_pop() const noexcept
 {
   return queue_->can_pop();
 }
@@ -73,4 +74,4 @@ DAQSource<T>::can_pop()
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APP_FRAMEWORK_INCLUDE_APP_FRAMEWORK_DAQSOURCE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_

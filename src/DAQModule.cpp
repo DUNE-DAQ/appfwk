@@ -8,35 +8,42 @@
 
 #include "appfwk/DAQModule.hpp"
 
+#include <string>
+#include <vector>
+
 namespace dunedaq::appfwk {
 
-void 
-DAQModule::do_init(const nlohmann::json& config) {
-    this->set_config(config);
-    this->init();
+void
+DAQModule::do_init(const nlohmann::json& config)
+{
+  this->set_config(config);
+  this->init();
 }
 
-void 
-DAQModule::execute_command(const std::string& name, const std::vector<std::string>& args) {
-   if (auto cmd = commands_.find(name); cmd != commands_.end()) {
-      std::invoke(cmd->second, args);
-      return;
-    }
+void
+DAQModule::execute_command(const std::string& name, const std::vector<std::string>& args)
+{
+  if (auto cmd = commands_.find(name); cmd != commands_.end()) {
+    std::invoke(cmd->second, args);
+    return;
+  }
 
-    throw UnknownCommand(ERS_HERE, name);
+  throw UnknownCommand(ERS_HERE, get_name(), name);
 }
 
-std::vector<std::string> 
-DAQModule::get_commands() const {
-    std::vector<std::string> cmds(commands_.size());
-    for ( const auto &[key, value] : commands_)
-        cmds.push_back(key);
-    return cmds;
+std::vector<std::string>
+DAQModule::get_commands() const
+{
+  std::vector<std::string> cmds(commands_.size());
+  for (const auto& [key, value] : commands_)
+    cmds.push_back(key);
+  return cmds;
 }
 
 bool
-DAQModule::has_command(const std::string name) const {
-    return (commands_.find(name) != commands_.end());
+DAQModule::has_command(const std::string& name) const
+{
+  return (commands_.find(name) != commands_.end());
 }
 
 } // namespace dunedaq::appfwk

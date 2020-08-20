@@ -1,5 +1,5 @@
-#include "appfwk/StdDeQueue.hpp"
 #include "appfwk/FollyQueue.hpp"
+#include "appfwk/StdDeQueue.hpp"
 
 #include <cxxabi.h>
 
@@ -7,7 +7,8 @@
 namespace dunedaq::appfwk {
 
 QueueConfig::queue_kind
-QueueConfig::stoqk( const std::string & name )   {
+QueueConfig::stoqk(const std::string& name)
+{
   if (name == "StdDeQueue" || name == "std_deque")
     return queue_kind::kStdDeQueue;
   else if (name == "FollySPSCQueue")
@@ -15,7 +16,7 @@ QueueConfig::stoqk( const std::string & name )   {
   else if (name == "FollyMPMCQueue")
     return queue_kind::kFollyMPMCQueue;
   else
-    throw QueueKindUnknown( ERS_HERE, name );
+    throw QueueKindUnknown(ERS_HERE, name);
 }
 
 template<typename T>
@@ -28,7 +29,8 @@ QueueRegistry::get_queue(const std::string& name)
     auto queuePtr = std::dynamic_pointer_cast<Queue<T>>(itQ->second.instance);
 
     if (!queuePtr) {
-      int status;
+      // TODO: John Freeman (jcfree@fnal.gov), Jun-23-2020. Add checks for demangling status. Timescale 2 weeks.
+      int status = -999;
       std::string realname_target = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
       std::string realname_source = abi::__cxa_demangle(itQ->second.type->name(), 0, 0, &status);
 
@@ -45,26 +47,27 @@ QueueRegistry::get_queue(const std::string& name)
     return std::dynamic_pointer_cast<Queue<T>>(entry.instance);
 
   } else {
-    int status;
+    // TODO: John Freeman (jcfree@fnal.gov), Jun-23-2020. Add checks for demangling status. Timescale 2 weeks.
+    int status = -999;
     std::string realname_target = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
     throw QueueNotFound(ERS_HERE, name, realname_target);
   }
 }
 
 template<typename T>
-std::shared_ptr<NamedObject>
-QueueRegistry::create_queue(std::string name, const QueueConfig& config)
+std::shared_ptr<Named>
+QueueRegistry::create_queue(const std::string& name, const QueueConfig& config)
 {
 
-  std::shared_ptr<NamedObject> queue;
+  std::shared_ptr<Named> queue;
   switch (config.kind) {
     case QueueConfig::kStdDeQueue:
       queue = std::make_shared<StdDeQueue<T>>(name, config.capacity);
       break;
-    case QueueConfig::kFollySPSCQueue :
+    case QueueConfig::kFollySPSCQueue:
       queue = std::make_shared<FollySPSCQueue<T>>(name, config.capacity);
       break;
-    case QueueConfig::kFollyMPMCQueue :
+    case QueueConfig::kFollyMPMCQueue:
       queue = std::make_shared<FollyMPMCQueue<T>>(name, config.capacity);
       break;
 
