@@ -3,7 +3,8 @@ project(appfwk VERSION 1.1.0)
 
 
 find_package(daq-buildtools REQUIRED) 
-
+message(INFO "CMAKE_MODULE_PATH is ${CMAKE_MODULE_PATH}")
+message(INFO "daq-buildtools_ROOT is ${daq-buildtools_ROOT}")
 include(DAQ)
 
 daq_setup_environment()
