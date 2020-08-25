@@ -84,6 +84,7 @@ daq_add_unit_test(ThreadHelper_test       ers::ers)
 ##############################################################################
 
 daq_install(TARGETS daq_application 
-                    appfwk 
+                    appfwk
+		    appfwk_QueryResponseCommandFacility_duneCommandFacility 
                     VectorIntFanOutDAQModule_duneDAQModule StringFanOutDAQModule_duneDAQModule NonCopyableTypeFanOutDAQModule_duneDAQModule
 	   )
