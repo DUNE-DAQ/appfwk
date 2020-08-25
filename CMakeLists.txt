@@ -4,8 +4,6 @@ project(appfwk VERSION 1.1.0)
 
 find_package(daq-buildtools REQUIRED) 
 
-include(DAQ)
-
 daq_setup_environment()
 
 find_package(Boost 1.70.0 COMPONENTS unit_test_framework program_options REQUIRED)
