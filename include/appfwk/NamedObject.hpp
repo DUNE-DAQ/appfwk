@@ -23,9 +23,6 @@ public:
    * @brief Named Constructor
    * @param name Name of this object
    */
-  // explicit Named(const std::string& name)
-  //   : name_(name)
-  // {}
   Named() = default;                       ///< Named is default-constructible
   Named(Named const&) = delete;            ///< Named is not copy-constructible
   Named(Named&&) = default;                ///< Named is move-constructible
@@ -34,7 +31,7 @@ public:
   virtual ~Named() = default;              ///< Default virtual destructor
 
   /**
-   * @brief Get the name of this NamedObejct
+   * @brief Get the name of this Named
    * @return The name of this Named
    */
   virtual const std::string& get_name() const = 0;
@@ -62,12 +59,12 @@ public:
 
   /**
    * @brief Get the name of this NamedObejct
-   * @return The name of this Named
+   * @return The name of this NamedObject
    */
   const std::string& get_name() const final { return name_; }
 
 private:
-  const std::string name_;
+  std::string name_;
 };
 
 } // namespace dunedaq::appfwk

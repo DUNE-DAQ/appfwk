@@ -80,6 +80,7 @@ daq_add_unit_test(FanOutDAQModule_test    appfwk )
 daq_add_unit_test(FollyQueue_test         ers::ers Folly::folly)
 daq_add_unit_test(StdDeQueue_test         ers::ers)
 daq_add_unit_test(ThreadHelper_test       ers::ers)
+daq_add_unit_test(NamedObject_test		  )
 
 ##############################################################################
 
