@@ -45,6 +45,12 @@ public:
   bool can_push() const noexcept;
   const std::string& get_name() const final {return queue_->get_name(); }
 
+  DAQSink(DAQSink const&) = delete;            
+  DAQSink(DAQSink&&) = delete;                
+  DAQSink& operator=(DAQSink const&) = delete; 
+  DAQSink& operator=(DAQSink&&) = delete;     
+
+
 private:
   std::shared_ptr<Queue<T>> queue_;
 };

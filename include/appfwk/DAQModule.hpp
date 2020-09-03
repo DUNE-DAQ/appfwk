@@ -122,6 +122,12 @@ protected:
   template<typename Child>
   void register_command(const std::string& name, void (Child::*f)(const std::vector<std::string>&));
 
+  DAQModule(DAQModule const&) = delete;            
+  DAQModule(DAQModule&&) = delete;                
+  DAQModule& operator=(DAQModule const&) = delete; 
+  DAQModule& operator=(DAQModule&&) = delete;     
+
+
 private:
   using CommandMap_t = std::map<std::string, std::function<void(const std::vector<std::string>&)>>;
   CommandMap_t commands_;
