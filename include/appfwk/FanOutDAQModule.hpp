@@ -92,7 +92,7 @@ public:
   FanOutDAQModule(FanOutDAQModule&&) = delete;                 ///< FanOutDAQModule is not move-constructible
   FanOutDAQModule& operator=(FanOutDAQModule&&) = delete;      ///< FanOutDAQModule is not move-assignable
 
-  void init() override;
+  void init(const nlohmann::json& ) override;
 
 private:
   // Commands

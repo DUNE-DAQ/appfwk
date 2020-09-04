@@ -47,7 +47,7 @@ public:
   FakeDataConsumerDAQModule& operator=(FakeDataConsumerDAQModule&&) =
     delete; ///< FakeDataConsumerDAQModule is not move-assignable
 
-  void init() override;
+  void init(const nlohmann::json& ) override;
 
 private:
   // Commands

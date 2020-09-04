@@ -75,9 +75,12 @@ public:
     : NamedObject(name)
   {}
 
-  const nlohmann::json& get_config() const { return configuration_; }
-
-  void do_init(const nlohmann::json& config);
+  /**
+   * @brief      Initializes the module
+   *
+   * Initialisation of the module. Abstract method to be overridden by derived classes.
+   */
+  virtual void init( const nlohmann::json& ) = 0;
 
   /**
    * @brief Execute a command in this DAQModule
@@ -98,22 +101,6 @@ public:
   bool has_command(const std::string& name) const;
 
 protected:
-  /**
-   * @brief      Initializes the module
-   *
-   * Initialisation of the module. Abstract method to be overridden by derived classes.
-   */
-  virtual void init() = 0;
-
-  /**
-   * @brief Set the configuration for the DAQModule
-   * @param config JSON Configuration for the DAQModule
-   *
-   * This function is a placeholder; once CCM is implemented more completely, it
-   * will not continue to be part of the application framework. DAQModule
-   * developers should not assume that it will be accessible in the future.
-   */
-  void set_config(const nlohmann::json& config) { configuration_ = config; }
 
   /**
    * @brief Registers a mdoule command under the name `cmd`.
@@ -132,7 +119,6 @@ private:
   using CommandMap_t = std::map<std::string, std::function<void(const std::vector<std::string>&)>>;
   CommandMap_t commands_;
 
-  nlohmann::json configuration_; ///< JSON configuration for the DAQModule
 };
 
 /**

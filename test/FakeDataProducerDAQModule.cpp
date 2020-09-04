@@ -37,19 +37,19 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
 }
 
 void
-FakeDataProducerDAQModule::init()
+FakeDataProducerDAQModule::init(const nlohmann::json& init_data)
 {
-  outputQueue_.reset(new DAQSink<std::vector<int>>(get_config()["output"].get<std::string>()));
+  outputQueue_.reset(new DAQSink<std::vector<int>>(init_data["output"].get<std::string>()));
 }
 
 void
 FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& /*args*/)
 {
-  nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
-  starting_int_ = get_config().value<int>("starting_int", -4);
-  ending_int_ = get_config().value<int>("ending_int", 14);
-  wait_between_sends_ms_ = get_config().value<int>("wait_between_sends_ms", 1000);
-  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
+  // nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
+  // starting_int_ = get_config().value<int>("starting_int", -4);
+  // ending_int_ = get_config().value<int>("ending_int", 14);
+  // wait_between_sends_ms_ = get_config().value<int>("wait_between_sends_ms", 1000);
+  // queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
 }
 
 void

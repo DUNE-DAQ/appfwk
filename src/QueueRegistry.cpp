@@ -38,4 +38,17 @@ QueueRegistry::configure(const std::map<std::string, QueueConfig>& configmap)
   configured_ = true;
 }
 
+QueueConfig::queue_kind
+QueueConfig::stoqk(const std::string& name)
+{
+  if (name == "StdDeQueue" || name == "std_deque")
+    return queue_kind::kStdDeQueue;
+  else if (name == "FollySPSCQueue")
+    return queue_kind::kFollySPSCQueue;
+  else if (name == "FollyMPMCQueue")
+    return queue_kind::kFollyMPMCQueue;
+  else
+    throw QueueKindUnknown(ERS_HERE, name);
+}
+
 } // namespace dunedaq::appfwk

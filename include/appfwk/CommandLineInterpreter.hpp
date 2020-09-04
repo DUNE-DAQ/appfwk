@@ -41,7 +41,7 @@ public:
    * @param argv Command-line arguments
    * @return CommandLineInterpreter structure with parsed arguments
    */
-  static CommandLineInterpreter ParseCommandLineArguments(int argc, char** argv)
+  static CommandLineInterpreter parse(int argc, char** argv)
   {
     CommandLineInterpreter output;
 

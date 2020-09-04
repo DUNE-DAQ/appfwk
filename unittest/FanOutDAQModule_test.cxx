@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(Configure)
   dunedaq::appfwk::FanOutDAQModule<dunedaq::appfwk::NonCopyableType> foum("configure_test");
 
   auto module_config = R"({"input": "input", "fanout_mode": "round_robin", "outputs": []})"_json;
-  foum.do_init(module_config);
+  foum.init(module_config);
 
   foum.execute_command("configure");
 }
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(InvalidConfigure)
 
   // Wrongly-capitalized fanout_mode
   auto module_config = R"({"input": "input", "fanout_mode": "Round_robin", "outputs": []})"_json;
-  foum.do_init(module_config);
+  foum.init(module_config);
 
   BOOST_REQUIRE_THROW(foum.execute_command("configure"), dunedaq::appfwk::ConfigureFailed);
 }
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(NonCopyableTypeTest)
                     "wait_interval": 10000
         }
     )"_json;
-  foum.do_init(module_config);
+  foum.init(module_config);
 
   // This test assumes RoundRobin mode. Once configurability is implemented,
   // we'll have to configure it appropriately.

@@ -1,0 +1,136 @@
+[
+    {
+        "data": {
+            "addrdats": [
+                {
+                    "data": {
+                        "addrdats": [
+                            {
+                                "data": {
+                                    "capacity": 10,
+                                    "kind": "StdDeQueue"
+                                },
+                                "tn": {
+                                    "name": "queue1",
+                                    "type": "StdDeQueue"
+                                }
+                            }
+                        ]
+                    },
+                    "tn": {
+                        "name": "",
+                        "type": "queue"
+                    }
+                },
+                {
+                    "data": {
+                        "data": {
+                            "output": "queue1"
+                        },
+                        "plugin": "FakeDataProducerDAQModule"
+                    },
+                    "tn": {
+                        "name": "source1",
+                        "type": "module"
+                    }
+                },
+                {
+                    "data": {
+                        "data": {
+                            "input": "queue1"
+                        },
+                        "plugin": "FakeDataConsumerDAQModule"
+                    },
+                    "tn": {
+                        "name": "sink1",
+                        "type": "module"
+                    }
+                }
+            ]
+        },
+        "id": "init"
+    },
+    {
+        "data": {
+            "addrdats": [
+                {
+                    "data": {
+                        "output": "queue1"
+                    },
+                    "tn": {
+                        "name": "source1",
+                        "type": "module"
+                    }
+                },
+                {
+                    "data": {
+                        "input": "queue1"
+                    },
+                    "tn": {
+                        "name": "sink1",
+                        "type": "module"
+                    }
+                }
+            ]
+        },
+        "id": "conf"
+    },
+    {
+        "data": {
+            "addrdats": [
+                {
+                    "data": {
+                        "run": 42
+                    },
+                    "tn": {
+                        "name": "source1",
+                        "type": "module"
+                    }
+                },
+                {
+                    "data": {
+                        "run": 42
+                    },
+                    "tn": {
+                        "name": "sink1",
+                        "type": "module"
+                    }
+                }
+            ]
+        },
+        "id": "start"
+    },
+    {
+        "data": {
+            "addrdats": [
+                {
+                    "data": {},
+                    "tn": {
+                        "name": "source1",
+                        "type": "module"
+                    }
+                },
+                {
+                    "data": {},
+                    "tn": {
+                        "name": "sink1",
+                        "type": "module"
+                    }
+                }
+            ]
+        },
+        "id": "stop"
+    },
+    {
+        "data": {
+            "addrdats": []
+        },
+        "id": "scrap"
+    },
+    {
+        "data": {
+            "addrdats": []
+        },
+        "id": "fina"
+    }
+]

@@ -8,6 +8,8 @@
  */
 
 #include "appfwk/CommandLineInterpreter.hpp"
+#include "appfwk/DAQModuleManager.hpp"
+#include "appfwk/CommandFacility.hpp"
 
 #include "ers/Issue.h"
 #include <nlohmann/json.hpp>
@@ -56,8 +58,9 @@ main(int argc, char* argv[])
 {
   using namespace dunedaq::appfwk;
 
+  CommandLineInterpreter args;
   try {
-    auto args = CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
+    args = CommandLineInterpreter::parse(argc, argv);
   } catch (ers::Issue& e) {
     // Die but do it gracefully gracefully
     std::cout << "Command-line parsing failed. Error:" << std::endl;
@@ -65,7 +68,8 @@ main(int argc, char* argv[])
     exit(-1);
   }
 
-
-
+  DAQModuleManager manager;
+  auto cmdfac = makeCommandFacility(args.commandFacilityPluginName);
+  cmdfac->run(manager);
 
 }

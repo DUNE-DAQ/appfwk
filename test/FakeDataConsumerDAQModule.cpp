@@ -38,19 +38,19 @@ FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
 }
 
 void
-FakeDataConsumerDAQModule::init()
+FakeDataConsumerDAQModule::init(const nlohmann::json& init_data)
 {
-  inputQueue_.reset(new DAQSource<std::vector<int>>(get_config()["input"].get<std::string>()));
+  inputQueue_.reset(new DAQSource<std::vector<int>>(init_data["input"].get<std::string>()));
 }
 
 void
 FakeDataConsumerDAQModule::do_configure(const std::vector<std::string>& /*args*/)
 {
 
-  nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
-  starting_int_ = get_config().value<int>("starting_int", -4);
-  ending_int_ = get_config().value<int>("ending_int", 14);
-  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
+  // nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
+  // starting_int_ = get_config().value<int>("starting_int", -4);
+  // ending_int_ = get_config().value<int>("ending_int", 14);
+  // queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
 }
 
 void

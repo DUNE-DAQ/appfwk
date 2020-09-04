@@ -19,13 +19,13 @@ FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::init()
+FanOutDAQModule<ValueType>::init(const nlohmann::json& init_data)
 {
 
-  auto inputName = get_config()["input"].get<std::string>();
+  auto inputName = init_data["input"].get<std::string>();
   TLOG(TLVL_TRACE, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName << " as input";
   inputQueue_.reset(new DAQSource<ValueType>(inputName));
-  for (auto& output : get_config()["outputs"]) {
+  for (auto& output : init_data["outputs"]) {
     outputQueues_.emplace_back(new DAQSink<ValueType>(output.get<std::string>()));
   }
 }
@@ -34,26 +34,26 @@ template<typename ValueType>
 void
 FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& /*args*/)
 {
-  if (get_config().contains("fanout_mode")) {
-    auto modeString = get_config()["fanout_mode"].get<std::string>();
-    if (modeString == "broadcast") {
+  // if (get_config().contains("fanout_mode")) {
+  //   auto modeString = get_config()["fanout_mode"].get<std::string>();
+  //   if (modeString == "broadcast") {
 
-      mode_ = FanOutMode::Broadcast;
-    } else if (modeString == "first_available") {
+  //     mode_ = FanOutMode::Broadcast;
+  //   } else if (modeString == "first_available") {
 
-      mode_ = FanOutMode::FirstAvailable;
-    } else if (modeString == "round_robin") {
-      mode_ = FanOutMode::RoundRobin;
-    } else {
-      throw ConfigureFailed(ERS_HERE, get_name(), std::string("given unknown fanout_mode ") + modeString);
-    }
-  } else {
-    // RoundRobin by default
-    mode_ = FanOutMode::RoundRobin;
-  }
+  //     mode_ = FanOutMode::FirstAvailable;
+  //   } else if (modeString == "round_robin") {
+  //     mode_ = FanOutMode::RoundRobin;
+  //   } else {
+  //     throw ConfigureFailed(ERS_HERE, get_name(), std::string("given unknown fanout_mode ") + modeString);
+  //   }
+  // } else {
+  //   // RoundRobin by default
+  //   mode_ = FanOutMode::RoundRobin;
+  // }
 
-  wait_interval_us_ = get_config().value<int>("wait_interval_us", 10000);
-  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
+  // wait_interval_us_ = get_config().value<int>("wait_interval_us", 10000);
+  // queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
 }
 
 template<typename ValueType>
