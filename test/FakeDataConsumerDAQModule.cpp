@@ -32,7 +32,7 @@ FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
   , inputQueue_(nullptr)
 {
 
-  register_command("configure", &FakeDataConsumerDAQModule::do_configure);
+  register_command("conf", &FakeDataConsumerDAQModule::do_configure);
   register_command("start", &FakeDataConsumerDAQModule::do_start);
   register_command("stop", &FakeDataConsumerDAQModule::do_stop);
 }

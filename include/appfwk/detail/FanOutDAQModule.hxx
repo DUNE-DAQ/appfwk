@@ -12,7 +12,7 @@ FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
   , wait_interval_us_(std::numeric_limits<size_t>::max())
 {
 
-  register_command("configure", &FanOutDAQModule<ValueType>::do_configure);
+  register_command("conf", &FanOutDAQModule<ValueType>::do_configure);
   register_command("start", &FanOutDAQModule<ValueType>::do_start);
   register_command("stop", &FanOutDAQModule<ValueType>::do_stop);
 }

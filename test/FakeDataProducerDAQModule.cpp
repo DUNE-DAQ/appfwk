@@ -31,7 +31,7 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
   , queueTimeout_(100)
 {
 
-  register_command("configure", &FakeDataProducerDAQModule::do_configure);
+  register_command("conf", &FakeDataProducerDAQModule::do_configure);
   register_command("start", &FakeDataProducerDAQModule::do_start);
   register_command("stop", &FakeDataProducerDAQModule::do_stop);
 }

@@ -38,6 +38,7 @@ protected:
 
     void init_queues( const dataobj_t& queue_data );
 
+    std::vector<std::shared_ptr<DAQModule>> match(std::string name);
 private:
 
     bool initialized_;

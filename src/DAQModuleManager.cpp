@@ -92,6 +92,22 @@ DAQModuleManager::init_queues(const dataobj_t& queue_data) {
 }
 
 
+std::vector<std::shared_ptr<DAQModule>>
+DAQModuleManager::match(std::string name)
+{
+    if (name.empty()) { name = ".*"; }
+
+    std::vector<std::shared_ptr<DAQModule>> ret;
+    for (auto const& [nm, mptr] : modulemap_) {
+        if (! std::regex_match(nm.c_str(), std::regex(name.c_str())) ) {
+            continue;
+        }
+        ret.push_back(mptr);
+    }
+    return ret;
+}
+
+
 void
 DAQModuleManager::execute( const dataobj_t& cmd_data ) {
 
@@ -108,6 +124,18 @@ DAQModuleManager::execute( const dataobj_t& cmd_data ) {
         this->initialize( cmdobj.data );
     } else {
 
+
+        auto ads = cmdobj.data.get<cfg::Addressed>();
+        for (const auto& ad : ads.addrdats) {
+            ERS_INFO("---" << ad.tn.type << "  " << ad.tn.name );
+
+            if ( ad.tn.type != "module" )
+                continue;
+
+            for ( auto mptr : match(ad.tn.name) ) {
+                mptr->execute_command(cmdobj.id, ad.data);
+            }
+        }
     }
 
 }
