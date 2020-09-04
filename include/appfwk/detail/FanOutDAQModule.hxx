@@ -32,40 +32,40 @@ FanOutDAQModule<ValueType>::init(const nlohmann::json& init_data)
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& /*args*/)
+FanOutDAQModule<ValueType>::do_configure(const data_t& data)
 {
-  // if (get_config().contains("fanout_mode")) {
-  //   auto modeString = get_config()["fanout_mode"].get<std::string>();
-  //   if (modeString == "broadcast") {
+  if (data.contains("fanout_mode")) {
+    auto modeString = data["fanout_mode"].get<std::string>();
+    if (modeString == "broadcast") {
 
-  //     mode_ = FanOutMode::Broadcast;
-  //   } else if (modeString == "first_available") {
+      mode_ = FanOutMode::Broadcast;
+    } else if (modeString == "first_available") {
 
-  //     mode_ = FanOutMode::FirstAvailable;
-  //   } else if (modeString == "round_robin") {
-  //     mode_ = FanOutMode::RoundRobin;
-  //   } else {
-  //     throw ConfigureFailed(ERS_HERE, get_name(), std::string("given unknown fanout_mode ") + modeString);
-  //   }
-  // } else {
-  //   // RoundRobin by default
-  //   mode_ = FanOutMode::RoundRobin;
-  // }
+      mode_ = FanOutMode::FirstAvailable;
+    } else if (modeString == "round_robin") {
+      mode_ = FanOutMode::RoundRobin;
+    } else {
+      throw ConfigureFailed(ERS_HERE, get_name(), std::string("given unknown fanout_mode ") + modeString);
+    }
+  } else {
+    // RoundRobin by default
+    mode_ = FanOutMode::RoundRobin;
+  }
 
-  // wait_interval_us_ = get_config().value<int>("wait_interval_us", 10000);
-  // queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
+  wait_interval_us_ = data.value<int>("wait_interval_us", 10000);
+  queueTimeout_ = std::chrono::milliseconds(data.value<int>("queue_timeout_ms", 100));
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_start(const std::vector<std::string>& /*args*/)
+FanOutDAQModule<ValueType>::do_start(const data_t& /*data*/)
 {
   thread_.start_working_thread();
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_stop(const std::vector<std::string>& /*args*/)
+FanOutDAQModule<ValueType>::do_stop(const data_t& /*data*/)
 {
   thread_.stop_working_thread();
 }

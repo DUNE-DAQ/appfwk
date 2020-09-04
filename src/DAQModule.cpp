@@ -14,10 +14,10 @@
 namespace dunedaq::appfwk {
 
 void
-DAQModule::execute_command(const std::string& name, const std::vector<std::string>& args)
+DAQModule::execute_command(const std::string& name, const data_t& data)
 {
   if (auto cmd = commands_.find(name); cmd != commands_.end()) {
-    std::invoke(cmd->second, args);
+    std::invoke(cmd->second, data);
     return;
   }
 

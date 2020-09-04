@@ -43,23 +43,23 @@ FakeDataProducerDAQModule::init(const nlohmann::json& init_data)
 }
 
 void
-FakeDataProducerDAQModule::do_configure(const std::vector<std::string>& /*args*/)
+FakeDataProducerDAQModule::do_configure(const data_t& data)
 {
-  // nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
-  // starting_int_ = get_config().value<int>("starting_int", -4);
-  // ending_int_ = get_config().value<int>("ending_int", 14);
-  // wait_between_sends_ms_ = get_config().value<int>("wait_between_sends_ms", 1000);
-  // queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
+  nIntsPerVector_ = data.value<int>("nIntsPerVector", 10);
+  starting_int_ = data.value<int>("starting_int", -4);
+  ending_int_ = data.value<int>("ending_int", 14);
+  wait_between_sends_ms_ = data.value<int>("wait_between_sends_ms", 1000);
+  queueTimeout_ = std::chrono::milliseconds(data.value<int>("queue_timeout_ms", 100));
 }
 
 void
-FakeDataProducerDAQModule::do_start(const std::vector<std::string>& /*args*/)
+FakeDataProducerDAQModule::do_start(const data_t& /*data*/)
 {
   thread_.start_working_thread();
 }
 
 void
-FakeDataProducerDAQModule::do_stop(const std::vector<std::string>& /*args*/)
+FakeDataProducerDAQModule::do_stop(const data_t& /*data*/)
 {
   thread_.stop_working_thread();
 }

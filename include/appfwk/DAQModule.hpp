@@ -67,7 +67,10 @@ namespace appfwk {
 class DAQModule : public NamedObject
 {
 public:
-  /**
+
+  using data_t = nlohmann::json;
+
+    /**
    * @brief DAQModule Constructor
    * @param name Name of the DAQModule
    */
@@ -80,7 +83,7 @@ public:
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
-  virtual void init( const nlohmann::json& ) = 0;
+  virtual void init( const data_t& ) = 0;
 
   /**
    * @brief Execute a command in this DAQModule
@@ -94,7 +97,7 @@ public:
    *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
-  void execute_command(const std::string& name, const std::vector<std::string>& args = {});
+  void execute_command(const std::string& name, const data_t& data = {});
 
   std::vector<std::string> get_commands() const;
 
@@ -107,7 +110,7 @@ protected:
    * Returns whether the command was inserted (false meaning that command `cmd` already exists)
    */
   template<typename Child>
-  void register_command(const std::string& name, void (Child::*f)(const std::vector<std::string>&));
+  void register_command(const std::string& name, void (Child::*f)(const data_t&));
 
   DAQModule(DAQModule const&) = delete;            
   DAQModule(DAQModule&&) = delete;                
@@ -116,7 +119,7 @@ protected:
 
 
 private:
-  using CommandMap_t = std::map<std::string, std::function<void(const std::vector<std::string>&)>>;
+  using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
   CommandMap_t commands_;
 
 };

@@ -40,7 +40,7 @@ public:
 
   void init(const nlohmann::json& ) final {}
 
-  virtual void do_stuff(const std::vector<std::string>& /*args*/)
+  virtual void do_stuff(const data_t& /*data*/)
   {
     ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyParentModule do_stuff"));
   };
@@ -53,7 +53,7 @@ public:
     : DummyParentModule(name)
   {}
 
-  void do_stuff(const std::vector<std::string>& /*args*/) override
+  void do_stuff(const data_t& /*data*/) override
   {
     ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_stuff"));
   };

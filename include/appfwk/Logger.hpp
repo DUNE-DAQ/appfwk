@@ -24,7 +24,7 @@ public:
    * @brief Setup the Logger service
    * @param args Command-line arguments used to setup the Logger
    */
-  static void setup(const std::vector<std::string>& /*args*/) {}
+  static void setup(const data_t& /*data*/) {}
 };
 } // namespace dunedaq::appfwk
 
