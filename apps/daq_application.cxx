@@ -26,27 +26,6 @@
  */
 using json = nlohmann::json;
 
-namespace dunedaq {
-
-/**
-  * @brief InvalidConfiguration ERS Issue
- */
-ERS_DECLARE_ISSUE(appfwk,               // namespace
-		  InvalidConfiguration, // issue class name
-		  "Invalid configuration detected in daq_application: module with name "
-                  << module_name << " could not be added to application graph!", // message
-		  ((std::string)module_name)) // parameters
-
-/**
- * @brief NoConfiguration ERS Issue
- */
-ERS_DECLARE_ISSUE(appfwk,          // namespace
-                  NoConfiguration, // issue class name
-                  "No configuration file given to daq_application; re-run with "
-                  "daq_application -h to see options!", // message
-)
-} // namespace dunedaq
-
 /**
  * @brief Entry point for daq_application
  * @param argc Number of arguments
@@ -71,5 +50,6 @@ main(int argc, char* argv[])
   DAQModuleManager manager;
   auto cmdfac = makeCommandFacility(args.commandFacilityPluginName);
   cmdfac->run(manager);
-
+  return 0;
 }
+
