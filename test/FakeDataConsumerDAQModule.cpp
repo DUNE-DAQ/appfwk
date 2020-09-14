@@ -9,6 +9,9 @@
 
 #include "FakeDataConsumerDAQModule.hpp"
 
+// to serialize command data objects into our own structures.
+#include "appfwk/fdc/Nljs.hpp"
+
 #include "TRACE/trace.h"
 #include <ers/ers.h>
 
@@ -28,7 +31,6 @@ namespace dunedaq::appfwk {
 FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
   : DAQModule(name)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this, std::placeholders::_1))
-  , queueTimeout_(100)
   , inputQueue_(nullptr)
 {
 
@@ -40,17 +42,17 @@ FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
 void
 FakeDataConsumerDAQModule::init(const nlohmann::json& init_data)
 {
-  inputQueue_.reset(new DAQSource<std::vector<int>>(init_data["input"].get<std::string>()));
+  auto ini = init_data.get<fdc::Init>();
+
+  inputQueue_.reset(new DAQSource<std::vector<int>>(ini.input));
 }
 
 void
 FakeDataConsumerDAQModule::do_configure(const data_t& data)
 {
+  cfg_ = data.get<fdc::Conf>();
 
-  nIntsPerVector_ = data.value<int>("nIntsPerVector", 10);
-  starting_int_ = data.value<int>("starting_int", -4);
-  ending_int_ = data.value<int>("ending_int", 14);
-  queueTimeout_ = std::chrono::milliseconds(data.value<int>("queue_timeout_ms", 100));
+  queueTimeout_ = std::chrono::milliseconds(cfg_.queue_timeout_ms);
 }
 
 void
@@ -88,7 +90,7 @@ operator<<(std::ostream& t, std::vector<int> ints)
 void
 FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 {
-  int current_int = starting_int_;
+  int current_int = cfg_.starting_int;
   int counter = 0;
   int fail_count = 0;
   std::vector<int> vec;
@@ -127,8 +129,8 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
           current_int = point;
         }
         ++current_int;
-        if (current_int > ending_int_)
-          current_int = starting_int_;
+        if (current_int > cfg_.ending_int)
+          current_int = cfg_.starting_int;
         ++ii;
       }
       TLOG(TLVL_TRACE) << get_name() << ": Done with processing loop, failed=" << failed;

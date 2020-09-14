@@ -17,6 +17,9 @@
 #include "appfwk/DAQSink.hpp"
 #include "appfwk/ThreadHelper.hpp"
 
+// Our command structures.  
+#include "appfwk/fdp/Structs.hpp"
+
 #include <future>
 #include <memory>
 #include <string>
@@ -61,11 +64,13 @@ private:
   // Configuration
   std::unique_ptr<DAQSink<std::vector<int>>> outputQueue_;
   std::chrono::milliseconds queueTimeout_;
-  size_t nIntsPerVector_ = 999;
-  int starting_int_ = -999;
-  int ending_int_ = -999;
 
-  size_t wait_between_sends_ms_ = 999;
+  fdp::Conf cfg_;
+
+  // size_t nIntsPerVector_ = 999;
+  // int starting_int_ = -999;
+  // int ending_int_ = -999;
+  // size_t wait_between_sends_ms_ = 999;
 };
 } // namespace appfwk
 

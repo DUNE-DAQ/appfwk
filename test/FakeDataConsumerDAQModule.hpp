@@ -16,6 +16,9 @@
 #include "appfwk/DAQSource.hpp"
 #include "appfwk/ThreadHelper.hpp"
 
+// Our command data structures
+#include "appfwk/fdc/Structs.hpp"
+
 #include <ers/Issue.h>
 
 #include <future>
@@ -60,9 +63,10 @@ private:
   ThreadHelper thread_;
 
   // Configuration (for validation)
-  size_t nIntsPerVector_ = 999;
-  int starting_int_ = -999;
-  int ending_int_ = -999;
+  fdc::Conf cfg_;
+  // size_t nIntsPerVector_ = 999;
+  // int starting_int_ = -999;
+  // int ending_int_ = -999;
   std::chrono::milliseconds queueTimeout_;
   std::unique_ptr<DAQSource<std::vector<int>>> inputQueue_;
 };

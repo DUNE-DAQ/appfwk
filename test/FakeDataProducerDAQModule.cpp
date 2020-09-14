@@ -9,6 +9,9 @@
 
 #include "FakeDataProducerDAQModule.hpp"
 
+// To serialize our command data objects
+#include "appfwk/fdp/Nljs.hpp"
+
 #include <chrono>
 #include <string>
 #include <thread>
@@ -39,17 +42,17 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
 void
 FakeDataProducerDAQModule::init(const nlohmann::json& init_data)
 {
-  outputQueue_.reset(new DAQSink<std::vector<int>>(init_data["output"].get<std::string>()));
+  auto ini = init_data.get<fdp::Init>();
+
+  outputQueue_.reset(new DAQSink<std::vector<int>>(ini.output));
 }
 
 void
 FakeDataProducerDAQModule::do_configure(const data_t& data)
 {
-  nIntsPerVector_ = data.value<int>("nIntsPerVector", 10);
-  starting_int_ = data.value<int>("starting_int", -4);
-  ending_int_ = data.value<int>("ending_int", 14);
-  wait_between_sends_ms_ = data.value<int>("wait_between_sends_ms", 1000);
-  queueTimeout_ = std::chrono::milliseconds(data.value<int>("queue_timeout_ms", 100));
+  cfg_ = data.get<fdp::Conf>();
+
+  queueTimeout_ = std::chrono::milliseconds(cfg_.queue_timeout_ms);
 }
 
 void
@@ -87,20 +90,20 @@ operator<<(std::ostream& t, std::vector<int> ints)
 void
 FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
 {
-  int current_int = starting_int_;
+  int current_int = cfg_.starting_int;
   size_t counter = 0;
   std::ostringstream oss;
 
   while (running_flag.load()) {
     TLOG(TLVL_TRACE) << get_name() << ": Creating output vector";
-    std::vector<int> output(nIntsPerVector_);
+    std::vector<int> output(cfg_.nIntsPerVector);
 
     TLOG(TLVL_TRACE) << get_name() << ": Start of fill loop";
-    for (size_t ii = 0; ii < nIntsPerVector_; ++ii) {
+    for (size_t ii = 0; ii < cfg_.nIntsPerVector; ++ii) {
       output[ii] = current_int;
       ++current_int;
-      if (current_int > ending_int_)
-        current_int = starting_int_;
+      if (current_int > cfg_.ending_int)
+        current_int = cfg_.starting_int;
     }
     oss << "Produced vector " << counter << " with contents " << output << " and size " << output.size();
     ers::debug(ProducerProgressUpdate(ERS_HERE, get_name(), oss.str()));
@@ -114,7 +117,7 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
     }
 
     TLOG(TLVL_TRACE) << get_name() << ": Start of sleep between sends";
-    std::this_thread::sleep_for(std::chrono::milliseconds(wait_between_sends_ms_));
+    std::this_thread::sleep_for(std::chrono::milliseconds(cfg_.wait_between_sends_ms));
     TLOG(TLVL_TRACE) << get_name() << ": End of do_work loop";
     counter++;
   }

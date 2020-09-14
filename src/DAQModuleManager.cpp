@@ -1,12 +1,9 @@
 #include "appfwk/DAQModuleManager.hpp"
 
 #include "appfwk/Issues.hpp"
-#include "appfwk/cfg/CfgStructs.hpp"
-#include "appfwk/cfg/CfgNljs.hpp"
-#include "appfwk/cmd/CmdStructs.hpp"
-#include "appfwk/cmd/CmdNljs.hpp"
-#include "appfwk/cfg/DqmNljs.hpp"
-#include "appfwk/cfg/DqmNljs.hpp"
+#include "appfwk/cmd/Nljs.hpp"
+#include "appfwk/app/Nljs.hpp"
+
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/QueueRegistry.hpp"
 
@@ -27,25 +24,25 @@ DAQModuleManager::DAQModuleManager() :
 void
 DAQModuleManager::initialize( const dataobj_t& init_data) {
 
-    auto ads = init_data.get<cfg::Addressed>();
+    auto ads = init_data.get<app::Addressed>();
     
     // Find the queue object
     // How to guarantee uniqueness?
     for (const auto& ad : ads.addrdats) {
-        if ( ad.tn.type != "queue" ) continue;
+        if ( ad.ki.kind != "queue" ) continue;
 
         init_queues(ad.data);
     }
 
     // loop over modules
     for (const auto& ad : ads.addrdats) {
-        ERS_INFO("construct: " << ad.tn.type << " : " << ad.tn.name);
+        ERS_INFO("construct: " << ad.ki.kind << " : " << ad.ki.inst);
 
-        if ( ad.tn.type == "module" ) {
-            auto mi = ad.data.get<cfg::ModInit>();
+        if ( ad.ki.kind == "module" ) {
+            auto mi = ad.data.get<app::ModInit>();
             // data = mi.data;
-            auto mptr = makeModule(mi.plugin, ad.tn.name);
-            modulemap_.emplace(ad.tn.name, mptr);
+            auto mptr = makeModule(mi.plugin, ad.ki.inst);
+            modulemap_.emplace(ad.ki.inst, mptr);
 
             mptr->init(mi.data);
         }
@@ -57,26 +54,26 @@ DAQModuleManager::initialize( const dataobj_t& init_data) {
 
 void 
 DAQModuleManager::init_queues(const dataobj_t& queue_data) {
-    auto ads = queue_data.get<cfg::Addressed>();
+    auto ads = queue_data.get<app::Addressed>();
 
     std::map<std::string, QueueConfig> qrcfg;
     for (auto& ad : ads.addrdats) {
-        auto qi = ad.data.get<cfg::QueueInit>();
+        auto qi = ad.data.get<app::QueueInit>();
         // N.B.: here we mimic the behavior of daq_application and
-        // ignore the tn.type.  This requires user configuration
-        // to assure unique queue names across all queue types.
-        const std::string qname = ad.tn.name;
+        // ignore the kind.  This requires user configuration to
+        // assure unique queue names across all queue types.
+        const std::string qname = ad.ki.inst;
         // fixme: maybe one day replace QueueConfig with codgen.
         // Until then, wheeee....
         QueueConfig qc;
         switch(qi.kind) {
-        case cfg::Kind::StdDeQueue:
+        case app::QueueKind::StdDeQueue:
             qc.kind = QueueConfig::queue_kind::kStdDeQueue;
             break;
-        case cfg::Kind::FollySPSCQueue:
+        case app::QueueKind::FollySPSCQueue:
             qc.kind = QueueConfig::queue_kind::kFollySPSCQueue;
             break;
-        case cfg::Kind::FollyMPMCQueue:
+        case app::QueueKind::FollyMPMCQueue:
             qc.kind = QueueConfig::queue_kind::kFollyMPMCQueue;
             break;
         default:
@@ -120,19 +117,18 @@ DAQModuleManager::execute( const dataobj_t& cmd_data ) {
             throw DAQModuleManagerNotInitialized(ERS_HERE, cmdobj.id);
         }
         ERS_INFO("Dispatch init construction with:\n" << cmdobj.data.dump(4));
-        // auto ads = cmdobj.data.get<cfg::Addressed>();
         this->initialize( cmdobj.data );
     } else {
 
 
-        auto ads = cmdobj.data.get<cfg::Addressed>();
+        auto ads = cmdobj.data.get<app::Addressed>();
         for (const auto& ad : ads.addrdats) {
-            ERS_INFO("---" << ad.tn.type << "  " << ad.tn.name );
+            ERS_INFO("---" << ad.ki.kind << "  " << ad.ki.inst );
 
-            if ( ad.tn.type != "module" )
+            if ( ad.ki.kind != "module" )
                 continue;
 
-            for ( auto mptr : match(ad.tn.name) ) {
+            for ( auto mptr : match(ad.ki.inst) ) {
                 mptr->execute_command(cmdobj.id, ad.data);
             }
         }
