@@ -90,17 +90,10 @@
                 {
                     ki: {
                         kind: "module",
-                        inst: "fdp",
+                        inst: ".*",
                     },
                     data: {}
                 },
-                {
-                    ki: {
-                        kind: "module",
-                        inst: "fdc",
-                    },
-                    data: { }
-                }
             ]
         },
     },
@@ -111,17 +104,10 @@
                 {
                     ki: {
                         kind: "module",
-                        inst: "fdp",
+                        inst: ".*",
                     },
                     data: {}
                 },
-                {
-                    ki: {
-                        kind: "module",
-                        inst: "fdc",
-                    },
-                    data: { }
-                }
             ]
         },
     }

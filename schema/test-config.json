@@ -88,14 +88,7 @@
                 {
                     "data": {},
                     "ki": {
-                        "inst": "fdp",
-                        "kind": "module"
-                    }
-                },
-                {
-                    "data": {},
-                    "ki": {
-                        "inst": "fdc",
+                        "inst": ".*",
                         "kind": "module"
                     }
                 }
@@ -109,14 +102,7 @@
                 {
                     "data": {},
                     "ki": {
-                        "inst": "fdp",
-                        "kind": "module"
-                    }
-                },
-                {
-                    "data": {},
-                    "ki": {
-                        "inst": "fdc",
+                        "inst": ".*",
                         "kind": "module"
                     }
                 }
