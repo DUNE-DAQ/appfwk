@@ -49,5 +49,79 @@
             ]
         },
         "id": "init"
+    },
+    {
+        "data": {
+            "addrdats": [
+                {
+                    "data": {
+                        "ending_int": 14,
+                        "nIntsPerVector": 10,
+                        "queue_timeout_ms": 100,
+                        "starting_int": -4,
+                        "wait_between_sends_ms": 1000
+                    },
+                    "ki": {
+                        "inst": "fdp",
+                        "kind": "module"
+                    }
+                },
+                {
+                    "data": {
+                        "ending_int": 14,
+                        "nIntsPerVector": 10,
+                        "queue_timeout_ms": 100,
+                        "starting_int": -4
+                    },
+                    "ki": {
+                        "inst": "fdc",
+                        "kind": "module"
+                    }
+                }
+            ]
+        },
+        "id": "conf"
+    },
+    {
+        "data": {
+            "addrdats": [
+                {
+                    "data": {},
+                    "ki": {
+                        "inst": "fdp",
+                        "kind": "module"
+                    }
+                },
+                {
+                    "data": {},
+                    "ki": {
+                        "inst": "fdc",
+                        "kind": "module"
+                    }
+                }
+            ]
+        },
+        "id": "start"
+    },
+    {
+        "data": {
+            "addrdats": [
+                {
+                    "data": {},
+                    "ki": {
+                        "inst": "fdp",
+                        "kind": "module"
+                    }
+                },
+                {
+                    "data": {},
+                    "ki": {
+                        "inst": "fdc",
+                        "kind": "module"
+                    }
+                }
+            ]
+        },
+        "id": "stop"
     }
 ]
