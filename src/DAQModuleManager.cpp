@@ -36,11 +36,11 @@ DAQModuleManager::initialize( const dataobj_t& init_data) {
 
     // loop over modules
     for (const auto& ad : ads.addrdats) {
-        ERS_INFO("construct: " << ad.ki.kind << " : " << ad.ki.inst);
 
         if ( ad.ki.kind == "module" ) {
             auto mi = ad.data.get<app::ModInit>();
-            // data = mi.data;
+
+            ERS_INFO("construct: " << mi.plugin << " : " << ad.ki.inst);
             auto mptr = makeModule(mi.plugin, ad.ki.inst);
             modulemap_.emplace(ad.ki.inst, mptr);
 
@@ -82,9 +82,8 @@ DAQModuleManager::init_queues(const dataobj_t& queue_data) {
         }
         qc.capacity = qi.capacity;
         qrcfg[qname] = qc;
-        ERS_INFO("Queue command handler: " << qname);
+        ERS_INFO("Adding queue: " << qname);
     }
-    ERS_INFO("Queue command handler initialize queue registry");
     QueueRegistry::get().configure(qrcfg);
 }
 

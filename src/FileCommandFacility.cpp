@@ -167,6 +167,7 @@ struct fileCommandFacility : public CommandFacility {
     }
 
     fileCommandFacility(std::string uri) : CommandFacility(uri) {
+
         auto dot = uri.find_last_of(".");
         auto sep = uri.find("://");
         if (dot == std::string::npos) {

@@ -1,0 +1,53 @@
+[
+    {
+        "data": {
+            "addrdats": [
+                {
+                    "data": {
+                        "addrdats": [
+                            {
+                                "data": {
+                                    "capacity": 10,
+                                    "kind": "StdDeQueue"
+                                },
+                                "ki": {
+                                    "inst": "hose",
+                                    "kind": "IGNORED"
+                                }
+                            }
+                        ]
+                    },
+                    "ki": {
+                        "inst": "IGNORED",
+                        "kind": "queue"
+                    }
+                },
+                {
+                    "data": {
+                        "data": {
+                            "output": "hose"
+                        },
+                        "plugin": "FakeDataProducerDAQModule"
+                    },
+                    "ki": {
+                        "inst": "fdp",
+                        "kind": "module"
+                    }
+                },
+                {
+                    "data": {
+                        "data": {
+                            "input": "hose"
+                        },
+                        "plugin": "FakeDataConsumerDAQModule"
+                    },
+                    "ki": {
+                        "inst": "fdc",
+                        "kind": "module"
+                    }
+                }
+            ]
+        },
+        "id": "init"
+    }
+]
