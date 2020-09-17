@@ -75,6 +75,7 @@ public:
       throw CommandLineIssue(ERS_HERE, *argv, e.what());
     }
 
+    output.commandFacilityPluginName = vm["commandFacility"].as<std::string>();
     output.isValid = true;
     return output;
   }

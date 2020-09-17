@@ -33,7 +33,7 @@ using json = nlohmann::json;
  * @return Status Code
  */
 int
-broken_main(int argc, char* argv[])
+main(int argc, char* argv[])
 {
   using namespace dunedaq::appfwk;
 
@@ -47,26 +47,8 @@ broken_main(int argc, char* argv[])
     exit(-1);
   }
 
-  ERS_INFO("commandFacilityPluginName: " << args.commandFacilityPluginName);
-
   DAQModuleManager manager;
   auto cmdfac = makeCommandFacility(args.commandFacilityPluginName);
-  cmdfac->run(manager);
-  return 0;
-}
-
-int
-main(int argc, char* argv[])
-{
-  using namespace dunedaq::appfwk;
-
-  if (argc != 2) {
-      ERS_INFO("usage: daq_application file://commands.json");
-      return -1;
-  }
-
-  DAQModuleManager manager;
-  auto cmdfac = makeCommandFacility(argv[1]);
   cmdfac->run(manager);
   return 0;
 }
