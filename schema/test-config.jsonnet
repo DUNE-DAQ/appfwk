@@ -1,64 +1,53 @@
 [
     {
         id: "init",
-        data: {                 // Addressed, passed to initialize()
-            addrdats: [
-                {               // Addrdat in initialize()
-                    ki: {
-                        kind: "queue",
-                        inst: "IGNORED",
+        data: {                 // "any" / app::Init struct
+            queues: [           // sequence of ...
+                {               // ... app::QueueSpec
+                    kind: "StdDeQueue", // enum
+                    inst: "hose",       // string(re.ident)
+                    capacity: 10,       // number(i4,>0)
+                },
+            ],
+            modules: [          // sequence of...
+                {               // app::ModSpec
+                    plugin: "FakeDataProducerDAQModule", // string(re.ident)
+                    inst: "fdp",  // string(re.ident)
+                    data: {       // "any" / app::ModInit
+                        qinfos: [             // sequence of...
+                            {                 // app::QueueInfo
+                                inst: "hose", // string(re.ident)
+                                name: "output", // string(re.indent), known to mod C++
+                                dir: "output",
+                            }, // ... possibly more
+                        ],
+                        // may extend app::ModInit attributes
+                        // may add fdp::Init attributes
                     },
-                    data: {         // Addressed, passed to init_queues()
-                        addrdats: [
+                },
+                {               // etc for a consumer
+                    plugin: "FakeDataConsumerDAQModule",
+                    inst: "fdc",
+                    data: {
+                        qinfos: [
                             {
-                                ki: {
-                                    kind: "IGNORED", // actual parameter
-                                    inst: "hose",  // actual parameter
-                                },
-                                data: { // QueueInit
-                                    kind: "StdDeQueue", // should be in ki.kind
-                                    capacity: 10,       // acutal param
-                                },
+                                inst: "hose",
+                                name: "input",
+                                dir: "input",
                             },
                         ],
                     },
-                },
-                {               // AddrDat in initialize()
-                    ki: {
-                        kind: "module",
-                        inst: "fdp",
-                    },
-                    data: {     // ModInit
-                        plugin: "FakeDataProducerDAQModule",
-                        data: { // fdp.Init
-                            output: "hose",
-                        }
-                    },
-                },
-                {
-                    ki: {
-                        kind: "module",
-                        inst: "fdc",
-                    },
-                    data: { // ModInit
-                        plugin: "FakeDataConsumerDAQModule",
-                        data: { // fdc.Init
-                            input: "hose",
-                        },
-                    },
                 }
-            ],
-        },
-    },
-    {                           // 
+            ],                  // end of module init data
+        },                      // end of init command data
+    },                          // end of init command
+
+    {
         id: "conf",
-        data: {                 // Addressed
-            addrdats: [
-                {               // AddrDat
-                    ki: {
-                        kind: "module",
-                        inst: "fdp",
-                    },
+        data: {
+            modules: [          // sequence of ...
+                {               // ... app::ModConf 
+                    inst: "fdp",
                     data: {     // fdp.Conf
                         // These all have default values so may be omitted
                         nIntsPerVector: 10,
@@ -69,11 +58,8 @@
                     }
                 },
                 {
-                    ki: {
-                        kind: "module",
-                        inst: "fdc",
-                    },
-                    data: {
+                    inst: "fdc",
+                    data: {     // fdc.Conf
                         nIntsPerVector: 10,
                         starting_int: -4,
                         ending_int: 14,
@@ -86,30 +72,29 @@
     {
         id: "start",
         data: {
-            addrdats: [
-                {
-                    ki: {
-                        kind: "module",
-                        inst: ".*",
+            modules: [          // sequence of...
+                {               // ...app::Mod
+                    inst: ".*", // match all, empty string also works
+                    data: {     // app::Start
+                        run: 42,
                     },
-                    data: {}
-                },
+                }
             ]
         },
     },
     {
         id: "stop",
         data: {
-            addrdats: [
+            modules: [
                 {
-                    ki: {
-                        kind: "module",
-                        inst: ".*",
-                    },
-                    data: {}
+                    inst: "fdp",
+                    data: {},
+                },
+                {
+                    inst: "fdc",
+                    data: {},
                 },
             ]
         },
-    }
-    
+    }    
 ]

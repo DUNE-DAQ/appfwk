@@ -1,6 +1,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 
+#include "appfwk/cmd/Structs.hpp"
 #include <nlohmann/json.hpp>
 #include <ers/Issue.h>
 
@@ -29,14 +30,17 @@ public:
 
     bool initialized() const { return initialized_; }
 
+    // Execute a properly structured command
     void execute( const dataobj_t& cmd_data );
 
 protected:
     typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap; ///< DAQModules indexed by name
 
-    void initialize( const dataobj_t& init_data );
+    void initialize( const dataobj_t& data );
+    void init_queues( const cmd::QueueSpecs& qspecs );
+    void init_modules( const cmd::ModSpecs& mspecs );
 
-    void init_queues( const dataobj_t& queue_data );
+    void dispatch(cmd::CmdId id, const dataobj_t& data );
 
     std::vector<std::shared_ptr<DAQModule>> match(std::string name);
 private:

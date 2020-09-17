@@ -40,15 +40,6 @@ namespace dunedaq::appfwk::fdp {
             j.at("wait_between_sends_ms").get_to(obj.wait_between_sends_ms);    
     }
     
-    inline void to_json(data_t& j, const Init& obj) {
-        j["output"] = obj.output;
-    }
-    
-    inline void from_json(const data_t& j, Init& obj) {
-        if (j.contains("output"))
-            j.at("output").get_to(obj.output);    
-    }
-    
     // fixme: add support for MessagePack serializers (at least)
 
 } // namespace dunedaq::appfwk::fdp

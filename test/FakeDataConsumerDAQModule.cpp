@@ -9,7 +9,7 @@
 
 #include "FakeDataConsumerDAQModule.hpp"
 
-// to serialize command data objects into our own structures.
+#include "appfwk/cmd/Nljs.hpp"
 #include "appfwk/fdc/Nljs.hpp"
 
 #include "TRACE/trace.h"
@@ -33,7 +33,6 @@ FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this, std::placeholders::_1))
   , inputQueue_(nullptr)
 {
-
   register_command("conf", &FakeDataConsumerDAQModule::do_configure);
   register_command("start", &FakeDataConsumerDAQModule::do_start);
   register_command("stop", &FakeDataConsumerDAQModule::do_stop);
@@ -42,9 +41,13 @@ FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
 void
 FakeDataConsumerDAQModule::init(const nlohmann::json& init_data)
 {
-  auto ini = init_data.get<fdc::Init>();
-
-  inputQueue_.reset(new DAQSource<std::vector<int>>(ini.input));
+  auto ini = init_data.get<cmd::ModInit>();
+  for (const auto& qi : ini.qinfos) {
+    if (qi.name == "input") {
+      ERS_INFO("FDP: input queue is " << qi.inst);
+      inputQueue_.reset(new DAQSource<std::vector<int>>(qi.inst));
+    }
+  }
 }
 
 void
@@ -90,6 +93,7 @@ operator<<(std::ostream& t, std::vector<int> ints)
 void
 FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 {
+  ERS_INFO("FDC: do_work");
   int current_int = cfg_.starting_int;
   int counter = 0;
   int fail_count = 0;
@@ -101,9 +105,11 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 
       TLOG(TLVL_TRACE) << get_name() << ": Going to receive data from inputQueue";
 
+      ERS_INFO("FDC \"" << get_name() << "\" pop " << counter);
       try {
         inputQueue_->pop(vec, queueTimeout_);
       } catch (const dunedaq::appfwk::QueueTimeoutExpired& excpt) {
+        ERS_INFO("FDC \"" << get_name() << "\" queue timeout on " << counter);
         continue;
       }
 
@@ -150,3 +156,7 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 } // namespace dunedaq::appfwk
 
 DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::FakeDataConsumerDAQModule)
+
+// Local Variables:
+// c-basic-offset: 2
+// End:

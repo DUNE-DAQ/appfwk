@@ -20,13 +20,6 @@ local fdc = {
     count : s.number("Count", "i4",
                      doc="A count of not too many things"),
 
-    ident: s.string("Ident", moo.re.ident_only,
-                    doc="An identifier"),
-
-    init: s.record("Init", [
-        s.field("input", self.ident, "Output queue name"),
-    ]),
-
     conf: s.record("Conf",  [
         s.field("nIntsPerVector", self.size, 10,
                 doc="Number of numbers"),

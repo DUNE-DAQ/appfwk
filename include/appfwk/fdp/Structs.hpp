@@ -8,7 +8,6 @@
 #define DUNEDAQ_APPFWK_FDP_STRUCTS_HPP
 
 
-#include <string>
 
 namespace dunedaq::appfwk::fdp {
 
@@ -35,16 +34,6 @@ namespace dunedaq::appfwk::fdp {
 
         // @brief Millisecs to wait between sending
         Count wait_between_sends_ms;
-    };
-
-    // @brief An identifier
-    using Ident = std::string;
-
-    // @brief 
-    struct Init {
-
-        // @brief 
-        Ident output;
     };
 
 } // namespace dunedaq::appfwk::fdp

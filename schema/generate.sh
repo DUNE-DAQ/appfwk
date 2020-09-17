@@ -32,21 +32,12 @@ render () {
     echo $outhpp
 }
 
-for name in cmd app fdp fdc ; do
-    for what in Structs Nljs ; do
-        render $name $what
-    done
-done
-                
 
-# render cmd Structs
-# render cmd Nljs
+render cmd Structs
+render cmd Nljs
 
-# render app Structs
-# render app Nljs
+render fdp Structs
+render fdp Nljs
 
-# render fdp Structs
-# render fdp Nljs
-
-# render fdc Structs
-# render fdc Nljs
+render fdc Structs
+render fdc Nljs

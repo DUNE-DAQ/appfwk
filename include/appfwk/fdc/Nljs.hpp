@@ -37,15 +37,6 @@ namespace dunedaq::appfwk::fdc {
             j.at("queue_timeout_ms").get_to(obj.queue_timeout_ms);    
     }
     
-    inline void to_json(data_t& j, const Init& obj) {
-        j["input"] = obj.input;
-    }
-    
-    inline void from_json(const data_t& j, Init& obj) {
-        if (j.contains("input"))
-            j.at("input").get_to(obj.input);    
-    }
-    
     // fixme: add support for MessagePack serializers (at least)
 
 } // namespace dunedaq::appfwk::fdc

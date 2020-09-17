@@ -47,6 +47,7 @@ struct ObjectStream {
     // Get stream, checked okay for reading
     std::iostream& r() {
         if (io.eof()) {
+            ERS_INFO("EOF: " << name);
             throw StreamExhausted(ERS_HERE, name, "EOF");
         }
         if (! io.good()) {
@@ -79,6 +80,7 @@ struct JsonStream : ObjectStream {
         }
         catch (const object_t::parse_error& pe) {
             if (pe.id == 101) {
+                ERS_INFO("EOF: " << name);
                 throw StreamExhausted(ERS_HERE, name, "EOF");
             }
             throw StreamCorrupt(ERS_HERE, name, pe.what());
@@ -126,6 +128,7 @@ struct JsonArray : public ObjectStream {
 
     virtual object_t get() {
         if (arr.empty()) {
+            ERS_INFO("EOF: " << name);
             throw StreamExhausted(ERS_HERE, name, "array end");
         }
         auto obj = arr[0];
@@ -224,6 +227,7 @@ struct fileCommandFacility : public CommandFacility {
             }
 
             manager.execute(command);
+            ERS_INFO("DAQModuleManager execution complete");
         }
 
     }

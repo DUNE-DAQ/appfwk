@@ -8,7 +8,6 @@
 #define DUNEDAQ_APPFWK_FDC_STRUCTS_HPP
 
 
-#include <string>
 
 namespace dunedaq::appfwk::fdc {
 
@@ -32,16 +31,6 @@ namespace dunedaq::appfwk::fdc {
 
         // @brief Milliseconds to wait on queue before timing out
         Count queue_timeout_ms;
-    };
-
-    // @brief An identifier
-    using Ident = std::string;
-
-    // @brief 
-    struct Init {
-
-        // @brief 
-        Ident input;
     };
 
 } // namespace dunedaq::appfwk::fdc

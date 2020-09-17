@@ -1,50 +1,39 @@
 [
     {
         "data": {
-            "addrdats": [
+            "modules": [
                 {
                     "data": {
-                        "addrdats": [
+                        "qinfos": [
                             {
-                                "data": {
-                                    "capacity": 10,
-                                    "kind": "StdDeQueue"
-                                },
-                                "ki": {
-                                    "inst": "hose",
-                                    "kind": "IGNORED"
-                                }
+                                "dir": "output",
+                                "inst": "hose",
+                                "name": "output"
                             }
                         ]
                     },
-                    "ki": {
-                        "inst": "IGNORED",
-                        "kind": "queue"
-                    }
+                    "inst": "fdp",
+                    "plugin": "FakeDataProducerDAQModule"
                 },
                 {
                     "data": {
-                        "data": {
-                            "output": "hose"
-                        },
-                        "plugin": "FakeDataProducerDAQModule"
+                        "qinfos": [
+                            {
+                                "dir": "input",
+                                "inst": "hose",
+                                "name": "input"
+                            }
+                        ]
                     },
-                    "ki": {
-                        "inst": "fdp",
-                        "kind": "module"
-                    }
-                },
+                    "inst": "fdc",
+                    "plugin": "FakeDataConsumerDAQModule"
+                }
+            ],
+            "queues": [
                 {
-                    "data": {
-                        "data": {
-                            "input": "hose"
-                        },
-                        "plugin": "FakeDataConsumerDAQModule"
-                    },
-                    "ki": {
-                        "inst": "fdc",
-                        "kind": "module"
-                    }
+                    "capacity": 10,
+                    "inst": "hose",
+                    "kind": "StdDeQueue"
                 }
             ]
         },
@@ -52,7 +41,7 @@
     },
     {
         "data": {
-            "addrdats": [
+            "modules": [
                 {
                     "data": {
                         "ending_int": 14,
@@ -61,10 +50,7 @@
                         "starting_int": -4,
                         "wait_between_sends_ms": 1000
                     },
-                    "ki": {
-                        "inst": "fdp",
-                        "kind": "module"
-                    }
+                    "inst": "fdp"
                 },
                 {
                     "data": {
@@ -73,10 +59,7 @@
                         "queue_timeout_ms": 100,
                         "starting_int": -4
                     },
-                    "ki": {
-                        "inst": "fdc",
-                        "kind": "module"
-                    }
+                    "inst": "fdc"
                 }
             ]
         },
@@ -84,13 +67,12 @@
     },
     {
         "data": {
-            "addrdats": [
+            "modules": [
                 {
-                    "data": {},
-                    "ki": {
-                        "inst": ".*",
-                        "kind": "module"
-                    }
+                    "data": {
+                        "run": 42
+                    },
+                    "inst": ".*"
                 }
             ]
         },
@@ -98,13 +80,14 @@
     },
     {
         "data": {
-            "addrdats": [
+            "modules": [
                 {
                     "data": {},
-                    "ki": {
-                        "inst": ".*",
-                        "kind": "module"
-                    }
+                    "inst": "fdp"
+                },
+                {
+                    "data": {},
+                    "inst": "fdc"
                 }
             ]
         },

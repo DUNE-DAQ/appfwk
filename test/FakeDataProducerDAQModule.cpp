@@ -9,8 +9,9 @@
 
 #include "FakeDataProducerDAQModule.hpp"
 
-// To serialize our command data objects
+#include "appfwk/cmd/Nljs.hpp"
 #include "appfwk/fdp/Nljs.hpp"
+
 
 #include <chrono>
 #include <string>
@@ -33,7 +34,6 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
   , outputQueue_(nullptr)
   , queueTimeout_(100)
 {
-
   register_command("conf", &FakeDataProducerDAQModule::do_configure);
   register_command("start", &FakeDataProducerDAQModule::do_start);
   register_command("stop", &FakeDataProducerDAQModule::do_stop);
@@ -42,14 +42,22 @@ FakeDataProducerDAQModule::FakeDataProducerDAQModule(const std::string& name)
 void
 FakeDataProducerDAQModule::init(const nlohmann::json& init_data)
 {
-  auto ini = init_data.get<fdp::Init>();
-
-  outputQueue_.reset(new DAQSink<std::vector<int>>(ini.output));
+  auto ini = init_data.get<cmd::ModInit>();
+  for (const auto& qi : ini.qinfos) {
+    if (qi.name == "output") {
+      ERS_INFO("FDP: output queue is " << qi.inst);
+      outputQueue_.reset(new DAQSink<std::vector<int>>(qi.inst));
+    }
+  }
 }
+
+#include <iostream>
 
 void
 FakeDataProducerDAQModule::do_configure(const data_t& data)
 {
+  std::cerr << data.dump(4) << std::endl;
+
   cfg_ = data.get<fdp::Conf>();
 
   queueTimeout_ = std::chrono::milliseconds(cfg_.queue_timeout_ms);
@@ -90,6 +98,7 @@ operator<<(std::ostream& t, std::vector<int> ints)
 void
 FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
 {
+  ERS_INFO("FDP: do_work");
   int current_int = cfg_.starting_int;
   size_t counter = 0;
   std::ostringstream oss;
@@ -110,9 +119,11 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
     oss.str("");
 
     TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
+    ERS_INFO("FDP \"" << get_name() << "\" push " << counter);
     try {
       outputQueue_->push(std::move(output), queueTimeout_);
     } catch(const QueueTimeoutExpired& ex) {
+      ERS_INFO("FDP \"" << get_name() << "\" queue timeout on " << counter);
       ers::warning(ex);
     }
 
@@ -127,3 +138,8 @@ FakeDataProducerDAQModule::do_work(std::atomic<bool>& running_flag)
 } // namespace dunedaq
 
 DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::FakeDataProducerDAQModule)
+
+
+// Local Variables:
+// c-basic-offset: 2
+// End:

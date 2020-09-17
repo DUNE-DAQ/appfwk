@@ -2,7 +2,6 @@
 
 #include "appfwk/Issues.hpp"
 #include "appfwk/cmd/Nljs.hpp"
-#include "appfwk/app/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/QueueRegistry.hpp"
@@ -22,69 +21,72 @@ DAQModuleManager::DAQModuleManager() :
 
 
 void
-DAQModuleManager::initialize( const dataobj_t& init_data) {
-
-    auto ads = init_data.get<app::Addressed>();
-    
-    // Find the queue object
-    // How to guarantee uniqueness?
-    for (const auto& ad : ads.addrdats) {
-        if ( ad.ki.kind != "queue" ) continue;
-
-        init_queues(ad.data);
-    }
-
-    // loop over modules
-    for (const auto& ad : ads.addrdats) {
-
-        if ( ad.ki.kind == "module" ) {
-            auto mi = ad.data.get<app::ModInit>();
-
-            ERS_INFO("construct: " << mi.plugin << " : " << ad.ki.inst);
-            auto mptr = makeModule(mi.plugin, ad.ki.inst);
-            modulemap_.emplace(ad.ki.inst, mptr);
-
-            mptr->init(mi.data);
-        }
-    }
-
+DAQModuleManager::initialize( const dataobj_t& data)
+{
+    auto ini = data.get<cmd::Init>();
+    init_queues(ini.queues);
+    init_modules(ini.modules);
     this->initialized_ = true;
+}
+
+void 
+DAQModuleManager::init_modules(const cmd::ModSpecs& mspecs)
+{
+    for (const auto& mspec : mspecs) {
+        ERS_INFO("construct: " << mspec.plugin << " : " << mspec.inst);
+        auto mptr = makeModule(mspec.plugin, mspec.inst);
+        modulemap_.emplace(mspec.inst, mptr);
+        mptr->init(mspec.data);
+    }
 }
 
 
 void 
-DAQModuleManager::init_queues(const dataobj_t& queue_data) {
-    auto ads = queue_data.get<app::Addressed>();
-
+DAQModuleManager::init_queues(const cmd::QueueSpecs& qspecs)
+{
     std::map<std::string, QueueConfig> qrcfg;
-    for (auto& ad : ads.addrdats) {
-        auto qi = ad.data.get<app::QueueInit>();
+    for (const auto& qs : qspecs) {
+
         // N.B.: here we mimic the behavior of daq_application and
         // ignore the kind.  This requires user configuration to
         // assure unique queue names across all queue types.
-        const std::string qname = ad.ki.inst;
+        const std::string qname = qs.inst;
         // fixme: maybe one day replace QueueConfig with codgen.
         // Until then, wheeee....
         QueueConfig qc;
-        switch(qi.kind) {
-        case app::QueueKind::StdDeQueue:
+        switch(qs.kind) {
+        case cmd::QueueKind::StdDeQueue:
             qc.kind = QueueConfig::queue_kind::kStdDeQueue;
             break;
-        case app::QueueKind::FollySPSCQueue:
+        case cmd::QueueKind::FollySPSCQueue:
             qc.kind = QueueConfig::queue_kind::kFollySPSCQueue;
             break;
-        case app::QueueKind::FollyMPMCQueue:
+        case cmd::QueueKind::FollyMPMCQueue:
             qc.kind = QueueConfig::queue_kind::kFollyMPMCQueue;
             break;
         default:
             throw MissingComponent(ERS_HERE, "unknown queue type");
             break;
         }
-        qc.capacity = qi.capacity;
+        qc.capacity = qs.capacity;
         qrcfg[qname] = qc;
         ERS_INFO("Adding queue: " << qname);
     }
     QueueRegistry::get().configure(qrcfg);
+}
+
+void
+DAQModuleManager::dispatch(cmd::CmdId id, const dataobj_t& data)
+{
+    // The command dispatch protocol
+    auto cmdobj = data.get<cmd::CmdObj>();
+    for (const auto& addressed : cmdobj.modules) {
+        for ( auto mptr : match(addressed.match) ) {
+            ERS_INFO("dispatch \""<<id<<"\" to \"" << mptr->get_name()
+                     << "\":\n" << addressed.data.dump(4));
+            mptr->execute_command(id, addressed.data);
+        }
+    }
 }
 
 
@@ -107,32 +109,18 @@ DAQModuleManager::match(std::string name)
 void
 DAQModuleManager::execute( const dataobj_t& cmd_data ) {
 
-    auto cmdobj = cmd_data.get<cmd::Command>();
-    ERS_INFO("Command id:"<< cmdobj.id);
+    auto cmd = cmd_data.get<cmd::Command>();
+    ERS_INFO("Command id:"<< cmd.id);
 
     if ( ! initialized_ ) {
-
-        if ( cmdobj.id != "init" ) {
-            throw DAQModuleManagerNotInitialized(ERS_HERE, cmdobj.id);
+        if ( cmd.id != "init" ) {
+            throw DAQModuleManagerNotInitialized(ERS_HERE, cmd.id);
         }
-        ERS_INFO("Dispatch init construction with:\n" << cmdobj.data.dump(4));
-        this->initialize( cmdobj.data );
-    } else {
-
-
-        auto ads = cmdobj.data.get<app::Addressed>();
-        for (const auto& ad : ads.addrdats) {
-            ERS_INFO("---" << ad.ki.kind << "  " << ad.ki.inst );
-
-            if ( ad.ki.kind != "module" )
-                continue;
-
-            for ( auto mptr : match(ad.ki.inst) ) {
-                mptr->execute_command(cmdobj.id, ad.data);
-            }
-        }
+        this->initialize( cmd.data );
+        return;
     }
 
+    dispatch(cmd.id, cmd.data);
 }
 
 
