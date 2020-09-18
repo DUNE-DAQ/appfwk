@@ -3,12 +3,28 @@
         "data": {
             "modules": [
                 {
-                    "data": {},
+                    "data": {
+                        "qinfos": [
+                            {
+                                "dir": "output",
+                                "inst": "hose",
+                                "name": "output"
+                            }
+                        ]
+                    },
                     "inst": "fdp",
                     "plugin": "FakeDataProducerDAQModule"
                 },
                 {
-                    "data": {},
+                    "data": {
+                        "qinfos": [
+                            {
+                                "dir": "input",
+                                "inst": "hose",
+                                "name": "input"
+                            }
+                        ]
+                    },
                     "inst": "fdc",
                     "plugin": "FakeDataConsumerDAQModule"
                 }
@@ -28,7 +44,7 @@
             "modules": [
                 {
                     "data": {
-                        "ending_int": 10,
+                        "ending_int": 14,
                         "nIntsPerVector": 10,
                         "queue_timeout_ms": 100,
                         "starting_int": -4,
@@ -38,7 +54,7 @@
                 },
                 {
                     "data": {
-                        "ending_int": 10,
+                        "ending_int": 14,
                         "nIntsPerVector": 10,
                         "queue_timeout_ms": 100,
                         "starting_int": -4
@@ -67,32 +83,14 @@
             "modules": [
                 {
                     "data": {},
-                    "match": ""
+                    "match": "fdp"
+                },
+                {
+                    "data": {},
+                    "match": "fdc"
                 }
             ]
         },
         "id": "stop"
-    },
-    {
-        "data": {
-            "modules": [
-                {
-                    "data": {},
-                    "match": ""
-                }
-            ]
-        },
-        "id": "scrap"
-    },
-    {
-        "data": {
-            "modules": [
-                {
-                    "data": {},
-                    "match": ""
-                }
-            ]
-        },
-        "id": "fini"
     }
 ]

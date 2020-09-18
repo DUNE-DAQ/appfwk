@@ -5,12 +5,21 @@
         inst:inst, kind:kind, capacity:capacity,
     },
 
+    // queue direction attribute, use this to catch spelling errors.
+    qdir: { unknown:"unknown", input: "input", output: "output" },
+
+    // Build a quinfo to provide to the module part of an init command object.
+    qinfo(name, inst, dir=self.qdir.unknown) :: {
+        name:name, inst:inst, dir:dir
+    },
+
     // Make a module spec.  Data is any custom data (beyond queue
     // locating info) needed by the module's "init" handler.  Most
     // modules have none as their customization is handled by the
     // "conf" command.
-    mspec(inst, plugin, data={}) :: {
-        inst:inst, plugin:plugin, data:data,
+    mspec(inst, plugin, qinfos=[], modini={}) :: {
+        local qis = if std.type(qinfos) == "array" then qinfos else [qinfos],
+        inst:inst, plugin:plugin, data: {qinfos:qis} + modini,
     },
 
     // Construct a cmdobj for an "init" command from arrays of
@@ -38,9 +47,11 @@
     // all).
     mcmd(match="", cmdobj={}) :: { match:match, data:cmdobj },
     
+    local defaddr = [self.mcmd()],
+
     // Make a non-init command object.  The addressed should be an
     // array of matched commands (mcmd() output).
-    cmd(id, addressed = [self.mcmd()]) :: { id:id, data:{modules:addressed} },
+    cmd(id, addressed = defaddr) :: { id:id, data:{modules:addressed} },
 
     // A "conf" command with an array of matched commands.  See mcmd() comment.
     conf(mcmds) :: self.cmd("conf", mcmds),
@@ -48,12 +59,12 @@
     // A "start" command sent to all modules
     start(runnum) :: self.cmd("start", [self.mcmd(cmdobj={run:runnum})]),
 
-    // A "stop" command sent to all modules
-    stop() :: self.cmd("stop"),
+    // A "stop" command, by default sent to all modules
+    stop(addr=defaddr) :: self.cmd("stop", addr),
 
-    // A "scrap" command sent to all modules
-    scrap() :: self.cmd("scrap"),
+    // A "scrap" command, by default sent to all modules
+    scrap(addr=defaddr) :: self.cmd("scrap", addr),
 
-    // A "fini" command sent to all modules
-    fini() :: self.cmd("fini"),
+    // A "fini" command, by default sent to all modules
+    fini(addr=defaddr) :: self.cmd("fini", addr),
 }

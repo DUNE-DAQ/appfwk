@@ -47,7 +47,7 @@
         data: {
             modules: [          // sequence of ...
                 {               // ... app::ModConf 
-                    inst: "fdp",
+                    match: "fdp",
                     data: {     // fdp.Conf
                         // These all have default values so may be omitted
                         nIntsPerVector: 10,
@@ -58,7 +58,7 @@
                     }
                 },
                 {
-                    inst: "fdc",
+                    match: "fdc",
                     data: {     // fdc.Conf
                         nIntsPerVector: 10,
                         starting_int: -4,
@@ -74,7 +74,7 @@
         data: {
             modules: [          // sequence of...
                 {               // ...app::Mod
-                    inst: ".*", // match all, empty string also works
+                    match: ".*", // match all, empty string also works
                     data: {     // app::Start
                         run: 42,
                     },
@@ -87,11 +87,11 @@
         data: {
             modules: [
                 {
-                    inst: "fdp",
+                    match: "fdp",
                     data: {},
                 },
                 {
-                    inst: "fdc",
+                    match: "fdc",
                     data: {},
                 },
             ]

@@ -50,7 +50,7 @@
                         "starting_int": -4,
                         "wait_between_sends_ms": 1000
                     },
-                    "inst": "fdp"
+                    "match": "fdp"
                 },
                 {
                     "data": {
@@ -59,7 +59,7 @@
                         "queue_timeout_ms": 100,
                         "starting_int": -4
                     },
-                    "inst": "fdc"
+                    "match": "fdc"
                 }
             ]
         },
@@ -72,7 +72,7 @@
                     "data": {
                         "run": 42
                     },
-                    "inst": ".*"
+                    "match": ".*"
                 }
             ]
         },
@@ -83,11 +83,11 @@
             "modules": [
                 {
                     "data": {},
-                    "inst": "fdp"
+                    "match": "fdp"
                 },
                 {
                     "data": {},
-                    "inst": "fdc"
+                    "match": "fdc"
                 }
             ]
         },
