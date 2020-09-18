@@ -1,0 +1,98 @@
+[
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {},
+                    "inst": "fdp",
+                    "plugin": "FakeDataProducerDAQModule"
+                },
+                {
+                    "data": {},
+                    "inst": "fdc",
+                    "plugin": "FakeDataConsumerDAQModule"
+                }
+            ],
+            "queues": [
+                {
+                    "capacity": 10,
+                    "inst": "hose",
+                    "kind": "StdDeQueue"
+                }
+            ]
+        },
+        "id": "init"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {
+                        "ending_int": 10,
+                        "nIntsPerVector": 10,
+                        "queue_timeout_ms": 100,
+                        "starting_int": -4,
+                        "wait_between_sends_ms": 1000
+                    },
+                    "match": "fdp"
+                },
+                {
+                    "data": {
+                        "ending_int": 10,
+                        "nIntsPerVector": 10,
+                        "queue_timeout_ms": 100,
+                        "starting_int": -4
+                    },
+                    "match": "fdc"
+                }
+            ]
+        },
+        "id": "conf"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {
+                        "run": 42
+                    },
+                    "match": ""
+                }
+            ]
+        },
+        "id": "start"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {},
+                    "match": ""
+                }
+            ]
+        },
+        "id": "stop"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {},
+                    "match": ""
+                }
+            ]
+        },
+        "id": "scrap"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {},
+                    "match": ""
+                }
+            ]
+        },
+        "id": "fini"
+    }
+]
