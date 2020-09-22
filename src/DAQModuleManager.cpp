@@ -112,6 +112,11 @@ DAQModuleManager::execute( const dataobj_t& cmd_data ) {
     auto cmd = cmd_data.get<cmd::Command>();
     ERS_INFO("Command id:"<< cmd.id);
 
+    if (cmd_data.contains("waitms")) {
+        int waitms = cmd_data["waitms"];
+        std::this_thread::sleep_for (std::chrono::milliseconds(waitms));
+    }
+
     if ( ! initialized_ ) {
         if ( cmd.id != "init" ) {
             throw DAQModuleManagerNotInitialized(ERS_HERE, cmd.id);
