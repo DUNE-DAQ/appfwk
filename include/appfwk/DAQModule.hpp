@@ -53,6 +53,9 @@
 namespace dunedaq {
 
 namespace appfwk {
+
+    
+
 /**
  * @brief The DAQModule class implementations are a set of code which performs
  * a specific task.
@@ -194,8 +197,13 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
                        ((std::string)reason)                  ///< Attribute of this class
 )
 
+
 } // namespace dunedaq
 
 #include "detail/DAQModule.hxx"
 
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
+
+// Local Variables:
+// c-basic-offset: 2
+// End:

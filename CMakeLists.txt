@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 project(appfwk VERSION 1.1.0)
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../daq-buildtools/cmake ${CMAKE_MODULE_PATH})
 find_package(daq-buildtools)
 
 daq_setup_environment()
@@ -18,7 +17,8 @@ set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly nlohman
 ##############################################################################
 daq_point_build_to( src )
 
-add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQModule.cpp src/DAQModuleManager.cpp)
+add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQModule.cpp
+  src/DAQModuleManager.cpp src/DAQModuleHelper.cpp)
 target_link_libraries(appfwk ${APPFWK_DEPENDENCIES})
 target_include_directories(appfwk PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 
