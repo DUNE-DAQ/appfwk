@@ -7,6 +7,7 @@
 #ifndef DUNEDAQ_APPFWK_CMD_STRUCTS_HPP
 #define DUNEDAQ_APPFWK_CMD_STRUCTS_HPP
 
+#include <cstdint>
 
 #include <nlohmann/json.hpp>
 #include <vector>

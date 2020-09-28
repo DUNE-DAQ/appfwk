@@ -10,7 +10,7 @@ srcdir=$(dirname $mydir)
 oschema=$HOME/dev/moo/examples/oschema
 runmoo () {
     moo -g '/lang:ocpp.jsonnet' \
-        -J $oschema -T $oschema -J $mydir \
+        -M $oschema -T $oschema -M $mydir \
         "$@"
 }
 

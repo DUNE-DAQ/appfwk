@@ -7,6 +7,7 @@
 #ifndef DUNEDAQ_APPFWK_FDP_STRUCTS_HPP
 #define DUNEDAQ_APPFWK_FDP_STRUCTS_HPP
 
+#include <cstdint>
 
 
 namespace dunedaq::appfwk::fdp {
