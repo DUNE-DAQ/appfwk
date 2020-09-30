@@ -24,11 +24,13 @@ render () {
     local tmpl="o${what}.hpp.j2"
     local outhpp="$outdir/${What}.hpp"
     mkdir -p $outdir
+    set -x
     runmoo -A path="dunedaq.appfwk.${name}" \
            -A ctxpath="dunedaq" \
            -A os="appfwk-${name}-schema.jsonnet" \
            render omodel.jsonnet $tmpl \
            > $outhpp
+    set +x
     echo $outhpp
 }
 
@@ -36,8 +38,9 @@ render () {
 render cmd Structs
 render cmd Nljs
 
-render fdp Structs
-render fdp Nljs
+render fdp Structs $srcdir/test/appfwk/fdp
+render fdp Nljs    $srcdir/test/appfwk/fdp
 
-render fdc Structs
-render fdc Nljs
+render fdc Structs $srcdir/test/appfwk/fdc
+render fdc Nljs    $srcdir/test/appfwk/fdc
+

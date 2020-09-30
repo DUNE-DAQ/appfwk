@@ -90,5 +90,8 @@ daq_add_unit_test(NamedObject_test		  )
 daq_install(TARGETS daq_application 
                     appfwk
 		    # appfwk_QueryResponseCommandFacility_duneCommandFacility 
-                    VectorIntFanOutDAQModule_duneDAQModule StringFanOutDAQModule_duneDAQModule NonCopyableTypeFanOutDAQModule_duneDAQModule
+                    appfwk_fileCommandFacility_duneCommandFacility
+                    VectorIntFanOutDAQModule_duneDAQModule
+                    StringFanOutDAQModule_duneDAQModule
+                    NonCopyableTypeFanOutDAQModule_duneDAQModule
 	   )
