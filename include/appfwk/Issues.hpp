@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef DUNEDAQ_APPFWK_ISSUES_HPP
-#define DUNEDAQ_APPFWK_ISSUES_HPP
+#ifndef APPFWK_INCLUDE_APPFWK_ISSUES_HPP_
+#define APPFWK_INCLUDE_APPFWK_ISSUES_HPP_
 
 #include "ers/ers.h"
 #include <string>
@@ -85,7 +85,7 @@ namespace dunedaq {
                       ((std::string)cmd)
                       ((std::string)who))
 
-}
+} // namespace dunedaq
 
 
-#endif
+#endif  // APPFWK_INCLUDE_APPFWK_ISSUES_HPP_

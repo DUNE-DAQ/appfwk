@@ -41,7 +41,8 @@ main(int argc, char* argv[])
   try {
     args = CommandLineInterpreter::parse(argc, argv);
   } catch (ers::Issue& e) {
-    // Die but do it gracefully gracefully
+    // Die but do it gracefully gracefully.
+    // Use of std::cout annoys the linter. 
     std::cout << "Command-line parsing failed. Error:" << std::endl;
     std::cout << e.message() << std::endl;
     exit(-1);

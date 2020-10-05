@@ -1,6 +1,17 @@
+/**
+ * @file DAQModuleHelper.cpp DAQModule helper functions
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
+ */
+
 #include "appfwk/DAQModuleHelper.hpp"
 #include "appfwk/Issues.hpp"
 #include "appfwk/cmd/Nljs.hpp"
+
+#include <string>
+#include <vector>
 
 namespace dunedaq::appfwk {
 
@@ -23,4 +34,4 @@ cmd::QueueInfos qinfos(const nlohmann::json& iniobj)
 {
     return iniobj.get<cmd::ModInit>().qinfos;
 }
-}
+} // namespace dunedaq::appfwk

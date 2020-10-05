@@ -34,6 +34,12 @@ struct ObjectStream {
     }
     virtual ~ObjectStream(){}
 
+    // One could, but in this case, one should not.
+    ObjectStream(const ObjectStream&) = delete;
+    ObjectStream(const ObjectStream&&) = delete;
+    ObjectStream& operator=(const ObjectStream&) = delete;
+    ObjectStream& operator=(const ObjectStream&&) = delete;
+
     // Get the next object from the stream.
     virtual object_t get() = 0;
 
@@ -72,6 +78,12 @@ struct ObjectStream {
 struct JsonStream : ObjectStream {   
     virtual ~JsonStream() {}
     JsonStream(std::string name, std::iostream& io) : ObjectStream(name, io) {}
+    // One could, but in this case, one should not.
+    JsonStream(const JsonStream&) = delete;
+    JsonStream(const JsonStream&&) = delete;
+    JsonStream& operator=(const JsonStream&) = delete;
+    JsonStream& operator=(const JsonStream&&) = delete;
+
 
     virtual object_t get() {
         object_t obj;
@@ -85,7 +97,7 @@ struct JsonStream : ObjectStream {
             }
             throw StreamCorrupt(ERS_HERE, name, pe.what());
         }
-        if (not obj.is_object()) {
+        if (! obj.is_object()) {
             std::string msg = "want: object, got: ";
             msg += obj.dump(4); // fixme: temp for debugging!
             throw StreamCorrupt(ERS_HERE, name, msg);
@@ -104,13 +116,19 @@ struct JsonStream : ObjectStream {
 struct JsonArray : public ObjectStream {
     object_t arr;
     bool isread;
-    virtual ~JsonArray() { if (!isread) { this->flush(); } }
     JsonArray(std::string name, std::iostream& io, bool isread=true)
         : ObjectStream(name, io)
         , isread(isread) {
         arr = object_t::array();
         if (isread) slurp();
     }
+    virtual ~JsonArray() { if (!isread) { this->flush(); } }
+
+    // One could, but in this case, one should not.
+    JsonArray(const JsonArray&) = delete;
+    JsonArray(const JsonArray&&) = delete;
+    JsonArray& operator=(const JsonArray&) = delete;
+    JsonArray& operator=(const JsonArray&&) = delete;
 
     void slurp() {
         try {
@@ -119,7 +137,7 @@ struct JsonArray : public ObjectStream {
         catch (const object_t::parse_error& pe) {
             throw StreamCorrupt(ERS_HERE, name, pe.what());
         }
-        if (not arr.is_array()) {
+        if (! arr.is_array()) {
             std::string msg = "want: array, got: ";
             msg += arr.dump(4); // fixme: temp for debugging!
             throw StreamCorrupt(ERS_HERE, name, msg);
@@ -133,7 +151,7 @@ struct JsonArray : public ObjectStream {
         }
         auto obj = arr[0];
         arr.erase(0);
-        if (not obj.is_object()) {
+        if (! obj.is_object()) {
             std::string msg = "want: object, got: ";
             msg += obj.dump(4); // fixme: temp for debugging!
             throw StreamCorrupt(ERS_HERE, name, msg);
@@ -168,6 +186,10 @@ struct fileCommandFacility : public CommandFacility {
         // assure these die first.
         ios.reset();
     }
+    fileCommandFacility(const fileCommandFacility&) = delete;
+    fileCommandFacility(const fileCommandFacility&&) = delete;
+    fileCommandFacility& operator=(const fileCommandFacility&) = delete;
+    fileCommandFacility& operator=(const fileCommandFacility&&) = delete;
 
     fileCommandFacility(std::string uri) : CommandFacility(uri) {
 
@@ -184,8 +206,7 @@ struct fileCommandFacility : public CommandFacility {
         if (sep == std::string::npos) { // simple path
             scheme = "file";
             iname = uri;
-        }
-        else {                  // with scheme
+        } else {                  // with scheme
             scheme = uri.substr(0, sep);
             iname = uri.substr(sep+3);
         }
@@ -194,7 +215,7 @@ struct fileCommandFacility : public CommandFacility {
         ERS_INFO("open: scheme:" << scheme << " ext:" << ext);
 
         
-        if (scheme.empty() or scheme == "file") {
+        if (scheme.empty() || scheme == "file") {
             istr.open(iname, std::ios_base::in);
             if (ext == "json") {
                 ios.reset(new JsonArray(iname, istr, true));

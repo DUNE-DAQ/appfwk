@@ -5,6 +5,11 @@
 #include <nlohmann/json.hpp>
 #include <ers/Issue.h>
 
+#include <map>
+#include <string>
+#include <vector>
+#include <memory>
+
 namespace dunedaq {
 
 /**
@@ -50,6 +55,6 @@ private:
     DAQModuleMap modulemap_;
 };
 
-}
-}
+} // namespace appfwk
+} // namespace dunedaq
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
