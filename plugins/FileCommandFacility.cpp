@@ -171,27 +171,27 @@ struct JsonArray : public ObjectStream {
 };
 
 
-// Note: this is registered as fileCommandFacility (lower-case "f"),
+// Note: this is registered as FileCommandFacility (lower-case "f"),
 // available on CLI as file:// scheme or simple filesystem path name.
 // Since files are not bi-directional, this will form an output
 // filename based on the input with "-out" appended to the base
 // filename.  The same extention and thus format assumptions used by
 // the input are kept for output.
-struct fileCommandFacility : public CommandFacility {
+struct FileCommandFacility : public CommandFacility {
 
     std::fstream istr;
     std::unique_ptr<ObjectStream> ios;
 
-    virtual ~fileCommandFacility() {
+    virtual ~FileCommandFacility() {
         // assure these die first.
         ios.reset();
     }
-    fileCommandFacility(const fileCommandFacility&) = delete;
-    fileCommandFacility(const fileCommandFacility&&) = delete;
-    fileCommandFacility& operator=(const fileCommandFacility&) = delete;
-    fileCommandFacility& operator=(const fileCommandFacility&&) = delete;
+    FileCommandFacility(const FileCommandFacility&) = delete;
+    FileCommandFacility(const FileCommandFacility&&) = delete;
+    FileCommandFacility& operator=(const FileCommandFacility&) = delete;
+    FileCommandFacility& operator=(const FileCommandFacility&&) = delete;
 
-    fileCommandFacility(std::string uri) : CommandFacility(uri) {
+    FileCommandFacility(std::string uri) : CommandFacility(uri) {
 
         auto dot = uri.find_last_of(".");
         auto sep = uri.find("://");
@@ -257,6 +257,6 @@ struct fileCommandFacility : public CommandFacility {
 
 extern "C" {
     std::shared_ptr<dunedaq::appfwk::CommandFacility> make(std::string uri) { 
-        return std::shared_ptr<dunedaq::appfwk::CommandFacility>(new fileCommandFacility(uri));
+        return std::shared_ptr<dunedaq::appfwk::CommandFacility>(new FileCommandFacility(uri));
     }
 }
