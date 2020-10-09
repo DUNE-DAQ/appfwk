@@ -6,10 +6,9 @@
     Fixme: need more imp files with http://, zeromq://, gRPC://, etc.
 
  */
-
-#include "appfwk/CommandFacility.hpp"
 #include "appfwk/Issues.hpp"
 #include "appfwk/DAQModuleManager.hpp"
+#include "cmdlib/CommandFacility.hpp"
 
 #include <cetlib/BasicPluginFactory.h>
 #include <nlohmann/json.hpp>
@@ -177,19 +176,12 @@ struct JsonArray : public ObjectStream {
 // filename based on the input with "-out" appended to the base
 // filename.  The same extention and thus format assumptions used by
 // the input are kept for output.
-struct fileCommandFacility : public CommandFacility {
-
-    std::fstream istr;
-    std::unique_ptr<ObjectStream> ios;
-
+class fileCommandFacility : public dunedaq::cmdlib::CommandFacility {
+public:
     virtual ~fileCommandFacility() {
         // assure these die first.
         ios.reset();
     }
-    fileCommandFacility(const fileCommandFacility&) = delete;
-    fileCommandFacility(const fileCommandFacility&&) = delete;
-    fileCommandFacility& operator=(const fileCommandFacility&) = delete;
-    fileCommandFacility& operator=(const fileCommandFacility&&) = delete;
 
     fileCommandFacility(std::string uri) : CommandFacility(uri) {
 
@@ -234,9 +226,8 @@ struct fileCommandFacility : public CommandFacility {
     }
 
 
-    void run(DAQModuleManager& manager) const {
-
-        while (true) {
+    void run(std::atomic<bool>& end_marker) {
+        while (end_marker) {
             object_t command;
 
             try {
@@ -246,17 +237,29 @@ struct fileCommandFacility : public CommandFacility {
                 ERS_INFO("Command stream end");
                 break;
             }
-
-            manager.execute(command);
+            //manager.execute(command);
+            inherited::executeCommand(command);
             ERS_INFO("DAQModuleManager execution complete");
         }
-
+        ios.reset();
     }
+
+protected:
+  typedef CommandFacility inherited;
+
+  // Implementation of completionHandler interface
+  void completionCallback(const std::string& result) {
+    ERS_INFO("Command execution resulted with: " << result);
+  }
+
+private:
+  std::fstream istr;
+  std::unique_ptr<ObjectStream> ios;
 
 };
 
 extern "C" {
-    std::shared_ptr<dunedaq::appfwk::CommandFacility> make(std::string uri) { 
-        return std::shared_ptr<dunedaq::appfwk::CommandFacility>(new fileCommandFacility(uri));
+    std::shared_ptr<dunedaq::cmdlib::CommandFacility> make(std::string uri) { 
+        return std::shared_ptr<dunedaq::cmdlib::CommandFacility>(new fileCommandFacility(uri));
     }
 }
