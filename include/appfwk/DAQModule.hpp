@@ -53,6 +53,9 @@
 namespace dunedaq {
 
 namespace appfwk {
+
+    
+
 /**
  * @brief The DAQModule class implementations are a set of code which performs
  * a specific task.
@@ -67,7 +70,10 @@ namespace appfwk {
 class DAQModule : public NamedObject
 {
 public:
-  /**
+
+  using data_t = nlohmann::json;
+
+    /**
    * @brief DAQModule Constructor
    * @param name Name of the DAQModule
    */
@@ -75,9 +81,12 @@ public:
     : NamedObject(name)
   {}
 
-  const nlohmann::json& get_config() const { return configuration_; }
-
-  void do_init(const nlohmann::json& config);
+  /**
+   * @brief      Initializes the module
+   *
+   * Initialisation of the module. Abstract method to be overridden by derived classes.
+   */
+  virtual void init( const data_t& ) = 0;
 
   /**
    * @brief Execute a command in this DAQModule
@@ -91,36 +100,20 @@ public:
    *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
-  void execute_command(const std::string& name, const std::vector<std::string>& args = {});
+  void execute_command(const std::string& name, const data_t& data = {});
 
   std::vector<std::string> get_commands() const;
 
   bool has_command(const std::string& name) const;
 
 protected:
-  /**
-   * @brief      Initializes the module
-   *
-   * Initialisation of the module. Abstract method to be overridden by derived classes.
-   */
-  virtual void init() = 0;
-
-  /**
-   * @brief Set the configuration for the DAQModule
-   * @param config JSON Configuration for the DAQModule
-   *
-   * This function is a placeholder; once CCM is implemented more completely, it
-   * will not continue to be part of the application framework. DAQModule
-   * developers should not assume that it will be accessible in the future.
-   */
-  void set_config(const nlohmann::json& config) { configuration_ = config; }
 
   /**
    * @brief Registers a mdoule command under the name `cmd`.
    * Returns whether the command was inserted (false meaning that command `cmd` already exists)
    */
   template<typename Child>
-  void register_command(const std::string& name, void (Child::*f)(const std::vector<std::string>&));
+  void register_command(const std::string& name, void (Child::*f)(const data_t&));
 
   DAQModule(DAQModule const&) = delete;            
   DAQModule(DAQModule&&) = delete;                
@@ -129,10 +122,9 @@ protected:
 
 
 private:
-  using CommandMap_t = std::map<std::string, std::function<void(const std::vector<std::string>&)>>;
+  using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
   CommandMap_t commands_;
 
-  nlohmann::json configuration_; ///< JSON configuration for the DAQModule
 };
 
 /**
@@ -205,8 +197,13 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
                        ((std::string)reason)                  ///< Attribute of this class
 )
 
+
 } // namespace dunedaq
 
 #include "detail/DAQModule.hxx"
 
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
+
+// Local Variables:
+// c-basic-offset: 2
+// End:

@@ -9,6 +9,9 @@
 
 #include "FakeDataConsumerDAQModule.hpp"
 
+#include "appfwk/cmd/Nljs.hpp"
+#include "appfwk/fdc/Nljs.hpp"
+
 #include "TRACE/trace.h"
 #include <ers/ers.h>
 
@@ -28,39 +31,41 @@ namespace dunedaq::appfwk {
 FakeDataConsumerDAQModule::FakeDataConsumerDAQModule(const std::string& name)
   : DAQModule(name)
   , thread_(std::bind(&FakeDataConsumerDAQModule::do_work, this, std::placeholders::_1))
-  , queueTimeout_(100)
   , inputQueue_(nullptr)
 {
-
-  register_command("configure", &FakeDataConsumerDAQModule::do_configure);
+  register_command("conf", &FakeDataConsumerDAQModule::do_configure);
   register_command("start", &FakeDataConsumerDAQModule::do_start);
   register_command("stop", &FakeDataConsumerDAQModule::do_stop);
 }
 
 void
-FakeDataConsumerDAQModule::init()
+FakeDataConsumerDAQModule::init(const nlohmann::json& init_data)
 {
-  inputQueue_.reset(new DAQSource<std::vector<int>>(get_config()["input"].get<std::string>()));
+  auto ini = init_data.get<cmd::ModInit>();
+  for (const auto& qi : ini.qinfos) {
+    if (qi.name == "input") {
+      ERS_INFO("FDP: input queue is " << qi.inst);
+      inputQueue_.reset(new DAQSource<std::vector<int>>(qi.inst));
+    }
+  }
 }
 
 void
-FakeDataConsumerDAQModule::do_configure(const std::vector<std::string>& /*args*/)
+FakeDataConsumerDAQModule::do_configure(const data_t& data)
 {
+  cfg_ = data.get<fdc::Conf>();
 
-  nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
-  starting_int_ = get_config().value<int>("starting_int", -4);
-  ending_int_ = get_config().value<int>("ending_int", 14);
-  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
+  queueTimeout_ = std::chrono::milliseconds(cfg_.queue_timeout_ms);
 }
 
 void
-FakeDataConsumerDAQModule::do_start(const std::vector<std::string>& /*args*/)
+FakeDataConsumerDAQModule::do_start(const data_t& /*data*/)
 {
   thread_.start_working_thread();
 }
 
 void
-FakeDataConsumerDAQModule::do_stop(const std::vector<std::string>& /*args*/)
+FakeDataConsumerDAQModule::do_stop(const data_t& /*data*/)
 {
   thread_.stop_working_thread();
 }
@@ -88,7 +93,8 @@ operator<<(std::ostream& t, std::vector<int> ints)
 void
 FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 {
-  int current_int = starting_int_;
+  ERS_INFO("FDC: do_work");
+  int current_int = cfg_.starting_int;
   int counter = 0;
   int fail_count = 0;
   std::vector<int> vec;
@@ -99,9 +105,11 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 
       TLOG(TLVL_TRACE) << get_name() << ": Going to receive data from inputQueue";
 
+      ERS_INFO("FDC \"" << get_name() << "\" pop " << counter);
       try {
         inputQueue_->pop(vec, queueTimeout_);
       } catch (const dunedaq::appfwk::QueueTimeoutExpired& excpt) {
+        ERS_INFO("FDC \"" << get_name() << "\" queue timeout on " << counter);
         continue;
       }
 
@@ -127,8 +135,8 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
           current_int = point;
         }
         ++current_int;
-        if (current_int > ending_int_)
-          current_int = starting_int_;
+        if (current_int > cfg_.ending_int)
+          current_int = cfg_.starting_int;
         ++ii;
       }
       TLOG(TLVL_TRACE) << get_name() << ": Done with processing loop, failed=" << failed;
@@ -148,3 +156,7 @@ FakeDataConsumerDAQModule::do_work(std::atomic<bool>& running_flag)
 } // namespace dunedaq::appfwk
 
 DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::FakeDataConsumerDAQModule)
+
+// Local Variables:
+// c-basic-offset: 2
+// End:

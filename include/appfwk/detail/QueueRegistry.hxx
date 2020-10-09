@@ -6,19 +6,6 @@
 // Declarations
 namespace dunedaq::appfwk {
 
-QueueConfig::queue_kind
-QueueConfig::stoqk(const std::string& name)
-{
-  if (name == "StdDeQueue" || name == "std_deque")
-    return queue_kind::kStdDeQueue;
-  else if (name == "FollySPSCQueue")
-    return queue_kind::kFollySPSCQueue;
-  else if (name == "FollyMPMCQueue")
-    return queue_kind::kFollyMPMCQueue;
-  else
-    throw QueueKindUnknown(ERS_HERE, name);
-}
-
 template<typename T>
 std::shared_ptr<Queue<T>>
 QueueRegistry::get_queue(const std::string& name)

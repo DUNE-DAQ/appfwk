@@ -41,7 +41,7 @@ public:
    * @param argv Command-line arguments
    * @return CommandLineInterpreter structure with parsed arguments
    */
-  static CommandLineInterpreter ParseCommandLineArguments(int argc, char** argv)
+  static CommandLineInterpreter parse(int argc, char** argv)
   {
     CommandLineInterpreter output;
 
@@ -50,18 +50,16 @@ public:
             << " known arguments (additional arguments will be stored and "
                "passed on)";
     bpo::options_description desc(descstr.str());
-    desc.add_options()("commandFacility,c", bpo::value<std::string>(), "CommandFacility plugin name")(
-      "configManager,m", bpo::value<std::string>(), "ConfigurationManager plugin name")(
-      "service,s", bpo::value<std::vector<std::string>>(), "Service plugin(s) to load")(
-      "configJson,j", bpo::value<std::string>(), "JSON Application configuration file name")("help,h",
-                                                                                             "produce help message");
+    desc.add_options()
+      ("commandFacility,c", bpo::value<std::string>()->required(),  "CommandFacility URI")
+      ("help,h", "produce help message");
+      
     bpo::variables_map vm;
     try {
       auto parsed = bpo::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
 
       output.otherOptions = bpo::collect_unrecognized(parsed.options, bpo::include_positional);
       bpo::store(parsed, vm);
-      bpo::notify(vm);
     } catch (bpo::error const& e) {
       throw CommandLineIssue(ERS_HERE, *argv, e.what());
     }
@@ -71,33 +69,21 @@ public:
       exit(0);
     }
 
-    if (vm.count("commandFacility")) {
-      output.commandFacilityPluginName = vm["commandFacility"].as<std::string>();
-    } else {
-      std::cout << desc; // NOLINT
-      throw CommandLineIssue(ERS_HERE, *argv, "CommandFacility not specified on command line!");
-      exit(-2);
+    try {
+      bpo::notify(vm);
+    } catch (bpo::error const& e) {
+      throw CommandLineIssue(ERS_HERE, *argv, e.what());
     }
-    if (vm.count("configManager")) {
-      output.configurationManagerPluginName = vm["configManager"].as<std::string>();
-    }
-    if (vm.count("service")) {
-      output.servicePluginNames = vm["service"].as<std::vector<std::string>>();
-    }
-    if (vm.count("configJson")) {
-      output.applicationConfigurationFile = vm["configJson"].as<std::string>();
-    }
+
+    output.commandFacilityPluginName = vm["commandFacility"].as<std::string>();
     output.isValid = true;
     return output;
   }
 
   bool isValid{ false };                       ///< Whether the command line was successfully parsed
-  std::string applicationConfigurationFile;    ///< File that contains application
-                                               ///< configuration (JSON)
+
   std::string commandFacilityPluginName;       ///< Name of the CommandFacility plugin to load
-  std::string configurationManagerPluginName;  ///< Name of the ConfigurationManager
-                                               ///< plugin to load
-  std::vector<std::string> servicePluginNames; ///< Names of the Service plugins to load
+
   std::vector<std::string> otherOptions;       ///< Any other options which were passed and not recognized
 };
 } // namespace appfwk

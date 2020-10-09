@@ -2,7 +2,7 @@ namespace dunedaq::appfwk {
 
 template<typename Child>
 void
-DAQModule::register_command(const std::string& name, void (Child::*f)(const std::vector<std::string>&))
+DAQModule::register_command(const std::string& name, void (Child::*f)(const data_t&))
 {
   using namespace std::placeholders;
 
