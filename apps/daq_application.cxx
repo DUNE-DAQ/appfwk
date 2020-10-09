@@ -73,7 +73,7 @@ main(int argc, char* argv[])
   auto cmdfac = cmdlib::makeCommandFacility(args.commandFacilityPluginName);
 
   // Add commanded object to CF
-  cmdfac->addCommanded(manager);
+  cmdfac->setCommanded(manager);
 
   // Run until global signal
   cmdfac->run(run_marker);
