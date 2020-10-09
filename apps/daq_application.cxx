@@ -9,11 +9,12 @@
 
 #include "appfwk/CommandLineInterpreter.hpp"
 #include "appfwk/DAQModuleManager.hpp"
-#include "appfwk/CommandFacility.hpp"
+#include "cmdlib/CommandFacility.hpp"
 
 #include "ers/Issue.h"
 #include <nlohmann/json.hpp>
 
+#include <csignal>
 #include <fstream>
 #include <list>
 #include <map>
@@ -27,6 +28,19 @@
 using json = nlohmann::json;
 
 /**
+ * @brief Global atomic for process lifetime
+ */
+std::atomic<bool> run_marker{true};
+
+/**
+ * @brief Signal handler for graceful stop
+ */
+static void sigHandler(int signal) {
+  std::cout << "Signal received: " << signal << '\n';
+  run_marker.store(false);
+}
+
+/**
  * @brief Entry point for daq_application
  * @param argc Number of arguments
  * @param argv Arguments
@@ -35,11 +49,15 @@ using json = nlohmann::json;
 int
 main(int argc, char* argv[])
 {
-  using namespace dunedaq::appfwk;
+  // Setup signals
+  std::signal(SIGABRT, sigHandler);
+  std::signal(SIGQUIT, sigHandler);
 
-  CommandLineInterpreter args;
+  using namespace dunedaq;
+
+  appfwk::CommandLineInterpreter args;
   try {
-    args = CommandLineInterpreter::parse(argc, argv);
+    args = appfwk::CommandLineInterpreter::parse(argc, argv);
   } catch (ers::Issue& e) {
     // Die but do it gracefully gracefully.
     // Use of std::cout annoys the linter. 
@@ -48,9 +66,17 @@ main(int argc, char* argv[])
     exit(-1);
   }
 
-  DAQModuleManager manager;
-  auto cmdfac = makeCommandFacility(args.commandFacilityPluginName);
-  cmdfac->run(manager);
+  // DAQModuleManager commandable
+  appfwk::DAQModuleManager manager;
+
+  // CommandFacility
+  auto cmdfac = cmdlib::makeCommandFacility(args.commandFacilityPluginName);
+
+  // Add commanded object to CF
+  cmdfac->addCommanded(manager);
+
+  // Run until global signal
+  cmdfac->run(run_marker);
+
   return 0;
 }
-
