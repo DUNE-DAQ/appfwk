@@ -11,9 +11,10 @@ find_package(TRACE 3.15.09 REQUIRED)
 find_package(cetlib REQUIRED)   # Uses the daq-buildtools/cmake/Findcetlib.cmake
 find_package(folly REQUIRED)
 find_package(ers REQUIRED)
+find_package(cmdlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
 
-set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly nlohmann_json::nlohmann_json pthread)
+set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly cmdlib::cmdlib nlohmann_json::nlohmann_json pthread)
 
 ##############################################################################
 daq_point_build_to( src )
@@ -41,7 +42,7 @@ MakeDataTypeLibraries(CPPTYPE std::string PREFIX String)
 MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyableType)
 
 add_library(appfwk_fileCommandFacility_duneCommandFacility src/FileCommandFacility.cpp)
-target_link_libraries(appfwk_fileCommandFacility_duneCommandFacility appfwk)
+target_link_libraries(appfwk_fileCommandFacility_duneCommandFacility cmdlib::cmdlib) #appfwk)
 
 
 ##############################################################################
