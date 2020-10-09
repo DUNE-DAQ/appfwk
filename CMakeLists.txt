@@ -62,9 +62,11 @@ target_link_libraries(appfwk_DummyModule_duneDAQModule appfwk)
 
 add_library(appfwk_FakeDataConsumerDAQModule_duneDAQModule test/FakeDataConsumerDAQModule.cpp)
 target_link_libraries(appfwk_FakeDataConsumerDAQModule_duneDAQModule appfwk)
+target_include_directories(appfwk_FakeDataConsumerDAQModule_duneDAQModule PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test>) 
 
 add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducerDAQModule.cpp)
 target_link_libraries(appfwk_FakeDataProducerDAQModule_duneDAQModule appfwk)
+target_include_directories(appfwk_FakeDataProducerDAQModule_duneDAQModule PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test>) 
 
 add_executable(queue_IO_check test/queue_IO_check.cxx)
 target_link_libraries(queue_IO_check ${Boost_PROGRAM_OPTIONS_LIBRARY} appfwk)
