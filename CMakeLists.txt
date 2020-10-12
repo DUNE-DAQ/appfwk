@@ -24,9 +24,6 @@ add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQModule.cpp
 target_link_libraries(appfwk ${APPFWK_DEPENDENCIES})
 target_include_directories(appfwk PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 
-# add_library(appfwk_QueryResponseCommandFacility_duneCommandFacility src/QueryResponseCommandFacility.cpp)
-# target_link_libraries(appfwk_QueryResponseCommandFacility_duneCommandFacility appfwk)
-
 macro(MakeDataTypeLibraries)
    set(oneValueArgs CPPTYPE PREFIX)
    cmake_parse_arguments(MAKE_DATATYPE "" "${oneValueArgs}" "" ${ARGN})
@@ -40,10 +37,6 @@ endmacro()
 MakeDataTypeLibraries(CPPTYPE std::vector<int> PREFIX VectorInt)
 MakeDataTypeLibraries(CPPTYPE std::string PREFIX String)
 MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyableType)
-
-add_library(appfwk_fileCommandFacility_duneCommandFacility src/FileCommandFacility.cpp)
-target_link_libraries(appfwk_fileCommandFacility_duneCommandFacility cmdlib::cmdlib) #appfwk)
-
 
 ##############################################################################
 daq_point_build_to( apps )
@@ -94,7 +87,6 @@ daq_add_unit_test(NamedObject_test		  )
 daq_install(TARGETS daq_application 
                     appfwk
 		    # appfwk_QueryResponseCommandFacility_duneCommandFacility 
-                    appfwk_fileCommandFacility_duneCommandFacility
                     VectorIntFanOutDAQModule_duneDAQModule
                     StringFanOutDAQModule_duneDAQModule
                     NonCopyableTypeFanOutDAQModule_duneDAQModule
