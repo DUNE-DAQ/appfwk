@@ -2,6 +2,7 @@
 #define APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 
 #include "appfwk/cmd/Structs.hpp"
+#include "cmdlib/CommandedObject.hpp"
 #include <nlohmann/json.hpp>
 #include <ers/Issue.h>
 
@@ -25,7 +26,7 @@ namespace appfwk {
 
 class DAQModule;
 
-class DAQModuleManager
+class DAQModuleManager : public cmdlib::CommandedObject
 {
 public:
 
