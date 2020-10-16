@@ -9,6 +9,7 @@ find_dependency(TRACE 3.15.09)
 find_dependency(cetlib)
 find_dependency(folly)
 find_dependency(ers)
+find_dependency(cmdlib)
 
 find_package(nlohmann_json)
 
