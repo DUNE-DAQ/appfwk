@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(appfwk VERSION 1.1.0)
 
-find_package(daq-buildtools 1.2.0 REQUIRED )
+find_package(daq-buildtools 1.2.1 REQUIRED )
 
 daq_setup_environment()
 
