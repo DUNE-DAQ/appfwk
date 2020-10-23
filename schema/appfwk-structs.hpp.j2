@@ -1,0 +1,32 @@
+{% import 'appfwk-cpp.hpp.j2' as cpp %}
+/*
+ * This file is 100% generated.  Any manual edits will likely be lost.
+ *
+ * This contains struct and other type definitions for shema in 
+ * {{cpp.ns(model)}}.
+ */
+{% set tcname = "Structs" %}
+#ifndef {{cpp.headerguard(model, tcname)}}
+#define {{cpp.headerguard(model, tcname)}}
+
+#include <cstdint>
+{% for ep in model.extrefs %}
+#include "{{ep}}/{{tcname}}.hpp"
+{% endfor %}
+
+{% for schema, typeref in model.byscn.items() %}
+{% if typeref %}{% for imp in model.lang.imports.get(schema, []) %}
+#include <{{imp}}>
+{% endfor %}{% endif %}
+{% endfor %}
+
+{{ cpp.ns(model) }} {
+
+    {% for t in model.types %}
+    // @brief {{ t.doc }}
+    {{ cpp["declare_"+t.schema](model, t)|indent }}
+
+    {% endfor %}
+} // {{ cpp.ns(model) }}
+
+#endif // {{cpp.headerguard(model, tcname)}}

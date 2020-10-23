@@ -66,7 +66,8 @@ namespace dunedaq::appfwk::cmd {
     using InstName = std::string;
 
     // @brief Capacity of a queue
-    using QueueCapacity = uint64_t;
+    using QueueCapacity = uint64_t; // NOLINT
+
 
     // @brief Queue specification
     struct QueueSpec {
@@ -138,7 +139,7 @@ namespace dunedaq::appfwk::cmd {
     // @brief A standardized portion of every ModSpec.data
     struct ModInit {
 
-        // @brief 
+        // @brief Information for a module to find its queue
         QueueInfos qinfos;
     };
 
