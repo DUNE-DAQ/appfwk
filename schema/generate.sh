@@ -3,6 +3,18 @@
 # Really ugly and temporary glue to run moo code generator.
 # This will simplify and move into CMake.
 
+# For current best ideas for CMake integration see:
+# https://brettviren.github.io/moo/buildsys.html#cmake
+
+# For guidance on how to write schema see:
+# https://brettviren.github.io/moo/dunedaq-appfwk-schema.html
+
+# For guidance on how to make schema objects see:
+# https://brettviren.github.io/dune-daq-repl/ddcmd.html
+
+# For guidance on how to deliver objects to daq_application see:
+# https://brettviren.github.io/dune-daq-repl/ddrepl.html
+
 mydir=$(dirname $(realpath $BASH_SOURCE))
 srcdir=$(dirname $mydir)
 
