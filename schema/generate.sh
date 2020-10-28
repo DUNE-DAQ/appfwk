@@ -3,16 +3,20 @@
 # Really ugly and temporary glue to run moo code generator.
 # This will simplify and move into CMake.
 
+# For current best ideas for CMake integration see:
+# https://brettviren.github.io/moo/buildsys.html#cmake
+
+# For guidance on how to write schema see:
+# https://brettviren.github.io/moo/dunedaq-appfwk-schema.html
+
+# For guidance on how to make schema objects see:
+# https://brettviren.github.io/dune-daq-repl/ddcmd.html
+
+# For guidance on how to deliver objects to daq_application see:
+# https://brettviren.github.io/dune-daq-repl/ddrepl.html
+
 mydir=$(dirname $(realpath $BASH_SOURCE))
 srcdir=$(dirname $mydir)
-
-# The need for this detail will go away once moo is cleaned up a bit.
-oschema=$HOME/dev/moo/examples/oschema
-runmoo () {
-    moo -g '/lang:ocpp.jsonnet' \
-        -M $oschema -T $oschema -M $mydir \
-        "$@"
-}
 
 # Wrap up the render command.  This bakes in a mapping to file name
 # which would be better somehow captured by the schema itself.
@@ -21,15 +25,17 @@ render () {
     local What="$1" ; shift
     local outdir="${1:-$srcdir/include/appfwk/${name}}"
     local what="$(echo $What | tr '[:upper:]' '[:lower:]')"
-    local tmpl="o${what}.hpp.j2"
+    local tmpl="appfwk-${what}.hpp.j2"
     local outhpp="$outdir/${What}.hpp"
     mkdir -p $outdir
     set -x
-    runmoo -A path="dunedaq.appfwk.${name}" \
-           -A ctxpath="dunedaq" \
-           -A os="appfwk-${name}-schema.jsonnet" \
-           render omodel.jsonnet $tmpl \
-           > $outhpp
+    moo -g '/lang:ocpp.jsonnet' \
+        -M $mydir -T $mydir \
+        -A path="dunedaq.appfwk.${name}" \
+        -A ctxpath="dunedaq" \
+        -A os="appfwk-${name}-schema.jsonnet" \
+        render appfwk-model.jsonnet $tmpl \
+        > $outhpp || exit -1
     set +x
     echo $outhpp
 }

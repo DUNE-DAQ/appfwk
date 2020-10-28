@@ -1,0 +1,66 @@
+{% import 'appfwk-cpp.hpp.j2' as cpp %}
+/*
+ * This file is 100% generated.  Any manual edits will likely be lost.
+ *
+ * This contains functions struct and other type definitions for shema in 
+ * {{cpp.ns(model)}} to be serialized via nlohmann::json.
+ */
+{% set tcname = "Nljs" %}
+#ifndef {{cpp.headerguard(model, tcname)}}
+#define {{cpp.headerguard(model, tcname)}}
+
+
+#include "{{model.relpath|replace(".","/")}}/Structs.hpp"
+
+{% for ep in model.extrefs %}
+#include "{{ep}}/{{tcname}}.hpp"
+{% endfor %}
+
+#include <nlohmann/json.hpp>
+
+{{ cpp.ns(model) }} {
+
+    using data_t = nlohmann::json;
+
+    {% for fqn in model.byscn.enum %}
+    {% set e = model.byref[fqn] %}
+    {% set n = fqn.replace(model.nspre,"") %}
+    NLOHMANN_JSON_SERIALIZE_ENUM( {{n}}, {
+            {% for sname in e.symbols %}
+            { {{"::".join(model.path)}}::{{n}}::{{sname}}, "{{sname}}" },
+            {% endfor %}
+        })
+    {% endfor %}
+
+    {% for fqn in model.byscn.record %}    
+    {% set r = model.byref[fqn] %}
+    {% set n = fqn.replace(model.nspre,"") %}
+    inline void to_json(data_t& j, const {{n}}& obj) {
+        {% for b in r.fields if b.name.startswith("_base_") %}
+        to_json(j, (const {{b.type}}&)obj);
+        {% endfor %}
+        {% for f in r.fields if not f.name.startswith("_base_") %}
+        j["{{f.name}}"] = obj.{{f.name}};
+        {% endfor%}
+    }
+    
+    inline void from_json(const data_t& j, {{r.name}}& obj) {
+        {% for b in r.fields if b.name.startswith("_base_") %}
+        from_json(j, ({{b.type}}&)obj);
+        {% endfor %}
+        {% for f in r.fields if not f.name.startswith("_base_") %}
+        {% if f.item in model.byscn.any %}
+        obj.{{f.name}} = j.at("{{f.name}}");
+        {% else %}
+        if (j.contains("{{f.name}}"))
+            j.at("{{f.name}}").get_to(obj.{{f.name}});    
+        {% endif %}
+        {% endfor%}
+    }
+    {% endfor %}
+    
+    // fixme: add support for MessagePack serializers (at least)
+
+} // {{ cpp.ns(model) }}
+
+#endif // {{cpp.headerguard(model, tcname)}}

@@ -13,10 +13,12 @@
 namespace dunedaq::appfwk::fdp {
 
     // @brief A count of very many things
-    using Size = uint64_t;
+    using Size = uint64_t; // NOLINT
+
 
     // @brief A count of not too many things
     using Count = int32_t;
+
 
     // @brief Fake Data Producer DAQ Module Configuration
     struct Conf {

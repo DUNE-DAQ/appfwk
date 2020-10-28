@@ -1,0 +1,43 @@
+{%- macro field_type(ft) %}
+{% if ft is mapping %}std::vector<{{field_type(ft["items"])}}>{% elif ft == "string" %}std::string{% elif ft == "any"%}model.anytype{% else %}{{ ft }}{% endif %}
+{%- endmacro -%}
+
+{% macro declare_sequence(model, t) %}
+using {{t.name}} = {{model.lang.types.sequence}}<{{t["items"]|replace(".","::")}}>;
+{%- endmacro -%}
+{% macro declare_record(model, t) %}
+struct {{t.name}} {
+    {% for f in t.fields %}
+
+    // @brief {{f.doc}}
+    {{f.item|replace(model.nspre,"")|replace(".","::")}} {{f.name}};
+    {% endfor %}
+};
+{%- endmacro -%}
+{% macro declare_string(model, t) %}
+using {{t.name}} = {{model.lang.types.string}};
+{%- endmacro -%}
+{% macro declare_number(model, t) %}
+{% if t.dtype[0] == "u" %}
+using {{t.name}} = {{model.lang.dtypes[t.dtype]}}; // NOLINT
+{% else %}
+using {{t.name}} = {{model.lang.dtypes[t.dtype]}};
+{% endif %}
+{%- endmacro -%}
+{% macro declare_any(model, t) %}
+using {{t.name}} = {{model.lang.types.any}};
+{%- endmacro -%}
+{% macro declare_enum(model, t) %}
+enum class {{t.name}}: unsigned {
+    {% for sname in t.symbols %}
+    {{sname}},
+    {% endfor %}
+};
+{%- endmacro -%}
+
+{% macro ns(model) %}
+namespace {{ "::".join(model.path) }}
+{%- endmacro -%}
+{% macro headerguard(model, what) %}
+{{ "_".join(model.path).upper() + "_" + what.upper() + "_HPP" }}
+{%- endmacro -%}
