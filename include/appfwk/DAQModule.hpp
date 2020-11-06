@@ -53,10 +53,10 @@
 namespace dunedaq {
 
   /**
- * @brief The CommandFailed DAQModule ERS Issue
- */
-  ERS_DECLARE_ISSUE(appfwk,                                                                ///< Namespace
-                    DAQModuleCreationFailed,                                               ///< Type of the Issue
+  * @brief A ERS Issue for DAQModule creation failure
+  */
+  ERS_DECLARE_ISSUE(appfwk,                                                                       ///< Namespace
+                    DAQModuleCreationFailed,                                                      ///< Type of the Issue
                     "Failed to create DAQModule " << instance_name << " of type " << plugin_name, ///< Log Message from the issue
                     ((std::string)plugin_name)((std::string)instance_name)                        ///< Message parameters
   )
