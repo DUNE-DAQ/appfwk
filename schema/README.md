@@ -71,14 +71,14 @@ reference, we will first make an intermediate **object of types**.
 
 We start out by importing helper code from `moo`:
 
-```json
+``` {.jsonnet}
 local moo = import "moo.jsonnet";
 ```
 
 Then we define the base "path" and make a "schema factory" object
 rooted on that path:
 
-```json
+``` {.jsonnet}
 local ns = "dunedaq.appfwk.fdc";
 local s = moo.oschema.schema(ns);
 ```
@@ -98,7 +98,7 @@ type that may be defined elsewhere. Every type will carry its path in a
 
 We now get to the main body of the schema definition
 
-```json
+``` {.jsonnet}
 local fdc = {
 
     size: s.number("Size", "u8",
@@ -365,7 +365,7 @@ also possible). Let\'s walk through the Jsonnet defining the sequence.
 First the preamble
 
 
-```json
+``` {.jsonnet}
 local moo = import "moo.jsonnet";
 
 local cmd = import "appfwk-cmd-make.jsonnet";
@@ -383,7 +383,7 @@ name of an `appfwk` Queue that is needed in a few places.
 What follows is an array (`[...]`), each element is a command object
 which we will take in turn.
 
-```json
+``` {.jsonnet}
 cmd.init([cmd.qspec("hose", "StdDeQueue", 10)],
          [cmd.mspec("fdp", "FakeDataProducerDAQModule",
                     cmd.qinfo(fdp.queue, qname, cmd.qdir.output)),
@@ -417,7 +417,7 @@ itself be provided as generated code in the future.
 We next continue to defining the `conf` command object.
 
 
-```json
+``` {.jsonnet}
 cmd.conf([cmd.mcmd("fdp", fdp.conf(10,-4,14)),
           cmd.mcmd("fdc", fdc.conf(10,-4,14))]),
 ```
@@ -427,7 +427,7 @@ The `cmd.mcmd()` wraps is arguments in the correct structure expected by
 module. The main information is provided by the module-specific `make`
 helpers, eg `fdc.conf()`. Let\'s look a that function:
 
-```json
+``` {.jsonnet}
 // Make a conf object for FDC
 conf(nper, beg, end, toms=100) :: {
     nIntsPerVector: nper, starting_int: beg, ending_int: end,
