@@ -335,12 +335,11 @@ command objects. That is, we must be able to produce a data structure
 such when fed through the processing inside `appfwk` the right bits pop
 out to our `DAQModule` configuration handling method.
 
-::: {.warning}
+**Warning**:
 How we best do this is still in development. Eventually we will have a
 "configuration editor" application. What follows is just one way to do
 things with Jsonnet. A Python-centric approach is also under
 development.
-:::
 
 The main `appfwk` program `daq_application` accepts a **command
 sequence** which is simply a number of **command objects** consumed in
