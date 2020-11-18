@@ -29,8 +29,12 @@ render () {
     local outhpp="$outdir/${What}.hpp"
     mkdir -p $outdir
     set -x
-    moo -M $mydir -T $mydir \
-        render appfwk-${name}-model.jsonnet $tmpl \
+    moo -g '/lang:ocpp.jsonnet' \
+        -M $mydir -T $mydir \
+        -A path="dunedaq.appfwk.${name}" \
+        -A ctxpath="dunedaq" \
+        -A os="appfwk-${name}-schema.jsonnet" \
+        render appfwk-model.jsonnet $tmpl \
         > $outhpp || exit -1
     set +x
     echo $outhpp
