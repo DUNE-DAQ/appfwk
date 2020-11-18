@@ -10,7 +10,7 @@
 #include "FakeDataProducerDAQModule.hpp"
 
 #include "appfwk/cmd/Nljs.hpp"
-#include "appfwk/fdp/Nljs.hpp"
+#include "appfwk/fakedataproducerdaqmodule/Nljs.hpp"
 
 
 #include <chrono>
@@ -58,7 +58,7 @@ FakeDataProducerDAQModule::do_configure(const data_t& data)
 {
   std::cerr << data.dump(4) << std::endl;
 
-  cfg_ = data.get<fdp::Conf>();
+  cfg_ = data.get<fakedataproducerdaqmodule::Conf>();
 
   queueTimeout_ = std::chrono::milliseconds(cfg_.queue_timeout_ms);
 }

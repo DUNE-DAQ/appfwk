@@ -13,5 +13,5 @@
 // parameterize this much shorter.
 
 local model = import "appfwk-model.jsonnet";
-model(import "appfwk-fdp-schema.jsonnet",
-      "dunedaq.appfwk.fdp", ["dunedaq"])
+model(import "appfwk-FakeDataProducerDAQModule-schema.jsonnet",
+      "dunedaq.appfwk.fakedataproducerdaqmodule", ["dunedaq"])
