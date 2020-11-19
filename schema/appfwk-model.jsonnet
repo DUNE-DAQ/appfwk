@@ -1,17 +1,6 @@
-// This is a parameterized model for the templates targetting C++
-// codegen.
-
 local oschema = import "oschema.jsonnet";
 
-local ocpp = import "ocpp.jsonnet";
-
-// Call it with the object schema (eg appfwk-cmd-schema.jsonnet), and
-// a dot-separated path in which the schema is rooted and a ctxpath
-// which will be stripped from the path when doing things in-context
-// such as #include's.
 function(os, path, ctxpath=[]) {
-    lang: ocpp,
-
     // The path/namespace this model "lives" in
     path: oschema.listify(path),
     nspre: oschema.prepath(self.path),
