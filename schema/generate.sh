@@ -44,9 +44,9 @@ render () {
 render cmd Structs
 render cmd Nljs
 
-render fdp Structs $srcdir/test/appfwk/fdp
-render fdp Nljs    $srcdir/test/appfwk/fdp
+render fdp Structs $srcdir/test/src/appfwk/fdp
+render fdp Nljs    $srcdir/test/src/appfwk/fdp
 
-render fdc Structs $srcdir/test/appfwk/fdc
-render fdc Nljs    $srcdir/test/appfwk/fdc
+render fdc Structs $srcdir/test/src/appfwk/fdc
+render fdc Nljs    $srcdir/test/src/appfwk/fdc
 
