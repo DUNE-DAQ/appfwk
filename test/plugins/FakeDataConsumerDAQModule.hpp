@@ -17,7 +17,7 @@
 #include "appfwk/ThreadHelper.hpp"
 
 // Our command data structures
-#include "appfwk/fdc/Structs.hpp"
+#include "appfwk/fakedataconsumerdaqmodule/Structs.hpp"
 
 #include <ers/Issue.h>
 
@@ -63,7 +63,7 @@ private:
   ThreadHelper thread_;
 
   // Configuration (for validation)
-  fdc::Conf cfg_;
+  fakedataconsumerdaqmodule::Conf cfg_;
   // size_t nIntsPerVector_ = 999;
   // int starting_int_ = -999;
   // int ending_int_ = -999;

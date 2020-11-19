@@ -10,7 +10,7 @@
 #include "FakeDataConsumerDAQModule.hpp"
 
 #include "appfwk/cmd/Nljs.hpp"
-#include "appfwk/fdc/Nljs.hpp"
+#include "appfwk/fakedataconsumerdaqmodule/Nljs.hpp"
 
 #include "TRACE/trace.h"
 #include <ers/ers.h>
@@ -53,7 +53,7 @@ FakeDataConsumerDAQModule::init(const nlohmann::json& init_data)
 void
 FakeDataConsumerDAQModule::do_configure(const data_t& data)
 {
-  cfg_ = data.get<fdc::Conf>();
+  cfg_ = data.get<fakedataconsumerdaqmodule::Conf>();
 
   queueTimeout_ = std::chrono::milliseconds(cfg_.queue_timeout_ms);
 }
