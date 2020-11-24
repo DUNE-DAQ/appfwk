@@ -26,8 +26,8 @@ daq_add_application( daq_application daq_application.cxx LINK_LIBRARIES appfwk )
 # ##############################################################################
 # Test plugins
 daq_add_plugin( DummyModule		  duneDAQModule TEST LINK_LIBRARIES appfwk )
-daq_add_plugin( FakeDataConsumerDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk )
-daq_add_plugin( FakeDataProducerDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk )
+daq_add_plugin( FakeDataConsumerDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk SCHEMA)
+daq_add_plugin( FakeDataProducerDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk SCHEMA)
 
 # Test applications
 daq_add_application( queue_IO_check queue_IO_check.cxx TEST LINK_LIBRARIES appfwk )

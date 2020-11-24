@@ -8,11 +8,11 @@
 local moo = import "moo.jsonnet";
 
 // A schema builder in the given path (namespace)
-local ns = "dunedaq.appfwk.fdp";
+local ns = "dunedaq.appfwk.fakedataproducerdaqmodule";
 local s = moo.oschema.schema(ns);
 
 // Object structure used by the test/fake producer module
-local fdp = {
+local fakedataproducerdaqmodule = {
     size: s.number("Size", "u8",
                    doc="A count of very many things"),
 
@@ -34,5 +34,5 @@ local fdp = {
 
 };
 
-moo.oschema.sort_select(fdp, ns)
+moo.oschema.sort_select(fakedataproducerdaqmodule, ns)
 

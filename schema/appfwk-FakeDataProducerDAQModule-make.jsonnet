@@ -1,4 +1,4 @@
-// hand written helpers to make object compliant with appfwk-fdp-schema
+// hand written helpers to make object compliant with appfwk-FakeDataProducerDAQModule-schema
 {
     // The internally known name of the only queue used
     queue: "output",

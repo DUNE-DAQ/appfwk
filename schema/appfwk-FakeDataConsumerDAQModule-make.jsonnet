@@ -1,4 +1,4 @@
-// hand written helpers to make object compliant with appfwk-fdc-schema
+// hand written helpers to make object compliant with appfwk-FakeDataConsumerDAQModule-schema
 {
     // The internally known name of the only queue used
     queue: "input",
