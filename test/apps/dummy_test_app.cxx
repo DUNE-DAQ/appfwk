@@ -36,11 +36,14 @@ class dummy_test_app_contructor : public GraphConstructor
 int
 main(int argc, char* argv[])
 {
-  auto args = dunedaq::appfwk::CommandLineInterpreter::ParseCommandLineArguments(argc, argv);
 
-  dunedaq::appfwk::DAQProcess theDAQProcess(args);
+  using namespace dunedaq::appfwk;
 
-  dunedaq::appfwk::dummy_test_app_contructor gc;
+  auto args = CommandLineInterpreter::parse(argc, argv);
+
+  DAQProcess theDAQProcess(args);
+
+  dummy_test_app_contructor gc;
   theDAQProcess.register_modules(gc);
 
   return theDAQProcess.listen();

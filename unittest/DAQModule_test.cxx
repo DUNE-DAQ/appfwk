@@ -35,10 +35,10 @@ public:
     register_command("stuff", &BadDAQModule::do_other_stuff);
   }
 
-  void init() final {}
+  void init(const nlohmann::json& ) final {}
 
-  void do_stuff(std::vector<std::string> const& /*args*/) {}
-  void do_other_stuff(std::vector<std::string> const& /*args*/) {}
+  void do_stuff(const data_t& /*data*/) {}
+  void do_other_stuff(const data_t& /*data*/) {}
 };
 
 class GoodDAQModule : public DAQModule
@@ -50,9 +50,9 @@ public:
     register_command("stuff", &GoodDAQModule::do_stuff);
   }
 
-  void init() final {}
+  void init(const nlohmann::json& ) final {}
 
-  void do_stuff(std::vector<std::string> const& /*args*/) {}
+  void do_stuff(const data_t& /*data*/) {}
 };
 } // namespace daqmoduletest
 

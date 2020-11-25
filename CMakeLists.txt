@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
-project(appfwk VERSION 1.1.0)
+project(appfwk VERSION 2.0.0)
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../daq-buildtools/cmake ${CMAKE_MODULE_PATH})
-include(DAQ)
+find_package(daq-cmake REQUIRED )
 
 daq_setup_environment()
 
@@ -11,79 +10,43 @@ find_package(TRACE 3.15.09 REQUIRED)
 find_package(cetlib REQUIRED)   # Uses the daq-buildtools/cmake/Findcetlib.cmake
 find_package(folly REQUIRED)
 find_package(ers REQUIRED)
+find_package(cmdlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
 
-set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly nlohmann_json::nlohmann_json pthread)
+set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly cmdlib::cmdlib nlohmann_json::nlohmann_json pthread)
 
 ##############################################################################
-daq_point_build_to( src )
+# Main library
+daq_add_library(QueueRegistry.cpp DAQModule*.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
 
-add_library(appfwk SHARED src/QueueRegistry.cpp src/DAQProcess.cpp src/DAQModule.cpp)
-target_link_libraries(appfwk ${APPFWK_DEPENDENCIES})
-target_include_directories(appfwk PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
+# ##############################################################################
+# Applications
+daq_add_application( daq_application daq_application.cxx LINK_LIBRARIES appfwk )
 
-add_library(appfwk_QueryResponseCommandFacility_duneCommandFacility src/QueryResponseCommandFacility.cpp)
-target_link_libraries(appfwk_QueryResponseCommandFacility_duneCommandFacility appfwk)
+# ##############################################################################
+# Test plugins
+daq_add_plugin( DummyModule		  duneDAQModule TEST LINK_LIBRARIES appfwk )
+daq_add_plugin( FakeDataConsumerDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk SCHEMA)
+daq_add_plugin( FakeDataProducerDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk SCHEMA)
 
-macro(MakeDataTypeLibraries)
-   set(oneValueArgs CPPTYPE PREFIX)
-   cmake_parse_arguments(MAKE_DATATYPE "" "${oneValueArgs}" "" ${ARGN})
+# Test applications
+daq_add_application( queue_IO_check queue_IO_check.cxx TEST LINK_LIBRARIES appfwk )
 
-   configure_file(src/FanOutDAQModule.cpp.in src/${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cpp)
-   add_library(${MAKE_DATATYPE_PREFIX}FanOutDAQModule_duneDAQModule SHARED src/${MAKE_DATATYPE_PREFIX}FanOutDAQModule.cpp)
-   target_link_libraries(${MAKE_DATATYPE_PREFIX}FanOutDAQModule_duneDAQModule appfwk)
-
-endmacro()
-
-MakeDataTypeLibraries(CPPTYPE std::vector<int> PREFIX VectorInt)
-MakeDataTypeLibraries(CPPTYPE std::string PREFIX String)
-MakeDataTypeLibraries(CPPTYPE dunedaq::appfwk::NonCopyableType PREFIX NonCopyableType)
-
-
-##############################################################################
-daq_point_build_to( apps )
-
-add_executable(daq_application apps/daq_application.cxx)
-target_link_libraries(daq_application ${Boost_PROGRAM_OPTIONS_LIBRARY} appfwk)
-
-##############################################################################
-daq_point_build_to( doc )
-# (No action taken, doc/ doesn't yet contain anything)
-
-##############################################################################
-daq_point_build_to( test )
-
-add_library(appfwk_DummyModule_duneDAQModule test/DummyModule.cpp)
-target_link_libraries(appfwk_DummyModule_duneDAQModule appfwk)
-
-add_library(appfwk_FakeDataConsumerDAQModule_duneDAQModule test/FakeDataConsumerDAQModule.cpp)
-target_link_libraries(appfwk_FakeDataConsumerDAQModule_duneDAQModule appfwk)
-
-add_library(appfwk_FakeDataProducerDAQModule_duneDAQModule test/FakeDataProducerDAQModule.cpp)
-target_link_libraries(appfwk_FakeDataProducerDAQModule_duneDAQModule appfwk)
-
-add_executable(queue_IO_check test/queue_IO_check.cxx)
-target_link_libraries(queue_IO_check ${Boost_PROGRAM_OPTIONS_LIBRARY} appfwk)
-
-add_executable(dummy_test_app test/dummy_test_app.cxx)
-target_link_libraries(dummy_test_app appfwk appfwk_DummyModule_duneDAQModule ${Boost_PROGRAM_OPTIONS_LIBRARY} appfwk)
-
-
+# Test configurations
 file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
+file(COPY test/test-config.json                    DESTINATION test)
+
+# ##############################################################################
+# Unit tests
+
+daq_add_unit_test(DAQModule_test          LINK_LIBRARIES appfwk )
+daq_add_unit_test(DAQSink_DAQSource_test  LINK_LIBRARIES appfwk )
+daq_add_unit_test(FanOutDAQModule_test    LINK_LIBRARIES appfwk )
+daq_add_unit_test(FollyQueue_test         LINK_LIBRARIES ers::ers Folly::folly)
+daq_add_unit_test(StdDeQueue_test         LINK_LIBRARIES ers::ers)
+daq_add_unit_test(ThreadHelper_test       LINK_LIBRARIES ers::ers)
+daq_add_unit_test(NamedObject_test        )
 
 ##############################################################################
-daq_point_build_to( unittest )
 
-daq_add_unit_test(DAQModule_test          appfwk )
-daq_add_unit_test(DAQSink_DAQSource_test  appfwk )
-daq_add_unit_test(FanOutDAQModule_test    appfwk )
-daq_add_unit_test(FollyQueue_test         ers::ers Folly::folly)
-daq_add_unit_test(StdDeQueue_test         ers::ers)
-daq_add_unit_test(ThreadHelper_test       ers::ers)
-
-##############################################################################
-
-daq_install(TARGETS daq_application 
-                    appfwk 
-                    VectorIntFanOutDAQModule_duneDAQModule StringFanOutDAQModule_duneDAQModule NonCopyableTypeFanOutDAQModule_duneDAQModule
-	   )
+daq_install()

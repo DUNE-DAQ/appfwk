@@ -42,6 +42,12 @@ public:
   bool can_pop() const noexcept;
   const std::string& get_name() const final {return queue_->get_name(); }
 
+  DAQSource(DAQSource const&) = delete;            
+  DAQSource(DAQSource&&) = delete;                
+  DAQSource& operator=(DAQSource const&) = delete; 
+  DAQSource& operator=(DAQSource&&) = delete;     
+
+
 private:
   std::shared_ptr<Queue<T>> queue_;
 };

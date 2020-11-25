@@ -17,6 +17,9 @@
 #include "appfwk/DAQSink.hpp"
 #include "appfwk/ThreadHelper.hpp"
 
+// Our command structures.  
+#include "appfwk/fakedataproducerdaqmodule/Structs.hpp"
+
 #include <future>
 #include <memory>
 #include <string>
@@ -46,13 +49,13 @@ public:
   FakeDataProducerDAQModule& operator=(FakeDataProducerDAQModule&&) =
     delete; ///< FakeDataProducerDAQModule is not move-assignable
 
-  void init() override;
+  void init(const nlohmann::json& ) override;
 
 private:
   // Commands
-  void do_configure(const std::vector<std::string>& args);
-  void do_start(const std::vector<std::string>& args);
-  void do_stop(const std::vector<std::string>& args);
+  void do_configure(const data_t& data);
+  void do_start(const data_t& data);
+  void do_stop(const data_t& data);
 
   // Threading
   ThreadHelper thread_;
@@ -61,11 +64,13 @@ private:
   // Configuration
   std::unique_ptr<DAQSink<std::vector<int>>> outputQueue_;
   std::chrono::milliseconds queueTimeout_;
-  size_t nIntsPerVector_ = 999;
-  int starting_int_ = -999;
-  int ending_int_ = -999;
 
-  size_t wait_between_sends_ms_ = 999;
+  fakedataproducerdaqmodule::Conf cfg_;
+
+  // size_t nIntsPerVector_ = 999;
+  // int starting_int_ = -999;
+  // int ending_int_ = -999;
+  // size_t wait_between_sends_ms_ = 999;
 };
 } // namespace appfwk
 

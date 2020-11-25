@@ -12,30 +12,30 @@ FanOutDAQModule<ValueType>::FanOutDAQModule(std::string name)
   , wait_interval_us_(std::numeric_limits<size_t>::max())
 {
 
-  register_command("configure", &FanOutDAQModule<ValueType>::do_configure);
+  register_command("conf", &FanOutDAQModule<ValueType>::do_configure);
   register_command("start", &FanOutDAQModule<ValueType>::do_start);
   register_command("stop", &FanOutDAQModule<ValueType>::do_stop);
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::init()
+FanOutDAQModule<ValueType>::init(const nlohmann::json& init_data)
 {
 
-  auto inputName = get_config()["input"].get<std::string>();
+  auto inputName = init_data["input"].get<std::string>();
   TLOG(TLVL_TRACE, "FanOutDAQModule") << get_name() << ": Getting queue with name " << inputName << " as input";
   inputQueue_.reset(new DAQSource<ValueType>(inputName));
-  for (auto& output : get_config()["outputs"]) {
+  for (auto& output : init_data["outputs"]) {
     outputQueues_.emplace_back(new DAQSink<ValueType>(output.get<std::string>()));
   }
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& /*args*/)
+FanOutDAQModule<ValueType>::do_configure(const data_t& data)
 {
-  if (get_config().contains("fanout_mode")) {
-    auto modeString = get_config()["fanout_mode"].get<std::string>();
+  if (data.contains("fanout_mode")) {
+    auto modeString = data["fanout_mode"].get<std::string>();
     if (modeString == "broadcast") {
 
       mode_ = FanOutMode::Broadcast;
@@ -52,20 +52,20 @@ FanOutDAQModule<ValueType>::do_configure(const std::vector<std::string>& /*args*
     mode_ = FanOutMode::RoundRobin;
   }
 
-  wait_interval_us_ = get_config().value<int>("wait_interval_us", 10000);
-  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
+  wait_interval_us_ = data.value<int>("wait_interval_us", 10000);
+  queueTimeout_ = std::chrono::milliseconds(data.value<int>("queue_timeout_ms", 100));
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_start(const std::vector<std::string>& /*args*/)
+FanOutDAQModule<ValueType>::do_start(const data_t& /*data*/)
 {
   thread_.start_working_thread();
 }
 
 template<typename ValueType>
 void
-FanOutDAQModule<ValueType>::do_stop(const std::vector<std::string>& /*args*/)
+FanOutDAQModule<ValueType>::do_stop(const data_t& /*data*/)
 {
   thread_.stop_working_thread();
 }
