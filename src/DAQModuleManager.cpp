@@ -78,39 +78,45 @@ DAQModuleManager::init_queues(const cmd::QueueSpecs& qspecs)
 void
 DAQModuleManager::dispatch(cmd::CmdId id, const dataobj_t& data)
 {
-    // The command dispatch protocol
-    auto cmdobj = data.get<cmd::CmdObj>();
-    for (const auto& addressed : cmdobj.modules) {
-        for ( auto mptr : match(addressed.match) ) {
-            ERS_INFO("dispatch \""<<id<<"\" to \"" << mptr->get_name()
-                     << "\":\n" << addressed.data.dump(4));
-            mptr->execute_command(id, addressed.data);
-        }
+    // The command dispatching: commands and parameters are distributed to all modules that
+    // have registered a method corresponding to the command. If no parameters are found, an
+    // empty dataobj_t is passed.
+    bool fault = false;
+    std::string bad_mod_names("");
+    auto cmd_obj = data.get<cmd::CmdObj>();
+    for (const auto& [mod_name, mod_ptr] : modulemap_) {
+	if (mod_ptr->has_command(id)) {
+	    dataobj_t params;
+	    for (const auto& addressed : cmd_obj.modules) {
+                if (addressed.match.empty() || std::regex_match(mod_name.c_str(), std::regex(addressed.match.c_str()))  ) {
+		    for (nlohmann::json::const_iterator it = addressed.data.begin(); it != addressed.data.end(); ++it) {
+        	        params[it.key()] = it.value();
+    		    }
+		}
+	    }
+            ERS_LOG("Dispatch \""<<id<<"\" to \"" << mod_ptr->get_name()
+                     << "\":\n" << params.dump(4));
+            try {
+		mod_ptr->execute_command(id, params);
+	    }
+	    catch(ers::Issue& ex) {
+		ers::error(ex);
+		fault=true;
+		bad_mod_names.append(mod_name);
+		bad_mod_names.append(", ");	 
+	    }
+	}
+    }
+    if(fault) {
+	throw CommandDispatchingFailed(ERS_HERE, id, bad_mod_names);
     }
 }
-
-
-std::vector<std::shared_ptr<DAQModule>>
-DAQModuleManager::match(std::string name)
-{
-    if (name.empty()) { name = ".*"; }
-
-    std::vector<std::shared_ptr<DAQModule>> ret;
-    for (auto const& [nm, mptr] : modulemap_) {
-        if (! std::regex_match(nm.c_str(), std::regex(name.c_str())) ) {
-            continue;
-        }
-        ret.push_back(mptr);
-    }
-    return ret;
-}
-
 
 void
 DAQModuleManager::execute( const dataobj_t& cmd_data ) {
 
     auto cmd = cmd_data.get<cmd::Command>();
-    ERS_INFO("Command id:"<< cmd.id);
+    ERS_LOG("Command id:"<< cmd.id);
 
     if ( ! initialized_ ) {
         if ( cmd.id != "init" ) {

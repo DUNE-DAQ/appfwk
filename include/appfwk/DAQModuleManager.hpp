@@ -22,6 +22,14 @@ ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
                   ((std::string)cmdid)     ///< Message parameters
 )
 
+ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
+                  CommandDispatchingFailed,  ///< Issue class name
+                  "Command " << cmdid << " was not executed correctly by: " << modules, ///< Message
+                  ((std::string)cmdid)     ///< Message parameters
+                  ((std::string)modules)     ///< Message parameters
+)
+
+
 namespace appfwk {
 
 class DAQModule;
@@ -48,7 +56,6 @@ protected:
 
     void dispatch(cmd::CmdId id, const dataobj_t& data );
 
-    std::vector<std::shared_ptr<DAQModule>> match(std::string name);
 private:
 
     bool initialized_;
