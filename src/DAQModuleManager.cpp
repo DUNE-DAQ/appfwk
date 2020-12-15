@@ -162,8 +162,8 @@ DAQModuleManager::dispatch_one_match_only(cmd::CmdId id, const dataobj_t& data) 
                 unmatched_addr.push_back(addressed.match);
                 continue;
             }
-            mod_sequence.emplace_back( matches, &addressed.data);
         }
+        mod_sequence.emplace_back( matches, &addressed.data);
     }
 
     if ( !unmatched_addr.empty() ) {
@@ -180,7 +180,7 @@ DAQModuleManager::dispatch_one_match_only(cmd::CmdId id, const dataobj_t& data) 
         }
     }
 
-
+    // Catch cases 
     if (mod_to_re.size() > 0) {
         std::string mod_names;
         for( const auto& [mod_name, matched_re] : mod_to_re ) {
@@ -195,6 +195,7 @@ DAQModuleManager::dispatch_one_match_only(cmd::CmdId id, const dataobj_t& data) 
     for ( auto& [mod_names, data_ptr] : mod_sequence) {
         for ( auto& mod_name : mod_names ) {
             try {
+                ERS_LOG( "Executing " << id << " -> " << mod_name );
                 modulemap_[mod_name]->execute_command(id, *data_ptr);
             } catch (ers::Issue& ex) {
                 ers::error(ex);
