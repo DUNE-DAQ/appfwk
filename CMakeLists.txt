@@ -26,22 +26,20 @@ daq_add_application( daq_application daq_application.cxx LINK_LIBRARIES appfwk )
 # ##############################################################################
 # Test plugins
 daq_add_plugin( DummyModule		  duneDAQModule TEST LINK_LIBRARIES appfwk )
-daq_add_plugin( FakeDataConsumerDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk SCHEMA)
-daq_add_plugin( FakeDataProducerDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk SCHEMA)
 
 # Test applications
 daq_add_application( queue_IO_check queue_IO_check.cxx TEST LINK_LIBRARIES appfwk )
 
 # Test configurations
-file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
-file(COPY test/test-config.json                    DESTINATION test)
+# file(COPY test/producer_consumer_dynamic_test.json DESTINATION test)
+# file(COPY test/test-config.json                    DESTINATION test)
 
 # ##############################################################################
 # Unit tests
 
 daq_add_unit_test(DAQModule_test          LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQSink_DAQSource_test  LINK_LIBRARIES appfwk )
-daq_add_unit_test(FanOutDAQModule_test    LINK_LIBRARIES appfwk )
+# daq_add_unit_test(FanOutDAQModule_test    LINK_LIBRARIES appfwk )
 daq_add_unit_test(FollyQueue_test         LINK_LIBRARIES ers::ers Folly::folly)
 daq_add_unit_test(StdDeQueue_test         LINK_LIBRARIES ers::ers)
 daq_add_unit_test(ThreadHelper_test       LINK_LIBRARIES ers::ers)
