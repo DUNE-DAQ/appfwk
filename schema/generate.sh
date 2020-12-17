@@ -27,34 +27,25 @@ render () {
     local name_lc=$( echo "$name" | tr '[:upper:]' '[:lower:]' )
     local outdir="${1:-$srcdir/include/appfwk/${name}}"
     local what="$(echo $What | tr '[:upper:]' '[:lower:]')"
-    local tmpl="appfwk-${what}.hpp.j2"
+    local tmpl="o${what}.hpp.j2"
     local outhpp="$outdir/${What}.hpp"
     mkdir -p $outdir
     set -x
     moo -g '/lang:ocpp.jsonnet' \
+        -M ../../cmdlib/schema \
         -M $mydir -T $mydir \
         -A path="dunedaq.appfwk.${name_lc}" \
         -A ctxpath="dunedaq" \
         -A os="appfwk-${name}-schema.jsonnet" \
-        render appfwk-model.jsonnet $tmpl \
+        render omodel.jsonnet $tmpl \
         > $outhpp || exit -1
     set +x
     echo $outhpp
 }
 
+render topo Structs
+render topo Nljs
 
 render cmd Structs
 render cmd Nljs
-
-# JCF, Nov-19-2020
-
-# The production of Structs.hpp and Nljs.hpp for the fake data modules
-# here is commented out since this is now handled automatically by the
-# build system (see daq-cmake Issue #1 for details).
-
-#render FakeDataProducerDAQModule Structs $srcdir/test/src/appfwk/fakedataproducerdaqmodule
-#render FakeDataProducerDAQModule Nljs    $srcdir/test/src/appfwk/fakedataproducerdaqmodule
-
-#render FakeDataConsumerDAQModule Structs $srcdir/test/src/appfwk/fakedataconsumerdaqmodule
-#render FakeDataConsumerDAQModule Nljs    $srcdir/test/src/appfwk/fakedataconsumerdaqmodule
 
