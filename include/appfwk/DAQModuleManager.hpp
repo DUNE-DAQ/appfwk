@@ -9,7 +9,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 
-#include "appfwk/cmd/Structs.hpp"
+#include "cmdlib/cmd/Structs.hpp"
 #include "cmdlib/CommandedObject.hpp"
 
 #include "ers/Issue.h"
