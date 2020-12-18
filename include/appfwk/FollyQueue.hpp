@@ -62,7 +62,10 @@ public:
   FollyQueue& operator=(FollyQueue&&) = delete;
 
 private:
-  FollyQueueType<T, false> fQueue;
+  // The boolean argument is `MayBlock`, where "block" appears to mean
+  // "make a system call". With `MayBlock` set to false, the queue
+  // just spin-waits, so we want true
+  FollyQueueType<T, true> fQueue;
 };
 
 template<typename T>
