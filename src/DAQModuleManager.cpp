@@ -129,6 +129,7 @@ DAQModuleManager::dispatch_one_match_only(cmd::CmdId id, const dataobj_t& data) 
     // vastly improved, in style if not in performance.
 
     auto cmd_obj = data.get<cmd::CmdObj>();
+    const dataobj_t dummy{};
 
     // Make a convenience array with module names that have the requested command
     std::vector<std::string> cmd_mod_names = get_modnames_by_cmdid(id);
@@ -137,62 +138,67 @@ DAQModuleManager::dispatch_one_match_only(cmd::CmdId id, const dataobj_t& data) 
     std::vector<std::string> unmatched_addr;
     std::map<std::string, std::vector<std::string> > mod_to_re;
 
-    std::vector<std::pair<std::vector<std::string>, const dataobj_t* >> mod_sequence;
+    std::vector<std::pair<std::vector<std::string>, const dataobj_t* >> mod_seq;
 
-    for (const auto& addressed : cmd_obj.modules) {
+    if (!cmd_obj.modules.empty()) {
+        for (const auto& addressed : cmd_obj.modules) {
 
-        // Module names matching the 'match' regex
-        std::vector<std::string> matches;
+            // Module names matching the 'match' regex
+            std::vector<std::string> matches;
 
-        // First exception: empty = `all`
-        if (addressed.match.empty()) {
-            matches = cmd_mod_names;
-        } else {
-            // Find module names matching the regex
-            for ( const std::string& mod_name : cmd_mod_names ) {
-                // match module name with regex
-                if ( std::regex_match(mod_name, std::regex(addressed.match)) ) {
-                    matches.push_back(mod_name);
-                    mod_to_re[mod_name].push_back(addressed.match);
+            // First exception: empty = `all`
+            if (addressed.match.empty()) {
+                matches = cmd_mod_names;
+            } else {
+                // Find module names matching the regex
+                for ( const std::string& mod_name : cmd_mod_names ) {
+                    // match module name with regex
+                    if ( std::regex_match(mod_name, std::regex(addressed.match)) ) {
+                        matches.push_back(mod_name);
+                        mod_to_re[mod_name].push_back(addressed.match);
+                    }
+                }
+
+                // Keep track of unmatched expressions
+                if (matches.empty()) {
+                    unmatched_addr.push_back(addressed.match);
+                    continue;
                 }
             }
+            mod_seq.emplace_back( matches, &addressed.data);
+        }
 
-            // Keep track of unmatched expressions
-            if (matches.empty()) {
-                unmatched_addr.push_back(addressed.match);
-                continue;
+        if ( !unmatched_addr.empty() ) {
+            // say something!
+            // or not?
+        }
+
+        // Select modules with multiple matches
+        for (auto i = mod_to_re.begin(), last = mod_to_re.end(); i != last; ) {
+            if (i->second.size() == 1) {
+                i = mod_to_re.erase(i);
+            } else {
+                ++i;
             }
         }
-        mod_sequence.emplace_back( matches, &addressed.data);
-    }
 
-    if ( !unmatched_addr.empty() ) {
-        // say something!
-        // or not?
-    }
-
-    // Select modules with multiple matches
-    for (auto i = mod_to_re.begin(), last = mod_to_re.end(); i != last; ) {
-        if (i->second.size() == 1) {
-            i = mod_to_re.erase(i);
-        } else {
-            ++i;
+        // Catch cases 
+        if (mod_to_re.size() > 0) {
+            std::string mod_names;
+            for( const auto& [mod_name, matched_re] : mod_to_re ) {
+                mod_names += mod_name + ", ";
+            }
+            throw ConflictingCommandMatching(ERS_HERE, id, mod_names);
         }
-    }
 
-    // Catch cases 
-    if (mod_to_re.size() > 0) {
-        std::string mod_names;
-        for( const auto& [mod_name, matched_re] : mod_to_re ) {
-            mod_names += mod_name + ", ";
-        }
-        throw ConflictingCommandMatching(ERS_HERE, id, mod_names);
+    } else {
+        mod_seq.emplace_back(cmd_mod_names, &dummy);
     }
-
+    
     std::string failed_mod_names("");
 
     // All sorted, execute!
-    for ( auto& [mod_names, data_ptr] : mod_sequence) {
+    for ( auto& [mod_names, data_ptr] : mod_seq) {
         for ( auto& mod_name : mod_names ) {
             try {
                 ERS_LOG( "Executing " << id << " -> " << mod_name );
