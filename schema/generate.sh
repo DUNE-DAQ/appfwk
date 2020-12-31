@@ -15,8 +15,12 @@
 # For guidance on how to deliver objects to daq_application see:
 # https://brettviren.github.io/dune-daq-repl/ddrepl.html
 
-mydir=$(dirname $(realpath $BASH_SOURCE))
-srcdir=$(dirname $mydir)
+# mydir=$(dirname $(realpath $BASH_SOURCE))
+set -x
+mydir=$(cd $(dirname $BASH_SOURCE) && pwd)
+pkgdir=$(dirname $mydir)
+srcdir=$(dirname $pkgdir)
+set +x
 
 # Wrap up the render command.  This bakes in a mapping to file name
 # which would be better somehow captured by the schema itself.
@@ -25,14 +29,14 @@ render () {
     local What="$1" ; shift
 
     local name_lc=$( echo "$name" | tr '[:upper:]' '[:lower:]' )
-    local outdir="${1:-$srcdir/include/appfwk/${name}}"
+    local outdir="${1:-$pkgdir/include/appfwk/${name}}"
     local what="$(echo $What | tr '[:upper:]' '[:lower:]')"
     local tmpl="o${what}.hpp.j2"
     local outhpp="$outdir/${What}.hpp"
     mkdir -p $outdir
     set -x
     moo -g '/lang:ocpp.jsonnet' \
-        -M ../../cmdlib/schema \
+        -M $srcdir/cmdlib/schema \
         -M $mydir -T $mydir \
         -A path="dunedaq.appfwk.${name_lc}" \
         -A ctxpath="dunedaq" \

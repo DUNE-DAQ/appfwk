@@ -8,8 +8,11 @@
 
 #include "appfwk/DAQModuleManager.hpp"
 
+#include "cmdlib/cmd/Nljs.hpp"
+
 #include "appfwk/Issues.hpp"
 #include "appfwk/cmd/Nljs.hpp"
+#include "appfwk/topo/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/QueueRegistry.hpp"
@@ -30,17 +33,15 @@ DAQModuleManager::DAQModuleManager()
 {}
 
 void
-DAQModuleManager::initialize(const dataobj_t& data)
-{
-  auto ini = data.get<cmd::Init>();
+DAQModuleManager::initialize( const dataobj_t& data) {
+  auto ini = data.get<topo::Init>();
   init_queues(ini.queues);
   init_modules(ini.modules);
   this->m_initialized = true;
 }
 
 void
-DAQModuleManager::init_modules(const cmd::ModSpecs& mspecs)
-{
+DAQModuleManager::init_modules(const topo::ModSpecs & mspecs) {
   for (const auto& mspec : mspecs) {
     ERS_INFO("construct: " << mspec.plugin << " : " << mspec.inst);
     auto mptr = make_module(mspec.plugin, mspec.inst);
@@ -49,9 +50,9 @@ DAQModuleManager::init_modules(const cmd::ModSpecs& mspecs)
   }
 }
 
+
 void
-DAQModuleManager::init_queues(const cmd::QueueSpecs& qspecs)
-{
+DAQModuleManager::init_queues(const topo::QueueSpecs & qspecs) {
   std::map<std::string, QueueConfig> queue_cfgs;
   for (const auto& qs : qspecs) {
 
@@ -59,20 +60,18 @@ DAQModuleManager::init_queues(const cmd::QueueSpecs& qspecs)
     // ignore the kind.  This requires user configuration to
     // assure unique queue names across all queue types.
     const std::string queue_name = qs.inst;
-
-    // Eric Flumerfelt, Jan-28-2021, eflumerf@fnal.gov
     // fixme: maybe one day replace QueueConfig with codgen.
     // Until then, wheeee....
     QueueConfig qc;
     switch (qs.kind) {
-      case cmd::QueueKind::StdDeQueue:
-        qc.m_kind = QueueConfig::queue_kind::kStdDeQueue;
+      case topo::QueueKind::StdDeQueue:
+        qc.kind = QueueConfig::queue_kind::kStdDeQueue;
         break;
-      case cmd::QueueKind::FollySPSCQueue:
-        qc.m_kind = QueueConfig::queue_kind::kFollySPSCQueue;
+      case topo::QueueKind::FollySPSCQueue:
+        qc.kind = QueueConfig::queue_kind::kFollySPSCQueue;
         break;
-      case cmd::QueueKind::FollyMPMCQueue:
-        qc.m_kind = QueueConfig::queue_kind::kFollyMPMCQueue;
+      case topo::QueueKind::FollyMPMCQueue:
+        qc.kind = QueueConfig::queue_kind::kFollyMPMCQueue;
         break;
       default:
         throw MissingComponent(ERS_HERE, "unknown queue type");
