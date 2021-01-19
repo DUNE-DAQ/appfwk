@@ -105,6 +105,17 @@ local cs = {
                 doc="Addressed, module command objects"),
     ], doc="Structure of app-level, non-init command object"), 
 
+    run_number: s.number("RunNumber", dtype="u8",
+                       doc="Run Number"),
+
+    start_params: s.record("StartParams", [
+        s.field("run", self.run_number, doc="Run Number")
+    ]),
+
+    empty_params: s.record("EmptyParams", [
+    ])
+
+
 };
 
 // Output a topologically sorted array.
