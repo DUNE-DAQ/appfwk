@@ -26,6 +26,7 @@
 #include <ers/Issue.h>
 #include <nlohmann/json.hpp>
 
+#include <condition_variable>
 #include <functional>
 #include <map>
 #include <memory>
@@ -57,7 +58,8 @@ namespace dunedaq {
   */
   ERS_DECLARE_ISSUE(appfwk,                                                                       ///< Namespace
                     DAQModuleCreationFailed,                                                      ///< Type of the Issue
-                    "Failed to create DAQModule " << instance_name << " of type " << plugin_name, ///< Log Message from the issue
+                  "Failed to create DAQModule " << instance_name << " of type "
+                                                << plugin_name,          ///< Log Message from the issue
                     ((std::string)plugin_name)((std::string)instance_name)                        ///< Message parameters
   )
 
@@ -114,8 +116,7 @@ namespace dunedaq {
                          ((std::string)reason)                  ///< Attribute of this class
   )
 
-  namespace appfwk
-  {
+namespace appfwk {
 
     /**
  * @brief The DAQModule class implementations are a set of code which performs
@@ -131,7 +132,6 @@ namespace dunedaq {
     class DAQModule : public NamedObject
     {
     public:
-
       using data_t = nlohmann::json;
 
       /**
@@ -167,8 +167,15 @@ namespace dunedaq {
 
       bool has_command(const std::string& name) const;
 
-    protected:
+  /**
+   * @brief Send a notification to all threads currently in a call to interruptible_wait
+   *
+   * Note that there is minimal penalty for calling interrupt() when no threads are waiting, so it can be called
+   * multiple times in succession, for example by a "stop" command handler and then by execute_command.
+   */
+  void interrupt() { m_wait_cv_.notify_all(); }
 
+protected:
       /**
        * @brief Registers a mdoule command under the name `cmd`.
        * Returns whether the command was inserted (false meaning that command `cmd` already exists)
@@ -176,16 +183,30 @@ namespace dunedaq {
       template<typename Child>
       void register_command(const std::string& name, void (Child::*f)(const data_t&));
 
+  /**
+   * @brief Sleep for the given amount of time while wait_condition evaluates to false
+   * @param wait_duration The amount of time to sleep for
+   * @param wait_condition A function which evaluates to false if the sleep should be continued
+   * @returns The result of wait_condition after the sleep
+   *
+   * Note that calling interrupt() will cause an evaluation of wait_condition, and if the condition is still false, the
+   * sleep will continue. Therefore, interrupt() should be called only after the state of the DAQModule has been
+   * changed.
+   */
+  bool interruptible_wait(std::chrono::microseconds wait_duration, std::function<bool()> wait_condition);
+
       DAQModule(DAQModule const&) = delete;
       DAQModule(DAQModule&&) = delete;
       DAQModule& operator=(DAQModule const&) = delete;
       DAQModule& operator=(DAQModule&&) = delete;
 
-
     private:
       using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
       CommandMap_t commands_;
 
+  // For interruptible waits
+  std::condition_variable m_wait_cv_;
+  std::mutex m_wait_mutex_;
     };
 
     /**
@@ -211,7 +232,6 @@ namespace dunedaq {
     }
 
 } // namespace appfwk
-
 
 } // namespace dunedaq
 
