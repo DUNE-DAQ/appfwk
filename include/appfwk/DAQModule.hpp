@@ -173,7 +173,11 @@ namespace appfwk {
    * Note that there is minimal penalty for calling interrupt() when no threads are waiting, so it can be called
    * multiple times in succession, for example by a "stop" command handler and then by execute_command.
    */
-  void interrupt() { m_wait_cv_.notify_all(); }
+      void interrupt()
+      {
+        std::unique_lock<std::mutex> wait_lock(m_wait_mutex_);
+        m_wait_cv_.notify_all();
+      }
 
 protected:
       /**
@@ -186,14 +190,15 @@ protected:
   /**
    * @brief Sleep for the given amount of time while wait_condition evaluates to false
    * @param wait_duration The amount of time to sleep for
-   * @param wait_condition A function which evaluates to false if the sleep should be continued
+   * @param wait_condition An atomic bool which indicates via the direction parameterr if the sleep should be continued
+   * @param direction Indicates which value of wait_condition should indicate if the sleep should continue
    * @returns The result of wait_condition after the sleep
    *
-   * Note that calling interrupt() will cause an evaluation of wait_condition, and if the condition is still false, the
-   * sleep will continue. Therefore, interrupt() should be called only after the state of the DAQModule has been
-   * changed.
+   * Note that calling interrupt() will cause an evaluation of wait_condition, and if the condition still indicates 
+   * "sleep", the sleep will continue. Therefore, interrupt() should be called only after the state of the DAQModule
+   * has been changed.
    */
-  bool interruptible_wait(std::chrono::microseconds wait_duration, std::function<bool()> wait_condition);
+  bool interruptible_wait(std::chrono::microseconds wait_duration, std::atomic<bool>& wait_condition, bool direction = false);
 
       DAQModule(DAQModule const&) = delete;
       DAQModule(DAQModule&&) = delete;
