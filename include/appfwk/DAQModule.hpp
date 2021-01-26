@@ -175,8 +175,8 @@ namespace appfwk {
    */
       void interrupt()
       {
-        std::unique_lock<std::mutex> wait_lock(m_wait_mutex_);
-        m_wait_cv_.notify_all();
+        std::unique_lock<std::mutex> wait_lock(m_wait_mutex);
+        m_wait_cv.notify_all();
       }
 
 protected:
@@ -210,8 +210,8 @@ protected:
       CommandMap_t commands_;
 
   // For interruptible waits
-  std::condition_variable m_wait_cv_;
-  std::mutex m_wait_mutex_;
+  std::condition_variable m_wait_cv;
+  std::mutex m_wait_mutex;
     };
 
     /**
