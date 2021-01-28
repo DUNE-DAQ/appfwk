@@ -55,7 +55,7 @@ auto timeout = std::chrono::milliseconds(100); ///< Queue's timeout
  */
 std::unique_ptr<dunedaq::appfwk::Queue<int>> queue = nullptr;
 
-int num_elements = 1000000;    ///< Number of elements to push to the Queue (total)
+int num_elements = 1000000;   ///< Number of elements to push to the Queue (total)
 int num_adding_threads = 1;   ///< Number of threads which will call push
 int num_removing_threads = 1; ///< Number of threads which will call pop
 
@@ -100,9 +100,10 @@ add_things(const volatile bool& spinlock)
 {
   const int num_pushes = num_elements / num_adding_threads;
   auto start_time_push = std::chrono::steady_clock::now(); // Won't ever use the initialization value
-  auto size_snapshot = queue_size.load();                 // Unlike queue_size, only this thread writes to size_snapshot
+  auto size_snapshot = queue_size.load(); // Unlike queue_size, only this thread writes to size_snapshot
 
-  while (spinlock) { } // Main program thread will set this to false, then this thread starts pushing
+  while (spinlock) {
+  } // Main program thread will set this to false, then this thread starts pushing
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto start_time_system =
@@ -126,8 +127,8 @@ add_things(const volatile bool& spinlock)
         } else {
           start_time_push = std::chrono::steady_clock::now();
           queue->push(std::move(i), timeout);
-          if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time_push) >
-              timeout) {
+          if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+                                                                    start_time_push) > timeout) {
             timeout_pushes++;
           }
         }
@@ -169,7 +170,8 @@ remove_things(const volatile bool& spinlock)
   auto start_time_pop = std::chrono::steady_clock::now(); // Won't ever use the initialization value
   int val = -999;
 
-  while (spinlock) { } // Main program thread will set this to false, then this thread starts popping
+  while (spinlock) {
+  } // Main program thread will set this to false, then this thread starts popping
 
   const auto start_time = std::chrono::steady_clock::now();
   const auto start_time_system =
@@ -235,10 +237,12 @@ main(int argc, char* argv[])
   num_elements_desc << "# of elements you want pushed and/or popped (default is " << num_elements << ")";
 
   std::ostringstream push_threads_desc;
-  push_threads_desc << "# of threads you want pushing elements onto the queue (default is " << num_adding_threads << ")";
+  push_threads_desc << "# of threads you want pushing elements onto the queue (default is " << num_adding_threads
+                    << ")";
 
   std::ostringstream pop_threads_desc;
-  pop_threads_desc << "# of threads you want popping elements off the queue (default is " << num_removing_threads << ")";
+  pop_threads_desc << "# of threads you want popping elements off the queue (default is " << num_removing_threads
+                   << ")";
 
   std::ostringstream push_pause_desc;
   push_pause_desc << "average time in milliseconds between a thread's pushes (default is "
