@@ -8,8 +8,8 @@
  * received with this code.
  */
 
-#ifndef APPFWK_TEST_DUMMYMODULE_HPP_
-#define APPFWK_TEST_DUMMYMODULE_HPP_
+#ifndef APPFWK_TEST_PLUGINS_DUMMYMODULE_HPP_
+#define APPFWK_TEST_PLUGINS_DUMMYMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
 
@@ -38,7 +38,7 @@ public:
     register_command("stuff", &DummyParentModule::do_stuff);
   }
 
-  void init(const nlohmann::json& ) final {}
+  void init(const nlohmann::json&) final {}
 
   virtual void do_stuff(const data_t& /*data*/)
   {
@@ -62,4 +62,4 @@ public:
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APPFWK_TEST_DUMMYMODULE_HPP_
+#endif // APPFWK_TEST_PLUGINS_DUMMYMODULE_HPP_

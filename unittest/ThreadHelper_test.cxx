@@ -20,14 +20,14 @@
 namespace {
 
 void
-DoSomething(std::atomic<bool>&)
+do_something(std::atomic<bool>&)
 {
-  int nseconds = 5;
-  BOOST_TEST_MESSAGE("This function will just sleep for " << nseconds << " second(s) and then return");
-  std::this_thread::sleep_for(std::chrono::seconds(nseconds));
+  int num_seconds = 5;
+  BOOST_TEST_MESSAGE("This function will just sleep for " << num_seconds << " second(s) and then return");
+  std::this_thread::sleep_for(std::chrono::seconds(num_seconds));
 }
 
-} // namespace
+} // namespace ""
 
 BOOST_AUTO_TEST_CASE(sanity_checks)
 {
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
   std::unique_ptr<dunedaq::appfwk::ThreadHelper> umth_ptr = nullptr;
 
   auto starttime = std::chrono::steady_clock::now();
-  BOOST_REQUIRE_NO_THROW(umth_ptr = std::make_unique<dunedaq::appfwk::ThreadHelper>(DoSomething));
+  BOOST_REQUIRE_NO_THROW(umth_ptr = std::make_unique<dunedaq::appfwk::ThreadHelper>(do_something));
   auto construction_time_in_ms =
     std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - starttime).count();
   BOOST_TEST_MESSAGE("Construction time was " << construction_time_in_ms << " ms");
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
 BOOST_AUTO_TEST_CASE(inappropriate_transitions, *boost::unit_test::depends_on("sanity_checks"))
 {
 
-  dunedaq::appfwk::ThreadHelper umth(DoSomething);
+  dunedaq::appfwk::ThreadHelper umth(do_something);
   BOOST_REQUIRE_THROW(umth.stop_working_thread(), dunedaq::appfwk::ThreadingIssue);
 
   umth.start_working_thread();
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(abort_checks, *boost::unit_test::depends_on("inappropriate_
 {
 
   {
-    dunedaq::appfwk::ThreadHelper umth(DoSomething);
+    dunedaq::appfwk::ThreadHelper umth(do_something);
   }
   BOOST_TEST(true,
              "ThreadHelper without having start_working_thread() thread "
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(abort_checks, *boost::unit_test::depends_on("inappropriate_
   //     "start_working_thread() but before calling stop_working_thread_()");
 
   // {
-  //   dunedaq::appfwk::ThreadHelper umth(DoSomething);
+  //   dunedaq::appfwk::ThreadHelper umth(do_something);
   //   umth.start_working_thread();
   // }
 }

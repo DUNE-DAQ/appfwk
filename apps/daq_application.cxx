@@ -30,13 +30,15 @@ using json = nlohmann::json;
 /**
  * @brief Global atomic for process lifetime
  */
-std::atomic<bool> run_marker{true};
+std::atomic<bool> run_marker{ true };
 
 /**
  * @brief Signal handler for graceful stop
  */
-static void sigHandler(int signal) {
-  std::cout << "Signal received: " << signal << '\n';
+static void
+signal_handler(int signal)
+{
+  std::cout << "Signal received: " << signal << '\n'; // NOLINT(runtime/output_format)
   run_marker.store(false);
 }
 
@@ -50,8 +52,8 @@ int
 main(int argc, char* argv[])
 {
   // Setup signals
-  std::signal(SIGABRT, sigHandler);
-  std::signal(SIGQUIT, sigHandler);
+  std::signal(SIGABRT, signal_handler);
+  std::signal(SIGQUIT, signal_handler);
 
   using namespace dunedaq;
 
@@ -60,9 +62,9 @@ main(int argc, char* argv[])
     args = appfwk::CommandLineInterpreter::parse(argc, argv);
   } catch (ers::Issue& e) {
     // Die but do it gracefully gracefully.
-    // Use of std::cout annoys the linter. 
-    std::cout << "Command-line parsing failed. Error:" << std::endl;
-    std::cout << e.message() << std::endl;
+    // Use of std::cout annoys the linter.
+    std::cout << "Command-line parsing failed. Error:" << std::endl; // NOLINT(runtime/output_format)
+    std::cout << e.message() << std::endl;                           // NOLINT(runtime/output_format)
     exit(-1);
   }
 
@@ -70,7 +72,7 @@ main(int argc, char* argv[])
   appfwk::DAQModuleManager manager;
 
   // CommandFacility
-  auto cmdfac = cmdlib::makeCommandFacility(args.commandFacilityPluginName);
+  auto cmdfac = cmdlib::makeCommandFacility(args.m_command_facility_plugin_name);
 
   // Add commanded object to CF
   cmdfac->setCommanded(manager);

@@ -34,30 +34,29 @@ template<typename T>
 class DAQSource : public Named
 {
 public:
-  using value_type = T;
-  using duration_type = std::chrono::milliseconds;
+  using value_t = T;
+  using duration_t = std::chrono::milliseconds;
 
   explicit DAQSource(const std::string& name);
-  void pop(T&, const duration_type& timeout = duration_type::zero());
+  void pop(T&, const duration_t& timeout = duration_t::zero());
   bool can_pop() const noexcept;
-  const std::string& get_name() const final {return queue_->get_name(); }
+  const std::string& get_name() const final { return m_queue->get_name(); }
 
-  DAQSource(DAQSource const&) = delete;            
-  DAQSource(DAQSource&&) = delete;                
-  DAQSource& operator=(DAQSource const&) = delete; 
-  DAQSource& operator=(DAQSource&&) = delete;     
-
+  DAQSource(DAQSource const&) = delete;
+  DAQSource(DAQSource&&) = delete;
+  DAQSource& operator=(DAQSource const&) = delete;
+  DAQSource& operator=(DAQSource&&) = delete;
 
 private:
-  std::shared_ptr<Queue<T>> queue_;
+  std::shared_ptr<Queue<T>> m_queue;
 };
 
 template<typename T>
 DAQSource<T>::DAQSource(const std::string& name)
 {
   try {
-    queue_ = QueueRegistry::get().get_queue<T>(name);
-    TLOG(TLVL_TRACE, "DAQSource") << "Queue " << name << " is at " << queue_.get();
+    m_queue = QueueRegistry::get().get_queue<T>(name);
+    TLOG(TLVL_TRACE, "DAQSource") << "Queue " << name << " is at " << m_queue.get();
   } catch (QueueTypeMismatch& ex) {
     throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
   }
@@ -65,16 +64,16 @@ DAQSource<T>::DAQSource(const std::string& name)
 
 template<typename T>
 void
-DAQSource<T>::pop(T& val, const duration_type& timeout)
+DAQSource<T>::pop(T& val, const duration_t& timeout)
 {
-  queue_->pop(val, timeout);
+  m_queue->pop(val, timeout);
 }
 
 template<typename T>
 bool
 DAQSource<T>::can_pop() const noexcept
 {
-  return queue_->can_pop();
+  return m_queue->can_pop();
 }
 
 } // namespace appfwk

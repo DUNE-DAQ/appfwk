@@ -36,7 +36,7 @@ constexpr auto timeout = std::chrono::milliseconds(1);
  */
 constexpr auto timeout_in_us = std::chrono::duration_cast<std::chrono::microseconds>(timeout).count();
 
-dunedaq::appfwk::FollySPSCQueue<int> Queue("FollyQueue", 10); ///< Queue instance for the test
+dunedaq::appfwk::FollySPSCQueue<int> queue("FollyQueue", 10); ///< Queue instance for the test
 
 } // namespace ""
 
@@ -45,18 +45,18 @@ dunedaq::appfwk::FollySPSCQueue<int> Queue("FollyQueue", 10); ///< Queue instanc
 
 BOOST_AUTO_TEST_CASE(sanity_checks)
 {
-  BOOST_REQUIRE(!Queue.can_pop());
+  BOOST_REQUIRE(!queue.can_pop());
 
-  auto starttime = std::chrono::steady_clock::now();
+  auto start_time = std::chrono::steady_clock::now();
   try {
-    Queue.push(42, timeout);
-  } catch(const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+    queue.push(42, timeout);
+  } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
     BOOST_TEST_REQUIRE(false, "Test failure: unexpected timeout exception throw from push");
-  } catch(...) { // NOLINT
+  } catch (...) { // NOLINT
     BOOST_TEST_REQUIRE(false, "Test failure: unexpected exception (non-timeout-related) thrown");
   }
 
-  auto push_time = std::chrono::steady_clock::now() - starttime;
+  auto push_time = std::chrono::steady_clock::now() - start_time;
 
   if (push_time > timeout) {
     auto push_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(push_time).count();
@@ -67,20 +67,19 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
                          << push_time_in_us << " microseconds, timeout is " << timeout_in_us << " microseconds)");
   }
 
-  BOOST_REQUIRE(Queue.can_pop());
+  BOOST_REQUIRE(queue.can_pop());
 
-  starttime = std::chrono::steady_clock::now();
+  start_time = std::chrono::steady_clock::now();
   int popped_value = -999;
   try {
-    Queue.pop(popped_value, timeout);
+    queue.pop(popped_value, timeout);
   } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
     BOOST_TEST_REQUIRE(false, "Test failure: unexpected timeout exception throw from pop");
   } catch (...) { // NOLINT
     BOOST_TEST_REQUIRE(false, "Test failure: unexpected exception (non-timeout-related) thrown");
   }
 
-
-  auto pop_time = std::chrono::steady_clock::now() - starttime;
+  auto pop_time = std::chrono::steady_clock::now() - start_time;
 
   if (pop_time > timeout) {
     auto pop_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(pop_time).count();
@@ -97,25 +96,25 @@ BOOST_AUTO_TEST_CASE(empty_checks, *boost::unit_test::depends_on("sanity_checks"
 {
   int popped_value = -999;
 
-  while (Queue.can_pop()) {
+  while (queue.can_pop()) {
 
     try {
-      Queue.pop(popped_value, timeout);
+      queue.pop(popped_value, timeout);
     } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
       BOOST_TEST(false,
-		 "Timeout exception thrown in call to FollyQueue::pop(); unable "
-		 "to empty the Queue");
+                 "Timeout exception thrown in call to FollyQueue::pop(); unable "
+                 "to empty the Queue");
       break;
     }
   }
 
-  BOOST_REQUIRE(!Queue.can_pop());
+  BOOST_REQUIRE(!queue.can_pop());
 
   // pop off of an empty Queue
 
-  auto starttime = std::chrono::steady_clock::now();
-  BOOST_CHECK_THROW(Queue.pop(popped_value, timeout), dunedaq::appfwk::QueueTimeoutExpired);
-  auto pop_duration = std::chrono::steady_clock::now() - starttime;
+  auto start_time = std::chrono::steady_clock::now();
+  BOOST_CHECK_THROW(queue.pop(popped_value, timeout), dunedaq::appfwk::QueueTimeoutExpired);
+  auto pop_duration = std::chrono::steady_clock::now() - start_time;
 
   const double fraction_of_pop_timeout_used =
     static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(pop_duration).count()) /

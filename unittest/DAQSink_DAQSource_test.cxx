@@ -34,9 +34,9 @@ struct DAQSinkDAQSourceTestFixture
 
   void setup()
   {
-    std::map<std::string, QueueConfig> queuemap = { { "dummy", { QueueConfig::queue_kind::kStdDeQueue, 100 } } };
+    std::map<std::string, QueueConfig> queue_map = { { "dummy", { QueueConfig::queue_kind::kStdDeQueue, 100 } } };
 
-    QueueRegistry::get().configure(queuemap);
+    QueueRegistry::get().configure(queue_map);
   }
 };
 
@@ -47,15 +47,15 @@ BOOST_AUTO_TEST_CASE(Construct)
   DAQSink<std::string> sink("dummy");
   DAQSource<std::string> source("dummy");
 
-  [[maybe_unused]] DAQSink<int>* badsink;
+  [[maybe_unused]] DAQSink<int>* bad_sink;
 
-  BOOST_REQUIRE_EXCEPTION(badsink = new DAQSink<int>("dummy"),
+  BOOST_REQUIRE_EXCEPTION(bad_sink = new DAQSink<int>("dummy"),
                           dunedaq::appfwk::DAQSinkConstructionFailed,
                           [&](dunedaq::appfwk::DAQSinkConstructionFailed) { return true; });
 
-  [[maybe_unused]] DAQSource<int>* badsource;
+  [[maybe_unused]] DAQSource<int>* bad_source;
 
-  BOOST_REQUIRE_EXCEPTION(badsource = new DAQSource<int>("dummy"),
+  BOOST_REQUIRE_EXCEPTION(bad_source = new DAQSource<int>("dummy"),
                           dunedaq::appfwk::DAQSourceConstructionFailed,
                           [&](dunedaq::appfwk::DAQSourceConstructionFailed) { return true; });
 }
