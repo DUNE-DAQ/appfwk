@@ -11,8 +11,8 @@
 
 #define BOOST_TEST_MODULE DAQModule_test // NOLINT
 
-#include <boost/test/unit_test.hpp>
-#include <nlohmann/json.hpp>
+#include "boost/test/unit_test.hpp"
+#include "nlohmann/json.hpp"
 
 #include <string>
 #include <vector>

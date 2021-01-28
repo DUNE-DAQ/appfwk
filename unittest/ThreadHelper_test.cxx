@@ -10,9 +10,9 @@
 #include "appfwk/ThreadHelper.hpp"
 
 #define BOOST_TEST_MODULE ThreadHelper_test // NOLINT
-#include <boost/test/unit_test.hpp>
 
-#include <boost/asio/signal_set.hpp>
+#include "boost/asio/signal_set.hpp"
+#include "boost/test/unit_test.hpp"
 
 #include <chrono>
 #include <memory>

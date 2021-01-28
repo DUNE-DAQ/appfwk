@@ -15,7 +15,7 @@
 
 #define BOOST_TEST_MODULE DAQSink_DAQSource_test // NOLINT
 
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
 #include <map>
 #include <string>

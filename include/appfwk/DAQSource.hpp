@@ -9,10 +9,11 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
 
-#include "TRACE/trace.h"
-#include "ers/Issue.h"
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
+
+#include "TRACE/trace.h"
+#include "ers/Issue.h"
 
 #include <chrono>
 #include <memory>

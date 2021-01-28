@@ -13,6 +13,7 @@
 #define APPFWK_INCLUDE_APPFWK_ISSUES_HPP_
 
 #include "ers/ers.h"
+
 #include <string>
 
 namespace dunedaq {
