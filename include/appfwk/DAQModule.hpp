@@ -21,10 +21,10 @@
 
 #include "appfwk/NamedObject.hpp"
 
-#include <cetlib/BasicPluginFactory.h>
-#include <cetlib/compiler_macros.h>
-#include <ers/Issue.h>
-#include <nlohmann/json.hpp>
+#include "cetlib/BasicPluginFactory.h"
+#include "cetlib/compiler_macros.h"
+#include "ers/Issue.h"
+#include "nlohmann/json.hpp"
 
 #include <functional>
 #include <map>

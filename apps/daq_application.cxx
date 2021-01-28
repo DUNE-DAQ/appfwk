@@ -12,7 +12,7 @@
 #include "cmdlib/CommandFacility.hpp"
 
 #include "ers/Issue.h"
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 
 #include <csignal>
 #include <fstream>

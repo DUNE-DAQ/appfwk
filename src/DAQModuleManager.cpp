@@ -59,6 +59,8 @@ DAQModuleManager::init_queues(const cmd::QueueSpecs& qspecs)
     // ignore the kind.  This requires user configuration to
     // assure unique queue names across all queue types.
     const std::string queue_name = qs.inst;
+
+    // Eric Flumerfelt, Jan-28-2021, eflumerf@fnal.gov
     // fixme: maybe one day replace QueueConfig with codgen.
     // Until then, wheeee....
     QueueConfig qc;

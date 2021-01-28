@@ -11,8 +11,9 @@
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
-#include <appfwk/Queue.hpp>
-#include <appfwk/QueueRegistry.hpp>
+#include "appfwk/Queue.hpp"
+#include "appfwk/QueueRegistry.hpp"
+
 #include <chrono>
 #include <memory>
 #include <string>
