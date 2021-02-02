@@ -11,8 +11,8 @@
 
 #define BOOST_TEST_MODULE DAQModule_test // NOLINT
 
-#include <boost/test/unit_test.hpp>
-#include <nlohmann/json.hpp>
+#include "boost/test/unit_test.hpp"
+#include "nlohmann/json.hpp"
 
 #include <string>
 #include <vector>
@@ -35,7 +35,7 @@ public:
     register_command("stuff", &BadDAQModule::do_other_stuff);
   }
 
-  void init(const nlohmann::json& ) final {}
+  void init(const nlohmann::json&) final {}
 
   void do_stuff(const data_t& /*data*/) {}
   void do_other_stuff(const data_t& /*data*/) {}
@@ -50,7 +50,7 @@ public:
     register_command("stuff", &GoodDAQModule::do_stuff);
   }
 
-  void init(const nlohmann::json& ) final {}
+  void init(const nlohmann::json&) final {}
 
   void do_stuff(const data_t& /*data*/) {}
 };

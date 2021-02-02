@@ -12,9 +12,9 @@
 #ifndef APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
 #define APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
 
-#include <ers/ers.h>
+#include "boost/program_options.hpp"
+#include "ers/ers.h"
 
-#include <boost/program_options.hpp>
 #include <string>
 #include <vector>
 
@@ -50,15 +50,14 @@ public:
             << " known arguments (additional arguments will be stored and "
                "passed on)";
     bpo::options_description desc(descstr.str());
-    desc.add_options()
-      ("commandFacility,c", bpo::value<std::string>()->required(),  "CommandFacility URI")
-      ("help,h", "produce help message");
-      
+    desc.add_options()("commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")(
+      "help,h", "produce help message");
+
     bpo::variables_map vm;
     try {
       auto parsed = bpo::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
 
-      output.otherOptions = bpo::collect_unrecognized(parsed.options, bpo::include_positional);
+      output.m_other_options = bpo::collect_unrecognized(parsed.options, bpo::include_positional);
       bpo::store(parsed, vm);
     } catch (bpo::error const& e) {
       throw CommandLineIssue(ERS_HERE, *argv, e.what());
@@ -75,16 +74,16 @@ public:
       throw CommandLineIssue(ERS_HERE, *argv, e.what());
     }
 
-    output.commandFacilityPluginName = vm["commandFacility"].as<std::string>();
-    output.isValid = true;
+    output.m_command_facility_plugin_name = vm["commandFacility"].as<std::string>();
+    output.m_is_valid = true;
     return output;
   }
 
-  bool isValid{ false };                       ///< Whether the command line was successfully parsed
+  bool m_is_valid{ false }; ///< Whether the command line was successfully parsed
 
-  std::string commandFacilityPluginName;       ///< Name of the CommandFacility plugin to load
+  std::string m_command_facility_plugin_name; ///< Name of the CommandFacility plugin to load
 
-  std::vector<std::string> otherOptions;       ///< Any other options which were passed and not recognized
+  std::vector<std::string> m_other_options; ///< Any other options which were passed and not recognized
 };
 } // namespace appfwk
 } // namespace dunedaq

@@ -16,7 +16,7 @@ namespace dunedaq::appfwk {
 void
 DAQModule::execute_command(const std::string& name, const data_t& data)
 {
-  if (auto cmd = commands_.find(name); cmd != commands_.end()) {
+  if (auto cmd = m_commands.find(name); cmd != m_commands.end()) {
     std::invoke(cmd->second, data);
     return;
   }
@@ -27,8 +27,8 @@ DAQModule::execute_command(const std::string& name, const data_t& data)
 std::vector<std::string>
 DAQModule::get_commands() const
 {
-  std::vector<std::string> cmds(commands_.size());
-  for (const auto& [key, value] : commands_)
+  std::vector<std::string> cmds(m_commands.size());
+  for (const auto& [key, value] : m_commands)
     cmds.push_back(key);
   return cmds;
 }
@@ -36,7 +36,7 @@ DAQModule::get_commands() const
 bool
 DAQModule::has_command(const std::string& name) const
 {
-  return (commands_.find(name) != commands_.end());
+  return (m_commands.find(name) != m_commands.end());
 }
 
 } // namespace dunedaq::appfwk

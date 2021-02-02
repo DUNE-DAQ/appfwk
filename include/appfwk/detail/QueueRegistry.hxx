@@ -11,15 +11,15 @@ std::shared_ptr<Queue<T>>
 QueueRegistry::get_queue(const std::string& name)
 {
 
-  auto itQ = queue_registry_.find(name);
-  if (itQ != queue_registry_.end()) {
-    auto queuePtr = std::dynamic_pointer_cast<Queue<T>>(itQ->second.instance);
+  auto queue_it = m_queue_registry.find(name);
+  if (queue_it != m_queue_registry.end()) {
+    auto queuePtr = std::dynamic_pointer_cast<Queue<T>>(queue_it->second.m_instance);
 
     if (!queuePtr) {
       // TODO: John Freeman (jcfree@fnal.gov), Jun-23-2020. Add checks for demangling status. Timescale 2 weeks.
       int status = -999;
       std::string realname_target = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
-      std::string realname_source = abi::__cxa_demangle(itQ->second.type->name(), 0, 0, &status);
+      std::string realname_source = abi::__cxa_demangle(queue_it->second.m_type->name(), 0, 0, &status);
 
       throw QueueTypeMismatch(ERS_HERE, name, realname_source, realname_target);
     }
@@ -27,11 +27,11 @@ QueueRegistry::get_queue(const std::string& name)
     return queuePtr;
   }
 
-  auto itP = this->queue_configmap_.find(name);
-  if (itP != queue_configmap_.end()) {
-    QueueEntry entry = { &typeid(T), create_queue<T>(name, itP->second) };
-    queue_registry_[name] = entry;
-    return std::dynamic_pointer_cast<Queue<T>>(entry.instance);
+  auto config_it = this->m_queue_config_map.find(name);
+  if (config_it != m_queue_config_map.end()) {
+    QueueEntry entry = { &typeid(T), create_queue<T>(name, config_it->second) };
+    m_queue_registry[name] = entry;
+    return std::dynamic_pointer_cast<Queue<T>>(entry.m_instance);
 
   } else {
     // TODO: John Freeman (jcfree@fnal.gov), Jun-23-2020. Add checks for demangling status. Timescale 2 weeks.
@@ -47,19 +47,19 @@ QueueRegistry::create_queue(const std::string& name, const QueueConfig& config)
 {
 
   std::shared_ptr<Named> queue;
-  switch (config.kind) {
+  switch (config.m_kind) {
     case QueueConfig::kStdDeQueue:
-      queue = std::make_shared<StdDeQueue<T>>(name, config.capacity);
+      queue = std::make_shared<StdDeQueue<T>>(name, config.m_capacity);
       break;
     case QueueConfig::kFollySPSCQueue:
-      queue = std::make_shared<FollySPSCQueue<T>>(name, config.capacity);
+      queue = std::make_shared<FollySPSCQueue<T>>(name, config.m_capacity);
       break;
     case QueueConfig::kFollyMPMCQueue:
-      queue = std::make_shared<FollyMPMCQueue<T>>(name, config.capacity);
+      queue = std::make_shared<FollyMPMCQueue<T>>(name, config.m_capacity);
       break;
 
     default:
-      throw QueueKindUnknown(ERS_HERE, std::to_string(config.kind));
+      throw QueueKindUnknown(ERS_HERE, std::to_string(config.m_kind));
   }
 
   return queue;

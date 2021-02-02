@@ -16,26 +16,26 @@
 
 namespace dunedaq::appfwk {
 
-  std::unique_ptr<QueueRegistry> QueueRegistry::me_ = nullptr;
+std::unique_ptr<QueueRegistry> QueueRegistry::s_instance = nullptr;
 
 QueueRegistry&
 QueueRegistry::get()
 {
-  if (!me_) {
-    me_.reset( new QueueRegistry() );
+  if (!s_instance) {
+    s_instance.reset(new QueueRegistry());
   }
-  return *me_;
+  return *s_instance;
 }
 
 void
-QueueRegistry::configure(const std::map<std::string, QueueConfig>& configmap)
+QueueRegistry::configure(const std::map<std::string, QueueConfig>& config_map)
 {
-  if (configured_) {
+  if (m_configured) {
     throw QueueRegistryConfigured(ERS_HERE);
   }
 
-  queue_configmap_ = configmap;
-  configured_ = true;
+  m_queue_config_map = config_map;
+  m_configured = true;
 }
 
 QueueConfig::queue_kind
