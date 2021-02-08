@@ -16,7 +16,7 @@
 
 #include "appfwk/NamedObject.hpp"
 
-#include <ers/Issue.h>
+#include "ers/Issue.h"
 
 #include <chrono>
 #include <cstddef>
@@ -38,8 +38,8 @@ template<class T>
 class Queue : public NamedObject
 {
 public:
-  using value_type = T;                            ///< Type stored in the Queue
-  using duration_type = std::chrono::milliseconds; ///< Base duration type for timeouts
+  using value_t = T;                            ///< Type stored in the Queue
+  using duration_t = std::chrono::milliseconds; ///< Base duration type for timeouts
 
   /**
    * @brief Queue Constructor
@@ -47,7 +47,7 @@ public:
    */
   explicit Queue(const std::string& name, size_t capacity)
     : NamedObject(name)
-    , capacity_(capacity)
+    , m_capacity(capacity)
   {}
 
   /**
@@ -59,7 +59,7 @@ public:
    * If push takes longer than the timeout, implementations should throw an
    * exception.
    */
-  virtual void push(T&& val, const duration_type& timeout) = 0;
+  virtual void push(value_t&& val, const duration_t& timeout) = 0;
 
   /**
    * @brief Determine whether the Queue may be pushed onto
@@ -78,7 +78,7 @@ public:
    * If pop takes longer than the timeout, implementations should throw an
    * exception
    */
-  virtual void pop(T& val, const duration_type& timeout) = 0;
+  virtual void pop(value_t& val, const duration_t& timeout) = 0;
 
   /**
    * @brief Determine whether the Queue may be popped from
@@ -89,7 +89,7 @@ public:
   virtual bool can_pop() const noexcept = 0;
 
 protected:
-  size_t GetCapacity() const { return capacity_; }
+  size_t get_capacity() const { return m_capacity; }
 
 private:
   Queue(const Queue&) = delete;
@@ -97,7 +97,7 @@ private:
   Queue(Queue&&) = default;
   Queue& operator=(Queue&&) = default;
 
-  size_t capacity_;
+  size_t m_capacity;
 };
 
 } // namespace appfwk
@@ -107,8 +107,8 @@ private:
 ERS_DECLARE_ISSUE(appfwk,              // namespace
                   QueueTimeoutExpired, // issue class name
                   name << ": Unable to " << func_name << " within timeout period (timeout period was " << timeout
-                       << " milliseconds)", // message
-                  ((std::string)name)((std::string)func_name)((int)timeout))
+                       << " milliseconds)",                                  // message
+                  ((std::string)name)((std::string)func_name)((int)timeout)) // NOLINT(readability/casting)
 } // namespace dunedaq
 
 #endif // APPFWK_INCLUDE_APPFWK_QUEUE_HPP_

@@ -15,23 +15,24 @@
 
 namespace dunedaq::appfwk {
 
-IndexedQueueInfos qindex(const nlohmann::json& iniobj,
-                             std::vector<std::string> required)
+IndexedQueueInfos_t
+queue_index(const nlohmann::json& iniobj, std::vector<std::string> required)
 {
-    IndexedQueueInfos ret;
-    for (auto qi : qinfos(iniobj)) {
-        ret[qi.name] = qi;
+  IndexedQueueInfos_t ret;
+  for (auto qi : queue_infos(iniobj)) {
+    ret[qi.name] = qi;
+  }
+  for (auto name : required) {
+    if (ret.find(name) == ret.end()) {
+      throw SchemaError(ERS_HERE, "missing queue: " + name);
     }
-    for (auto name : required) {
-        if (ret.find(name) == ret.end()) {
-            throw SchemaError(ERS_HERE, "missing queue: " + name);
-        }
-    }
-    return ret;
+  }
+  return ret;
 }
-    
-cmd::QueueInfos qinfos(const nlohmann::json& iniobj)
+
+cmd::QueueInfos
+queue_infos(const nlohmann::json& iniobj)
 {
-    return iniobj.get<cmd::ModInit>().qinfos;
+  return iniobj.get<cmd::ModInit>().qinfos;
 }
 } // namespace dunedaq::appfwk

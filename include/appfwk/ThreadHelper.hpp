@@ -16,7 +16,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_THREADHELPER_HPP_
 #define APPFWK_INCLUDE_APPFWK_THREADHELPER_HPP_
 
-#include <ers/Issue.h>
+#include "ers/Issue.h"
 
 #include <functional>
 #include <future>
@@ -79,9 +79,9 @@ public:
    * This constructor sets the defaults for the thread control variables
    */
   explicit ThreadHelper(std::function<void(std::atomic<bool>&)> do_work)
-    : thread_running_(false)
-    , working_thread_(nullptr)
-    , do_work_(do_work)
+    : m_thread_running(false)
+    , m_working_thread(nullptr)
+    , m_do_work(do_work)
   {}
 
   /**
@@ -95,8 +95,8 @@ public:
                            "Attempted to start working thread "
                            "when it is already running!");
     }
-    thread_running_ = true;
-    working_thread_.reset(new std::thread([&] { do_work_(std::ref(thread_running_)); }));
+    m_thread_running = true;
+    m_working_thread.reset(new std::thread([&] { m_do_work(std::ref(m_thread_running)); }));
   }
   /**
    * @brief Stop the working thread
@@ -111,11 +111,11 @@ public:
                            "Attempted to stop working thread "
                            "when it is not running!");
     }
-    thread_running_ = false;
+    m_thread_running = false;
 
-    if (working_thread_->joinable()) {
+    if (m_working_thread->joinable()) {
       try {
-        working_thread_->join();
+        m_working_thread->join();
       } catch (std::system_error const& e) {
         throw ThreadingIssue(ERS_HERE, std::string("Error while joining thread, ") + e.what());
       }
@@ -128,7 +128,7 @@ public:
    * @brief Determine if the thread is currently running
    * @return Whether the thread is currently running
    */
-  bool thread_running() const { return thread_running_.load(); }
+  bool thread_running() const { return m_thread_running.load(); }
 
   ThreadHelper(const ThreadHelper&) = delete;            ///< ThreadHelper is not copy-constructible
   ThreadHelper& operator=(const ThreadHelper&) = delete; ///< ThreadHelper is not copy-assginable
@@ -136,9 +136,9 @@ public:
   ThreadHelper& operator=(ThreadHelper&&) = delete;      ///< ThreadHelper is not move-assignable
 
 private:
-  std::atomic<bool> thread_running_;
-  std::unique_ptr<std::thread> working_thread_;
-  std::function<void(std::atomic<bool>&)> do_work_;
+  std::atomic<bool> m_thread_running;
+  std::unique_ptr<std::thread> m_working_thread;
+  std::function<void(std::atomic<bool>&)> m_do_work;
 };
 } // namespace appfwk
 

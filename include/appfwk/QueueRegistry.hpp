@@ -46,9 +46,9 @@ struct QueueConfig
    */
   static queue_kind stoqk(const std::string& name);
 
-  QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
-                                                       ///< QueueConfig
-  size_t capacity = 0;                                 ///< The maximum size of the queue
+  QueueConfig::queue_kind m_kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
+                                                         ///< QueueConfig
+  size_t m_capacity = 0;                                 ///< The maximum size of the queue
 };
 
 /**
@@ -82,13 +82,13 @@ public:
    * @brief Configure the QueueRegistry
    * @param configmap Map relating Queue names to their configurations
    */
-  void configure(const std::map<std::string, QueueConfig>& configmap);
+  void configure(const std::map<std::string, QueueConfig>& config_map);
 
 private:
   struct QueueEntry
   {
-    const std::type_info* type;
-    std::shared_ptr<Named> instance;
+    const std::type_info* m_type;
+    std::shared_ptr<Named> m_instance;
   };
 
   QueueRegistry() = default;
@@ -96,12 +96,12 @@ private:
   template<typename T>
   std::shared_ptr<Named> create_queue(const std::string& name, const QueueConfig& config);
 
-  std::map<std::string, QueueEntry> queue_registry_;
-  std::map<std::string, QueueConfig> queue_configmap_;
+  std::map<std::string, QueueEntry> m_queue_registry;
+  std::map<std::string, QueueConfig> m_queue_config_map;
 
-  bool configured_{ false };
+  bool m_configured{ false };
 
-  static std::unique_ptr<QueueRegistry> me_;
+  static std::unique_ptr<QueueRegistry> s_instance;
 
   QueueRegistry(const QueueRegistry&) = delete;
   QueueRegistry& operator=(const QueueRegistry&) = delete;

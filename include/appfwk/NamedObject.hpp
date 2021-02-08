@@ -48,7 +48,7 @@ public:
    * @param name Name of this object
    */
   explicit NamedObject(const std::string& name)
-    : name_(name)
+    : m_name(name)
   {}
 
   NamedObject(NamedObject const&) = delete;            ///< NamedObject is not copy-constructible
@@ -61,10 +61,10 @@ public:
    * @brief Get the name of this NamedObejct
    * @return The name of this NamedObject
    */
-  const std::string& get_name() const final { return name_; }
+  const std::string& get_name() const final { return m_name; }
 
 private:
-  std::string name_;
+  std::string m_name;
 };
 
 } // namespace dunedaq::appfwk

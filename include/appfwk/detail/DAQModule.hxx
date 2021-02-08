@@ -6,7 +6,7 @@ DAQModule::register_command(const std::string& name, void (Child::*f)(const data
 {
   using namespace std::placeholders;
 
-  bool done = commands_.emplace(name, std::bind(f, dynamic_cast<Child*>(this), _1)).second;
+  bool done = m_commands.emplace(name, std::bind(f, dynamic_cast<Child*>(this), _1)).second;
   if (!done) {
     // Throw here
     throw CommandRegistrationFailed(ERS_HERE, get_name(), name);

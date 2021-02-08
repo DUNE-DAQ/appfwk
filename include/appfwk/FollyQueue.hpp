@@ -28,28 +28,28 @@ template<class T, template<typename, bool> class FollyQueueType>
 class FollyQueue : public Queue<T>
 {
 public:
-  using value_type = T;
-  using duration_type = typename Queue<T>::duration_type;
+  using value_t = T;
+  using duration_t = typename Queue<T>::duration_t;
 
   explicit FollyQueue(const std::string& name, size_t capacity)
     : Queue<T>(name, capacity)
-    , fQueue(this->GetCapacity())
+    , m_queue(this->get_capacity())
   {}
 
-  bool can_pop() const noexcept override { return !fQueue.empty(); }
-  void pop(value_type& val, const duration_type& dur) override
+  bool can_pop() const noexcept override { return !m_queue.empty(); }
+  void pop(value_t& val, const duration_t& dur) override
   {
-    if (!fQueue.try_dequeue_for(val, dur)) {
+    if (!m_queue.try_dequeue_for(val, dur)) {
       throw QueueTimeoutExpired(
         ERS_HERE, this->get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
   }
 
-  bool can_push() const noexcept override { return fQueue.size() < this->GetCapacity(); }
+  bool can_push() const noexcept override { return m_queue.size() < this->get_capacity(); }
 
-  void push(value_type&& t, const duration_type& dur) override
+  void push(value_t&& t, const duration_t& dur) override
   {
-    if (!fQueue.try_enqueue_for(std::move(t), dur)) {
+    if (!m_queue.try_enqueue_for(std::move(t), dur)) {
       throw QueueTimeoutExpired(
         ERS_HERE, this->get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
@@ -65,7 +65,7 @@ private:
   // The boolean argument is `MayBlock`, where "block" appears to mean
   // "make a system call". With `MayBlock` set to false, the queue
   // just spin-waits, so we want true
-  FollyQueueType<T, true> fQueue;
+  FollyQueueType<T, true> m_queue;
 };
 
 template<typename T>
