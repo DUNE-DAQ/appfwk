@@ -27,6 +27,22 @@ do_something(std::atomic<bool>&)
   std::this_thread::sleep_for(std::chrono::seconds(num_seconds));
 }
 
+std::string test_thread_name;
+std::string actual_thread_name;
+
+void
+print_name(std::atomic<bool>&)
+{
+  // Give ThreadHelper time to set the name
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+  char buffer[16];
+  int res = pthread_getname_np(pthread_self(), buffer, 16);
+  BOOST_REQUIRE_EQUAL(res, 0);
+  actual_thread_name = std::string(buffer);
+  BOOST_TEST_MESSAGE("This function prints the current thread name, which is " + actual_thread_name);
+}
+
 } // namespace ""
 
 BOOST_AUTO_TEST_CASE(sanity_checks)
@@ -64,6 +80,23 @@ BOOST_AUTO_TEST_CASE(inappropriate_transitions, *boost::unit_test::depends_on("s
   BOOST_REQUIRE_THROW(umth.start_working_thread(), dunedaq::appfwk::ThreadingIssue);
 
   umth.stop_working_thread();
+}
+
+BOOST_AUTO_TEST_CASE(thread_name)
+{
+  dunedaq::appfwk::ThreadHelper umth(print_name);
+  test_thread_name = "name test";
+  umth.start_working_thread(test_thread_name);
+  umth.stop_working_thread();
+
+  BOOST_REQUIRE_EQUAL(test_thread_name, actual_thread_name);
+
+  test_thread_name = "too long name test";
+  umth.start_working_thread(test_thread_name);
+  umth.stop_working_thread();
+
+  // Name not changed
+  BOOST_REQUIRE_EQUAL(actual_thread_name, "ThreadHelper_te");
 }
 
 // You'll want this to test case to execute last, for reasons that are obvious
