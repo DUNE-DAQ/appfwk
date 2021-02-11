@@ -88,7 +88,7 @@ public:
    * @brief Start the working thread (which executes the do_work() function)
    * @throws ThreadingIssue if the thread is already running
    */
-  void start_working_thread(const std::string name="noname")
+  void start_working_thread(const std::string& name="noname")
   {
     if (thread_running()) {
       throw ThreadingIssue(ERS_HERE,
