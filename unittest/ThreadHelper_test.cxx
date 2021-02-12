@@ -27,6 +27,12 @@ do_something(std::atomic<bool>&)
   std::this_thread::sleep_for(std::chrono::seconds(num_seconds));
 }
 
+void
+throw_something(std::atomic<bool>&)
+{
+  throw std::runtime_error("foo!");
+}
+
 std::string test_thread_name;
 std::string actual_thread_name;
 
@@ -121,4 +127,11 @@ BOOST_AUTO_TEST_CASE(abort_checks, *boost::unit_test::depends_on("inappropriate_
   //   dunedaq::appfwk::ThreadHelper umth(do_something);
   //   umth.start_working_thread();
   // }
+}
+
+BOOST_AUTO_TEST_CASE(catch_throw)
+{
+  dunedaq::appfwk::ThreadHelper umth(throw_something);
+  umth.start_working_thread();
+  BOOST_CHECK_THROW(umth.stop_working_thread(), std::runtime_error);
 }

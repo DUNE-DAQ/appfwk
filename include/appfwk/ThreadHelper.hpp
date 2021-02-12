@@ -18,6 +18,7 @@
 
 #include "ers/ers.h"
 
+#include <exception>
 #include <functional>
 #include <future>
 #include <list>
@@ -96,7 +97,15 @@ public:
                            "when it is already running!");
     }
     m_thread_running = true;
-    m_working_thread.reset(new std::thread([&] { m_do_work(std::ref(m_thread_running)); }));
+    m_working_thread.reset(new std::thread([&]()
+    {
+      try{
+        m_do_work(std::ref(m_thread_running));
+      }
+      catch(...){
+        m_exception_ptr=std::current_exception();
+      }
+    }));
     auto handle = m_working_thread->native_handle();
     auto rc=pthread_setname_np(handle, name.c_str());
     if(rc !=0) {
@@ -126,6 +135,9 @@ public:
       } catch (std::system_error const& e) {
         throw ThreadingIssue(ERS_HERE, std::string("Error while joining thread, ") + e.what());
       }
+      if(m_exception_ptr!=nullptr){
+        std::rethrow_exception(m_exception_ptr);
+      }
     } else {
       throw ThreadingIssue(ERS_HERE, "Thread not in joinable state during working thread stop!");
     }
@@ -146,6 +158,7 @@ private:
   std::atomic<bool> m_thread_running;
   std::unique_ptr<std::thread> m_working_thread;
   std::function<void(std::atomic<bool>&)> m_do_work;
+  std::exception_ptr m_exception_ptr;
 };
 } // namespace appfwk
 
