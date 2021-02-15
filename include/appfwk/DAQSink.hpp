@@ -9,8 +9,12 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
 
+#include "appfwk/Issues.hpp"
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
+#include "appfwk/DAQModuleHelper.hpp"
+#include "appfwk/cmd/Structs.hpp"
+#include "appfwk/cmd/Nljs.hpp"
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
@@ -40,6 +44,9 @@ public:
   using duration_t = std::chrono::milliseconds;
 
   explicit DAQSink(const std::string& name);
+  DAQSink(const nlohmann::json& init_json, const std::string& name);
+  DAQSink(const cmd::ModInit& init, const std::string& name);
+
   void push(T&& element, const duration_t& timeout = duration_t::zero());
   void push(const T& element, const duration_t& timeout = duration_t::zero());
   bool can_push() const noexcept;
@@ -55,12 +62,43 @@ private:
 };
 
 template<typename T>
-DAQSink<T>::DAQSink(const std::string& name)
+DAQSink<T>::DAQSink(const std::string& inst)
 {
   try {
-    m_queue = QueueRegistry::get().get_queue<T>(name);
+    m_queue = QueueRegistry::get().get_queue<T>(inst);
+    TLOG(TLVL_TRACE, "DAQSink") << "Queue " << inst << " is at " << m_queue.get();
+  } catch (const QueueTypeMismatch& ex) {
+    throw DAQSinkConstructionFailed(ERS_HERE, inst, ex);
+  }
+}
+
+template<typename T>
+DAQSink<T>::DAQSink(const nlohmann::json& init_json, const std::string& name)
+{
+  try {
+    auto qindex=queue_index(init_json, {name});
+    m_queue = QueueRegistry::get().get_queue<T>(qindex[name].inst);
     TLOG(TLVL_TRACE, "DAQSink") << "Queue " << name << " is at " << m_queue.get();
   } catch (const QueueTypeMismatch& ex) {
+    throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
+  }
+  catch (const SchemaError& ex) {
+    throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
+  }
+}
+
+template<typename T>
+DAQSink<T>::DAQSink(const cmd::ModInit& init, const std::string& name)
+{
+  nlohmann::json init_json=init;
+  try {
+    auto qindex=queue_index(init_json, {name});
+    m_queue = QueueRegistry::get().get_queue<T>(qindex[name].inst);
+    TLOG(TLVL_TRACE, "DAQSink") << "Queue " << name << " is at " << m_queue.get();
+  } catch (const QueueTypeMismatch& ex) {
+    throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
+  }
+  catch (const SchemaError& ex) {
     throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
 }

@@ -11,6 +11,10 @@
 
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
+#include "appfwk/Issues.hpp"
+#include "appfwk/DAQModuleHelper.hpp"
+#include "appfwk/cmd/Structs.hpp"
+#include "appfwk/cmd/Nljs.hpp"
 
 #include "TRACE/trace.h"
 #include "ers/Issue.h"
@@ -39,7 +43,10 @@ public:
   using value_t = T;
   using duration_t = std::chrono::milliseconds;
 
-  explicit DAQSource(const std::string& name);
+  explicit DAQSource(const std::string& inst);
+  DAQSource(const nlohmann::json& init_json, const std::string& name);
+  DAQSource(const cmd::ModInit& init, const std::string& name);
+
   void pop(T&, const duration_t& timeout = duration_t::zero());
   bool can_pop() const noexcept;
   const std::string& get_name() const final { return m_queue->get_name(); }
@@ -54,12 +61,43 @@ private:
 };
 
 template<typename T>
-DAQSource<T>::DAQSource(const std::string& name)
+DAQSource<T>::DAQSource(const std::string& inst)
 {
   try {
-    m_queue = QueueRegistry::get().get_queue<T>(name);
-    TLOG(TLVL_TRACE, "DAQSource") << "Queue " << name << " is at " << m_queue.get();
+    m_queue = QueueRegistry::get().get_queue<T>(inst);
+    TLOG(TLVL_TRACE, "DAQSource") << "Queue " << inst << " is at " << m_queue.get();
   } catch (QueueTypeMismatch& ex) {
+    throw DAQSourceConstructionFailed(ERS_HERE, inst, ex);
+  }
+}
+
+template<typename T>
+DAQSource<T>::DAQSource(const nlohmann::json& init_json, const std::string& name)
+{
+  try {
+    auto qindex=queue_index(init_json, {name});
+    m_queue = QueueRegistry::get().get_queue<T>(qindex[name].inst);
+    TLOG(TLVL_TRACE, "DAQSource") << "Queue " << name << " is at " << m_queue.get();
+  } catch (const QueueTypeMismatch& ex) {
+    throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
+  }
+  catch (const SchemaError& ex) {
+    throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
+  }
+}
+
+template<typename T>
+DAQSource<T>::DAQSource(const cmd::ModInit& init, const std::string& name)
+{
+  nlohmann::json init_json=init;
+  try {
+    auto qindex=queue_index(init_json, {name});
+    m_queue = QueueRegistry::get().get_queue<T>(qindex[name].inst);
+    TLOG(TLVL_TRACE, "DAQSource") << "Queue " << name << " is at " << m_queue.get();
+  } catch (const QueueTypeMismatch& ex) {
+    throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
+  }
+  catch (const SchemaError& ex) {
     throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
   }
 }

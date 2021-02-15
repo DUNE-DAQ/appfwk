@@ -10,6 +10,7 @@
 #include "appfwk/DAQSink.hpp"
 #include "appfwk/DAQSource.hpp"
 #include "appfwk/StdDeQueue.hpp"
+#include "appfwk/cmd/Nljs.hpp"
 
 #include "ers/ers.h"
 
@@ -34,7 +35,8 @@ struct DAQSinkDAQSourceTestFixture
 
   void setup()
   {
-    std::map<std::string, QueueConfig> queue_map = { { "dummy", { QueueConfig::queue_kind::kStdDeQueue, 100 } } };
+    std::map<std::string, QueueConfig> queue_map = { { "dummy", { QueueConfig::queue_kind::kStdDeQueue, 100 } },
+                                                     { "dummy2", { QueueConfig::queue_kind::kStdDeQueue, 100 } } };
 
     QueueRegistry::get().configure(queue_map);
   }
@@ -104,6 +106,27 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   BOOST_REQUIRE_EXCEPTION(sink.push("bbBbbb"),
                           dunedaq::appfwk::QueueTimeoutExpired,
                           [&](dunedaq::appfwk::QueueTimeoutExpired) { return true; });
+}
+
+BOOST_AUTO_TEST_CASE(FromName)
+{
+  dunedaq::appfwk::cmd::ModInit sink_init;
+  sink_init.qinfos.push_back({"dummy2", "myname", "output"});
+  nlohmann::json j=sink_init;
+
+  DAQSink<std::string> sink(j, "myname");
+  DAQSink<std::string> sink2(sink_init, "myname");
+  BOOST_REQUIRE(sink.can_push());
+  BOOST_REQUIRE(sink2.can_push());
+
+  dunedaq::appfwk::cmd::ModInit source_init;
+  source_init.qinfos.push_back({"dummy2", "myname", "input"});
+  nlohmann::json j2=source_init;
+
+  DAQSource<std::string> source(j2, "myname");
+  DAQSource<std::string> source2(source_init, "myname");
+  BOOST_REQUIRE(!source.can_pop());
+  BOOST_REQUIRE(!source2.can_pop());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
