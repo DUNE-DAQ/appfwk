@@ -47,8 +47,8 @@ render () {
     echo $outhpp
 }
 
-render topo Structs
-render topo Nljs
+render app Structs
+render app Nljs
 
 render cmd Structs
 render cmd Nljs
