@@ -11,15 +11,16 @@ find_package(cetlib REQUIRED)   # Uses the daq-buildtools/cmake/Findcetlib.cmake
 find_package(folly REQUIRED)
 find_package(ers REQUIRED)
 find_package(cmdlib REQUIRED)
+find_package(opmonlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
 
-set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly cmdlib::cmdlib nlohmann_json::nlohmann_json pthread)
+set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly cmdlib::cmdlib opmonlib::opmonlib nlohmann_json::nlohmann_json pthread)
 
 daq_codegen_schema(*.jsonnet MPATH_PKGS cmdlib TEMPL Structs.hpp Nljs.hpp )
 
 ##############################################################################
 # Main library
-daq_add_library(QueueRegistry.cpp DAQModule*.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
+daq_add_library(QueueRegistry.cpp DAQModule*.cpp Application.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
 
 # ##############################################################################
 # Applications

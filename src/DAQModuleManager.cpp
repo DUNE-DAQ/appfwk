@@ -248,5 +248,14 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
   // dispatch(cmd.id, cmd.data);
 }
 
+void
+DAQModuleManager::gather_stats(opmonlib::InfoCollector & ci, int level) {
+
+  for (const auto& [mod_name, mod_ptr] : m_module_map) {
+    mod_ptr->get_info(ci, level);   
+  } 
+
+}
+
 } // namespace appfwk
 } // namespace dunedaq

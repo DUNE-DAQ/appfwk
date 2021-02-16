@@ -21,6 +21,8 @@
 
 #include "appfwk/NamedObject.hpp"
 
+#include "opmonlib/InfoCollector.hpp"
+
 #include "cetlib/BasicPluginFactory.h"
 #include "cetlib/compiler_macros.h"
 #include "ers/Issue.h"
@@ -165,6 +167,8 @@ public:
   std::vector<std::string> get_commands() const;
 
   bool has_command(const std::string& name) const;
+
+  virtual void get_info(opmonlib::InfoCollector & ci, int level) { return; }; 
 
 protected:
   /**

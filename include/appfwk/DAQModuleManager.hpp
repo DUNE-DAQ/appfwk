@@ -11,8 +11,8 @@
 
 #include "cmdlib/cmd/Structs.hpp"
 #include "appfwk/app/Structs.hpp"
-#include "cmdlib/CommandedObject.hpp"
 
+#include "opmonlib/InfoCollector.hpp"
 #include "ers/Issue.h"
 #include "nlohmann/json.hpp"
 
@@ -50,7 +50,7 @@ namespace appfwk {
 
 class DAQModule;
 
-class DAQModuleManager : public cmdlib::CommandedObject
+class DAQModuleManager 
 {
 public:
   using dataobj_t = nlohmann::json;
@@ -61,6 +61,9 @@ public:
 
   // Execute a properly structured command
   void execute(const dataobj_t& cmd_data);
+
+  // Gather statistics from modules
+  void gather_stats(opmonlib::InfoCollector& ic, int level); 
 
 protected:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
