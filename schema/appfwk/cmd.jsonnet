@@ -38,8 +38,8 @@ local cs = {
         s.field("run", self.run_number, doc="Run Number")
     ]),
 
-    empty_params: s.record("EmptyParams", [
-    ])
+    # empty_params: s.record("EmptyParams", [
+    # ])
 
 
 };

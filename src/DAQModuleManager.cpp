@@ -12,7 +12,7 @@
 
 #include "appfwk/Issues.hpp"
 #include "appfwk/cmd/Nljs.hpp"
-#include "appfwk/topo/Nljs.hpp"
+#include "appfwk/app/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/QueueRegistry.hpp"
@@ -34,14 +34,14 @@ DAQModuleManager::DAQModuleManager()
 
 void
 DAQModuleManager::initialize( const dataobj_t& data) {
-  auto ini = data.get<topo::Init>();
+  auto ini = data.get<app::Init>();
   init_queues(ini.queues);
   init_modules(ini.modules);
   this->m_initialized = true;
 }
 
 void
-DAQModuleManager::init_modules(const topo::ModSpecs & mspecs) {
+DAQModuleManager::init_modules(const app::ModSpecs & mspecs) {
   for (const auto& mspec : mspecs) {
     ERS_INFO("construct: " << mspec.plugin << " : " << mspec.inst);
     auto mptr = make_module(mspec.plugin, mspec.inst);
@@ -52,7 +52,7 @@ DAQModuleManager::init_modules(const topo::ModSpecs & mspecs) {
 
 
 void
-DAQModuleManager::init_queues(const topo::QueueSpecs & qspecs) {
+DAQModuleManager::init_queues(const app::QueueSpecs & qspecs) {
   std::map<std::string, QueueConfig> queue_cfgs;
   for (const auto& qs : qspecs) {
 
@@ -64,20 +64,20 @@ DAQModuleManager::init_queues(const topo::QueueSpecs & qspecs) {
     // Until then, wheeee....
     QueueConfig qc;
     switch (qs.kind) {
-      case topo::QueueKind::StdDeQueue:
+      case app::QueueKind::StdDeQueue:
         qc.kind = QueueConfig::queue_kind::kStdDeQueue;
         break;
-      case topo::QueueKind::FollySPSCQueue:
+      case app::QueueKind::FollySPSCQueue:
         qc.kind = QueueConfig::queue_kind::kFollySPSCQueue;
         break;
-      case topo::QueueKind::FollyMPMCQueue:
+      case app::QueueKind::FollyMPMCQueue:
         qc.kind = QueueConfig::queue_kind::kFollyMPMCQueue;
         break;
       default:
         throw MissingComponent(ERS_HERE, "unknown queue type");
         break;
     }
-    qc.m_capacity = qs.capacity;
+    qc.capacity = qs.capacity;
     queue_cfgs[queue_name] = qc;
     ERS_INFO("Adding queue: " << queue_name);
   }
@@ -85,7 +85,7 @@ DAQModuleManager::init_queues(const topo::QueueSpecs & qspecs) {
 }
 
 void
-DAQModuleManager::dispatch_after_merge(cmd::CmdId id, const dataobj_t& data)
+DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data)
 {
   // The command dispatching: commands and parameters are distributed to all modules that
   // have registered a method corresponding to the command. If no parameters are found, an
@@ -118,7 +118,7 @@ DAQModuleManager::dispatch_after_merge(cmd::CmdId id, const dataobj_t& data)
 }
 
 std::vector<std::string>
-DAQModuleManager::get_modnames_by_cmdid(cmd::CmdId id)
+DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id)
 {
   // Make a convenience array with module names that have the requested command
   std::vector<std::string> mod_names;
@@ -131,7 +131,7 @@ DAQModuleManager::get_modnames_by_cmdid(cmd::CmdId id)
 }
 
 void
-DAQModuleManager::dispatch_one_match_only(cmd::CmdId id, const dataobj_t& data)
+DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t& data)
 {
   // This method ensures that each module is only matched once per command.
   // If multiple matches are found, an ers::Issue is thrown
@@ -232,7 +232,7 @@ void
 DAQModuleManager::execute(const dataobj_t& cmd_data)
 {
 
-  auto cmd = cmd_data.get<cmd::Command>();
+  auto cmd = cmd_data.get<cmdlib::cmd::Command>();
   ERS_LOG("Command id:" << cmd.id);
 
   if (!m_initialized) {
