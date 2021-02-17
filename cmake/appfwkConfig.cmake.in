@@ -10,8 +10,7 @@ find_dependency(cetlib)
 find_dependency(folly)
 find_dependency(ers)
 find_dependency(cmdlib)
-
-find_package(nlohmann_json)
+find_dependency(nlohmann_json)
 
 # Figure out whether or not this dependency is an installed package or
 # in repo form
