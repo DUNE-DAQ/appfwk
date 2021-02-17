@@ -20,7 +20,7 @@ local cs = {
     mcmd: s.record("AddressedCmd", [
         s.field("match", self.match,
                 doc="A regex that matches on module instance names"),
-        s.field("data", cmd.Data,
+        s.field("data", cmd.Data, optional=true,
                 doc="The module-level command data object"),
     ], doc="General, non-init module-level command data structure"),
     mcmds: s.sequence("AddressedCmds", self.mcmd,
