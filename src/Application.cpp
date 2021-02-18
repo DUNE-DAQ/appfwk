@@ -10,6 +10,7 @@
 
 #include "appfwk/Issues.hpp"
 #include "appfwk/cmd/Nljs.hpp"
+#include "appfwk/appinfo/Nljs.hpp"
 
 #include "ers/ers.h"
 
@@ -46,9 +47,9 @@ void
 Application::execute(const dataobj_t& cmd_data)
 {
 
+  std::string cmdname = cmd_data.get<cmdlib::cmd::Command>().id;
   if(!is_cmd_valid(cmd_data)) {
-    std::string cmdname = cmd_data.get<cmd::Command>().id;
-    throw InvalidCommand(ERS_HERE, cmdname, m_state, m_error.load(), m_busy.load());
+    throw InvalidCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
   }
 
   m_busy.store(true);
@@ -56,7 +57,19 @@ Application::execute(const dataobj_t& cmd_data)
   try {
     m_mod_mgr.execute(cmd_data);
     m_busy.store(false);
-    m_state = "ANY" ; // FIXME: to be taken from cmd_data 
+    if (cmdname == "init" || cmdname == "scrap") {
+       set_state("INITIAL") ; 
+    }
+    else if (cmdname == "conf" || cmdname == "stop") {
+       set_state("CONFIGURED") ;
+     
+    }
+    else if (cmdname == "start" || cmdname == "resume") {
+       set_state("RUNNING") ;
+    }
+    else if (cmdname == "pause") {
+       set_state("PAUSED") ; // FIXME: to be taken from cmd_data 
+    }
   } 
   catch(CommandDispatchingFailed & ex) {
     m_busy.store(false);
@@ -69,25 +82,46 @@ void
 Application::gather_stats(opmonlib::InfoCollector & ci, int level) 
 {
   // TODO:Fill application info and add it to ci
+  appinfo::Info ai;
+  //ai.partition_name = m_partition; 
+  //ai.app_name = get_name();
+  ai.state = get_state();
+  ai.busy = m_busy.load();
+  ai.error = m_error.load();
+
+  opmonlib::InfoCollector tmp_ci;
+
+  tmp_ci.add(ai);
 
   if (level == 0) {
     // give only generic application info
   } 
   else {
     try {
-       m_mod_mgr.gather_stats(ci, level);
+       m_mod_mgr.gather_stats(tmp_ci, level);
     }
     catch(ers::Issue &ex) {
       ers::error(ex);
     }
   }
+  ci.add(get_name(), tmp_ci);
 }
 
 bool 
-Application::is_cmd_valid(const dataobj_t& /*cmd_data*/)
+Application::is_cmd_valid(const dataobj_t& cmd_data)
 {
- bool invalid = m_error.load(); 
-  return !invalid; //FIXME: validity of command to be checked against state!
+  if (m_busy.load() || m_error.load()) 
+    return false;
+
+  std::string state = get_state();
+  std::string cmd = cmd_data.get<cmdlib::cmd::Command>().id;
+  if( (state == "NONE" && cmd == "init") || (state == "INITIAL" && cmd == "conf") 
+      || (state == "CONFIGURED" && (cmd == "start" || cmd == "scrap"))
+      || (state == "RUNNING" && (cmd == "resume" || cmd == "stop" || cmd == "pause"))
+      || (state == "PAUSED" && (cmd == "resume" || cmd == "stop")) ) {
+     return true;
+  }
+  return false;
 }
 
 } // namespace appfwk

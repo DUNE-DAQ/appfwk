@@ -252,9 +252,12 @@ void
 DAQModuleManager::gather_stats(opmonlib::InfoCollector & ci, int level) {
 
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
-    mod_ptr->get_info(ci, level);   
+    opmonlib::InfoCollector tmp_ci;
+    mod_ptr->get_info(tmp_ci, level);
+    if (!tmp_ci.is_empty()) {
+       ci.add(mod_name, tmp_ci);
+    }   
   } 
-
 }
 
 } // namespace appfwk

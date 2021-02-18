@@ -23,6 +23,8 @@
 #include "nlohmann/json.hpp"
 
 #include <string>
+#include <atomic>
+#include <mutex>
 
 namespace dunedaq {
 
@@ -69,7 +71,19 @@ public:
   // Check whether the command can be accepted
   bool is_cmd_valid(const dataobj_t& cmd_data);
 
+  // State synch getter & setter
+
+  void  set_state(std::string s) {
+     const std::lock_guard<std::mutex> lock(m_mutex);
+     m_state = s;
+  } 
+  std::string get_state() {
+    const std::lock_guard<std::mutex> lock(m_mutex);
+    return m_state ;
+  }
+
 private:
+  std::mutex m_mutex;
   std::string m_partition;
   opmonlib::InfoManager m_info_mgr;
   std::string  m_state;
