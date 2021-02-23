@@ -121,6 +121,9 @@ Application::is_cmd_valid(const dataobj_t& cmd_data)
       || (state == "PAUSED" && (cmd == "resume" || cmd == "stop")) ) {
      return true;
   }
+  if (!(cmd=="init" || cmd=="conf" || cmd=="start" || cmd=="stop" || cmd == "pause" || cmd == "resume" || cmd == "scrap"))
+	return true;
+
   return false;
 }
 
