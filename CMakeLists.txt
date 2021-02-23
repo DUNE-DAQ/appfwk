@@ -12,11 +12,9 @@ find_package(folly REQUIRED)
 find_package(ers REQUIRED)
 find_package(cmdlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
-find_package(effective_robot REQUIRED)
 
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly cmdlib::cmdlib nlohmann_json::nlohmann_json pthread)
 
-# daq_codegen(*.jsonnet DEP_PKGS effective_robot cmdlib TEMPLATES effective_robot/Structs.hpp.j2 Nljs.hpp.j2 )
 daq_codegen( *.jsonnet DEP_PKGS cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
 
 ##############################################################################
