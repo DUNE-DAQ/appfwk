@@ -8,7 +8,7 @@
  */
 
 #include "appfwk/CommandLineInterpreter.hpp"
-#include "appfwk/DAQModuleManager.hpp"
+#include "appfwk/Application.hpp"
 #include "cmdlib/CommandFacility.hpp"
 
 #include "ers/Issue.h"
@@ -68,17 +68,11 @@ main(int argc, char* argv[])
     exit(-1);
   }
 
-  // DAQModuleManager commandable
-  appfwk::DAQModuleManager manager;
+  // Create the Application
+  appfwk::Application app(args.app_name, args.partition_name, args.command_facility_plugin_name, args.info_service_plugin_name);
 
-  // CommandFacility
-  auto cmdfac = cmdlib::makeCommandFacility(args.m_command_facility_plugin_name);
-
-  // Add commanded object to CF
-  cmdfac->set_commanded(manager);
-
-  // Run until global signal
-  cmdfac->run(run_marker);
+  app.init();
+  app.run(run_marker);
 
   return 0;
 }
