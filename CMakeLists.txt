@@ -15,6 +15,8 @@ find_package(nlohmann_json REQUIRED )
 
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly cmdlib::cmdlib nlohmann_json::nlohmann_json pthread)
 
+daq_codegen( *.jsonnet DEP_PKGS cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
+
 ##############################################################################
 # Main library
 daq_add_library(QueueRegistry.cpp DAQModule*.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})

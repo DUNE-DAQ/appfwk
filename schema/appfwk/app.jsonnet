@@ -7,25 +7,12 @@
 // appfwk "application" schema ("app").
 
 local moo = import "moo.jsonnet";
-local s = moo.oschema.schema("dunedaq.appfwk.cmd");
+local s = moo.oschema.schema("dunedaq.appfwk.app");
+local s_cmd = import "cmdlib/cmd.jsonnet";
+local cmd = moo.oschema.hier(s_cmd).dunedaq.cmdlib.cmd;
 
 // A temporary schema construction context.
 local cs = {
-    data: s.any("Data",
-                doc="An opaque object holding lower layer substructure"),
-
-    // fixme: this should be an enum but I'm not allowed to make it so yet.
-    cmdid: s.string("CmdId", pattern=moo.re.ident_only,
-                    doc="The command name.  FIXME: this should be an enum!"),
-    // cmdid: s.enum("CmdId", ["unknown","init","conf","start","stop","scrap","fini"],
-    //                 "unknown", doc="The known command types"),
-    
-    command: s.record("Command", [
-        s.field("id", self.cmdid,
-                doc="Identify the type of command"),
-        s.field("data", self.data, optional=true,
-                doc="Command data object with type-specific structure"),
-    ], doc="Top-level command object structure"),
 
     plugin: s.string("PluginName", moo.re.ident_only,
                      doc="Name of a plugin"),
@@ -55,7 +42,7 @@ local cs = {
                 doc="Name of a plugin providing the module"),
         s.field("inst", self.inst,
                 doc="Module instance name"),
-        s.field("data", self.data, optional=true,
+        s.field("data", cmd.Data, optional=true,
                 doc="Specific to the module implementation"),
     ], doc="Module specification"),
     mspecs: s.sequence("ModSpecs", self.mspec,
@@ -88,35 +75,7 @@ local cs = {
                 doc="Initial Module specifications"),
     ], doc="The app-level init command data object struction"),
 
-    // fixme: specify a pattern that itself matches any regex?
-    match: s.string("Match", doc="String used as a regex match"),
-
-    mcmd: s.record("AddressedCmd", [
-        s.field("match", self.match,
-                doc="A regex that matches on module instance names"),
-        s.field("data", self.data,
-                doc="The module-level command data object"),
-    ], doc="General, non-init module-level command data structure"),
-    mcmds: s.sequence("AddressedCmds", self.mcmd,
-                     doc="A sequence of AddressedCmd"),
-
-    mcmdobj: s.record("CmdObj", [
-        s.field("modules", self.mcmds,
-                doc="Addressed, module command objects"),
-    ], doc="Structure of app-level, non-init command object"), 
-
-    run_number: s.number("RunNumber", dtype="u8",
-                       doc="Run Number"),
-
-    start_params: s.record("StartParams", [
-        s.field("run", self.run_number, doc="Run Number")
-    ]),
-
-    empty_params: s.record("EmptyParams", [
-    ])
-
-
 };
 
 // Output a topologically sorted array.
-moo.oschema.sort_select(cs)
+s_cmd + moo.oschema.sort_select(cs)

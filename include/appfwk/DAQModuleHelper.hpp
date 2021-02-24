@@ -9,7 +9,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULEHELPER_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULEHELPER_HPP_
 
-#include "appfwk/cmd/Structs.hpp"
+#include "appfwk/app/Structs.hpp"
 
 #include <map>
 #include <string>
@@ -19,7 +19,7 @@ namespace dunedaq {
 
 namespace appfwk {
 
-using IndexedQueueInfos_t = std::map<std::string, cmd::QueueInfo>;
+using IndexedQueueInfos_t = std::map<std::string, app::QueueInfo>;
 
 /// @brief Return map of QueueInfo indexed by their "name".
 ///
@@ -28,7 +28,7 @@ IndexedQueueInfos_t
 queue_index(const nlohmann::json& iniobj, std::vector<std::string> required = {});
 
 /// @brief Return vector of QueueInfo from the init() object
-cmd::QueueInfos
+app::QueueInfos
 queue_infos(const nlohmann::json& iniobj);
 
 } // namespace appfwk

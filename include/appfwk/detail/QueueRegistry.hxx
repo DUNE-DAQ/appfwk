@@ -47,19 +47,19 @@ QueueRegistry::create_queue(const std::string& name, const QueueConfig& config)
 {
 
   std::shared_ptr<Named> queue;
-  switch (config.m_kind) {
+  switch (config.kind) {
     case QueueConfig::kStdDeQueue:
-      queue = std::make_shared<StdDeQueue<T>>(name, config.m_capacity);
+      queue = std::make_shared<StdDeQueue<T>>(name, config.capacity);
       break;
     case QueueConfig::kFollySPSCQueue:
-      queue = std::make_shared<FollySPSCQueue<T>>(name, config.m_capacity);
+      queue = std::make_shared<FollySPSCQueue<T>>(name, config.capacity);
       break;
     case QueueConfig::kFollyMPMCQueue:
-      queue = std::make_shared<FollyMPMCQueue<T>>(name, config.m_capacity);
+      queue = std::make_shared<FollyMPMCQueue<T>>(name, config.capacity);
       break;
 
     default:
-      throw QueueKindUnknown(ERS_HERE, std::to_string(config.m_kind));
+      throw QueueKindUnknown(ERS_HERE, std::to_string(config.kind));
   }
 
   return queue;
