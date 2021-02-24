@@ -24,7 +24,7 @@ queue_index(const nlohmann::json& iniobj, std::vector<std::string> required)
   }
   for (auto name : required) {
     if (ret.find(name) == ret.end()) {
-      throw SchemaError(ERS_HERE, "missing queue: " + name);
+      throw InvalidSchema(ERS_HERE, "missing queue: " + name);
     }
   }
   return ret;

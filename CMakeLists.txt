@@ -16,7 +16,7 @@ find_package(nlohmann_json REQUIRED )
 
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers Folly::folly cmdlib::cmdlib opmonlib::opmonlib nlohmann_json::nlohmann_json pthread)
 
-daq_codegen_schema(*.jsonnet MPATH_PKGS cmdlib TEMPL Structs.hpp Nljs.hpp )
+daq_codegen( *.jsonnet DEP_PKGS cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
 
 ##############################################################################
 # Main library
