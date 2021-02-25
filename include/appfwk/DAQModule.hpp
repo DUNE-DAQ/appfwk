@@ -21,6 +21,8 @@
 
 #include "appfwk/NamedObject.hpp"
 
+#include "opmonlib/InfoCollector.hpp"
+
 #include "cetlib/BasicPluginFactory.h"
 #include "cetlib/compiler_macros.h"
 #include "ers/Issue.h"
@@ -178,6 +180,8 @@ public:
     std::unique_lock<std::mutex> wait_lock(m_wait_mutex);
     m_wait_cv.notify_all();
   }
+  
+  virtual void get_info(opmonlib::InfoCollector & /*ci*/, int /*level*/) { return; }; 
 
 protected:
   /**

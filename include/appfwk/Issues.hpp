@@ -19,14 +19,13 @@
 namespace dunedaq {
 
 // Throw if a CLI receives unexpected usage.  The "what" arg
-// should explain the nature of the error.  Use ERS_INFO() or
-// similar to provide lengthy usage.
+// should explain the nature of the error.  
 ERS_DECLARE_ISSUE(appfwk, BadCliUsage, what, ((std::string)what))
 
 // Throw if an operation driven by a schema fails due to data not
 // following the schema.  This can be considered a special case of
 // a corrupt stream.  Describe the error in the "what" arg.
-ERS_DECLARE_ISSUE(appfwk, SchemaError, "Schema error: " << what, ((std::string)what))
+ERS_DECLARE_ISSUE(appfwk, InvalidSchema, "Schema error: " << what, ((std::string)what))
 
 // Throw if a lookup of a component fails.
 ERS_DECLARE_ISSUE(appfwk, MissingComponent, "No such component: " << what, ((std::string)what))

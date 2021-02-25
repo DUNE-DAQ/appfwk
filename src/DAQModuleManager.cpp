@@ -17,7 +17,7 @@
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/QueueRegistry.hpp"
 
-#include "ers/ers.h"
+#include "logging/Logging.hpp"
 
 #include <map>
 #include <regex>
@@ -43,7 +43,7 @@ DAQModuleManager::initialize( const dataobj_t& data) {
 void
 DAQModuleManager::init_modules(const app::ModSpecs & mspecs) {
   for (const auto& mspec : mspecs) {
-    ERS_INFO("construct: " << mspec.plugin << " : " << mspec.inst);
+    TLOG_DEBUG(0) << "construct: " << mspec.plugin << " : " << mspec.inst;
     auto mptr = make_module(mspec.plugin, mspec.inst);
     m_module_map.emplace(mspec.inst, mptr);
     mptr->init(mspec.data);
@@ -79,7 +79,7 @@ DAQModuleManager::init_queues(const app::QueueSpecs & qspecs) {
     }
     qc.capacity = qs.capacity;
     queue_cfgs[queue_name] = qc;
-    ERS_INFO("Adding queue: " << queue_name);
+    TLOG_DEBUG(2) << "Adding queue: " << queue_name;
   }
   QueueRegistry::get().configure(queue_cfgs);
 }
@@ -102,7 +102,7 @@ DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& d
           }
         }
       }
-      ERS_LOG("Dispatch \"" << id << "\" to \"" << mod_ptr->get_name() << "\":\n" << params.dump(4));
+      TLOG_DEBUG(2) << "Dispatch \"" << id << "\" to \"" << mod_ptr->get_name() << "\":\n" << params.dump(4);
       try {
         mod_ptr->execute_command(id, params);
       } catch (ers::Issue& ex) {
@@ -212,7 +212,7 @@ DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t
   for (auto& [mod_names, data_ptr] : mod_seq) {
     for (auto& mod_name : mod_names) {
       try {
-        ERS_LOG("Executing " << id << " -> " << mod_name);
+        TLOG_DEBUG(2) << "Executing " << id << " -> " << mod_name;
         m_module_map[mod_name]->execute_command(id, *data_ptr);
       } catch (ers::Issue& ex) {
         ers::error(ex);
@@ -233,7 +233,7 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
 {
 
   auto cmd = cmd_data.get<cmdlib::cmd::Command>();
-  ERS_LOG("Command id:" << cmd.id);
+  TLOG_DEBUG(1) <<"Command id:" << cmd.id;
 
   if (!m_initialized) {
     if (cmd.id != "init") {
@@ -246,6 +246,18 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
   dispatch_one_match_only(cmd.id, cmd.data);
 
   // dispatch(cmd.id, cmd.data);
+}
+
+void
+DAQModuleManager::gather_stats(opmonlib::InfoCollector & ci, int level) {
+
+  for (const auto& [mod_name, mod_ptr] : m_module_map) {
+    opmonlib::InfoCollector tmp_ci;
+    mod_ptr->get_info(tmp_ci, level);
+    if (!tmp_ci.is_empty()) {
+       ci.add(mod_name, tmp_ci);
+    }   
+  } 
 }
 
 } // namespace appfwk
