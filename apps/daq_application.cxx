@@ -11,7 +11,7 @@
 #include "appfwk/Application.hpp"
 #include "cmdlib/CommandFacility.hpp"
 
-#include "ers/Issue.h"
+#include "logging/Logging.hpp"
 #include "nlohmann/json.hpp"
 
 #include <csignal>
@@ -51,11 +51,16 @@ signal_handler(int signal)
 int
 main(int argc, char* argv[])
 {
+
+  dunedaq::logging::Logging().setup();
+
   // Setup signals
   std::signal(SIGABRT, signal_handler);
   std::signal(SIGQUIT, signal_handler);
 
   using namespace dunedaq;
+
+  
 
   appfwk::CommandLineInterpreter args;
   try {
