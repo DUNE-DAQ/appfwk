@@ -12,7 +12,7 @@
 #include "appfwk/cmd/Nljs.hpp"
 #include "appfwk/appinfo/Nljs.hpp"
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 namespace dunedaq {
 namespace appfwk {

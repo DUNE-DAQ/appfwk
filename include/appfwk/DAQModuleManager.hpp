@@ -13,7 +13,7 @@
 #include "appfwk/app/Structs.hpp"
 
 #include "opmonlib/InfoCollector.hpp"
-#include "ers/Issue.h"
+#include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 
 #include <map>

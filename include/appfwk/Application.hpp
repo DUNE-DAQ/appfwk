@@ -19,7 +19,7 @@
 #include "opmonlib/InfoProvider.hpp"
 #include "opmonlib/InfoManager.hpp"
 
-#include "ers/Issue.h"
+#include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 
 #include <string>

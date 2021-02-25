@@ -16,7 +16,7 @@
 
 #include "appfwk/NamedObject.hpp"
 
-#include "ers/Issue.h"
+#include "ers/Issue.hpp"
 
 #include <chrono>
 #include <cstddef>
