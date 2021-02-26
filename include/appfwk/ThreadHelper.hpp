@@ -16,7 +16,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_THREADHELPER_HPP_
 #define APPFWK_INCLUDE_APPFWK_THREADHELPER_HPP_
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 #include <functional>
 #include <future>

@@ -13,7 +13,7 @@
 
 #include "appfwk/Queue.hpp"
 
-#include "ers/Issue.h"
+#include "ers/Issue.hpp"
 
 #include <map>
 #include <memory>

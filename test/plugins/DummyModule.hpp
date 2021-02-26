@@ -13,7 +13,7 @@
 
 #include "appfwk/DAQModule.hpp"
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 #include <string>
 #include <vector>

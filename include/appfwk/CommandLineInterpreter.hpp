@@ -13,7 +13,7 @@
 #define APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
 
 #include "boost/program_options.hpp"
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 #include <string>
 #include <vector>

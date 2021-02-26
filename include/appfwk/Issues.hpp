@@ -12,7 +12,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_ISSUES_HPP_
 #define APPFWK_INCLUDE_APPFWK_ISSUES_HPP_
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 #include <string>
 
