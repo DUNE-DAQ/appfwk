@@ -11,7 +11,7 @@
 #include "appfwk/DAQSource.hpp"
 #include "appfwk/StdDeQueue.hpp"
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 #define BOOST_TEST_MODULE DAQSink_DAQSource_test // NOLINT
 

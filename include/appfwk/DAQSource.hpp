@@ -13,7 +13,7 @@
 #include "appfwk/QueueRegistry.hpp"
 
 #include "TRACE/trace.h"
-#include "ers/Issue.h"
+#include "ers/Issue.hpp"
 
 #include <chrono>
 #include <memory>

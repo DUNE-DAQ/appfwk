@@ -1,5 +1,5 @@
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 namespace dunedaq::appfwk {
 
