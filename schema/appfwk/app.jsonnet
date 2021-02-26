@@ -8,10 +8,9 @@
 
 local moo = import "moo.jsonnet";
 local s = moo.oschema.schema("dunedaq.appfwk.app");
-local s_cmd = import "cmdlib/cmd.jsonnet";
-local cmd = moo.oschema.hier(s_cmd).dunedaq.cmdlib.cmd;
 local s_rccmd = import "rcif/cmd.jsonnet";
 local rccmd = moo.oschema.hier(s_rccmd).dunedaq.rcif.cmd;
+local cmd = moo.oschema.hier(s_rccmd).dunedaq.cmdlib.cmd;
 
 // A temporary schema construction context.
 local cs = {
@@ -80,4 +79,4 @@ local cs = {
 };
 
 // Output a topologically sorted array.
-s_cmd + s_rccmd + moo.oschema.sort_select(cs)
+s_rccmd + moo.oschema.sort_select(cs)
