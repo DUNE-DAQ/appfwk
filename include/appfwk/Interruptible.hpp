@@ -49,8 +49,9 @@ protected:
   /**
    * @brief Sleep for the given amount of time while wait_condition evaluates to false
    * @param wait_duration The amount of time to sleep for
-   * @param wait_condition An atomic bool which indicates via the direction parameterr if the sleep
-   * should be continued
+   * @param wait_condition An atomic bool which indicates via the direction parameter if the sleep
+   * should be continued (default direction is false, so a false wait_condition indicates that the
+   * sleep should continue)
    * @param direction Indicates which value of wait_condition should indicate if the sleep should
    * continue
    * @returns The result of wait_condition after the sleep
