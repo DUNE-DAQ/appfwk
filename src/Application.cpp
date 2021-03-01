@@ -9,10 +9,11 @@
 #include "appfwk/Application.hpp"
 
 #include "appfwk/Issues.hpp"
-#include "appfwk/cmd/Nljs.hpp"
+#include "cmdlib/cmd/Nljs.hpp"
+#include "rcif/cmd/Nljs.hpp"
 #include "appfwk/appinfo/Nljs.hpp"
 
-#include "ers/ers.hpp"
+#include "logging/Logging.hpp"
 
 namespace dunedaq {
 namespace appfwk {
@@ -38,7 +39,18 @@ Application::run(std::atomic<bool>& end_marker)
   if (!m_initialized) {
     throw ApplicationNotInitialized(ERS_HERE, get_name());
   }
-  m_info_mgr.start(5, 3);
+
+  setenv("DUNEDAQ_OPMON_INTERVAL",    "10",0);
+  setenv("DUNEDAQ_OPMON_LEVEL",  "1",0);
+
+  std::stringstream s1(getenv("DUNEDAQ_OPMON_INTERVAL"));
+  std::stringstream s2(getenv("DUNEDAQ_OPMON_LEVEL"));
+  uint32_t interval = 0;
+  uint32_t level = 0;
+  s1 >> interval;
+  s2 >> level;
+
+  m_info_mgr.start(interval, level);
   m_cmd_fac->run(end_marker);
   m_info_mgr.stop();
 }
@@ -47,7 +59,9 @@ void
 Application::execute(const dataobj_t& cmd_data)
 {
 
-  std::string cmdname = cmd_data.get<cmdlib::cmd::Command>().id;
+  auto rc_cmd = cmd_data.get<rcif::cmd::RCCommand>();
+  std::string cmdname = rc_cmd.id;
+
   if(!is_cmd_valid(cmd_data)) {
     throw InvalidCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
   }
@@ -57,19 +71,8 @@ Application::execute(const dataobj_t& cmd_data)
   try {
     m_mod_mgr.execute(cmd_data);
     m_busy.store(false);
-    if (cmdname == "init" || cmdname == "scrap") {
-       set_state("INITIAL") ; 
-    }
-    else if (cmdname == "conf" || cmdname == "stop") {
-       set_state("CONFIGURED") ;
-     
-    }
-    else if (cmdname == "start" || cmdname == "resume") {
-       set_state("RUNNING") ;
-    }
-    else if (cmdname == "pause") {
-       set_state("PAUSED") ; // FIXME: to be taken from cmd_data 
-    }
+    if(rc_cmd.exit_state != "ANY" )
+	set_state(rc_cmd.exit_state);
   } 
   catch(CommandDispatchingFailed & ex) {
     m_busy.store(false);
@@ -96,7 +99,7 @@ Application::gather_stats(opmonlib::InfoCollector & ci, int level)
   if (level == 0) {
     // give only generic application info
   } 
-  else {
+  else if (ai.state == "CONFIGURED" || ai.state == "RUNNING") {
     try {
        m_mod_mgr.gather_stats(tmp_ci, level);
     }
@@ -114,7 +117,10 @@ Application::is_cmd_valid(const dataobj_t& cmd_data)
     return false;
 
   std::string state = get_state();
-  std::string cmd = cmd_data.get<cmdlib::cmd::Command>().id;
+  std::string entry_state = cmd_data.get<rcif::cmd::RCCommand>().entry_state;
+  if(entry_state == "ANY" || state == entry_state)
+    return true; 
+/*
   if( (state == "NONE" && cmd == "init") || (state == "INITIAL" && cmd == "conf") 
       || (state == "CONFIGURED" && (cmd == "start" || cmd == "scrap"))
       || (state == "RUNNING" && (cmd == "resume" || cmd == "stop" || cmd == "pause"))
@@ -123,7 +129,7 @@ Application::is_cmd_valid(const dataobj_t& cmd_data)
   }
   if (!(cmd=="init" || cmd=="conf" || cmd=="start" || cmd=="stop" || cmd == "pause" || cmd == "resume" || cmd == "scrap"))
 	return true;
-
+*/
   return false;
 }
 

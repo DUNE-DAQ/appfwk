@@ -17,7 +17,7 @@
 #include "appfwk/FollyQueue.hpp"
 #include "appfwk/StdDeQueue.hpp"
 
-#include "TRACE/trace.h"
+#include "logging/Logging.hpp"
 
 #include "boost/program_options.hpp"
 namespace bpo = boost::program_options;
