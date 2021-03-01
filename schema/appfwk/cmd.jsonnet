@@ -8,8 +8,9 @@
 
 local moo = import "moo.jsonnet";
 local s = moo.oschema.schema("dunedaq.appfwk.cmd");
-local s_cmd = import "cmdlib/cmd.jsonnet";
-local cmd = moo.oschema.hier(s_cmd).dunedaq.cmdlib.cmd;
+local s_rccmd = import "rcif/cmd.jsonnet";
+local rccmd = moo.oschema.hier(s_rccmd).dunedaq.rcif.cmd;
+local cmd = moo.oschema.hier(s_rccmd).dunedaq.cmdlib.cmd;
 
 // A temporary schema construction context.
 local cs = {
@@ -31,12 +32,12 @@ local cs = {
                 doc="Addressed, module command objects"),
     ], doc="Structure of app-level, non-init command object"), 
 
-    run_number: s.number("RunNumber", dtype="u8",
-                       doc="Run Number"),
+#    run_number: s.number("RunNumber", dtype="u8",
+#                       doc="Run Number"),
 
-    start_params: s.record("StartParams", [
-        s.field("run", self.run_number, doc="Run Number")
-    ]),
+#    start_params: s.record("StartParams", [
+#        s.field("run", self.run_number, doc="Run Number")
+#    ]),
 
     # empty_params: s.record("EmptyParams", [
     # ])
@@ -45,4 +46,4 @@ local cs = {
 };
 
 // Output a topologically sorted array.
-s_cmd + moo.oschema.sort_select(cs)
+s_rccmd + moo.oschema.sort_select(cs)
