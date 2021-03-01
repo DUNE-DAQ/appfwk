@@ -20,6 +20,7 @@
 #define APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 
 #include "appfwk/NamedObject.hpp"
+#include "appfwk/Interruptible.hpp"
 
 #include "opmonlib/InfoCollector.hpp"
 
@@ -28,7 +29,6 @@
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 
-#include <condition_variable>
 #include <functional>
 #include <map>
 #include <memory>
@@ -131,7 +131,7 @@ namespace appfwk {
  * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
-class DAQModule : public NamedObject
+class DAQModule : public NamedObject, public Interruptible
 {
 public:
   using data_t = nlohmann::json;
@@ -169,19 +169,7 @@ public:
 
   bool has_command(const std::string& name) const;
 
-  /**
-   * @brief Send a notification to all threads currently in a call to interruptible_wait
-   *
-   * Note that there is minimal penalty for calling interrupt() when no threads are waiting, so it can be called
-   * multiple times in succession, for example by a "stop" command handler and then by execute_command.
-   */
-  void interrupt()
-  {
-    std::unique_lock<std::mutex> wait_lock(m_wait_mutex);
-    m_wait_cv.notify_all();
-  }
-  
-  virtual void get_info(opmonlib::InfoCollector & /*ci*/, int /*level*/) { return; }; 
+  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; };
 
 protected:
   /**
@@ -191,21 +179,6 @@ protected:
   template<typename Child>
   void register_command(const std::string& name, void (Child::*f)(const data_t&));
 
-  /**
-   * @brief Sleep for the given amount of time while wait_condition evaluates to false
-   * @param wait_duration The amount of time to sleep for
-   * @param wait_condition An atomic bool which indicates via the direction parameterr if the sleep should be continued
-   * @param direction Indicates which value of wait_condition should indicate if the sleep should continue
-   * @returns The result of wait_condition after the sleep
-   *
-   * Note that calling interrupt() will cause an evaluation of wait_condition, and if the condition still indicates
-   * "sleep", the sleep will continue. Therefore, interrupt() should be called only after the state of the DAQModule
-   * has been changed.
-   */
-  bool interruptible_wait(std::chrono::microseconds wait_duration,
-                          std::atomic<bool>& wait_condition,
-                          bool direction = false);
-
   DAQModule(DAQModule const&) = delete;
   DAQModule(DAQModule&&) = delete;
   DAQModule& operator=(DAQModule const&) = delete;
@@ -214,10 +187,6 @@ protected:
 private:
   using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
   CommandMap_t m_commands;
-
-  // For interruptible waits
-  std::condition_variable m_wait_cv;
-  std::mutex m_wait_mutex;
 };
 
 /**

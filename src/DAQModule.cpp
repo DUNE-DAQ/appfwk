@@ -8,7 +8,6 @@
 
 #include "appfwk/DAQModule.hpp"
 
-#include <atomic>
 #include <string>
 #include <vector>
 
@@ -39,15 +38,6 @@ bool
 DAQModule::has_command(const std::string& name) const
 {
   return (m_commands.find(name) != m_commands.end());
-}
-
-bool
-DAQModule::interruptible_wait(std::chrono::microseconds wait_duration, std::atomic<bool>& wait_condition, bool direction)
-{
-  std::unique_lock<std::mutex> wait_lock(m_wait_mutex);
-
-  // Wait Predicate should return false to continue wait
-  return m_wait_cv.wait_for(wait_lock, wait_duration, [&]() { return wait_condition.load() != direction; });
 }
 
 } // namespace dunedaq::appfwk
