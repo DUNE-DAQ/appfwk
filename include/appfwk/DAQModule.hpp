@@ -20,7 +20,6 @@
 #define APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 
 #include "appfwk/NamedObject.hpp"
-#include "appfwk/Interruptible.hpp"
 
 #include "opmonlib/InfoCollector.hpp"
 
@@ -131,7 +130,7 @@ namespace appfwk {
  * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
-class DAQModule : public NamedObject, public Interruptible
+class DAQModule : public NamedObject
 {
 public:
   using data_t = nlohmann::json;

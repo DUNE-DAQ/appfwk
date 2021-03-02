@@ -15,7 +15,6 @@
 #define APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
 
 #include "appfwk/NamedObject.hpp"
-#include "appfwk/Interruptible.hpp"
 
 #include "ers/Issue.hpp"
 
@@ -36,7 +35,7 @@ namespace appfwk {
  * it can be included in generic containers), all implementations should be.
  */
 template<class T>
-class Queue : public NamedObject, public Interruptible
+class Queue : public NamedObject
 {
 public:
   using value_t = T;                            ///< Type stored in the Queue

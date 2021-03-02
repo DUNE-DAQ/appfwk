@@ -11,7 +11,6 @@
 
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
-#include "appfwk/Interruptible.hpp"
 
 #include "TRACE/trace.h"
 #include "ers/Issue.hpp"
@@ -34,7 +33,7 @@ ERS_DECLARE_ISSUE(appfwk,                                           // namespace
 namespace appfwk {
 
 template<typename T>
-class DAQSink : public Named, public Interruptible
+class DAQSink : public Named
 {
 public:
   using value_t = T;
@@ -50,8 +49,6 @@ public:
   DAQSink(DAQSink&&) = delete;
   DAQSink& operator=(DAQSink const&) = delete;
   DAQSink& operator=(DAQSink&&) = delete;
-
-  void interrupt() override { m_queue->interrupt(); }
 
 private:
   std::shared_ptr<Queue<T>> m_queue;
