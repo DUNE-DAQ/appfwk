@@ -18,7 +18,6 @@ DAQModule::execute_command(const std::string& name, const data_t& data)
 {
   if (auto cmd = m_commands.find(name); cmd != m_commands.end()) {
     std::invoke(cmd->second, data);
-    interrupt();
     return;
   }
 
