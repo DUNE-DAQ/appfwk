@@ -168,7 +168,7 @@ public:
 
   bool has_command(const std::string& name) const;
 
-  virtual void get_info(opmonlib::InfoCollector & /*ci*/, int /*level*/) { return; }; 
+  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; };
 
 protected:
   /**
