@@ -74,6 +74,11 @@ Application::execute(const dataobj_t& cmd_data)
     if(rc_cmd.exit_state != "ANY" )
 	set_state(rc_cmd.exit_state);
   } 
+  catch(DAQModuleManagerNotInitialized &ex) {
+    m_busy.store(false);
+    m_error.store(true);
+    throw ex;
+  }
   catch(CommandDispatchingFailed & ex) {
     m_busy.store(false);
     m_error.store(true);
