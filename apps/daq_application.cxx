@@ -7,11 +7,12 @@
  * received with this code.
  */
 
-#include "appfwk/CommandLineInterpreter.hpp"
 #include "appfwk/Application.hpp"
+#include "appfwk/CommandLineInterpreter.hpp"
+#include "appfwk/Issues.hpp"
 #include "cmdlib/CommandFacility.hpp"
-
 #include "logging/Logging.hpp"
+
 #include "nlohmann/json.hpp"
 
 #include <csignal>
@@ -38,7 +39,7 @@ std::atomic<bool> run_marker{ true };
 static void
 signal_handler(int signal)
 {
-  std::cout << "Signal received: " << signal << '\n'; // NOLINT(runtime/output_format)
+  TLOG() << "Signal received: " << signal;
   run_marker.store(false);
 }
 
@@ -60,21 +61,18 @@ main(int argc, char* argv[])
 
   using namespace dunedaq;
 
-  
-
   appfwk::CommandLineInterpreter args;
   try {
     args = appfwk::CommandLineInterpreter::parse(argc, argv);
   } catch (ers::Issue& e) {
     // Die but do it gracefully gracefully.
-    // Use of std::cout annoys the linter.
-    std::cout << "Command-line parsing failed. Error:" << std::endl; // NOLINT(runtime/output_format)
-    std::cout << e.message() << std::endl;                           // NOLINT(runtime/output_format)
+    ers::error(appfwk::BadCliUsage(ERS_HERE, e.message()));
     exit(-1);
   }
 
   // Create the Application
-  appfwk::Application app(args.app_name, args.partition_name, args.command_facility_plugin_name, args.info_service_plugin_name);
+  appfwk::Application app(
+    args.app_name, args.partition_name, args.command_facility_plugin_name, args.info_service_plugin_name);
 
   app.init();
   app.run(run_marker);

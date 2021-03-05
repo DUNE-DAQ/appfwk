@@ -12,8 +12,7 @@
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
 
-#include "TRACE/trace.h"
-#include "ers/Issue.hpp"
+#include "logging/Logging.hpp"
 
 #include <chrono>
 #include <memory>
@@ -59,7 +58,7 @@ DAQSink<T>::DAQSink(const std::string& name)
 {
   try {
     m_queue = QueueRegistry::get().get_queue<T>(name);
-    TLOG(TLVL_TRACE, "DAQSink") << "Queue " << name << " is at " << m_queue.get();
+    TLOG_DEBUG(1, "DAQSink") << "Queue " << name << " is at " << m_queue.get();
   } catch (const QueueTypeMismatch& ex) {
     throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
