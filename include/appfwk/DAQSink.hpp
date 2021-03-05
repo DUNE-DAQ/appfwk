@@ -12,8 +12,6 @@
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
 
-//#include "TRACE/trace.h"
-//#include "ers/Issue.h"
 #include "logging/Logging.hpp"
 
 #include <chrono>

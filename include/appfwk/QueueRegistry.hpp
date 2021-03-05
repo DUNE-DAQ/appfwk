@@ -13,7 +13,7 @@
 
 #include "appfwk/Queue.hpp"
 
-#include "ers/Issue.h"
+#include "ers/Issue.hpp"
 
 #include <map>
 #include <memory>
@@ -46,9 +46,9 @@ struct QueueConfig
    */
   static queue_kind stoqk(const std::string& name);
 
-  QueueConfig::queue_kind m_kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
+  QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
                                                          ///< QueueConfig
-  size_t m_capacity = 0;                                 ///< The maximum size of the queue
+  size_t capacity = 0;                                 ///< The maximum size of the queue
 };
 
 /**

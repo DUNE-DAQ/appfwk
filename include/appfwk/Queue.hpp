@@ -16,7 +16,7 @@
 
 #include "appfwk/NamedObject.hpp"
 
-#include "ers/Issue.h"
+#include "ers/Issue.hpp"
 
 #include <chrono>
 #include <cstddef>
@@ -47,7 +47,7 @@ public:
    */
   explicit Queue(const std::string& name, size_t capacity)
     : NamedObject(name)
-    , m_capacity(capacity)
+    , capacity(capacity)
   {}
 
   /**
@@ -89,7 +89,7 @@ public:
   virtual bool can_pop() const noexcept = 0;
 
 protected:
-  size_t get_capacity() const { return m_capacity; }
+  size_t get_capacity() const { return capacity; }
 
 private:
   Queue(const Queue&) = delete;
@@ -97,7 +97,7 @@ private:
   Queue(Queue&&) = default;
   Queue& operator=(Queue&&) = default;
 
-  size_t m_capacity;
+  size_t capacity;
 };
 
 } // namespace appfwk

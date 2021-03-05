@@ -8,7 +8,7 @@
 
 #include "appfwk/DAQModuleHelper.hpp"
 #include "appfwk/Issues.hpp"
-#include "appfwk/cmd/Nljs.hpp"
+#include "appfwk/app/Nljs.hpp"
 
 #include <string>
 #include <vector>
@@ -24,15 +24,15 @@ queue_index(const nlohmann::json& iniobj, std::vector<std::string> required)
   }
   for (auto name : required) {
     if (ret.find(name) == ret.end()) {
-      throw SchemaError(ERS_HERE, "missing queue: " + name);
+      throw InvalidSchema(ERS_HERE, "missing queue: " + name);
     }
   }
   return ret;
 }
 
-cmd::QueueInfos
+app::QueueInfos
 queue_infos(const nlohmann::json& iniobj)
 {
-  return iniobj.get<cmd::ModInit>().qinfos;
+  return iniobj.get<app::ModInit>().qinfos;
 }
 } // namespace dunedaq::appfwk
