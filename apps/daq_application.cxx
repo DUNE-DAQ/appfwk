@@ -59,9 +59,6 @@ main(int argc, char* argv[])
   std::signal(SIGABRT, signal_handler);
   std::signal(SIGQUIT, signal_handler);
 
-  Logging().setup();
-  TLOG_DEBUG(2) << "Logging().setup() called";
-
   using namespace dunedaq;
 
   
