@@ -12,7 +12,6 @@
 #include "cmdlib/CommandFacility.hpp"
 #include "logging/Logging.hpp"
 
-#include "logging/Logging.hpp"
 #include "nlohmann/json.hpp"
 
 #include <csignal>
