@@ -54,7 +54,7 @@ public:
       ("name,n", bpo::value<std::string>()->required(), "Application name")
       ("partition,p", bpo::value<std::string>()->default_value("global"), "Partition name")
       ("commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")
-      ("informationService,i", bpo::value<std::string>()->default_value("stdout://./info.ison"), "Information Service URI")
+      ("informationService,i", bpo::value<std::string>()->default_value("stdout://flat"), "Information Service URI")
       ("help,h", "produce help message");
 
     bpo::variables_map vm;
