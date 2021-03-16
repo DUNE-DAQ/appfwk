@@ -28,7 +28,7 @@ Application::Application(std::string appname, std::string partition, std::string
 void
 Application::init()
 {
-  m_cmd_fac->set_commanded(*this);
+  m_cmd_fac->set_commanded(*this, get_name());
   m_info_mgr.set_provider(*this);
   m_initialized = true;
 }
