@@ -22,13 +22,13 @@ Application::Application(std::string appname, std::string partition, std::string
   : NamedObject(appname), m_partition(partition), m_info_mgr(opmonlibimpl), m_state("NONE"), m_busy(false), m_error(false),
     m_initialized(false) 
 {
-   m_cmd_fac = cmdlib::makeCommandFacility(cmdlibimpl);
+   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 }
 
 void
 Application::init()
 {
-  m_cmd_fac->set_commanded(*this);
+  m_cmd_fac->set_commanded(*this, get_name());
   m_info_mgr.set_provider(*this);
   m_initialized = true;
 }
