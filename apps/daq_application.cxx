@@ -7,12 +7,13 @@
  * received with this code.
  */
 
+#include "appfwk/Application.hpp"
 #include "appfwk/CommandLineInterpreter.hpp"
-#include "appfwk/DAQModuleManager.hpp"
+#include "appfwk/Issues.hpp"
 #include "cmdlib/CommandFacility.hpp"
+#include "logging/Logging.hpp"
 
-#include "ers/Issue.h"
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 
 #include <csignal>
 #include <fstream>
@@ -30,13 +31,15 @@ using json = nlohmann::json;
 /**
  * @brief Global atomic for process lifetime
  */
-std::atomic<bool> run_marker{true};
+std::atomic<bool> run_marker{ true };
 
 /**
  * @brief Signal handler for graceful stop
  */
-static void sigHandler(int signal) {
-  std::cout << "Signal received: " << signal << '\n';
+static void
+signal_handler(int signal)
+{
+  TLOG() << "Signal received: " << signal;
   run_marker.store(false);
 }
 
@@ -49,9 +52,12 @@ static void sigHandler(int signal) {
 int
 main(int argc, char* argv[])
 {
+
+  dunedaq::logging::Logging().setup();
+
   // Setup signals
-  std::signal(SIGABRT, sigHandler);
-  std::signal(SIGQUIT, sigHandler);
+  std::signal(SIGABRT, signal_handler);
+  std::signal(SIGQUIT, signal_handler);
 
   using namespace dunedaq;
 
@@ -60,23 +66,16 @@ main(int argc, char* argv[])
     args = appfwk::CommandLineInterpreter::parse(argc, argv);
   } catch (ers::Issue& e) {
     // Die but do it gracefully gracefully.
-    // Use of std::cout annoys the linter. 
-    std::cout << "Command-line parsing failed. Error:" << std::endl;
-    std::cout << e.message() << std::endl;
+    ers::error(appfwk::BadCliUsage(ERS_HERE, e.message()));
     exit(-1);
   }
 
-  // DAQModuleManager commandable
-  appfwk::DAQModuleManager manager;
+  // Create the Application
+  appfwk::Application app(
+    args.app_name, args.partition_name, args.command_facility_plugin_name, args.info_service_plugin_name);
 
-  // CommandFacility
-  auto cmdfac = cmdlib::makeCommandFacility(args.commandFacilityPluginName);
-
-  // Add commanded object to CF
-  cmdfac->setCommanded(manager);
-
-  // Run until global signal
-  cmdfac->run(run_marker);
+  app.init();
+  app.run(run_marker);
 
   return 0;
 }

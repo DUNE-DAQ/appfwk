@@ -12,8 +12,7 @@
 #include "appfwk/Queue.hpp"
 #include "appfwk/QueueRegistry.hpp"
 
-#include "TRACE/trace.h"
-#include "ers/Issue.h"
+#include "logging/Logging.hpp"
 
 #include <chrono>
 #include <memory>
@@ -36,31 +35,30 @@ template<typename T>
 class DAQSink : public Named
 {
 public:
-  using value_type = T;
-  using duration_type = std::chrono::milliseconds;
+  using value_t = T;
+  using duration_t = std::chrono::milliseconds;
 
   explicit DAQSink(const std::string& name);
-  void push(T&& element, const duration_type& timeout = duration_type::zero());
-  void push(const T& element, const duration_type& timeout = duration_type::zero());
+  void push(T&& element, const duration_t& timeout = duration_t::zero());
+  void push(const T& element, const duration_t& timeout = duration_t::zero());
   bool can_push() const noexcept;
-  const std::string& get_name() const final {return queue_->get_name(); }
+  const std::string& get_name() const final { return m_queue->get_name(); }
 
-  DAQSink(DAQSink const&) = delete;            
-  DAQSink(DAQSink&&) = delete;                
-  DAQSink& operator=(DAQSink const&) = delete; 
-  DAQSink& operator=(DAQSink&&) = delete;     
-
+  DAQSink(DAQSink const&) = delete;
+  DAQSink(DAQSink&&) = delete;
+  DAQSink& operator=(DAQSink const&) = delete;
+  DAQSink& operator=(DAQSink&&) = delete;
 
 private:
-  std::shared_ptr<Queue<T>> queue_;
+  std::shared_ptr<Queue<T>> m_queue;
 };
 
 template<typename T>
 DAQSink<T>::DAQSink(const std::string& name)
 {
   try {
-    queue_ = QueueRegistry::get().get_queue<T>(name);
-    TLOG(TLVL_TRACE, "DAQSink") << "Queue " << name << " is at " << queue_.get();
+    m_queue = QueueRegistry::get().get_queue<T>(name);
+    TLOG_DEBUG(1, "DAQSink") << "Queue " << name << " is at " << m_queue.get();
   } catch (const QueueTypeMismatch& ex) {
     throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
@@ -68,23 +66,23 @@ DAQSink<T>::DAQSink(const std::string& name)
 
 template<typename T>
 void
-DAQSink<T>::push(T&& element, const duration_type& timeout)
+DAQSink<T>::push(T&& element, const duration_t& timeout)
 {
-  queue_->push(std::move(element), timeout);
+  m_queue->push(std::move(element), timeout);
 }
 
 template<typename T>
 void
-DAQSink<T>::push(const T& element, const duration_type& timeout)
+DAQSink<T>::push(const T& element, const duration_t& timeout)
 {
-  queue_->push(T(element), timeout);
+  m_queue->push(T(element), timeout);
 }
 
 template<typename T>
 bool
 DAQSink<T>::can_push() const noexcept
 {
-  return queue_->can_push();
+  return m_queue->can_push();
 }
 
 } // namespace appfwk

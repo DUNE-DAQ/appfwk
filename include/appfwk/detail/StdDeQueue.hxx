@@ -1,66 +1,64 @@
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
 namespace dunedaq::appfwk {
 
 template<class T>
 StdDeQueue<T>::StdDeQueue(const std::string& name, size_t capacity)
   : Queue<T>(name, capacity)
-  , fDeque()
-  , fSize(0)
+  , m_deque()
+  , m_size(0)
 {
-  assert(fDeque.max_size() > this->GetCapacity());
+  assert(m_deque.max_size() > this->get_capacity());
 }
 
 template<class T>
 void
-StdDeQueue<T>::push(value_type&& object_to_push, const duration_type& timeout)
+StdDeQueue<T>::push(value_t&& object_to_push, const duration_t& timeout)
 {
 
-  auto starttime = std::chrono::steady_clock::now();
-  std::unique_lock<std::mutex> lk(fMutex, std::defer_lock);
+  auto start_time = std::chrono::steady_clock::now();
+  std::unique_lock<std::mutex> lk(m_mutex, std::defer_lock);
 
   this->try_lock_for(lk, timeout);
 
-  auto time_to_wait_for_space = (starttime + timeout) - std::chrono::steady_clock::now();
+  auto time_to_wait_for_space = (start_time + timeout) - std::chrono::steady_clock::now();
 
   if (time_to_wait_for_space.count() > 0) {
-    fNoLongerFull.wait_for(lk, time_to_wait_for_space, [&]() { return this->can_push(); });
+    m_no_longer_full.wait_for(lk, time_to_wait_for_space, [&]() { return this->can_push(); });
   }
 
   if (this->can_push()) {
-    fDeque.push_back(std::move(object_to_push));
-    fSize++;
-    fNoLongerEmpty.notify_one();
+    m_deque.push_back(std::move(object_to_push));
+    m_size++;
+    m_no_longer_empty.notify_one();
   } else {
-    throw QueueTimeoutExpired(ERS_HERE,
-                              this->get_name(),
-                              "push",
-                              std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
+    throw QueueTimeoutExpired(
+      ERS_HERE, this->get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
 
 template<class T>
 void
-StdDeQueue<T>::pop(T& val, const duration_type& timeout)
+StdDeQueue<T>::pop(T& val, const duration_t& timeout)
 {
 
-  auto starttime = std::chrono::steady_clock::now();
-  std::unique_lock<std::mutex> lk(fMutex, std::defer_lock);
+  auto start_time = std::chrono::steady_clock::now();
+  std::unique_lock<std::mutex> lk(m_mutex, std::defer_lock);
 
   this->try_lock_for(lk, timeout);
 
-  auto time_to_wait_for_data = (starttime + timeout) - std::chrono::steady_clock::now();
+  auto time_to_wait_for_data = (start_time + timeout) - std::chrono::steady_clock::now();
 
   if (time_to_wait_for_data.count() > 0) {
-    fNoLongerEmpty.wait_for(lk, time_to_wait_for_data, [&]() { return this->can_pop(); });
+    m_no_longer_empty.wait_for(lk, time_to_wait_for_data, [&]() { return this->can_pop(); });
   }
 
   if (this->can_pop()) {
-    val = std::move(fDeque.front());
-    fDeque.pop_front();
-    fSize--;
-    fNoLongerFull.notify_one();
+    val = std::move(m_deque.front());
+    m_deque.pop_front();
+    m_size--;
+    m_no_longer_full.notify_one();
   } else {
     throw QueueTimeoutExpired(
       ERS_HERE, this->get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
@@ -74,19 +72,19 @@ StdDeQueue<T>::pop(T& val, const duration_type& timeout)
 
 template<class T>
 void
-StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_type& timeout)
+StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_t& timeout)
 {
   assert(!lk.owns_lock());
 
-  auto starttime = std::chrono::steady_clock::now();
+  auto start_time = std::chrono::steady_clock::now();
   lk.try_lock();
 
   if (!lk.owns_lock() && timeout.count() > 0) {
 
     int approximate_number_of_retries = 5;
-    duration_type pause_between_tries = duration_type(timeout.count() / approximate_number_of_retries);
+    duration_t pause_between_tries = duration_t(timeout.count() / approximate_number_of_retries);
 
-    while (std::chrono::steady_clock::now() < starttime + timeout) {
+    while (std::chrono::steady_clock::now() < start_time + timeout) {
       std::this_thread::sleep_for(pause_between_tries);
       lk.try_lock();
       if (lk.owns_lock()) {
@@ -96,10 +94,8 @@ StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_typ
   }
 
   if (!lk.owns_lock()) {
-    throw QueueTimeoutExpired(ERS_HERE,
-                              this->get_name(),
-                              "lock mutex",
-                              std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
+    throw QueueTimeoutExpired(
+      ERS_HERE, this->get_name(), "lock mutex", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
 }
 

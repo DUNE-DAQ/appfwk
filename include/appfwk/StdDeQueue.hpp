@@ -38,8 +38,8 @@ template<class T>
 class StdDeQueue : public Queue<T>
 {
 public:
-  using value_type = T;                                   ///< Type of data stored in the StdDeQueue
-  using duration_type = typename Queue<T>::duration_type; ///< Type used for expressing timeouts
+  using value_t = T;                                ///< Type of data stored in the StdDeQueue
+  using duration_t = typename Queue<T>::duration_t; ///< Type used for expressing timeouts
 
   /**
    * @brief StdDeQueue Constructor
@@ -47,11 +47,11 @@ public:
    */
   explicit StdDeQueue(const std::string& name, size_t capacity);
 
-  bool can_pop() const noexcept override { return fSize.load() > 0; }
-  void pop(value_type& val, const duration_type&) override; // Throws QueueTimeoutExpired if a timeout occurs
+  bool can_pop() const noexcept override { return m_size.load() > 0; }
+  void pop(value_t& val, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
-  bool can_push() const noexcept override { return fSize.load() < this->GetCapacity(); }
-  void push(value_type&&, const duration_type&) override; // Throws QueueTimeoutExpired if a timeout occurs
+  bool can_push() const noexcept override { return m_size.load() < this->get_capacity(); }
+  void push(value_t&&, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
@@ -62,14 +62,14 @@ public:
   StdDeQueue& operator=(StdDeQueue&&) = delete;      ///< StdDeQueue is not move-assignable
 
 private:
-  void try_lock_for(std::unique_lock<std::mutex>&, const duration_type&);
+  void try_lock_for(std::unique_lock<std::mutex>&, const duration_t&);
 
-  std::deque<value_type> fDeque;
-  std::atomic<size_t> fSize = 0;
+  std::deque<value_t> m_deque;
+  std::atomic<size_t> m_size = 0;
 
-  std::mutex fMutex;
-  std::condition_variable fNoLongerFull;
-  std::condition_variable fNoLongerEmpty;
+  std::mutex m_mutex;
+  std::condition_variable m_no_longer_full;
+  std::condition_variable m_no_longer_empty;
 };
 
 } // namespace appfwk

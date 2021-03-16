@@ -9,31 +9,36 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULEHELPER_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULEHELPER_HPP_
 
-#include "appfwk/cmd/Structs.hpp"
+#include "appfwk/app/Structs.hpp"
 
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace dunedaq {
 
 namespace appfwk {
 
-    using IndexedQueueInfos = std::map<std::string, cmd::QueueInfo>;
+using IndexedQueueInfos_t = std::map<std::string, app::QueueInfo>;
 
-    /// @brief Return map of QueueInfo indexed by their "name".
-    ///
-    /// The iniobj is as given to a module's init() method.
-    IndexedQueueInfos qindex(const nlohmann::json& iniobj,
-                             std::vector<std::string> required = {});
-    
-    /// @brief Return vector of QueueInfo from the init() object
-    cmd::QueueInfos qinfos(const nlohmann::json& iniobj);
+/// @brief Return map of QueueInfo indexed by their "name".
+///
+/// The iniobj is as given to a module's init() method.
+IndexedQueueInfos_t
+queue_index(const nlohmann::json& iniobj, std::vector<std::string> required = {});
 
+/// @brief Return vector of QueueInfo from the init() object
+app::QueueInfos
+queue_infos(const nlohmann::json& iniobj);
+
+std::string queue_inst(const nlohmann::json& iniobj, const std::string& name)
+{
+  return queue_index(iniobj, {name})[name].inst;
+}
+  
 } // namespace appfwk
 
 } // namespace dunedaq
-
 
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULEHELPER_HPP_
 
