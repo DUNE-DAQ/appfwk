@@ -48,6 +48,7 @@ BOOST_AUTO_TEST_CASE(RestApi)
     api.start();
     BOOST_TEST_REQUIRE(api.is_started());
     BOOST_TEST_REQUIRE(!api.start_failed());
+    BOOST_TEST_REQUIRE(api.get_port() != 0);
   } catch (const dunedaq::rest::RestApiStartFailed& ex) {
     BOOST_TEST_REQUIRE(false, "Test failure: unexpected API Start exception thrown");
   } catch (...) { // NOLINT

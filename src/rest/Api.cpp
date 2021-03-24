@@ -67,6 +67,7 @@ Api::start()
     usleep(100);
     realPort = m_http_endpoint->getPort();
   }
+  m_port = realPort;
   // wait for api to be started
   do
   {

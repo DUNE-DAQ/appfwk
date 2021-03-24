@@ -93,6 +93,8 @@ public:
    */
   bool start_failed() { return m_start_failed; }
 
+  Pistache::Port get_port() { return m_port; }
+
   /**
    * @brief Add and remove routes.
    * These functions forward directly to the pistache router, and do some extra bookkeeping
