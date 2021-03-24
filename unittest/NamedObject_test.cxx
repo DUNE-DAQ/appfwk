@@ -1,5 +1,5 @@
 /**
- * @file Named_test.cxx Named/NamedObject class Unit Tests
+ * @file NamedObject_test.cxx Named/NamedObject class Unit Tests
  *
  * The tests here primarily confirm that the move and copy semantics
  * are what we expect them to be

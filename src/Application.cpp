@@ -8,19 +8,21 @@
 
 #include "appfwk/Application.hpp"
 
+#include "appfwk/rest/Api.hpp"
 #include "appfwk/Issues.hpp"
 #include "cmdlib/cmd/Nljs.hpp"
 #include "rcif/cmd/Nljs.hpp"
 #include "appfwk/appinfo/Nljs.hpp"
-
 #include "logging/Logging.hpp"
+
+#include <stdint.h>
 
 namespace dunedaq {
 namespace appfwk {
 
-Application::Application(std::string appname, std::string partition, std::string cmdlibimpl, std::string opmonlibimpl)
-  : NamedObject(appname), m_partition(partition), m_info_mgr(opmonlibimpl), m_state("NONE"), m_busy(false), m_error(false),
-    m_initialized(false) 
+Application::Application(std::string appname, std::string partition, std::uint16_t rest_port, std::string cmdlibimpl, std::string opmonlibimpl)
+  : NamedObject(appname), m_partition(partition), m_rest_api(rest_port), m_info_mgr(opmonlibimpl), StateObject("NONE"), m_busy(false), m_error(false),
+    m_initialized(false)
 {
    m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 }
@@ -30,6 +32,8 @@ Application::init()
 {
   m_cmd_fac->set_commanded(*this, get_name());
   m_info_mgr.set_provider(*this);
+  m_rest_api.register_zpages(get_name(), (StateObject*)this);
+  m_rest_api.start();
   m_initialized = true;
 }
 
@@ -40,8 +44,8 @@ Application::run(std::atomic<bool>& end_marker)
     throw ApplicationNotInitialized(ERS_HERE, get_name());
   }
 
-  setenv("DUNEDAQ_OPMON_INTERVAL",    "10",0);
-  setenv("DUNEDAQ_OPMON_LEVEL",  "1",0);
+  setenv("DUNEDAQ_OPMON_INTERVAL", "10", 0);
+  setenv("DUNEDAQ_OPMON_LEVEL", "1", 0);
 
   std::stringstream s1(getenv("DUNEDAQ_OPMON_INTERVAL"));
   std::stringstream s2(getenv("DUNEDAQ_OPMON_LEVEL"));
@@ -71,8 +75,9 @@ Application::execute(const dataobj_t& cmd_data)
   try {
     m_mod_mgr.execute(cmd_data);
     m_busy.store(false);
-    if(rc_cmd.exit_state != "ANY" )
-	set_state(rc_cmd.exit_state);
+    if (rc_cmd.exit_state != "ANY" ) {
+      set_state(rc_cmd.exit_state);
+    }
   } 
   catch(DAQModuleManagerNotInitialized &ex) {
     m_busy.store(false);
@@ -133,7 +138,7 @@ Application::is_cmd_valid(const dataobj_t& cmd_data)
      return true;
   }
   if (!(cmd=="init" || cmd=="conf" || cmd=="start" || cmd=="stop" || cmd == "pause" || cmd == "resume" || cmd == "scrap"))
-	return true;
+  return true;
 */
   return false;
 }

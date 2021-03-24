@@ -72,7 +72,7 @@ main(int argc, char* argv[])
 
   // Create the Application
   appfwk::Application app(
-    args.app_name, args.partition_name, args.command_facility_plugin_name, args.info_service_plugin_name);
+    args.app_name, args.partition_name, args.rest_api, args.command_facility_plugin_name, args.info_service_plugin_name);
 
   app.init();
   app.run(run_marker);

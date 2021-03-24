@@ -54,6 +54,7 @@ public:
       ("name,n", bpo::value<std::string>()->required(), "Application name")
       ("partition,p", bpo::value<std::string>()->default_value("global"), "Partition name")
       ("commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")
+      ("rest-api,r", bpo::value<std::uint32_t>()->default_value(0), "REST API Port")
       ("informationService,i", bpo::value<std::string>()->default_value("stdout://flat"), "Information Service URI")
       ("help,h", "produce help message");
 
@@ -81,6 +82,7 @@ public:
     output.app_name = vm["name"].as<std::string>();
     output.partition_name = vm["partition"].as<std::string>();
     output.command_facility_plugin_name = vm["commandFacility"].as<std::string>();
+    output.rest_api = vm["rest-api"].as<std::uint32_t>();
     output.info_service_plugin_name = vm["informationService"].as<std::string>();
     output.is_valid = true;
     return output;
@@ -91,6 +93,7 @@ public:
   std::string app_name;
   std::string partition_name;
   std::string command_facility_plugin_name; ///< Name of the CommandFacility plugin to load
+  std::uint32_t rest_api;
   std::string info_service_plugin_name; ///< Name of the InfoService plugin to load
 
   std::vector<std::string> other_options; ///< Any other options which were passed and not recognized
