@@ -33,7 +33,7 @@ Api::Api(std::uint16_t port)
   register_get("/", Pistache::Rest::Routes::bind(&Api::handle_get_root, this));
   // healthz will always respond
   // even if register_zpages() has not been called
-  register_get("/healthz", Pistache::Rest::Routes::bind(&Api::handle_get_healthz, this));
+  register_get("/api/v0/healthz", Pistache::Rest::Routes::bind(&Api::handle_get_healthz, this));
 }
 
 Api::~Api()

@@ -135,7 +135,7 @@ private:
    */
   void handle_get_root(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response);
   /**
-   * @brief Function handling 'GET /healthz'
+   * @brief Function handling 'GET /api/v0/healthz'
    */
   void handle_get_healthz(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response);
 
