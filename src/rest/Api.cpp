@@ -7,6 +7,8 @@
  */
 
 #include "appfwk/rest/Api.hpp"
+#include "appfwk/DAQModuleManager.hpp"
+#include "appfwk/DAQModule.hpp"
 #include "cmdlib/CommandedObject.hpp"
 #include "logging/Logging.hpp"
 
@@ -34,6 +36,7 @@ Api::Api(std::uint16_t port)
   // healthz will always respond
   // even if register_zpages() has not been called
   register_get("/api/v0/healthz", Pistache::Rest::Routes::bind(&Api::handle_get_healthz, this));
+  register_get("/api/v0/modules", Pistache::Rest::Routes::bind(&Api::handle_get_modules, this));
 }
 
 Api::~Api()
@@ -46,6 +49,12 @@ Api::register_zpages(std::string name, appfwk::StateObject* stated)
 {
   m_app_name = name;
   m_state_obj = stated;
+}
+
+void
+Api::register_modulemanager(appfwk::DAQModuleManager* mm)
+{
+  m_module_manager = mm;
 }
 
 void
@@ -114,6 +123,27 @@ Api::handle_get_root([[maybe_unused]] const Pistache::Rest::Request& request, Pi
 {
   json j;
   j["routes"] = m_routes;
+  response.headers().add<Pistache::Http::Header::ContentType>(MIME(Application, Json));
+  response.send(Pistache::Http::Code::Ok, j.dump(2));
+}
+
+void
+Api::handle_get_modules([[maybe_unused]] const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response)
+{
+  if (!m_module_manager) {
+    response.send(Pistache::Http::Code::Service_Unavailable, "no module manager to query");
+    return;
+  }
+
+  json j;
+  j["modules"] = json::array();
+  for (const auto& [module_name, module_ptr] : m_module_manager->get_modules()) {
+    json j_item;
+    j_item["name"] = module_name;
+    j_item["commands"] = module_ptr->get_commands();
+    j["modules"].push_back(j_item);
+  }
+
   response.headers().add<Pistache::Http::Header::ContentType>(MIME(Application, Json));
   response.send(Pistache::Http::Code::Ok, j.dump(2));
 }

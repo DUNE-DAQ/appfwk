@@ -33,6 +33,7 @@ Application::init()
   m_cmd_fac->set_commanded(*this, get_name());
   m_info_mgr.set_provider(*this);
   m_rest_api.register_zpages(get_name(), (StateObject*)this);
+  m_rest_api.register_modulemanager(&m_mod_mgr);
   m_rest_api.start();
   m_initialized = true;
 }

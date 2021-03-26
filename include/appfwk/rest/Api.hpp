@@ -10,6 +10,7 @@
 
 #include "appfwk/NamedObject.hpp"
 #include "appfwk/StateObject.hpp"
+#include "appfwk/DAQModuleManager.hpp"
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 #include "structs.hpp"
@@ -51,7 +52,7 @@ class Api
 public:
   /**
    * Construct a new API on the given port.
-   * The port is not opened at construction time
+   * The port is not opened at construction time.
    * @param port the port to listen on
    */
   Api(std::uint16_t /*port*/);
@@ -63,14 +64,20 @@ public:
   Api& operator=(Api&&) = default;       ///< Api is move-assignable
 
   /**
-   * @brief register elements needed to serve z pages
+   * @brief Register elements needed to serve z pages.
    */
   void register_zpages(std::string /*name*/, appfwk::StateObject*);
 
   /**
+   * Register the DAQModuleManager that will be used
+   * to query for module info.
+   */
+  void register_modulemanager(appfwk::DAQModuleManager*);
+
+  /**
    * @brief Start this API.
    * 
-   * Spawns a separate thread that will serve incoming connections
+   * Spawns a separate thread that will serve incoming connections.
    * 
    * @throws RestApiAlreadyRunning if start() was called and succeeded before
    * @throws RestApiStartFailed if the api failed to start
@@ -113,6 +120,8 @@ private:
   std::string m_app_name;
   // The StateObject this API will call get_state() on
   appfwk::StateObject* m_state_obj;
+  // The DAQModuleManager the API will use to serve /modules
+  appfwk::DAQModuleManager* m_module_manager;
   // The port number this API will serve requests on
   Pistache::Port m_port;
   // The address this API will serve requests on
@@ -138,6 +147,10 @@ private:
    * @brief Function handling 'GET /api/v0/healthz'
    */
   void handle_get_healthz(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response);
+  /**
+   * @brief Function handling 'GET /api/v0/modules'
+   */
+  void handle_get_modules(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response);
 
   /**
    * Blocking call that starts the API and serves requests.
