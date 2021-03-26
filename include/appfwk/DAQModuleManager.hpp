@@ -66,6 +66,8 @@ public:
   // Gather statistics from modules
   void gather_stats(opmonlib::InfoCollector& ic, int level);
 
+  std::vector<dataobj_t> gather_history() { return m_command_history; }
+
   DAQModuleMap_t get_modules() { return m_module_map; }
 
 protected:
@@ -83,6 +85,8 @@ private:
   bool m_initialized;
 
   DAQModuleMap_t m_module_map;
+
+  std::vector<dataobj_t> m_command_history;
 };
 
 } // namespace appfwk

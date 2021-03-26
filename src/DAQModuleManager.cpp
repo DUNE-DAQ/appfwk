@@ -19,6 +19,8 @@
 
 #include "logging/Logging.hpp"
 
+#include "nlohmann/json.hpp"
+
 #include <map>
 #include <regex>
 #include <string>
@@ -234,6 +236,12 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
 
   auto cmd = cmd_data.get<cmdlib::cmd::Command>();
   TLOG_DEBUG(1) <<"Command id:" << cmd.id;
+
+  // cmd_data's content will be freed after the next command is received
+  // nlohmann::json does not have deep-copy functionality, so we
+  // take a copy
+  nlohmann::json j = nlohmann::json::parse(cmd_data.dump());
+  m_command_history.push_back(j);
 
   if (!m_initialized) {
     if (cmd.id != "init") {

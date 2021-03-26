@@ -151,6 +151,10 @@ private:
    * @brief Function handling 'GET /api/v0/modules'
    */
   void handle_get_modules(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response);
+  /**
+   * @brief Function handling 'GET /api/v0/commands/history'
+   */
+  void handle_get_commands_history(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response);
 
   /**
    * Blocking call that starts the API and serves requests.

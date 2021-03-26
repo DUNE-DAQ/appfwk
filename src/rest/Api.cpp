@@ -37,6 +37,7 @@ Api::Api(std::uint16_t port)
   // even if register_zpages() has not been called
   register_get("/api/v0/healthz", Pistache::Rest::Routes::bind(&Api::handle_get_healthz, this));
   register_get("/api/v0/modules", Pistache::Rest::Routes::bind(&Api::handle_get_modules, this));
+  register_get("/api/v0/commands/history", Pistache::Rest::Routes::bind(&Api::handle_get_commands_history, this));
 }
 
 Api::~Api()
@@ -143,6 +144,21 @@ Api::handle_get_modules([[maybe_unused]] const Pistache::Rest::Request& request,
     j_item["commands"] = module_ptr->get_commands();
     j["modules"].push_back(j_item);
   }
+
+  response.headers().add<Pistache::Http::Header::ContentType>(MIME(Application, Json));
+  response.send(Pistache::Http::Code::Ok, j.dump(2));
+}
+
+void
+Api::handle_get_commands_history([[maybe_unused]] const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response)
+{
+  if (!m_module_manager) {
+    response.send(Pistache::Http::Code::Service_Unavailable, "no module manager to query");
+    return;
+  }
+
+  json j;
+  j["commands"] = m_module_manager->gather_history();
 
   response.headers().add<Pistache::Http::Header::ContentType>(MIME(Application, Json));
   response.send(Pistache::Http::Code::Ok, j.dump(2));
