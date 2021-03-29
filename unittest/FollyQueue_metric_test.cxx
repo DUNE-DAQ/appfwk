@@ -79,6 +79,8 @@ BOOST_AUTO_TEST_CASE(three_thread_test)
 
   BOOST_TEST_MESSAGE("Last pushed value: " << last_pushed_entry );
   BOOST_TEST_MESSAGE("Last popped value: " << last_popped_entry );
+  BOOST_TEST_MESSAGE("Temp size: " << read_size );
+
 
   BOOST_REQUIRE_EQUAL( queue.size(), 0 );
   
