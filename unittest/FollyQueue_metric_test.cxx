@@ -83,6 +83,7 @@ BOOST_AUTO_TEST_CASE(three_thread_test)
 
 
   BOOST_REQUIRE_EQUAL( queue.size(), 0 );
+  BOOST_REQUIRE_EQUAL( last_pushed_entry, last_popped_entry );
   
   BOOST_CHECK_GT( read_size, 0 );
   
