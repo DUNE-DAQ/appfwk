@@ -16,6 +16,8 @@
 
 #include "appfwk/NamedObject.hpp"
 
+#include "opmonlib/InfoCollector.hpp"
+
 #include "ers/Issue.hpp"
 
 #include <chrono>
@@ -87,6 +89,8 @@ public:
    * This is a pure virtual function
    */
   virtual bool can_pop() const noexcept = 0;
+
+  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; };
 
 protected:
   size_t get_capacity() const { return capacity; }
