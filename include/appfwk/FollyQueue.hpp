@@ -19,6 +19,8 @@
 
 #include "folly/concurrency/DynamicBoundedQueue.h"
 
+#include "appfwk/queueinfo/Nljs.hpp"
+
 #include <string>
 #include <utility> // For std::move
 
@@ -54,6 +56,17 @@ public:
         ERS_HERE, this->get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
   }
+
+  virtual void get_info(opmonlib::InfoCollector& ci, int /*level*/) override { 
+    
+    queueinfo::Info info ;
+    
+    info.capacity = m_queue.weight() ;
+    info.number_of_elements = m_queue.size() ;
+    
+    ci.add( info ) ;
+  }
+
 
   // Delete the copy and move operations
   FollyQueue(const FollyQueue&) = delete;

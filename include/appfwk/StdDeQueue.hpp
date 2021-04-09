@@ -56,6 +56,8 @@ public:
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
 
+  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) override ;
+
   StdDeQueue(const StdDeQueue&) = delete;            ///< StdDeQueue is not copy-constructible
   StdDeQueue& operator=(const StdDeQueue&) = delete; ///< StdDeQueue is not copy-assignable
   StdDeQueue(StdDeQueue&&) = delete;                 ///< StdDeQueue is not move-constructible

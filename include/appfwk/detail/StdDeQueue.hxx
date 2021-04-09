@@ -1,5 +1,6 @@
 
 #include "ers/ers.hpp"
+#include "appfwk/queueinfo/Nljs.hpp"
 
 namespace dunedaq::appfwk {
 
@@ -97,6 +98,18 @@ StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_t& 
     throw QueueTimeoutExpired(
       ERS_HERE, this->get_name(), "lock mutex", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
+}
+
+template<class T>
+void 
+StdDeQueue<T>::get_info(opmonlib::InfoCollector& ci, int /*level*/) {
+
+  queueinfo::Info info ;
+
+  info.capacity = this -> get_capacity() ;
+  info.number_of_elements = m_size.load() ;
+  
+  ci.add(info);
 }
 
 } // namespace dunedaq::appfwk
