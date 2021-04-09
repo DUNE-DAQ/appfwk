@@ -61,7 +61,7 @@ public:
     
     queueinfo::Info info ;
     
-    info.capacity = m_queue.weight() ;
+    info.capacity = this -> get_capacity() ; 
     info.number_of_elements = m_queue.size() ;
     
     ci.add( info ) ;
