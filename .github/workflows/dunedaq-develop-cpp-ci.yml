@@ -1,0 +1,94 @@
+name: build-develop
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+  schedule:
+    - cron: "0 7 * * *"
+
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Manual start the CI workflow'
+        # Default value if no value is explicitly provided
+        default: 'Yes'
+        # Input has to be provided for the workflow to run
+        required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  bulid_the_develop_release:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: dunedaq/sl7-minimal:dev
+    env:
+      DBT_AREA_FILE: "dbt-settings"
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+    
+    - name: Start the CI
+      run: echo "Start the CI anyway ${{ github.event.inputs.name }}"
+
+    - name: Checkout daq-buildtools
+      uses: actions/checkout@v2
+      with:
+        repository: DUNE-DAQ/daq-buildtools
+        path: daq-buildtools
+
+    - name: Checkout daq-release
+      uses: actions/checkout@v2
+      with:
+        repository: DUNE-DAQ/daq-release
+        path: daq-release
+        
+    - name: setup dev area and checkout code
+      run: |
+          export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+          export DBT_ROOT=$GITHUB_WORKSPACE/daq-buildtools
+          source ${DBT_ROOT}/scripts/dbt-setup-tools.sh
+          add_many_paths PATH ${DBT_ROOT}/bin ${DBT_ROOT}/scripts
+          dbt-create.sh -r /releases dunedaq-develop dev
+          cd dev
+          cp $GITHUB_WORKSPACE/daq-release/configs/dunedaq-develop/release_manifest.sh .
+          $GITHUB_WORKSPACE/daq-release/scripts/checkout-package.sh -f ./release_manifest.sh -p $REPO -b develop -o sourcecode
+    
+    - name: setup build env and build the dev release
+      run: |
+          export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+          export DBT_ROOT=$GITHUB_WORKSPACE/daq-buildtools
+          source ${DBT_ROOT}/scripts/dbt-setup-tools.sh
+          add_many_paths PATH ${DBT_ROOT}/bin ${DBT_ROOT}/scripts
+          cd $GITHUB_WORKSPACE/dev
+          export DBT_AREA_ROOT=$PWD
+          export DBT_AREA_FILE="dbt-settings"
+          source ${DBT_AREA_ROOT}/${DBT_AREA_FILE}
+          setup_ups_product_areas || true
+          setup -B python ${dune_python_version} || true
+          source ${DBT_AREA_ROOT}/${DBT_VENV}/bin/activate 
+          setup_ups_products dune_devtools || true
+          setup_ups_products dune_systems || true
+          setup_ups_products dune_externals || true
+          setup_ups_products dune_daqpackages || true
+          unsetup $REPO
+          export DBT_INSTALL_DIR=${DBT_AREA_ROOT}/install
+          export DBT_SETUP_BUILD_ENVIRONMENT_SCRIPT_SOURCED=1
+          dbt-build.sh --install
+          $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev -o /tarballs
+
+    - name: upload build log
+      uses: actions/upload-artifact@v2
+      with:
+        name: log directory and dev release
+        path: |
+          $GITHUB_WORKSPACE/dev/log/
+          /tarballs
