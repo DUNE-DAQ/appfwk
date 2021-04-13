@@ -19,8 +19,6 @@
 
 #include "folly/concurrency/DynamicBoundedQueue.h"
 
-#include "appfwk/queueinfo/Nljs.hpp"
-
 #include <string>
 #include <utility> // For std::move
 
@@ -38,16 +36,14 @@ public:
     , m_queue(this->get_capacity())
   {}
 
-  bool can_pop() const noexcept override { return !m_queue.empty(); }
   void pop(value_t& val, const duration_t& dur) override
   {
     if (!m_queue.try_dequeue_for(val, dur)) {
       throw QueueTimeoutExpired(
         ERS_HERE, this->get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
+    this->decrease_num_elements();
   }
-
-  bool can_push() const noexcept override { return m_queue.size() < this->get_capacity(); }
 
   void push(value_t&& t, const duration_t& dur) override
   {
@@ -55,18 +51,8 @@ public:
       throw QueueTimeoutExpired(
         ERS_HERE, this->get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
+    this->increase_num_elements();
   }
-
-  virtual void get_info(opmonlib::InfoCollector& ci, int /*level*/) override { 
-    
-    queueinfo::Info info ;
-    
-    info.capacity = this -> get_capacity() ; 
-    info.number_of_elements = m_queue.size() ;
-    
-    ci.add( info ) ;
-  }
-
 
   // Delete the copy and move operations
   FollyQueue(const FollyQueue&) = delete;

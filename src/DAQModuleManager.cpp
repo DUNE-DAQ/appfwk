@@ -251,13 +251,17 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
 void
 DAQModuleManager::gather_stats(opmonlib::InfoCollector & ci, int level) {
 
+  QueueRegistry::get().gather_stats(ci, level);
+
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
     opmonlib::InfoCollector tmp_ci;
     mod_ptr->get_info(tmp_ci, level);
     if (!tmp_ci.is_empty()) {
        ci.add(mod_name, tmp_ci);
     }   
-  } 
+  }
+
+ 
 }
 
 } // namespace appfwk

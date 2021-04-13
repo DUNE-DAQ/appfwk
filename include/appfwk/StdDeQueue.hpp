@@ -47,16 +47,12 @@ public:
    */
   explicit StdDeQueue(const std::string& name, size_t capacity);
 
-  bool can_pop() const noexcept override { return m_size.load() > 0; }
   void pop(value_t& val, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
-  bool can_push() const noexcept override { return m_size.load() < this->get_capacity(); }
   void push(value_t&&, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
-
-  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) override ;
 
   StdDeQueue(const StdDeQueue&) = delete;            ///< StdDeQueue is not copy-constructible
   StdDeQueue& operator=(const StdDeQueue&) = delete; ///< StdDeQueue is not copy-assignable
@@ -67,7 +63,7 @@ private:
   void try_lock_for(std::unique_lock<std::mutex>&, const duration_t&);
 
   std::deque<value_t> m_deque;
-  std::atomic<size_t> m_size = 0;
+//  std::atomic<size_t> m_size = 0;
 
   std::mutex m_mutex;
   std::condition_variable m_no_longer_full;

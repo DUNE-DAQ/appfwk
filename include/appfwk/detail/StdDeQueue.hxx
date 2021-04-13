@@ -8,7 +8,6 @@ template<class T>
 StdDeQueue<T>::StdDeQueue(const std::string& name, size_t capacity)
   : Queue<T>(name, capacity)
   , m_deque()
-  , m_size(0)
 {
   assert(m_deque.max_size() > this->get_capacity());
 }
@@ -31,7 +30,7 @@ StdDeQueue<T>::push(value_t&& object_to_push, const duration_t& timeout)
 
   if (this->can_push()) {
     m_deque.push_back(std::move(object_to_push));
-    m_size++;
+    this->increase_num_elements();
     m_no_longer_empty.notify_one();
   } else {
     throw QueueTimeoutExpired(
@@ -58,7 +57,7 @@ StdDeQueue<T>::pop(T& val, const duration_t& timeout)
   if (this->can_pop()) {
     val = std::move(m_deque.front());
     m_deque.pop_front();
-    m_size--;
+    this->decrease_num_elements();
     m_no_longer_full.notify_one();
   } else {
     throw QueueTimeoutExpired(
@@ -98,18 +97,6 @@ StdDeQueue<T>::try_lock_for(std::unique_lock<std::mutex>& lk, const duration_t& 
     throw QueueTimeoutExpired(
       ERS_HERE, this->get_name(), "lock mutex", std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
   }
-}
-
-template<class T>
-void 
-StdDeQueue<T>::get_info(opmonlib::InfoCollector& ci, int /*level*/) {
-
-  queueinfo::Info info ;
-
-  info.capacity = this -> get_capacity() ;
-  info.number_of_elements = m_size.load() ;
-  
-  ci.add(info);
 }
 
 } // namespace dunedaq::appfwk

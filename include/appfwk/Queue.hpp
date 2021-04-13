@@ -14,7 +14,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
 #define APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
 
-#include "appfwk/NamedObject.hpp"
+#include "appfwk/QueueBase.hpp"
 
 #include "opmonlib/InfoCollector.hpp"
 
@@ -37,7 +37,7 @@ namespace appfwk {
  * it can be included in generic containers), all implementations should be.
  */
 template<class T>
-class Queue : public NamedObject
+class Queue : public QueueBase
 {
 public:
   using value_t = T;                            ///< Type stored in the Queue
@@ -48,8 +48,7 @@ public:
    * @param name Name of the Queue instance
    */
   explicit Queue(const std::string& name, size_t capacity)
-    : NamedObject(name)
-    , capacity(capacity)
+    : QueueBase(name, capacity)
   {}
 
   /**
@@ -64,14 +63,6 @@ public:
   virtual void push(value_t&& val, const duration_t& timeout) = 0;
 
   /**
-   * @brief Determine whether the Queue may be pushed onto
-   * @return True if the queue is not full, false if it is
-   *
-   * This is a pure virtual function
-   */
-  virtual bool can_push() const noexcept = 0;
-
-  /**
    * @brief Pop the first value off of the queue
    * @param val Reference to the value that is popped from the queue
    * @param timeout Timeout for the pop operation
@@ -82,18 +73,6 @@ public:
    */
   virtual void pop(value_t& val, const duration_t& timeout) = 0;
 
-  /**
-   * @brief Determine whether the Queue may be popped from
-   * @return True if the queue is not empty, false if it is
-   *
-   * This is a pure virtual function
-   */
-  virtual bool can_pop() const noexcept = 0;
-
-  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; };
-
-protected:
-  size_t get_capacity() const { return capacity; }
 
 private:
   Queue(const Queue&) = delete;
@@ -101,7 +80,6 @@ private:
   Queue(Queue&&) = default;
   Queue& operator=(Queue&&) = default;
 
-  size_t capacity;
 };
 
 } // namespace appfwk
