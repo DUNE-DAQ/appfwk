@@ -14,7 +14,7 @@ StdDeQueue<T>::StdDeQueue(const std::string& name, size_t capacity)
 
 template<class T>
 void
-StdDeQueue<T>::push(value_t&& object_to_push, const duration_t& timeout)
+StdDeQueue<T>::do_push(value_t&& object_to_push, const duration_t& timeout)
 {
 
   auto start_time = std::chrono::steady_clock::now();
@@ -30,7 +30,6 @@ StdDeQueue<T>::push(value_t&& object_to_push, const duration_t& timeout)
 
   if (this->can_push()) {
     m_deque.push_back(std::move(object_to_push));
-    this->increase_num_elements();
     m_no_longer_empty.notify_one();
   } else {
     throw QueueTimeoutExpired(
@@ -40,7 +39,7 @@ StdDeQueue<T>::push(value_t&& object_to_push, const duration_t& timeout)
 
 template<class T>
 void
-StdDeQueue<T>::pop(T& val, const duration_t& timeout)
+StdDeQueue<T>::do_pop(T& val, const duration_t& timeout)
 {
 
   auto start_time = std::chrono::steady_clock::now();
@@ -57,7 +56,6 @@ StdDeQueue<T>::pop(T& val, const duration_t& timeout)
   if (this->can_pop()) {
     val = std::move(m_deque.front());
     m_deque.pop_front();
-    this->decrease_num_elements();
     m_no_longer_full.notify_one();
   } else {
     throw QueueTimeoutExpired(

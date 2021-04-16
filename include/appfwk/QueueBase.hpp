@@ -51,20 +51,6 @@ public:
   {}
 
   /**
-   * @brief Determine whether the Queue may be pushed onto
-   * @return True if the queue is not full, false if it is
-   *
-   */
-   bool can_push() {return m_num_elements.load() < m_capacity ; }
-
-  /**
-   * @brief Determine whether the Queue may be popped from
-   * @return True if the queue is not empty, false if it is
-   *
-   */
-   bool can_pop() {return m_num_elements.load() >0; }
-
-  /**
    * @brief Method to retrieve information (occupancy) from
    * queues.
    */ 
@@ -81,9 +67,13 @@ public:
    */ 
   size_t get_capacity() const { return m_capacity; }
 
+  size_t get_num_elements() {return m_num_elements.load(); }
+
+protected:
+  
   void increase_num_elements() {++m_num_elements; }
   void decrease_num_elements() {--m_num_elements; }
-  size_t get_num_elements() {return m_num_elements.load(); }
+
 
 private:
   QueueBase(const QueueBase&) = delete;

@@ -52,6 +52,26 @@ public:
   {}
 
   /**
+   * @brief Determine whether the Queue may be pushed onto
+   * @return True if the queue is not full, false if it is
+   *
+   */
+  bool can_push() {return this->get_num_elements() < this->get_capacity() ; }
+
+  /**
+   * @brief Determine whether the Queue may be popped from
+   * @return True if the queue is not empty, false if it is
+   *
+   */
+  bool can_pop() { return this->get_num_elements() > 0; }
+
+
+  void push(value_t&& val, const duration_t& timeout) {
+    this->do_push(std::move(val), timeout);
+    this->increase_num_elements();
+  }
+
+  /**
    * @brief Push a value onto the Queue.
    * @param val Value to push (rvalue)
    * @param timeout Timeout for the push operation.
@@ -60,7 +80,8 @@ public:
    * If push takes longer than the timeout, implementations should throw an
    * exception.
    */
-  virtual void push(value_t&& val, const duration_t& timeout) = 0;
+  virtual void do_push(value_t&& val, const duration_t& timeout) = 0;
+
 
   /**
    * @brief Pop the first value off of the queue
@@ -71,7 +92,12 @@ public:
    * If pop takes longer than the timeout, implementations should throw an
    * exception
    */
-  virtual void pop(value_t& val, const duration_t& timeout) = 0;
+  virtual void do_pop(value_t& val, const duration_t& timeout) = 0;
+
+  void pop(value_t& val, const duration_t& timeout) {
+    this->do_pop(val, timeout);
+    this->decrease_num_elements();
+  }
 
 
 private:

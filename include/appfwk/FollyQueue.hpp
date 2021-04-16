@@ -36,22 +36,20 @@ public:
     , m_queue(this->get_capacity())
   {}
 
-  void pop(value_t& val, const duration_t& dur) override
+  void do_pop(value_t& val, const duration_t& dur) override
   {
     if (!m_queue.try_dequeue_for(val, dur)) {
       throw QueueTimeoutExpired(
         ERS_HERE, this->get_name(), "pop", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
-    this->decrease_num_elements();
   }
 
-  void push(value_t&& t, const duration_t& dur) override
+  void do_push(value_t&& t, const duration_t& dur) override
   {
     if (!m_queue.try_enqueue_for(std::move(t), dur)) {
       throw QueueTimeoutExpired(
         ERS_HERE, this->get_name(), "push", std::chrono::duration_cast<std::chrono::milliseconds>(dur).count());
     }
-    this->increase_num_elements();
   }
 
   // Delete the copy and move operations

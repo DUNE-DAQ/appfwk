@@ -47,9 +47,9 @@ public:
    */
   explicit StdDeQueue(const std::string& name, size_t capacity);
 
-  void pop(value_t& val, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
+  void do_pop(value_t& val, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
-  void push(value_t&&, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
+  void do_push(value_t&&, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
