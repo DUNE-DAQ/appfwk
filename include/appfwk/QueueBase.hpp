@@ -67,7 +67,7 @@ public:
    */ 
   size_t get_capacity() const { return m_capacity; }
 
-  size_t get_num_elements() {return m_num_elements.load(); }
+  size_t get_num_elements() {return m_num_elements.load(std::memory_order_acquire); }
 
 protected:
   
