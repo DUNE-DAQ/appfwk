@@ -32,11 +32,16 @@ public:
   using duration_t = typename Queue<T>::duration_t;
 
   explicit FollyQueue(const std::string& name, size_t capacity)
-    : Queue<T>(name, capacity)
-    , m_queue(this->get_capacity())
+    : Queue<T>(name)
+    , m_queue(capacity)
   {}
+  size_t get_capacity() const noexcept override { return m_queue.getCapacity(); }
 
-  void do_pop(value_t& val, const duration_t& dur) override
+  size_t get_num_elements() const noexcept override { return m_queue.size(); }
+
+  bool can_pop() const noexcept override { return !m_queue.empty(); }
+
+  void pop(value_t& val, const duration_t& dur) override
   {
     if (!m_queue.try_dequeue_for(val, dur)) {
       throw QueueTimeoutExpired(
@@ -44,7 +49,9 @@ public:
     }
   }
 
-  void do_push(value_t&& t, const duration_t& dur) override
+  bool can_push() const noexcept override { return m_queue.size() < this->get_capacity(); }
+
+  void push(value_t&& t, const duration_t& dur) override
   {
     if (!m_queue.try_enqueue_for(std::move(t), dur)) {
       throw QueueTimeoutExpired(

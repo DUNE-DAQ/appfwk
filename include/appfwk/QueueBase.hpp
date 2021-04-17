@@ -44,10 +44,8 @@ public:
    * @brief QueueBase Constructor
    * @param name Name of the Queue instance
    */
-  explicit QueueBase(const std::string& name, size_t capacity)
+  explicit QueueBase(const std::string& name)
     : NamedObject(name)
-    , m_capacity(capacity)
-    , m_num_elements(0)
   {}
 
   /**
@@ -65,24 +63,15 @@ public:
    * @brief Get the capacity (max size) of the queue
    * @return size_t capacity
    */ 
-  size_t get_capacity() const { return m_capacity; }
+  virtual size_t get_capacity() const = 0;
 
-  size_t get_num_elements() {return m_num_elements.load(std::memory_order_acquire); }
-
-protected:
-  
-  void increase_num_elements() {++m_num_elements; }
-  void decrease_num_elements() {--m_num_elements; }
-
+  virtual size_t get_num_elements() const = 0;
 
 private:
   QueueBase(const QueueBase&) = delete;
   QueueBase& operator=(const QueueBase&) = delete;
   QueueBase(QueueBase&&) = default;
   QueueBase& operator=(QueueBase&&) = default;
-
-  size_t m_capacity;
-  std::atomic<size_t> m_num_elements;
 };
 
 } // namespace appfwk

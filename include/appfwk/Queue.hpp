@@ -47,8 +47,8 @@ public:
    * @brief Queue Constructor
    * @param name Name of the Queue instance
    */
-  explicit Queue(const std::string& name, size_t capacity)
-    : QueueBase(name, capacity)
+  explicit Queue(const std::string& name)
+    : QueueBase(name)
   {}
 
   /**
@@ -56,20 +56,14 @@ public:
    * @return True if the queue is not full, false if it is
    *
    */
-  bool can_push() {return this->get_num_elements() < this->get_capacity() ; }
+  virtual bool can_push() const {return this->get_num_elements() < this->get_capacity() ; }
 
   /**
    * @brief Determine whether the Queue may be popped from
    * @return True if the queue is not empty, false if it is
    *
    */
-  bool can_pop() { return this->get_num_elements() > 0; }
-
-
-  void push(value_t&& val, const duration_t& timeout) {
-    this->do_push(std::move(val), timeout);
-    this->increase_num_elements();
-  }
+  virtual bool can_pop() const { return this->get_num_elements() > 0; }
 
   /**
    * @brief Push a value onto the Queue.
@@ -80,8 +74,7 @@ public:
    * If push takes longer than the timeout, implementations should throw an
    * exception.
    */
-  virtual void do_push(value_t&& val, const duration_t& timeout) = 0;
-
+  virtual void push(value_t&& val, const duration_t& timeout) = 0;
 
   /**
    * @brief Pop the first value off of the queue
@@ -92,13 +85,7 @@ public:
    * If pop takes longer than the timeout, implementations should throw an
    * exception
    */
-  virtual void do_pop(value_t& val, const duration_t& timeout) = 0;
-
-  void pop(value_t& val, const duration_t& timeout) {
-    this->do_pop(val, timeout);
-    this->decrease_num_elements();
-  }
-
+  virtual void pop(value_t& val, const duration_t& timeout) = 0;
 
 private:
   Queue(const Queue&) = delete;

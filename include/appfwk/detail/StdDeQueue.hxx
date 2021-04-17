@@ -1,20 +1,21 @@
 
 #include "ers/ers.hpp"
-#include "appfwk/queueinfo/Nljs.hpp"
 
 namespace dunedaq::appfwk {
 
 template<class T>
 StdDeQueue<T>::StdDeQueue(const std::string& name, size_t capacity)
-  : Queue<T>(name, capacity)
+  : Queue<T>(name)
   , m_deque()
+  , m_capacity(capacity)
+  , m_size(0)
 {
   assert(m_deque.max_size() > this->get_capacity());
 }
 
 template<class T>
 void
-StdDeQueue<T>::do_push(value_t&& object_to_push, const duration_t& timeout)
+StdDeQueue<T>::push(value_t&& object_to_push, const duration_t& timeout)
 {
 
   auto start_time = std::chrono::steady_clock::now();
@@ -30,6 +31,7 @@ StdDeQueue<T>::do_push(value_t&& object_to_push, const duration_t& timeout)
 
   if (this->can_push()) {
     m_deque.push_back(std::move(object_to_push));
+    m_size++;
     m_no_longer_empty.notify_one();
   } else {
     throw QueueTimeoutExpired(
@@ -39,7 +41,7 @@ StdDeQueue<T>::do_push(value_t&& object_to_push, const duration_t& timeout)
 
 template<class T>
 void
-StdDeQueue<T>::do_pop(T& val, const duration_t& timeout)
+StdDeQueue<T>::pop(T& val, const duration_t& timeout)
 {
 
   auto start_time = std::chrono::steady_clock::now();
@@ -55,6 +57,7 @@ StdDeQueue<T>::do_pop(T& val, const duration_t& timeout)
 
   if (this->can_pop()) {
     val = std::move(m_deque.front());
+    m_size--;
     m_deque.pop_front();
     m_no_longer_full.notify_one();
   } else {
