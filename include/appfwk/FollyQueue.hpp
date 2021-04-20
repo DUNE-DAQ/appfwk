@@ -34,8 +34,10 @@ public:
   explicit FollyQueue(const std::string& name, size_t capacity)
     : Queue<T>(name)
     , m_queue(capacity)
+    , m_capacity(capacity)
   {}
-  size_t get_capacity() const noexcept override { return m_queue.getCapacity(); }
+
+  size_t get_capacity() const noexcept override { return m_capacity; }
 
   size_t get_num_elements() const noexcept override { return m_queue.size(); }
 
@@ -70,6 +72,7 @@ private:
   // "make a system call". With `MayBlock` set to false, the queue
   // just spin-waits, so we want true
   FollyQueueType<T, true> m_queue;
+  size_t m_capacity;
 };
 
 template<typename T>
