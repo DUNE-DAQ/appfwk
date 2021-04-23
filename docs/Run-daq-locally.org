@@ -1,0 +1,87 @@
+These are some instructions to run the minidaq application locally, so that
+development can be done locally with all the fancy tools we want.
+
+* Installation and configuration
+The following steps are needed only once (with the exception of mounting)
+
+** Installing singularity
+The first thing we are going to do is to install singularity, which is a
+container framework. If you are using linux then your distribution may have a
+package for it and that way is the recommended one. If not, you can find some
+instructions in https://singularity-docs.readthedocs.io/en/latest/.
+** Installing cvmfs
+The next step is installing cvmfs. Again, if your distribution has a package for
+that get it from there, most distributions have one. Here is all the
+information: https://cernvm.cern.ch/fs/.
+** Configuring cvmfs
+Once cvmfs is installed we need to configure it to access some folders. I can't
+remember all the details but I have one file in ~/etc/cvmfs~ called ~default.local~
+where I have all the CVMFS repositories that we need:
+
+#+BEGIN_SRC
+CVMFS_REPOSITORIES=dune.opensciencegrid.org
+CVMFS_HTTP_PROXY=DIRECT
+#+END_SRC
+
+Run the following to configure cvmfs:
+#+BEGIN_SRC
+cvmfs_config setup
+#+END_SRC
+
+Then, make a directory /cvmfs and a file inside it called mount.sh where we have
+all the mounts that we need:
+#+BEGIN_SRC
+mount -t cvmfs singularity.opensciencegrid.org singularity.opensciencegrid.org
+mount -t cvmfs config-osg.opensciencegrid.org config-osg.opensciencegrid.org
+mount -t cvmfs dune.opensciencegrid.org dune.opensciencegrid.org
+mount -t cvmfs oasis.opensciencegrid.org oasis.opensciencegrid.org
+#+END_SRC
+
+Then we run
+#+BEGIN_SRC
+chmod +x mount.sh
+sudo ./mount.sh
+#+END_SRC
+We will need to mount those directories every time we want to work locally, the
+script will be very handy for that.
+
+* Working locally
+We are going to run
+#+BEGIN_SRC
+singularity run -B/cvmfs:/cvmfs /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest
+#+END_SRC
+and if all goes well we should be inside the singularity container.
+
+** My workflow
+I have downloaded every package in the DUNE-DAQ repos, by using the following
+command:
+#+BEGIN_SRC
+GHORG=DUNE-DAQ; curl "https://api.github.com/orgs/$GHORG/repos?per_page=1000" | grep -o 'git@[^"]*' | xargs -L1 git clone
+#+END_SRC
+I also have a small script to pull for all packages, called ~pull.sh~:
+#+BEGIN_SRC
+for f in $(ls -d */)
+do
+    cd $f
+    git pull&
+    cd ..
+done
+#+END_SRC
+that I run from the directory where I have all the packages.
+
+I have the whole repo cloned so that I can move between files quickly. Then, I
+cloned the daq-buildtools and made a test release following the instructions in
+https://github.com/DUNE-DAQ/appfwk/wiki/Compiling-and-running-under-v2.4.0:
+#+BEGIN_SRC
+git clone https://github.com/DUNE-DAQ/daq-buildtools.git -b v2.3.0
+source daq-buildtools/dbt-setup-env.sh
+dbt-create.sh v2.4.0 test-release-2.4.0
+#+END_SRC
+
+I add packages to sourcecode by adding a symbolic link to them:
+#+BEGIN_SRC
+cd test-release-2.4.0/sourcecode
+ln -s ~/Dune/Dune-daq-all/readout .
+#+END_SRC
+
+* Troubleshooting
