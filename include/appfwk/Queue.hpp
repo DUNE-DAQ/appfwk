@@ -14,7 +14,9 @@
 #ifndef APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
 #define APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
 
-#include "appfwk/NamedObject.hpp"
+#include "appfwk/QueueBase.hpp"
+
+#include "opmonlib/InfoCollector.hpp"
 
 #include "ers/Issue.hpp"
 
@@ -35,7 +37,7 @@ namespace appfwk {
  * it can be included in generic containers), all implementations should be.
  */
 template<class T>
-class Queue : public NamedObject
+class Queue : public QueueBase
 {
 public:
   using value_t = T;                            ///< Type stored in the Queue
@@ -45,10 +47,23 @@ public:
    * @brief Queue Constructor
    * @param name Name of the Queue instance
    */
-  explicit Queue(const std::string& name, size_t capacity)
-    : NamedObject(name)
-    , capacity(capacity)
+  explicit Queue(const std::string& name)
+    : QueueBase(name)
   {}
+
+  /**
+   * @brief Determine whether the Queue may be pushed onto
+   * @return True if the queue is not full, false if it is
+   *
+   */
+  virtual bool can_push() const {return this->get_num_elements() < this->get_capacity() ; }
+
+  /**
+   * @brief Determine whether the Queue may be popped from
+   * @return True if the queue is not empty, false if it is
+   *
+   */
+  virtual bool can_pop() const { return this->get_num_elements() > 0; }
 
   /**
    * @brief Push a value onto the Queue.
@@ -62,14 +77,6 @@ public:
   virtual void push(value_t&& val, const duration_t& timeout) = 0;
 
   /**
-   * @brief Determine whether the Queue may be pushed onto
-   * @return True if the queue is not full, false if it is
-   *
-   * This is a pure virtual function
-   */
-  virtual bool can_push() const noexcept = 0;
-
-  /**
    * @brief Pop the first value off of the queue
    * @param val Reference to the value that is popped from the queue
    * @param timeout Timeout for the pop operation
@@ -80,24 +87,12 @@ public:
    */
   virtual void pop(value_t& val, const duration_t& timeout) = 0;
 
-  /**
-   * @brief Determine whether the Queue may be popped from
-   * @return True if the queue is not empty, false if it is
-   *
-   * This is a pure virtual function
-   */
-  virtual bool can_pop() const noexcept = 0;
-
-protected:
-  size_t get_capacity() const { return capacity; }
-
 private:
   Queue(const Queue&) = delete;
   Queue& operator=(const Queue&) = delete;
   Queue(Queue&&) = default;
   Queue& operator=(Queue&&) = default;
 
-  size_t capacity;
 };
 
 } // namespace appfwk

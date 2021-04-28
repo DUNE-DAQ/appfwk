@@ -41,9 +41,10 @@ daq_add_application( queue_IO_check queue_IO_check.cxx TEST LINK_LIBRARIES appfw
 
 daq_add_unit_test(DAQModule_test          LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQSink_DAQSource_test  LINK_LIBRARIES appfwk )
-daq_add_unit_test(FollyQueue_test         LINK_LIBRARIES ers::ers Folly::folly)
-daq_add_unit_test(Interruptible_test         LINK_LIBRARIES appfwk)
-daq_add_unit_test(StdDeQueue_test         LINK_LIBRARIES ers::ers)
+daq_add_unit_test(FollyQueue_test         LINK_LIBRARIES appfwk )
+daq_add_unit_test(FollyQueue_metric_test  LINK_LIBRARIES appfwk )
+daq_add_unit_test(Interruptible_test      LINK_LIBRARIES appfwk)
+daq_add_unit_test(StdDeQueue_test         LINK_LIBRARIES appfwk )
 daq_add_unit_test(ThreadHelper_test       LINK_LIBRARIES ers::ers)
 daq_add_unit_test(NamedObject_test        )
 
