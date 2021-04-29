@@ -1,0 +1,42 @@
+{% import 'ocpp.hpp.j2' as cppm %}
+/*
+ * This file is 100% generated.  Any manual edits will likely be lost.
+ *
+ * This contains struct and other type definitions for schema in 
+ * {{cppm.ns(model)}}.
+ */
+{% set tcname = "OpmonStructs" %}
+#ifndef {{cppm.headerguard(model, tcname)}}
+#define {{cppm.headerguard(model, tcname)}}
+
+#include <cstdint>
+{% for ep in model.extrefs %}
+#include "{{ep|listify|relpath(model.extpath)|join("/")}}/{{tcname}}.hpp"
+{% endfor %}
+
+{% for schema, typeref in model.byscn.items() %}
+{% if typeref %}{% for imp in model.lang.imports.get(schema, []) %}
+#include <{{imp}}>
+{% endfor %}{% endif %}
+{% endfor %}
+
+#include <atomic>
+
+{{ cppm.ns(model) }} {
+
+    {% for t in model.types %}
+    // @brief {{ t.doc }}
+    {% if t.schema == "number" %}
+      {% if t.dtype[0] == "u" %}
+      using {{t.name}} = std::atomic<{{model.lang.dtypes[t.dtype]}}>; // NOLINT
+      {% else %}
+      using {{t.name}} = std::atomic<{{model.lang.dtypes[t.dtype]}}>;
+      {% endif %}
+    {% else %}
+    {{ cppm["declare_"+t.schema](model, t)|indent }}
+    {% endif%}
+
+    {% endfor %}
+} // {{ cppm.ns(model) }}
+
+#endif // {{cppm.headerguard(model, tcname)}}

@@ -51,3 +51,4 @@ daq_add_unit_test(NamedObject_test        )
 ##############################################################################
 
 daq_install()
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/schema/  DESTINATION ${CMAKE_INSTALL_SCHEMADIR} OPTIONAL FILES_MATCHING PATTERN "*.j2")
