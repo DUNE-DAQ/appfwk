@@ -16,27 +16,42 @@ Drilling down a bit deeper, the way that `daq_application`s can be configured so
 
 In general, in a full blown DAQ system users won't be running `daq_application` from the command line. However, it can be instructive to know what options `daq_application` takes. Details can be found [here](Daq-Application.md).
 
-## Writing DAQ modules
+## Writing DAQ modules: the basics
 
 The parts of the [`DAQModule.hpp` header](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp) most important to an implementor of a DAQ module are the following:
-* `init`: this pure virtual function is meant to initialize the DAQ module instance. It takes as an argument the type `DAQModule::data_t`, currently aliased to the `nlohmann::json` type - i.e., JSON is used to define the DAQ module's initialization. Typically it will use parameters from the JSON in order to de-facto construct the member data (e.g., `m_member_unique_ptr_to_a_widget_type = std::make_unique<MyModule::WidgetType>(parameter_for_widget_construction_found_in_JSON);`)
-* `register_command`: takes as arguments the name of a command and associated function which should execute when the command is received, and which takes an instance of `DAQModule::data_t` as argument. `register command` is typically called multiple times in the DAQ module's constructor to define the functionality of the DAQ module. While in principle any arbitary name could be associated with any function of arbitray behavior to create a command, in practice implementors of DAQ modules define commands associated with the DAQ's state machine: "conf", "start", "stop", "scrap". An idiom exists where the associated functions are private member functions with standardized names: `do_conf`, `do_start`, etc. 
+* The constructor, as this is where calls to `register_command` are typically made in order to define the DAQ module's command set
+* `register_command`: takes as arguments the name of a command and associated function which should execute when the command is received, and which takes an instance of `DAQModule::data_t` as argument. `register command` is typically called multiple times in the DAQ module's constructor to define the functionality of the DAQ module. While in principle any arbitary name could be associated with any function of arbitrary behavior to create a command, in practice implementors of DAQ modules define commands associated with the DAQ's state machine: "conf", "start", "stop", "scrap". An idiom exists where the associated functions are private member functions with standardized names: `do_conf`, `do_start`, etc. 
+* `init`: this pure virtual function's implementation is meant to initialize the DAQ module instance, i.e., build objects which are meant to be persistent across runs, for the lifetime of the DAQ module. It takes as an argument the type `DAQModule::data_t`, currently aliased to the `nlohmann::json` type - i.e., JSON is used to define the DAQ module's initialization. Typically it will use parameters from the JSON in order to de-facto construct the member data (which of course is in technically constructed in the DAQ module's constructor). A common idiom to achieve this is to declare a `unique_ptr` to a type of interest as a member datum and then, in `init`, allocate the desired object on the heap using values from the JSON, pointing the `unique_ptr` instance to it.
 
+An conceptual example of what this looks like is the following simplified version of a DAQ module implementation. 
+```
+// This file would be called plugins/MyDAQModule.hpp
+// Functions are defined would typically be defined in plugins/MyDAQModule.cpp
 
-***
-* [Step-by-step instructions for creating your own DAQModule package under v2.0.0](Step-by-step-instructions-for-creating-your-own-DAQModule-package-under-v2.0.0) (_under construction_)
-* [Step-by-step instructions for creating your own DAQModule package under v1.1.0](Step-by-step-instructions-for-creating-your-own-DAQModule-package-under-v1.1.0)
-* [Step-by-step instructions for creating your own DAQModule package under v1.0.0](Step-by-step-instructions-for-creating-your-own-DAQModule-package-under-v1)
-* [Step-by-step instructions for creating your own DAQModule package](Step-by-step-instructions-for-creating-your-own-DAQModule-package)
+class MyDAQModule : public dunedaq::appfwk::DAQModule {
+  public:
+     MyDAQModule(const std::string& name) : 
+        dunedaq::appfwk::DAQModule(name) {
+          register_command("conf",  &MyDAQModule::do_conf);
+          register_command("start", &MyDAQModule::do_start);
+          register_command("stop",  &MyDAQModule::do_stop);
+          register_command("scrap", &MyDAQModule::do_scrap);
+     }
+     
+     void init(const data_t& data) override;
+  
+  private:
+  
+     // Typically would define these functions in `plugins/MyDAQModule.cpp`
+     void do_conf(const data_t& conf_data);
+     void do_start(const data_t& start_data);
+     void do_stop(const data_t& stop_data);
+     void do_scrap(const data_t& scrap_data);
+};
 
-***
+```
 
-* [How to write your DAQModule](How-to-write-your-DAQModule)
-* [Application Framework Contributor's Guide](Contributors-Guide)
 
 ## Reference Documentation
 
 * [Glossary](Glossary-of-Terms)
-* [Coding style](Coding-style)
-* [Interfaces](Interfaces-between-DAQ-objects)
-* [Testing](Testing)
