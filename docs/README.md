@@ -19,6 +19,7 @@ In general, in a full blown DAQ system users won't be running `daq_application` 
 ## Writing DAQ modules: the basics
 
 When implenting a DAQ module, you'll want to `#include` the [`DAQModule.hpp` header](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp), and derive your DAQ module from the `DAQModule` base class. The most important parts of `DAQModule.hpp` to an implementor of a DAQ module are the following:
+* `DEFINE_DUNE_DAQ_MODULE`: This is a macro which should be "called" at the bottom of your DAQ module's source file with an "argument" of the form `dunedaq::<your_package_name>::<your DAQ module name`. E.g., `DEFINE_DUNE_DAQ_MODULE(dunedaq::dfmodules::DataGenerator)` [at the bottom of the dfmodules package's source file](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataGenerator.cpp) 
 * `register_command`: takes as arguments the name of a command and a function which should execute when the command is received. The function is user defined, and takes an instance of `DAQModule::data_t` as argument. `DAQModule::data_t` currently aliased to the `nlohmann::json` type and can thus be thought of as a blob of JSON-structured data. `register command` is typically called multiple times in the DAQ module's constructor, once for each relevant Run Control transition, to define the functionality of the DAQ module. While in principle any arbitary name could be associated with any function of arbitrary behavior to create a command, in practice implementors of DAQ modules define commands associated with the DAQ's state machine: "_conf_", "_start_", "_stop_", "_scrap_". Not all DAQ modules necessarily need to perform an action for each of those transitions; e.g., a module may only be designed to do something during configuration, and not change as the DAQ enters the running state ("_start_") or exits it ("_stop_").  
 * `init`: this pure virtual function's implementation is meant to initialize the DAQ module instance, i.e., build objects which are meant to be persistent for the lifetime of the DAQ module. It takes as an argument the type `DAQModule::data_t`. Typically it will use parameters from the JSON in order to de-facto construct the member data (which of course is in technically constructed in the DAQ module's constructor). A common idiom to achieve this is to declare a `unique_ptr` to a type of interest as a member datum and then, in `init`, allocate the desired object on the heap using values from the JSON, pointing the `unique_ptr` instance to it. Queues are commonly built in this function; queues are described in more detail later in this document. 
 
@@ -30,7 +31,8 @@ An conceptual example of what this looks like is the following simplified versio
 class MyDaqModule : public dunedaq::appfwk::DAQModule {
   public:
      MyDaqModule(const std::string& name) : // A DAQ module instance is meant to have a unique name
-        dunedaq::appfwk::DAQModule(name) {
+        dunedaq::appfwk::DAQModule(name)
+          {
           register_command("conf",  &MyDAQModule::do_conf);
           register_command("start", &MyDAQModule::do_start);
           register_command("stop",  &MyDAQModule::do_stop);
@@ -41,7 +43,6 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
   
   private:
   
-     // Typically would define these functions in `plugins/MyDaqModule.cpp`
      void do_conf(const data_t& conf_data);
      void do_start(const data_t& start_data);
      void do_stop(const data_t& stop_data);
@@ -50,7 +51,7 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
 ```
 A set of programming idioms have developed over the last year of DAQ module development which, while not strictly necessary for implementing DAQ modules, have proven to be quite useful. They'll be described within the context of the functions above. Of course, you can also see them in action by looking at the source code of actual DAQ modules. 
 
-### The _init_ function
+### The `init` function
 
 Already touched upon above, this function takes a `data_t` instance (i.e., JSON) to tell it what objects to make persistent over the DAQ module's lifetime. A very common example of this is the construction of the queues which will pipe data into and out of an instance of the DAQ module. A description of this common use case will illustrate a couple of very important aspects of DAQ module programming. 
 
@@ -58,20 +59,20 @@ When a DAQ module writer wants to bring data into a DAQ module, they'll want to 
 ```
 void MyDaqModule::init(const data_t& init_data) {
     auto qi = appfwk::queue_index(init_data, {"name_of_required_input_queue"});
-    m_required_input_queue.reset(new dunedaq::appfwk::DAQSource<MyType>(qi["name_of_required_input_queue"].inst));
+    m_required_input_queue.reset(new dunedaq::appfwk::DAQSource<MyType_t>(qi["name_of_required_input_queue"].inst));
 }
 ```
-In the code above, the call to `queue_index`, defined in [`DAQModuleHelper.cpp`](https://github.com/DUNE-DAQ/appfwk/blob/abd89ed3cba1f934d9df555727a1bf97d555d11e/src/DAQModuleHelper.cpp), returns a map which connects the names of queues with structs which reference the queues. It will throw an exception if any provided names don't appear - so in this case, if `name_of_required_input_queue` isn't found in `init_data`, an exception will be thrown. If that doesn't happen, then `m_required_input_queue`, which here is an `std::unique` to a `DAQSource` of `MyType`s, gets pointed to a newly-allocated `DAQSource`. When the DAQ enters the running state, we could have `MyDaqModule` pop elements of `MyType` off of `m_required_input_queue` for processing. 
+In the code above, the call to `queue_index`, defined in [`DAQModuleHelper.cpp`](https://github.com/DUNE-DAQ/appfwk/blob/abd89ed3cba1f934d9df555727a1bf97d555d11e/src/DAQModuleHelper.cpp), returns a map which connects the names of queues with structs which reference the queues. It will throw an exception if any provided names don't appear - so in this case, if `name_of_required_input_queue` isn't found in `init_data`, an exception will be thrown. If that doesn't happen, then `m_required_input_queue`, which here is an `std::unique` to a `DAQSource` of `MyType_t`s, gets pointed to a newly-allocated `DAQSource`. When the DAQ enters the running state, we could have `MyDaqModule` pop elements of `MyType_t` off of `m_required_input_queue` for processing. 
 
 ### The `do_conf` function
 
-As one might expect, there are many values which a DAQ module may rely on to perform its calculations when in the running state that ideally should be settable during the `conf` transition. The typical technique is to have some member data which in the DAQ module constructor intentionally gets initialized either to zero or to implausible values (e.g. `m_calibration_value(std::numeric_limits<double>::max())`, `m_num_total_warnings(0)`) and then to set them properly during the `config` transition. You'll see in the code below that the type of the data instance `data` which gets extracted from the JSON is `mydaqmodule::Conf`, and then `data` is used to set the member(s). 
+As one might expect, there are many values which a DAQ module may rely on to perform its calculations when in the running state that ideally should be settable during the `conf` transition. The typical technique is to have some member data which in the DAQ module constructor intentionally gets initialized either to zero or to implausible values (e.g. `m_calibration_scale_factor(-1)`, `m_num_total_warnings(0)`) and then to set them properly during the `config` transition. You'll see in the code below that the type of the data instance `data` which gets extracted from the JSON is `mydaqmodule::Conf`, and then `data` is used to set the member(s). 
 ```
 void MyDaqModule::do_conf(const data_t& conf_data)
 {
   auto data = conf_data.get<mydaqmodule::Conf>();
 
-  m_calibration_value = data.calibration_value;
+  m_calibration_scale_factor = data.calibration_scale_factor;
   // ...and then set the other members which take per-configuration values...
 }
 ```
@@ -87,6 +88,92 @@ void MyDaqModule::do_start(const data_t& /*args*/) {
     m_thread.start_working_thread();  // m_thread is an `appfwk::ThreadHelper` member of MyDaqModule
 }
 ```
+
+### The `do_stop` function
+
+Quite simple, basically the reverse of `do_start`:
+```
+void MyDaqModule::do_stop(const data_t& /*args*/) {
+    m_thread.stop_working_thread();  // m_thread is an `appfwk::ThreadHelper` member of MyDaqModule
+}
+```
+### The `do_scrap` function
+
+This is the reverse of `do_config`. Often this function isn't even needed since the values which get set in `do_conf` are completely overwritten on subsequent calls to `do_conf`
+
+### The full code
+
+Given the code features described above, `MyDaqModule` would look something like the following, ignoring things irrelevant to the pedagogy presented here, like proper error handling, log statements, `#include`s, etc. Pretend the name of the package `MyDaqModule` in is "mypackage":
+
+* `MyDaqModule.hpp`:
+```
+class MyDaqModule : public dunedaq::appfwk::DAQModule {
+  public:
+     
+     alias MyType_t = double; // Pretend this module processes an incoming stream of doubles 
+    
+     MyDaqModule(const std::string& name) : // A DAQ module instance is meant to have a unique name
+        dunedaq::appfwk::DAQModule(name),
+        m_thread(std::bind(&MyDaqModule::do_work, this, std::placeholders::_1)),
+        m_calibration_scale_factor(-1)
+        {
+          register_command("conf",  &MyDAQModule::do_conf);
+          register_command("start", &MyDAQModule::do_start);
+          register_command("stop",  &MyDAQModule::do_stop);
+          register_command("scrap", &MyDAQModule::do_scrap);
+     }
+     
+     void init(const data_t& init_data) override;
+  
+  private:
+  
+     void do_conf(const data_t& conf_data);
+     void do_start(const data_t& start_data);
+     void do_stop(const data_t& stop_data);
+     void do_scrap(const data_t& scrap_data);
+     
+     void do_work(std::atomic<bool>&);
+     dunedaq::appfwk::ThreadHelper m_thread; 
+     double m_calibration_scale_factor;
+     std::unique_ptr<dunedaq::appfwk::DAQSource<MyType_t>> m_required_input_queue; 
+};
+```
+* `MyDaqModule.cpp`:
+```
+
+void MyDaqModule::init(const data_t& init_data) {
+    auto qi = appfwk::queue_index(init_data, {"name_of_required_input_queue"});
+    m_required_input_queue.reset(new dunedaq::appfwk::DAQSource<MyType_t>(qi["name_of_required_input_queue"].inst));
+}
+
+void MyDaqModule::do_conf(const data_t& conf_data)
+{
+  auto data = conf_data.get<mydaqmodule::Conf>();
+
+  m_calibration_scale_factor = data.calibration_scale_factor;
+  // ...and then set the other members which take per-configuration values...
+}
+
+void MyDaqModule::do_start(const data_t& /*args*/) {
+    m_thread.start_working_thread();  // m_thread is an `appfwk::ThreadHelper` member of MyDaqModule
+}
+
+void MyDaqModule::do_work(std::atomic<bool>& running_flag)
+{
+   while (running_flag.load()) {
+      // Here we'd pop data off of m_required_input_queue and presumably use m_calibration_scale_factor when processing it
+   }
+}   
+
+DEFINE_DUNE_DAQ_MODULE(dunedaq::mypackage::MyDaqModule)
+```
+
+### Final thoughts on writing DAQ modules
+
+Now that you've been given an overview of appfwk and how to write DAQ modules, you're encouraged to look at the various repos to see how other DUNE DAQ developers have written DAQ modules. One package with plenty of DAQ modules to study is [dfmodules](https://github.com/DUNE-DAQ/dfmodules/tree/develop/plugins), modules used for dataflow purposes. Keep in mind that not all DAQ modules will adhere to the model described above, and you can judge for yourself what techniques you feel will make it easiest to write and maintain a DAQ module. 
+
+
+
 
 ## Reference Documentation
 
