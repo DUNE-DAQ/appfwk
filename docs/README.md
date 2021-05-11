@@ -51,18 +51,28 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
 ```
 A set of programming idioms developed over the first year of DAQ module development which, while not strictly necessary for implementing DAQ modules, have proven to be quite useful. They'll be described within the context of the functions above. Of course, you can also see them in action by looking at the source code of actual DAQ modules. 
 
+### The DAQ module's constructor
+
+While of course all member data will be initialized here in a _technical_ (as opposed to logical) sense, in general the only things about a DAQ module instance which are meaningfully defined in its constructor are:
+1. Their command set, already discussed
+2. Its unique name, via the argument to its constructor
+
+A word needs to be said about the concept of a "unique name" here. Looking in [`DAQModule.hpp`](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp), you'll see that the `DAQModule` base class itself inherits from an appfwk class called [`NamedObject`](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/NamedObject.hpp). The instances of any class which inherits from `NamedObject` will require unique names; while this of course would include DAQ modules as they inherit from `DAQModule`, [other types of class can require unique names as well](https://github.com/DUNE-DAQ/dfmodules/blob/a91706c214f9ae7f1cca0840af7d0381569be83f/src/dfmodules/TriggerInhibitAgent.hpp).
+
 ### The `init` function
 
 Already touched upon above, this function takes a `data_t` instance (i.e., JSON) to tell it what objects to make persistent over the DAQ module's lifetime. A very common example of this is the construction of the queues which will pipe data into and out of an instance of the DAQ module. A description of this common use case will illustrate a couple of very important aspects of DAQ module programming. 
 
-When a DAQ module writer wants to bring data into a DAQ module, they'll want to pop data off a queue via the [`DAQSource` class](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQSource.hpp), and when they want to send data out of a DAQ module they'll want to push it onto a queue via the [`DAQSink` class](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQSink.hpp). Typically instances of these classes aren't "hardwired" into the DAQ module through creation in the constructor, but rather get built in the call to `init` based on the JSON configuration `init` receives. A definition of `init`, then, can look like the following:
+When a DAQ module writer wants to bring data into a DAQ module, they'll want to pop data off a queue via the [`DAQSource` class](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQSource.hpp), and when they want to send data out of a DAQ module they'll want to push it onto a queue via the [`DAQSink` class](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQSink.hpp). Typically instances of these classes aren't "hardwired" into the DAQ module through creation in the constructor. Instead, they get built in the call to `init` based on the JSON configuration `init` receives . A definition of `init`, then, can look like the following:
 ```
 void MyDaqModule::init(const data_t& init_data) {
     auto qi = appfwk::queue_index(init_data, {"name_of_required_input_queue"});
-    m_required_input_queue.reset(new dunedaq::appfwk::DAQSource<MyType_t>(qi["name_of_required_input_queue"].inst));
+    m_required_input_queue_ptr.reset(new dunedaq::appfwk::DAQSource<MyType_t>(qi["name_of_required_input_queue"].inst));
 }
 ```
-In the code above, the call to `queue_index`, defined in [`DAQModuleHelper.cpp`](https://github.com/DUNE-DAQ/appfwk/blob/abd89ed3cba1f934d9df555727a1bf97d555d11e/src/DAQModuleHelper.cpp), returns a map which connects the names of queues with structs which reference the queues. It will throw an exception if any provided names don't appear - so in this case, if `name_of_required_input_queue` isn't found in `init_data`, an exception will be thrown. If that doesn't happen, then `m_required_input_queue`, which here is an `std::unique` to a `DAQSource` of `MyType_t`s, gets pointed to a newly-allocated `DAQSource`. When the DAQ enters the running state, we could have `MyDaqModule` pop elements of `MyType_t` off of `m_required_input_queue` for processing. 
+In the code above, the call to `queue_index`, defined in [`DAQModuleHelper.cpp`](https://github.com/DUNE-DAQ/appfwk/blob/develop/src/DAQModuleHelper.cpp), returns a map which connects the names of queues with structs which reference the queues. It will throw an exception if any provided names don't appear - so in this case, if `name_of_required_input_queue` isn't found in `init_data`, an exception will be thrown. If that doesn't happen, then `m_required_input_queue_ptr`, which here is an `std::unique` to a `DAQSource` of `MyType_t`s, gets pointed to a newly-allocated `DAQSource`. When the DAQ enters the running state, we could have `MyDaqModule` pop elements of `MyType_t` off of the queue pointed to by `m_required_input_queue_ptr` for processing. 
+
+For a JSON file which (among other things) defines queues, see [this example](https://github.com/DUNE-DAQ/flxlibs/blob/15e256c0df102b1fc93802e9ed79a7cfd8c0ea4a/test/felix_wib2_readout.json), where the two main things to define for a queue are (1) its capacity (the maximum number of elements it can hold) and (2) its implementation. The two primary options for DAQ running are "FollySPSCQueue" (Single Producer Single Consumer) and "FollyMPMCQueue" (Multiple Producer Multiple Consumer), both implemented originally for Facebook but found useful for DUNE. 
 
 ### The `do_conf` function
 
@@ -80,7 +90,7 @@ This of course raises the question: what _is_ `mydaqmodule::Conf`? It's a `struc
 
 ### The `do_start` function
 
-Most DAQ modules are designed to loop over some sort of repeated action when the DAQ enters the running state, and it's in the `do_start` function that this repeated action begins. A very common idiom for the `do_start` function is, "Set a member atomic boolean stating that we're now in the running state, and then start one or more threads which perform actions in loops which they break out of if they see that the atomic boolean indicates we're no longer in the running state". 
+Most DAQ modules are designed to loop over some sort of repeated action when the DAQ enters the running state, and it's in the `do_start` function that this repeated action begins. A very common idiom for the `do_start` function is, "Set an atomic boolean stating that we're now in the running state, and then start one or more threads which perform actions in loops which they break out of if they see that the atomic boolean indicates we're no longer in the running state". 
 
 While it's of course possible to accomplish this using the existing concurrency facilities provided by the C++ Standard Library, the appfwk package itself provides a class, `ThreadHelper`, which makes this easier. `ThreadHelper` is covered in detail [here](https://dune-daq-sw.readthedocs.io/en/latest/packages/appfwk/ThreadHelper-Usage-Notes/); when in use the `do_start` function can be as simple as follows:
 ```
@@ -99,7 +109,7 @@ void MyDaqModule::do_stop(const data_t& /*args*/) {
 ```
 ### The `do_scrap` function
 
-This is the reverse of `do_config`. Often this function isn't even needed since the values which get set in `do_conf` are completely overwritten on subsequent calls to `do_conf`
+This is the reverse of `do_config`. Often this function isn't even needed since the values which get set in `do_conf` are completely overwritten on subsequent calls to `do_conf`. However, as the point of this function is to bring the DAQ module back to a state where it can be configured again, it's important that any hardware or memory resources which were acquired in `do_conf` are released here in `do_scrap`.  
 
 ### The full code
 
@@ -135,7 +145,7 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
      void do_work(std::atomic<bool>&);
      dunedaq::appfwk::ThreadHelper m_thread; 
      double m_calibration_scale_factor;
-     std::unique_ptr<dunedaq::appfwk::DAQSource<MyType_t>> m_required_input_queue; 
+     std::unique_ptr<dunedaq::appfwk::DAQSource<MyType_t>> m_required_input_queue_ptr; 
 };
 ```
 * `MyDaqModule.cpp`:
@@ -143,7 +153,7 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
 
 void MyDaqModule::init(const data_t& init_data) {
     auto qi = appfwk::queue_index(init_data, {"name_of_required_input_queue"});
-    m_required_input_queue.reset(new dunedaq::appfwk::DAQSource<MyType_t>(qi["name_of_required_input_queue"].inst));
+    m_required_input_queue_ptr.reset(new dunedaq::appfwk::DAQSource<MyType_t>(qi["name_of_required_input_queue"].inst));
 }
 
 void MyDaqModule::do_conf(const data_t& conf_data)
@@ -158,10 +168,14 @@ void MyDaqModule::do_start(const data_t& /*args*/) {
     m_thread.start_working_thread();  // m_thread is an `appfwk::ThreadHelper` member of MyDaqModule
 }
 
+void MyDaqModule::do_stop(const data_t& /*args*/) {
+    m_thread.stop_working_thread();  
+}
+
 void MyDaqModule::do_work(std::atomic<bool>& running_flag)
 {
    while (running_flag.load()) {
-      // Here we'd pop data off of m_required_input_queue and presumably use m_calibration_scale_factor when processing it
+      // Here we'd pop data off of the queue pointed at by m_required_input_queue_ptr and presumably use m_calibration_scale_factor when processing the data
    }
 }   
 
@@ -173,8 +187,3 @@ DEFINE_DUNE_DAQ_MODULE(dunedaq::mypackage::MyDaqModule)
 Now that you've been given an overview of appfwk and how to write DAQ modules, you're encouraged to look at the various repos to see how other DUNE DAQ developers have written DAQ modules. One package with plenty of DAQ modules to study is [dfmodules](https://github.com/DUNE-DAQ/dfmodules/tree/develop/plugins), modules used for dataflow purposes. Keep in mind that not all DAQ modules will adhere to the model described above, and you can judge for yourself what techniques you feel will make it easiest to write and maintain a DAQ module. 
 
 
-
-
-## Reference Documentation
-
-* [Glossary](Glossary-of-Terms)
