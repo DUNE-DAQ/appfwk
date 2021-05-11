@@ -21,7 +21,7 @@ In general, in a full blown DAQ system users won't be running `daq_application` 
 When implenting a DAQ module, you'll want to `#include` the [`DAQModule.hpp` header](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp), and derive your DAQ module from the `DAQModule` base class. The most important parts of `DAQModule.hpp` to an implementor of a DAQ module are the following:
 * `DEFINE_DUNE_DAQ_MODULE`: This is a macro which should be "called" at the bottom of your DAQ module's source file with an "argument" of the form `dunedaq::<your_package_name>::<your DAQ module name>`. E.g., `DEFINE_DUNE_DAQ_MODULE(dunedaq::dfmodules::DataGenerator)` [at the bottom of the dfmodules package's source file](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataGenerator.cpp) 
 * `register_command`: takes as arguments the name of a command and a function which should execute when the command is received. The function is user defined, and takes an instance of `DAQModule::data_t` as argument. `DAQModule::data_t` is aliased to the `nlohmann::json` type and can thus be thought of as a blob of JSON-structured data. While in principle any arbitary name could be associated with any function of arbitrary behavior to create a command, in practice implementors of DAQ modules define commands associated with the DAQ's state machine: "_conf_", "_start_", "_stop_", "_scrap_". Not all DAQ modules necessarily need to perform an action for each of those transitions; e.g., a module may only be designed to do something during configuration, and not change as the DAQ enters the running state ("_start_") or exits it ("_stop_").  
-* `init`: this pure virtual function's implementation is meant to create objects which are meant to be persistent for the lifetime of the DAQ module. It takes as an argument the type `DAQModule::data_t`. Typically it will use parameters from this JSON argument to define the persistent objects. For persistent objects of types which don't have an efficient copy assigment operator, a common idiom to declare as member data a `unique_ptr` to the type of interest and then, in `init`, to allocate the desired object on the heap using values from the JSON and point the `unique_ptr` member to it. Queues are commonly allocated in `init`; they'll be described in more detail later in this document. 
+* `init`: this pure virtual function's implementation is meant to create objects which are persistent for the lifetime of the DAQ module. It takes as an argument the type `DAQModule::data_t`. Typically it will use parameters from this JSON argument to define the persistent objects. For persistent objects of types which don't have an efficient copy assigment operator, a common idiom to declare as member data a `unique_ptr` to the type of interest and then, in `init`, to allocate the desired object on the heap using values from the JSON and point the `unique_ptr` member to it. Queues are commonly allocated in `init`; they'll be described in more detail later in this document. 
 
 An conceptual example of what this looks like is the following simplified version of a DAQ module implementation. 
 ```
@@ -54,7 +54,7 @@ A set of programming idioms developed over the first year of DAQ module developm
 ### The DAQ module's constructor
 
 While of course all member data will be initialized here in a _technical_ (as opposed to logical) sense, in general the only things about a DAQ module instance which are meaningfully defined in its constructor are:
-1. Their command set, already discussed
+1. Its command set, already discussed
 2. Its unique name, via the argument to its constructor
 
 A word needs to be said about the concept of a "unique name" here. Looking in [`DAQModule.hpp`](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp), you'll see that the `DAQModule` base class itself inherits from an appfwk class called [`NamedObject`](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/NamedObject.hpp). The instances of any class which inherits from `NamedObject` will require unique names; while this of course would include DAQ modules as they inherit from `DAQModule`, [other types of class can require unique names as well](https://github.com/DUNE-DAQ/dfmodules/blob/a91706c214f9ae7f1cca0840af7d0381569be83f/src/dfmodules/TriggerInhibitAgent.hpp).
@@ -72,7 +72,7 @@ void MyDaqModule::init(const data_t& init_data) {
 ```
 In the code above, the call to `queue_index`, defined in [`DAQModuleHelper.cpp`](https://github.com/DUNE-DAQ/appfwk/blob/develop/src/DAQModuleHelper.cpp), returns a map which connects the names of queues with structs which reference the queues. It will throw an exception if any provided names don't appear - so in this case, if `name_of_required_input_queue` isn't found in `init_data`, an exception will be thrown. If that doesn't happen, then `m_required_input_queue_ptr`, which here is an `std::unique` to a `DAQSource` of `MyType_t`s, gets pointed to a newly-allocated `DAQSource`. When the DAQ enters the running state, we could have `MyDaqModule` pop elements of `MyType_t` off of the queue pointed to by `m_required_input_queue_ptr` for processing. 
 
-For a JSON file which (among other things) defines queues, see [this example](https://github.com/DUNE-DAQ/flxlibs/blob/15e256c0df102b1fc93802e9ed79a7cfd8c0ea4a/test/felix_wib2_readout.json), where the two main things to define for a queue are (1) its capacity (the maximum number of elements it can hold) and (2) its implementation. The two primary options for DAQ running are "FollySPSCQueue" (Single Producer Single Consumer) and "FollyMPMCQueue" (Multiple Producer Multiple Consumer), both implemented originally for Facebook but found useful for DUNE. 
+For a JSON file which (among other things) defines queues, see [this example](https://github.com/DUNE-DAQ/flxlibs/blob/15e256c0df102b1fc93802e9ed79a7cfd8c0ea4a/test/felix_wib2_readout.json), where the two main things to define for a queue are (1) its capacity (the maximum number of elements it can hold) and (2) its implementation. The two primary queue options for DAQ running are "FollySPSCQueue" (Single Producer Single Consumer) and "FollyMPMCQueue" (Multiple Producer Multiple Consumer), both implemented originally for Facebook but found useful for DUNE. 
 
 ### The `do_conf` function
 
@@ -170,6 +170,10 @@ void MyDaqModule::do_start(const data_t& /*args*/) {
 
 void MyDaqModule::do_stop(const data_t& /*args*/) {
     m_thread.stop_working_thread();  
+}
+
+void MyDaqModule::do_scrap(const data_t& /*args*/) {
+    m_calibration_scale_factor = -1;
 }
 
 void MyDaqModule::do_work(std::atomic<bool>& running_flag)
