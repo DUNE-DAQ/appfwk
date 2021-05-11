@@ -16,7 +16,7 @@ Drilling down a bit deeper, the way that `daq_application`s can be configured so
 
 In general, in a full blown DAQ system users won't be running `daq_application` from the command line. However, it can be instructive to know what options `daq_application` takes. Details can be found [here](Daq-Application.md).
 
-## Writing DAQ modules: the basics
+## Writing DAQ modules
 
 When implenting a DAQ module, you'll want to `#include` the [`DAQModule.hpp` header](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp), and derive your DAQ module from the `DAQModule` base class. The most important parts of `DAQModule.hpp` to an implementor of a DAQ module are the following:
 * `DEFINE_DUNE_DAQ_MODULE`: This is a macro which should be "called" at the bottom of your DAQ module's source file with an "argument" of the form `dunedaq::<your_package_name>::<your DAQ module name>`. E.g., `DEFINE_DUNE_DAQ_MODULE(dunedaq::dfmodules::DataGenerator)` [at the bottom of the dfmodules package's source file](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataGenerator.cpp) 
@@ -110,6 +110,14 @@ void MyDaqModule::do_stop(const data_t& /*args*/) {
 ### The `do_scrap` function
 
 This is the reverse of `do_config`. Often this function isn't even needed since the values which get set in `do_conf` are completely overwritten on subsequent calls to `do_conf`. However, as the point of this function is to bring the DAQ module back to a state where it can be configured again, it's important that any hardware or memory resources which were acquired in `do_conf` are released here in `do_scrap`.  
+
+### The `get_info` function
+
+Not yet mentioned, you can see in [`DAQModule.hpp`](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp) that there's a virtual function called `get_info` which defaults to a no-op:
+```
+virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; };
+```
+It's meant to be implemented by DAQ module writers to supply metrics about the DAQ module; an example of this can be found [here](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataWriter.cpp). 
 
 ### The full code
 
