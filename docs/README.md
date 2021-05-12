@@ -10,7 +10,7 @@ appfwk consists of a generic DAQ application (`daq_application`) which can be co
 
 appfwk provides the scaffolding on which all DUNE DAQ software processes can be developed. The running DAQ typically consists of multiple distinct processes assigned various tasks: filtering data, requesting it, saving it to storage, etc. There are many different types of process, some of which may not even have been conceived of yet, and it would be cumbersome to recompile multiple different types of process across many packages every time one wanted to change the behavior of the DAQ. To solve this problem, the approach that's been taken is to have a standard DUNE DAQ software process [`daq_application`](Daq-Application.md) which can be configured at runtime by Run Control in order to perform some particular function in the DAQ. 
 
-`daq_application` is designed as a flexible container of "DAQ modules" (units of code designed to perform specific tasks) and "queues" (designed to move data between DAQ modules). is that they are designed to have DAQ modules embedded in them, where DAQ modules are units of code designed to perform specific tasks and which pass data between each other by means of containers known as "queues". These specific tasks can vary widely; they include [producing fake data for testing purposes](https://github.com/DUNE-DAQ/readout/blob/develop/plugins/FakeCardReader.hpp), [putting data into long term storage](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataWriter.hpp), and so forth. DAQ modules will typically execute user-defined functions when receiving standard transitions from Run Control: conf, start, etc. appfwk provides the `DAQModule` base class which users should derive their DAQ module class from in their own packages.  
+`daq_application` is designed as a flexible container of "DAQ modules" (units of code designed to perform specific tasks) and "queues" (designed to move data between DAQ modules). These specific tasks can vary widely; they include [producing fake data for testing purposes](https://github.com/DUNE-DAQ/readout/blob/develop/plugins/FakeCardReader.hpp), [putting data into long term storage](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataWriter.hpp), and so forth. DAQ modules will typically execute user-defined functions when receiving standard transitions from Run Control: "conf", "start", etc. appfwk provides the `DAQModule` base class which users should derive their DAQ module class from in their own packages.  
 
 ## Running `daq_application`
 
@@ -52,7 +52,7 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
 };
 ```
 
-### Intro to function-by-function descriptions
+### Overview of additional function-by-function descriptions
 
 A set of programming idioms have been developed over the first year of DAQ module development which, while not strictly necessary for implementing DAQ modules, have proven to be quite useful. They'll be described within the context of the functions above, as well as some new functions described later. While writers of DAQ modules should follow the coding guidelines presented in the [DUNE DAQ C++ Style Guide](https://dune-daq-sw.readthedocs.io/en/latest/packages/styleguide/), the techniques which will be presented below concern a higher-level view of the code and unlike the guidelines are more recommendations than requirements. Of course, you can also see the techniques in action by looking at the source code of actual DAQ modules. 
 
