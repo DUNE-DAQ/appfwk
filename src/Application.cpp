@@ -9,8 +9,9 @@
 #include "appfwk/Application.hpp"
 
 #include "appfwk/Issues.hpp"
-#include "cmdlib/cmd/Nljs.hpp"
+#include "appfwk/cmd/Nljs.hpp"
 #include "rcif/cmd/Nljs.hpp"
+#include "rcif/runinfo/Nljs.hpp"
 #include "appfwk/appinfo/Nljs.hpp"
 
 #include "logging/Logging.hpp"
@@ -22,6 +23,10 @@ Application::Application(std::string appname, std::string partition, std::string
   : NamedObject(appname), m_partition(partition), m_info_mgr(opmonlibimpl), m_state("NONE"), m_busy(false), m_error(false),
     m_initialized(false) 
 {
+   m_runinfo.running = false;
+   m_runinfo.runno = 0 ;
+   m_runinfo.runtime = 0;
+
    m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 }
 
@@ -40,8 +45,8 @@ Application::run(std::atomic<bool>& end_marker)
     throw ApplicationNotInitialized(ERS_HERE, get_name());
   }
 
-  setenv("DUNEDAQ_OPMON_INTERVAL",    "10",0);
-  setenv("DUNEDAQ_OPMON_LEVEL",  "1",0);
+  setenv("DUNEDAQ_OPMON_INTERVAL", "10", 0);
+  setenv("DUNEDAQ_OPMON_LEVEL", "1", 0);
 
   std::stringstream s1(getenv("DUNEDAQ_OPMON_INTERVAL"));
   std::stringstream s2(getenv("DUNEDAQ_OPMON_LEVEL"));
@@ -61,12 +66,31 @@ Application::execute(const dataobj_t& cmd_data)
 
   auto rc_cmd = cmd_data.get<rcif::cmd::RCCommand>();
   std::string cmdname = rc_cmd.id;
-
   if(!is_cmd_valid(cmd_data)) {
     throw InvalidCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
   }
 
   m_busy.store(true);
+
+  if (cmdname == "start") {
+    auto cmd_obj = rc_cmd.data.get<cmd::CmdObj>();
+
+    for (const auto& addressed : cmd_obj.modules) {
+      dataobj_t startpars = addressed.data;
+      auto rc_startpars = startpars.get<rcif::cmd::StartParams>();
+      m_runinfo.runno = rc_startpars.run ;
+      break;
+    }
+
+    m_run_start_time = std::time(nullptr);
+    m_runinfo.running = true;   
+    m_runinfo.runtime = 0;
+  }
+  else if (cmdname == "stop") {
+    m_runinfo.running = false;
+    m_runinfo.runno = 0 ;
+    m_runinfo.runtime = 0;
+  }
 
   try {
     m_mod_mgr.execute(cmd_data);
@@ -100,6 +124,11 @@ Application::gather_stats(opmonlib::InfoCollector & ci, int level)
   opmonlib::InfoCollector tmp_ci;
 
   tmp_ci.add(ai);
+
+  if (ai.state == "RUNNING") {
+    m_runinfo.runtime = std::difftime(std::time(nullptr), m_run_start_time);
+  }
+  tmp_ci.add(m_runinfo);
 
   if (level == 0) {
     // give only generic application info
