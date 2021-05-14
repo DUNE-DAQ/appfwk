@@ -58,9 +58,9 @@ jobs:
     - name: setup build env and build the dev release
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-          source $GITHUB_WORKSPACE/daq-buildtools/dbt-setup-env.sh
+          source $GITHUB_WORKSPACE/daq-buildtools/env.sh
           cd $GITHUB_WORKSPACE/dev
-          dbt-setup-build-environment || true
+          dbt-workarea-env
           setup_repo_env="SETUP_$REPO"
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
           cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev/sourcecode
