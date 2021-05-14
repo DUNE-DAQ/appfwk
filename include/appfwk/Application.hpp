@@ -12,7 +12,7 @@
 #include "appfwk/DAQModuleManager.hpp"
 #include "appfwk/NamedObject.hpp"
 #include "appfwk/cmd/Structs.hpp"
-#include "rcif/runinfo/Structs.hpp"
+#include "rcif/runinfo/InfoStructs.hpp"
 
 #include "cmdlib/CommandedObject.hpp"
 #include "cmdlib/CommandFacility.hpp"

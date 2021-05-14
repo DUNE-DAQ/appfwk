@@ -16,7 +16,7 @@
 #define APPFWK_INCLUDE_APPFWK_QUEUEBASE_HPP_
 
 #include "appfwk/NamedObject.hpp"
-#include "appfwk/queueinfo/Nljs.hpp"
+#include "appfwk/queueinfo/InfoNljs.hpp"
 
 #include "opmonlib/InfoCollector.hpp"
 

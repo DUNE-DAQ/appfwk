@@ -11,8 +11,8 @@
 #include "appfwk/Issues.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 #include "rcif/cmd/Nljs.hpp"
-#include "rcif/runinfo/Nljs.hpp"
-#include "appfwk/appinfo/Nljs.hpp"
+#include "rcif/runinfo/InfoNljs.hpp"
+#include "appfwk/appinfo/InfoNljs.hpp"
 
 #include "logging/Logging.hpp"
 
