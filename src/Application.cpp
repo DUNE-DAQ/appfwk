@@ -82,7 +82,7 @@ Application::execute(const dataobj_t& cmd_data)
       break;
     }
 
-    m_run_start_time = std::time(nullptr);
+    m_run_start_time = std::chrono::steady_clock::now();;
     m_runinfo.running = true;   
     m_runinfo.runtime = 0;
   }
@@ -126,7 +126,8 @@ Application::gather_stats(opmonlib::InfoCollector & ci, int level)
   tmp_ci.add(ai);
 
   if (ai.state == "RUNNING") {
-    m_runinfo.runtime = std::difftime(std::time(nullptr), m_run_start_time);
+    auto now = std::chrono::steady_clock::now();
+    m_runinfo.runtime =  std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count();
   }
   tmp_ci.add(m_runinfo);
 

@@ -24,7 +24,7 @@
 #include "nlohmann/json.hpp"
 
 #include <string>
-#include <ctime>
+#include <chrono>
 #include <atomic>
 #include <mutex>
 
@@ -92,7 +92,7 @@ private:
   std::atomic<bool> m_busy;
   std::atomic<bool> m_error;
   bool m_initialized;
-  std::time_t m_run_start_time;
+  std::chrono::time_point<std::chrono::steady_clock> m_run_start_time;
   dunedaq::rcif::runinfo::Info m_runinfo;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
