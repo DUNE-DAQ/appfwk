@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(appfwk VERSION 2.2.2)
+project(appfwk VERSION 2.3.0)
 
 find_package(daq-cmake REQUIRED )
 
@@ -18,7 +18,8 @@ find_package(nlohmann_json REQUIRED )
 
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging Folly::folly cmdlib::cmdlib rcif::rcif opmonlib::opmonlib nlohmann_json::nlohmann_json pthread)
 
-daq_codegen( *.jsonnet DEP_PKGS rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
+daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
+daq_codegen( appinfo.jsonnet queueinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hpp.j2 opmonlib/InfoNljs.hpp.j2 )
 
 ##############################################################################
 # Main library

@@ -12,7 +12,7 @@
 #include "appfwk/DAQModuleManager.hpp"
 #include "appfwk/NamedObject.hpp"
 #include "appfwk/cmd/Structs.hpp"
-#include "rcif/runinfo/Structs.hpp"
+#include "rcif/runinfo/InfoStructs.hpp"
 
 #include "cmdlib/CommandedObject.hpp"
 #include "cmdlib/CommandFacility.hpp"
@@ -94,6 +94,7 @@ private:
   bool m_initialized;
   std::chrono::time_point<std::chrono::steady_clock> m_run_start_time;
   dunedaq::rcif::runinfo::Info m_runinfo;
+  std::string m_fully_qualified_name ;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
 };
