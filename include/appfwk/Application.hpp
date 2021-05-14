@@ -12,6 +12,7 @@
 #include "appfwk/DAQModuleManager.hpp"
 #include "appfwk/NamedObject.hpp"
 #include "appfwk/cmd/Structs.hpp"
+#include "rcif/runinfo/Structs.hpp"
 
 #include "cmdlib/CommandedObject.hpp"
 #include "cmdlib/CommandFacility.hpp"
@@ -23,6 +24,7 @@
 #include "nlohmann/json.hpp"
 
 #include <string>
+#include <chrono>
 #include <atomic>
 #include <mutex>
 
@@ -90,9 +92,10 @@ private:
   std::atomic<bool> m_busy;
   std::atomic<bool> m_error;
   bool m_initialized;
+  std::chrono::time_point<std::chrono::steady_clock> m_run_start_time;
+  dunedaq::rcif::runinfo::Info m_runinfo;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
-
 };
 
 } // namespace appfwk
