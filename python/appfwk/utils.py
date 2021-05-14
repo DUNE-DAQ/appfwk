@@ -9,7 +9,7 @@ moo.otypes.load_types('cmdlib/cmd.jsonnet', get_moo_model_path())
 import dunedaq.appfwk.cmd as cmd 
 import dunedaq.appfwk.app as app 
 import dunedaq.rcif.cmd as rccmd 
-import dunedaq.cmdlib.cmd as bcmd 
+import dunedaq.cmdlib.cmd as ccmd 
 
 
 def mspec(inst, plugin, qinfos):
@@ -32,7 +32,26 @@ def mspec(inst, plugin, qinfos):
                 )
             )
 
-def mcmd(cmdid, mods):
+def acmd(mods: list):
+    """ 
+    Helper function to create appfwk's CmdObj of Addressed module commands.
+        
+    :param      cmdid:  The coommand id
+    :type       cmdid:  str
+    :param      mods:   List of module name/data structures 
+    :type       mods:   list
+    
+    :returns:   A constructed Command object
+    :rtype:     dunedaq.appfwk.cmd.Command
+    """
+    return cmd.CmdObj(
+        modules=cmd.AddressedCmds(
+            cmd.AddressedCmd(match=m, data=o)
+            for m,o in mods
+        )
+    )
+
+def mcmd(cmdid: str, mods: list):
     """
     Helper function to create appfwk's Commands addressed to modules.
     
@@ -44,14 +63,9 @@ def mcmd(cmdid, mods):
     :returns:   A constructed Command object
     :rtype:     dunedaq.appfwk.cmd.Command
     """
-    return bcmd.Command(
-        id=bcmd.CmdId(cmdid),
-        data=cmd.CmdObj(
-            modules=cmd.AddressedCmds(
-                cmd.AddressedCmd(match=m, data=o)
-                for m,o in mods
-            )
-        )
+    return ccmd.Command(
+        id=ccmd.CmdId(cmdid),
+        data=acmd(mods)
     )
 
 def mrccmd(cmdid, instate, outstate, mods):
@@ -71,7 +85,7 @@ def mrccmd(cmdid, instate, outstate, mods):
     :rtype:     dunedaq.rcif.cmd.RCCommand
     """
     return rccmd.RCCommand(
-        id=bcmd.CmdId(cmdid),
+        id=ccmd.CmdId(cmdid),
         entry_state=rccmd.State(instate),
         exit_state=rccmd.State(outstate),
         data=cmd.CmdObj(
