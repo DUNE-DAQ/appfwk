@@ -47,7 +47,7 @@ jobs:
         
     - name: setup dev area
       run: |
-          source $GITHUB_WORKSPACE/daq-buildtools/dbt-setup-env.sh
+          source $GITHUB_WORKSPACE/daq-buildtools/env.sh
           dbt-create.sh -r /releases dunedaq-develop dev
           
     - name: checkout package for CI
