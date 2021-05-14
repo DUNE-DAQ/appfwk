@@ -94,6 +94,7 @@ private:
   bool m_initialized;
   std::time_t m_run_start_time;
   dunedaq::rcif::runinfo::Info m_runinfo;
+  std::string m_fully_qualified_name ;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
 };
