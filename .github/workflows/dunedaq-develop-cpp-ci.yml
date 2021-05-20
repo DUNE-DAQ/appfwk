@@ -55,7 +55,7 @@ jobs:
       with:
         path: ${{ github.repository }}
     
-    - name: setup build env and build the dev release
+    - name: setup build env, build and lint the repo against the development release
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           source $GITHUB_WORKSPACE/daq-buildtools/env.sh
@@ -65,6 +65,7 @@ jobs:
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
           cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev/sourcecode
           dbt-build.sh --install
+          dbt-build.sh --lint
           $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev -o /tarballs
           
     - name: upload UPS tarball and log file
@@ -77,4 +78,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: build_log
-        path: ${{ github.workspace }}/dev/log
+        path: ${{ github.workspace }}/dev/log/build*.log
+
+    - name: upload linter output file
+      uses: actions/upload-artifact@v2
+      with:
+        name: linting_log
+        path: ${{ github.workspace }}/dev/log/linting*.log
