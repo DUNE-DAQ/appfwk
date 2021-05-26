@@ -22,12 +22,12 @@
 
 #include "ers/Issue.hpp"
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>
-#include <atomic>
 
 namespace dunedaq {
 namespace appfwk {
@@ -39,7 +39,6 @@ namespace appfwk {
 class QueueBase : public NamedObject
 {
 public:
-
   /**
    * @brief QueueBase Constructor
    * @param name Name of the Queue instance
@@ -51,18 +50,19 @@ public:
   /**
    * @brief Method to retrieve information (occupancy) from
    * queues.
-   */ 
-  void get_info(opmonlib::InfoCollector& ci, int /*level*/) { 
-    queueinfo::Info info ;
-    info.capacity = this -> get_capacity() ;
-    info.number_of_elements = this->get_num_elements() ;
-    ci.add( info ) ;
+   */
+  void get_info(opmonlib::InfoCollector& ci, int /*level*/)
+  {
+    queueinfo::Info info;
+    info.capacity = this->get_capacity();
+    info.number_of_elements = this->get_num_elements();
+    ci.add(info);
   }
 
   /**
    * @brief Get the capacity (max size) of the queue
    * @return size_t capacity
-   */ 
+   */
   virtual size_t get_capacity() const = 0;
 
   virtual size_t get_num_elements() const = 0;
@@ -77,4 +77,4 @@ private:
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APPFWK_INCLUDE_APPFWK_QUEUE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_QUEUEBASE_HPP_

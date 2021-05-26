@@ -52,8 +52,8 @@ public:
 
   bool can_push() const noexcept override { return this->get_num_elements() < this->get_capacity(); }
   void push(value_t&&, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
-  
-  size_t get_capacity() const override { return m_capacity; } 
+
+  size_t get_capacity() const override { return m_capacity; }
 
   size_t get_num_elements() const override { return m_size.load(std::memory_order_acquire); }
 

@@ -88,7 +88,7 @@ public:
    * @brief Start the working thread (which executes the do_work() function)
    * @throws ThreadingIssue if the thread is already running
    */
-  void start_working_thread(const std::string& name="noname")
+  void start_working_thread(const std::string& name = "noname")
   {
     if (thread_running()) {
       throw ThreadingIssue(ERS_HERE,
@@ -98,11 +98,11 @@ public:
     m_thread_running = true;
     m_working_thread.reset(new std::thread([&] { m_do_work(std::ref(m_thread_running)); }));
     auto handle = m_working_thread->native_handle();
-    auto rc=pthread_setname_np(handle, name.c_str());
-    if(rc !=0) {
-       std::ostringstream s;
-       s << "The name " << name << " provided for the thread is too long.";
-       ers::warning(ThreadingIssue(ERS_HERE, s.str()));
+    auto rc = pthread_setname_np(handle, name.c_str());
+    if (rc != 0) {
+      std::ostringstream s;
+      s << "The name " << name << " provided for the thread is too long.";
+      ers::warning(ThreadingIssue(ERS_HERE, s.str()));
     }
   }
   /**

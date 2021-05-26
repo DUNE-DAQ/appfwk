@@ -39,13 +39,14 @@ QueueRegistry::configure(const std::map<std::string, QueueConfig>& config_map)
 }
 
 void
-QueueRegistry::gather_stats(opmonlib::InfoCollector& ic, int level) {
+QueueRegistry::gather_stats(opmonlib::InfoCollector& ic, int level)
+{
 
   for (const auto& [name, queue_entry] : m_queue_registry) {
     opmonlib::InfoCollector tmp_ci;
     queue_entry.m_instance->get_info(tmp_ci, level);
     if (!tmp_ci.is_empty()) {
-       ic.add(name, tmp_ci);     
+      ic.add(name, tmp_ci);
     }
   }
 }

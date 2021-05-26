@@ -1,6 +1,6 @@
 /**
  *
- * @file FollyQueue_metric_test.cxx FollyQueue class Unit Tests to check if size() can be called in a thread 
+ * @file FollyQueue_metric_test.cxx FollyQueue class Unit Tests to check if size() can be called in a thread
  * that is neither the producer nor the consumer
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -14,7 +14,7 @@
 #include "boost/test/included/unit_test.hpp"
 
 #include <chrono>
-#include <future> 
+#include <future>
 #include <thread>
 
 // For a first look at the code, you may want to skip past the
@@ -23,11 +23,11 @@
 
 namespace {
 
-  constexpr int initial_size = 100 ; ///< the initial size of the queue ;
+constexpr int initial_size = 100; ///< the initial size of the queue ;
 
-  constexpr auto test_time = std::chrono::milliseconds(500);
+constexpr auto test_time = std::chrono::milliseconds(500);
 
-  constexpr auto timeout = std::chrono::milliseconds(1);
+constexpr auto timeout = std::chrono::milliseconds(1);
 
 /**
  * @brief Timeout to use for tests
@@ -36,7 +36,7 @@ namespace {
  * expect the push/pop functions to execute instananeously
  */
 
-  folly::DSPSCQueue<int, true> queue(initial_size) ;   ///< Queue instance for the test
+folly::DSPSCQueue<int, true> queue(initial_size); ///< Queue instance for the test
 
 } // namespace ""
 
@@ -46,47 +46,40 @@ namespace {
 BOOST_AUTO_TEST_CASE(three_thread_test)
 {
 
+  std::future<size_t> size_thread = std::async(std::launch::async, [&]() {
+    std::this_thread::sleep_for(test_time / 2);
+    return queue.size();
+  });
 
-  std::future<size_t> size_thread = std::async( std::launch::async,
-						[&]() {
-						  std::this_thread::sleep_for( test_time / 2 ) ;
-						  return queue.size() ;
-						} ) ;
-  
-  std::future<int> push_thread = std::async( std::launch::async,  
-					     [&]() { 
-					       auto start_time = std::chrono::steady_clock::now();
-					       auto stop_time = start_time + test_time ;
-					       int number = 0 ;
-					       while( std::chrono::steady_clock::now() < stop_time ) {
-						 ++ number ;
-						 queue.enqueue( number ) ;
-					       }
-					       return number ;
-					     } ) ;
-  
-  std::future<int> pop_thread = std::async( std::launch::async,  
-					    [&]() { 
-					      int memory = 0 ;
-					      while( queue.try_dequeue_for( memory, timeout ) ) { ; }
-					      return memory ;
-					    } ) ;
-  
+  std::future<int> push_thread = std::async(std::launch::async, [&]() {
+    auto start_time = std::chrono::steady_clock::now();
+    auto stop_time = start_time + test_time;
+    int number = 0;
+    while (std::chrono::steady_clock::now() < stop_time) {
+      ++number;
+      queue.enqueue(number);
+    }
+    return number;
+  });
 
-  auto last_pushed_entry = push_thread.get() ;
-  auto last_popped_entry = pop_thread.get() ;
-  auto read_size = size_thread.get() ;
+  std::future<int> pop_thread = std::async(std::launch::async, [&]() {
+    int memory = 0;
+    while (queue.try_dequeue_for(memory, timeout)) {
+      ;
+    }
+    return memory;
+  });
 
-  BOOST_TEST_MESSAGE("Last pushed value: " << last_pushed_entry );
-  BOOST_TEST_MESSAGE("Last popped value: " << last_popped_entry );
-  BOOST_TEST_MESSAGE("Temp size: " << read_size );
+  auto last_pushed_entry = push_thread.get();
+  auto last_popped_entry = pop_thread.get();
+  auto read_size = size_thread.get();
 
+  BOOST_TEST_MESSAGE("Last pushed value: " << last_pushed_entry);
+  BOOST_TEST_MESSAGE("Last popped value: " << last_popped_entry);
+  BOOST_TEST_MESSAGE("Temp size: " << read_size);
 
-  BOOST_REQUIRE_EQUAL( queue.size(), 0 );
-  BOOST_REQUIRE_EQUAL( last_pushed_entry, last_popped_entry );
-  
-  BOOST_CHECK_GT( read_size, 0 );
-  
+  BOOST_REQUIRE_EQUAL(queue.size(), 0);
+  BOOST_REQUIRE_EQUAL(last_pushed_entry, last_popped_entry);
+
+  BOOST_CHECK_GT(read_size, 0);
 }
-
- 
