@@ -144,6 +144,11 @@ public:
   {}
 
   /**
+   * @brief DAQModule destructor
+  */
+  virtual ~DAQModule() noexcept = default;
+
+  /**
    * @brief      Initializes the module
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
