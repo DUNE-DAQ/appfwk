@@ -16,6 +16,7 @@ appfwk provides the scaffolding on which all DUNE DAQ software processes can be 
 
 In general, in a full blown DAQ system users won't be running `daq_application` from the command line. However, it can be instructive to know what options `daq_application` takes. Details can be found [here](Daq-Application.md).
 
+<a name="Writing_DAQ_modules"></a>
 ## Writing DAQ modules
 
 ### Basics of the `DAQModule` interface
