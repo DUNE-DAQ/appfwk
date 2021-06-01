@@ -50,12 +50,11 @@ public:
             << " known arguments (additional arguments will be stored and "
                "passed on)";
     bpo::options_description desc(descstr.str());
-    desc.add_options()
-      ("name,n", bpo::value<std::string>()->required(), "Application name")
-      ("partition,p", bpo::value<std::string>()->default_value("global"), "Partition name")
-      ("commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")
-      ("informationService,i", bpo::value<std::string>()->default_value("stdout://flat"), "Information Service URI")
-      ("help,h", "produce help message");
+    desc.add_options()("name,n", bpo::value<std::string>()->required(), "Application name")(
+      "partition,p", bpo::value<std::string>()->default_value("global"), "Partition name")(
+      "commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")(
+      "informationService,i", bpo::value<std::string>()->default_value("stdout://flat"), "Information Service URI")(
+      "help,h", "produce help message");
 
     bpo::variables_map vm;
     try {
@@ -91,7 +90,7 @@ public:
   std::string app_name;
   std::string partition_name;
   std::string command_facility_plugin_name; ///< Name of the CommandFacility plugin to load
-  std::string info_service_plugin_name; ///< Name of the InfoService plugin to load
+  std::string info_service_plugin_name;     ///< Name of the InfoService plugin to load
 
   std::vector<std::string> other_options; ///< Any other options which were passed and not recognized
 };

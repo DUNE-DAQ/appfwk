@@ -56,7 +56,7 @@ public:
    * @return True if the queue is not full, false if it is
    *
    */
-  virtual bool can_push() const {return this->get_num_elements() < this->get_capacity() ; }
+  virtual bool can_push() const { return this->get_num_elements() < this->get_capacity(); }
 
   /**
    * @brief Determine whether the Queue may be popped from
@@ -92,7 +92,6 @@ private:
   Queue& operator=(const Queue&) = delete;
   Queue(Queue&&) = default;
   Queue& operator=(Queue&&) = default;
-
 };
 
 } // namespace appfwk

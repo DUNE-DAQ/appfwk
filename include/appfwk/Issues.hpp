@@ -19,7 +19,7 @@
 namespace dunedaq {
 
 // Throw if a CLI receives unexpected usage.  The "what" arg
-// should explain the nature of the error.  
+// should explain the nature of the error.
 ERS_DECLARE_ISSUE(appfwk, BadCliUsage, what, ((std::string)what))
 
 // Throw if an operation driven by a schema fails due to data not

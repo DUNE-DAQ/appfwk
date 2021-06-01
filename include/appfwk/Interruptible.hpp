@@ -22,14 +22,17 @@ namespace appfwk {
 class Interruptible
 {
 public:
-  Interruptible() : m_wait_cv(), m_wait_mutex() {}
+  Interruptible()
+    : m_wait_cv()
+    , m_wait_mutex()
+  {}
 
   /**
-   * @brief Send a notification that an interrupt is requested. 
+   * @brief Send a notification that an interrupt is requested.
    *
    * This function is virtual to allow classes which inherit from Interruptible to implement
    * custom behavior (such as calling interrupt on Interruptible object members)
-  */
+   */
   virtual void interrupt() { interrupt_self(); }
 
   /**
@@ -75,7 +78,7 @@ private:
   std::condition_variable m_wait_cv;
   std::mutex m_wait_mutex;
 };
-}
-}
+} // namespace appfwk
+} // namespace dunedaq
 
 #endif // APPFWK_INCLUDE_APPFWK_INTERRUPTIBLE_HPP_

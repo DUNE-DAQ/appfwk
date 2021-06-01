@@ -9,26 +9,33 @@
 #include "appfwk/Application.hpp"
 
 #include "appfwk/Issues.hpp"
+#include "appfwk/appinfo/InfoNljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 #include "rcif/cmd/Nljs.hpp"
 #include "rcif/runinfo/InfoNljs.hpp"
-#include "appfwk/appinfo/InfoNljs.hpp"
 
 #include "logging/Logging.hpp"
+
+#include <string>
 
 namespace dunedaq {
 namespace appfwk {
 
 Application::Application(std::string appname, std::string partition, std::string cmdlibimpl, std::string opmonlibimpl)
-  : NamedObject(appname), m_partition(partition), m_info_mgr(opmonlibimpl), m_state("NONE"), m_busy(false), m_error(false),
-    m_initialized(false) 
+  : NamedObject(appname)
+  , m_partition(partition)
+  , m_info_mgr(opmonlibimpl)
+  , m_state("NONE")
+  , m_busy(false)
+  , m_error(false)
+  , m_initialized(false)
 {
-   m_runinfo.running = false;
-   m_runinfo.runno = 0 ;
-   m_runinfo.runtime = 0;
+  m_runinfo.running = false;
+  m_runinfo.runno = 0;
+  m_runinfo.runtime = 0;
 
-   m_fully_qualified_name = partition + "_" + appname;
-   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
+  m_fully_qualified_name = partition + "_" + appname;
+  m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 }
 
 void
@@ -51,8 +58,8 @@ Application::run(std::atomic<bool>& end_marker)
 
   std::stringstream s1(getenv("DUNEDAQ_OPMON_INTERVAL"));
   std::stringstream s2(getenv("DUNEDAQ_OPMON_LEVEL"));
-  uint32_t interval = 0;
-  uint32_t level = 0;
+  uint32_t interval = 0; // NOLINT(build/unsigned)
+  uint32_t level = 0;    // NOLINT(build/unsigned)
   s1 >> interval;
   s2 >> level;
 
@@ -67,7 +74,7 @@ Application::execute(const dataobj_t& cmd_data)
 
   auto rc_cmd = cmd_data.get<rcif::cmd::RCCommand>();
   std::string cmdname = rc_cmd.id;
-  if(!is_cmd_valid(cmd_data)) {
+  if (!is_cmd_valid(cmd_data)) {
     throw InvalidCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
   }
 
@@ -79,32 +86,30 @@ Application::execute(const dataobj_t& cmd_data)
     for (const auto& addressed : cmd_obj.modules) {
       dataobj_t startpars = addressed.data;
       auto rc_startpars = startpars.get<rcif::cmd::StartParams>();
-      m_runinfo.runno = rc_startpars.run ;
+      m_runinfo.runno = rc_startpars.run;
       break;
     }
 
-    m_run_start_time = std::chrono::steady_clock::now();;
-    m_runinfo.running = true;   
+    m_run_start_time = std::chrono::steady_clock::now();
+    ;
+    m_runinfo.running = true;
     m_runinfo.runtime = 0;
-  }
-  else if (cmdname == "stop") {
+  } else if (cmdname == "stop") {
     m_runinfo.running = false;
-    m_runinfo.runno = 0 ;
+    m_runinfo.runno = 0;
     m_runinfo.runtime = 0;
   }
 
   try {
     m_mod_mgr.execute(cmd_data);
     m_busy.store(false);
-    if(rc_cmd.exit_state != "ANY" )
-	set_state(rc_cmd.exit_state);
-  } 
-  catch(DAQModuleManagerNotInitialized &ex) {
+    if (rc_cmd.exit_state != "ANY")
+      set_state(rc_cmd.exit_state);
+  } catch (DAQModuleManagerNotInitialized& ex) {
     m_busy.store(false);
     m_error.store(true);
     throw ex;
-  }
-  catch(CommandDispatchingFailed & ex) {
+  } catch (CommandDispatchingFailed& ex) {
     m_busy.store(false);
     m_error.store(true);
     throw ex;
@@ -112,12 +117,12 @@ Application::execute(const dataobj_t& cmd_data)
 }
 
 void
-Application::gather_stats(opmonlib::InfoCollector & ci, int level) 
+Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 {
   // TODO:Fill application info and add it to ci
   appinfo::Info ai;
-  //ai.partition_name = m_partition; 
-  //ai.app_name = get_name();
+  // ai.partition_name = m_partition;
+  // ai.app_name = get_name();
   ai.state = get_state();
   ai.busy = m_busy.load();
   ai.error = m_error.load();
@@ -128,44 +133,42 @@ Application::gather_stats(opmonlib::InfoCollector & ci, int level)
 
   if (ai.state == "RUNNING") {
     auto now = std::chrono::steady_clock::now();
-    m_runinfo.runtime =  std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count();
+    m_runinfo.runtime = std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count();
   }
   tmp_ci.add(m_runinfo);
 
   if (level == 0) {
     // give only generic application info
-  } 
-  else if (ai.state == "CONFIGURED" || ai.state == "RUNNING") {
+  } else if (ai.state == "CONFIGURED" || ai.state == "RUNNING") {
     try {
-       m_mod_mgr.gather_stats(tmp_ci, level);
-    }
-    catch(ers::Issue &ex) {
+      m_mod_mgr.gather_stats(tmp_ci, level);
+    } catch (ers::Issue& ex) {
       ers::error(ex);
     }
   }
   ci.add(m_fully_qualified_name, tmp_ci);
 }
 
-bool 
+bool
 Application::is_cmd_valid(const dataobj_t& cmd_data)
 {
-  if (m_busy.load() || m_error.load()) 
+  if (m_busy.load() || m_error.load())
     return false;
 
   std::string state = get_state();
   std::string entry_state = cmd_data.get<rcif::cmd::RCCommand>().entry_state;
-  if(entry_state == "ANY" || state == entry_state)
-    return true; 
-/*
-  if( (state == "NONE" && cmd == "init") || (state == "INITIAL" && cmd == "conf") 
-      || (state == "CONFIGURED" && (cmd == "start" || cmd == "scrap"))
-      || (state == "RUNNING" && (cmd == "resume" || cmd == "stop" || cmd == "pause"))
-      || (state == "PAUSED" && (cmd == "resume" || cmd == "stop")) ) {
-     return true;
-  }
-  if (!(cmd=="init" || cmd=="conf" || cmd=="start" || cmd=="stop" || cmd == "pause" || cmd == "resume" || cmd == "scrap"))
-	return true;
-*/
+  if (entry_state == "ANY" || state == entry_state)
+    return true;
+#if 0 // TODO, Eric Flumerfelt <eflumerf@fnal.gov> May-26-2021: Should this code be removed
+    if( (state == "NONE" && cmd == "init") || (state == "INITIAL" && cmd == "conf")
+        || (state == "CONFIGURED" && (cmd == "start" || cmd == "scrap"))
+        || (state == "RUNNING" && (cmd == "resume" || cmd == "stop" || cmd == "pause"))
+        || (state == "PAUSED" && (cmd == "resume" || cmd == "stop")) ) {
+       return true;
+    }
+    if (!(cmd=="init" || cmd=="conf" || cmd=="start" || cmd=="stop" || cmd == "pause" || cmd == "resume" || cmd ==
+    "scrap")) return true;
+#endif
   return false;
 }
 

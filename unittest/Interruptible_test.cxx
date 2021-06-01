@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(NullWait)
   TLOG() << "Wait time was " << ti.m_wait_time.count() << " ms";
 }
 
-BOOST_AUTO_TEST_CASE(WaitThread) 
+BOOST_AUTO_TEST_CASE(WaitThread)
 {
   interruptibletest::TestInterruptible ti;
   auto wait_thread = std::thread([&]() { ti.wait_proc(10); });
@@ -87,7 +87,8 @@ BOOST_AUTO_TEST_CASE(WaitThread)
   TLOG() << "Wait time was " << ti.m_wait_time.count() << " ms";
 }
 
-BOOST_AUTO_TEST_CASE(Interrupt) {
+BOOST_AUTO_TEST_CASE(Interrupt)
+{
   interruptibletest::TestInterruptible ti;
   auto wait_thread = std::thread([&]() { ti.wait_proc(10); });
   usleep(5000);
@@ -96,6 +97,5 @@ BOOST_AUTO_TEST_CASE(Interrupt) {
   BOOST_REQUIRE(ti.m_wait_time < std::chrono::milliseconds(10));
   TLOG() << "Wait time was " << ti.m_wait_time.count() << " ms";
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -48,7 +48,7 @@ struct QueueConfig
   static queue_kind stoqk(const std::string& name);
 
   QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
-                                                         ///< QueueConfig
+                                                       ///< QueueConfig
   size_t capacity = 0;                                 ///< The maximum size of the queue
 };
 
@@ -87,7 +87,7 @@ public:
 
   // Gather statistics from queues
   void gather_stats(opmonlib::InfoCollector& ic, int level);
-  
+
 private:
   struct QueueEntry
   {
