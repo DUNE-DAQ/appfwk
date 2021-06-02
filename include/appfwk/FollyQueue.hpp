@@ -32,11 +32,17 @@ public:
   using duration_t = typename Queue<T>::duration_t;
 
   explicit FollyQueue(const std::string& name, size_t capacity)
-    : Queue<T>(name, capacity)
-    , m_queue(this->get_capacity())
+    : Queue<T>(name)
+    , m_queue(capacity)
+    , m_capacity(capacity)
   {}
 
+  size_t get_capacity() const noexcept override { return m_capacity; }
+
+  size_t get_num_elements() const noexcept override { return m_queue.size(); }
+
   bool can_pop() const noexcept override { return !m_queue.empty(); }
+
   void pop(value_t& val, const duration_t& dur) override
   {
     if (!m_queue.try_dequeue_for(val, dur)) {
@@ -66,6 +72,7 @@ private:
   // "make a system call". With `MayBlock` set to false, the queue
   // just spin-waits, so we want true
   FollyQueueType<T, true> m_queue;
+  size_t m_capacity;
 };
 
 template<typename T>

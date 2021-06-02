@@ -11,8 +11,8 @@
 #include "cmdlib/cmd/Nljs.hpp"
 
 #include "appfwk/Issues.hpp"
-#include "appfwk/cmd/Nljs.hpp"
 #include "appfwk/app/Nljs.hpp"
+#include "appfwk/cmd/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/QueueRegistry.hpp"
@@ -33,7 +33,8 @@ DAQModuleManager::DAQModuleManager()
 {}
 
 void
-DAQModuleManager::initialize( const dataobj_t& data) {
+DAQModuleManager::initialize(const dataobj_t& data)
+{
   auto ini = data.get<app::Init>();
   init_queues(ini.queues);
   init_modules(ini.modules);
@@ -41,7 +42,8 @@ DAQModuleManager::initialize( const dataobj_t& data) {
 }
 
 void
-DAQModuleManager::init_modules(const app::ModSpecs & mspecs) {
+DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
+{
   for (const auto& mspec : mspecs) {
     TLOG_DEBUG(0) << "construct: " << mspec.plugin << " : " << mspec.inst;
     auto mptr = make_module(mspec.plugin, mspec.inst);
@@ -50,9 +52,9 @@ DAQModuleManager::init_modules(const app::ModSpecs & mspecs) {
   }
 }
 
-
 void
-DAQModuleManager::init_queues(const app::QueueSpecs & qspecs) {
+DAQModuleManager::init_queues(const app::QueueSpecs& qspecs)
+{
   std::map<std::string, QueueConfig> queue_cfgs;
   for (const auto& qs : qspecs) {
 
@@ -233,7 +235,7 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
 {
 
   auto cmd = cmd_data.get<cmdlib::cmd::Command>();
-  TLOG_DEBUG(1) <<"Command id:" << cmd.id;
+  TLOG_DEBUG(1) << "Command id:" << cmd.id;
 
   if (!m_initialized) {
     if (cmd.id != "init") {
@@ -249,15 +251,18 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
 }
 
 void
-DAQModuleManager::gather_stats(opmonlib::InfoCollector & ci, int level) {
+DAQModuleManager::gather_stats(opmonlib::InfoCollector& ci, int level)
+{
+
+  QueueRegistry::get().gather_stats(ci, level);
 
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
     opmonlib::InfoCollector tmp_ci;
     mod_ptr->get_info(tmp_ci, level);
     if (!tmp_ci.is_empty()) {
-       ci.add(mod_name, tmp_ci);
-    }   
-  } 
+      ci.add(mod_name, tmp_ci);
+    }
+  }
 }
 
 } // namespace appfwk

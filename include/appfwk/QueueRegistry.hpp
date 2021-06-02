@@ -14,6 +14,7 @@
 #include "appfwk/Queue.hpp"
 
 #include "ers/Issue.hpp"
+#include "opmonlib/InfoCollector.hpp"
 
 #include <map>
 #include <memory>
@@ -47,7 +48,7 @@ struct QueueConfig
   static queue_kind stoqk(const std::string& name);
 
   QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
-                                                         ///< QueueConfig
+                                                       ///< QueueConfig
   size_t capacity = 0;                                 ///< The maximum size of the queue
 };
 
@@ -84,17 +85,20 @@ public:
    */
   void configure(const std::map<std::string, QueueConfig>& config_map);
 
+  // Gather statistics from queues
+  void gather_stats(opmonlib::InfoCollector& ic, int level);
+
 private:
   struct QueueEntry
   {
     const std::type_info* m_type;
-    std::shared_ptr<Named> m_instance;
+    std::shared_ptr<QueueBase> m_instance;
   };
 
   QueueRegistry() = default;
 
   template<typename T>
-  std::shared_ptr<Named> create_queue(const std::string& name, const QueueConfig& config);
+  std::shared_ptr<QueueBase> create_queue(const std::string& name, const QueueConfig& config);
 
   std::map<std::string, QueueEntry> m_queue_registry;
   std::map<std::string, QueueConfig> m_queue_config_map;

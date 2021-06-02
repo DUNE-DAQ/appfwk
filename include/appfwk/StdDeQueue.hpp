@@ -47,11 +47,15 @@ public:
    */
   explicit StdDeQueue(const std::string& name, size_t capacity);
 
-  bool can_pop() const noexcept override { return m_size.load() > 0; }
+  bool can_pop() const noexcept override { return this->get_num_elements() > 0; }
   void pop(value_t& val, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
 
-  bool can_push() const noexcept override { return m_size.load() < this->get_capacity(); }
+  bool can_push() const noexcept override { return this->get_num_elements() < this->get_capacity(); }
   void push(value_t&&, const duration_t&) override; // Throws QueueTimeoutExpired if a timeout occurs
+
+  size_t get_capacity() const override { return m_capacity; }
+
+  size_t get_num_elements() const override { return m_size.load(std::memory_order_acquire); }
 
   // Delete the copy and move operations since various member data instances
   // (e.g., of std::mutex or of std::atomic) aren't copyable or movable
@@ -65,6 +69,7 @@ private:
   void try_lock_for(std::unique_lock<std::mutex>&, const duration_t&);
 
   std::deque<value_t> m_deque;
+  size_t m_capacity;
   std::atomic<size_t> m_size = 0;
 
   std::mutex m_mutex;

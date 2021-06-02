@@ -96,7 +96,9 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   BOOST_CHECK_THROW(source.pop(res), dunedaq::appfwk::QueueTimeoutExpired);
 
   for (int ii = 0; ii < 100; ++ii) {
-    BOOST_REQUIRE(sink.can_push());
+    bool can_push = sink.can_push();
+    if (!can_push)
+      BOOST_REQUIRE(can_push);
     sink.push("aaAaaa");
   }
 

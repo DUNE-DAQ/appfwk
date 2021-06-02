@@ -42,11 +42,11 @@ QueueRegistry::get_queue(const std::string& name)
 }
 
 template<typename T>
-std::shared_ptr<Named>
+std::shared_ptr<QueueBase>
 QueueRegistry::create_queue(const std::string& name, const QueueConfig& config)
 {
 
-  std::shared_ptr<Named> queue;
+  std::shared_ptr<QueueBase> queue;
   switch (config.kind) {
     case QueueConfig::kStdDeQueue:
       queue = std::make_shared<StdDeQueue<T>>(name, config.capacity);

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(appfwk VERSION 2.2.2)
+project(appfwk VERSION 2.3.1)
 
 find_package(daq-cmake REQUIRED )
 
@@ -18,7 +18,8 @@ find_package(nlohmann_json REQUIRED )
 
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging Folly::folly cmdlib::cmdlib rcif::rcif opmonlib::opmonlib nlohmann_json::nlohmann_json pthread)
 
-daq_codegen( *.jsonnet DEP_PKGS rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
+daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
+daq_codegen( appinfo.jsonnet queueinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hpp.j2 opmonlib/InfoNljs.hpp.j2 )
 
 ##############################################################################
 # Main library
@@ -41,9 +42,10 @@ daq_add_application( queue_IO_check queue_IO_check.cxx TEST LINK_LIBRARIES appfw
 
 daq_add_unit_test(DAQModule_test          LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQSink_DAQSource_test  LINK_LIBRARIES appfwk )
-daq_add_unit_test(FollyQueue_test         LINK_LIBRARIES ers::ers Folly::folly)
-daq_add_unit_test(Interruptible_test         LINK_LIBRARIES appfwk)
-daq_add_unit_test(StdDeQueue_test         LINK_LIBRARIES ers::ers)
+daq_add_unit_test(FollyQueue_test         LINK_LIBRARIES appfwk )
+daq_add_unit_test(FollyQueue_metric_test  LINK_LIBRARIES appfwk )
+daq_add_unit_test(Interruptible_test      LINK_LIBRARIES appfwk)
+daq_add_unit_test(StdDeQueue_test         LINK_LIBRARIES appfwk )
 daq_add_unit_test(ThreadHelper_test       LINK_LIBRARIES ers::ers)
 daq_add_unit_test(NamedObject_test        )
 

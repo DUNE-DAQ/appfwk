@@ -35,6 +35,7 @@
 #include <vector>
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
+// NOLINTNEXTLINE(build/define_used)
 #define EXTERN_C_FUNC_DECLARE_START                                                                                    \
   extern "C"                                                                                                           \
   {
@@ -44,6 +45,7 @@
  * @brief Declare the function that will be called by the plugin loader
  * @param klass Class to be defined as a DUNE DAQ Module
  */
+// NOLINTNEXTLINE(build/define_used)
 #define DEFINE_DUNE_DAQ_MODULE(klass)                                                                                  \
   EXTERN_C_FUNC_DECLARE_START                                                                                          \
   std::shared_ptr<dunedaq::appfwk::DAQModule> make(std::string n)                                                      \
@@ -144,6 +146,11 @@ public:
   {}
 
   /**
+   * @brief DAQModule destructor
+  */
+  virtual ~DAQModule() noexcept = default;
+
+  /**
    * @brief      Initializes the module
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
@@ -168,7 +175,7 @@ public:
 
   bool has_command(const std::string& name) const;
 
-  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; };
+  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; }
 
 protected:
   /**
