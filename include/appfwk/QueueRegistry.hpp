@@ -115,6 +115,7 @@ private:
 
 } // namespace appfwk
 
+// Disable coverage collection LCOV_EXCL_START
 /**
  * @brief QueueTypeMismatch ERS Issue
  */
@@ -149,6 +150,7 @@ ERS_DECLARE_ISSUE(appfwk,                  // namespace
                   "QueueRegistry already configured",
                   ERS_EMPTY)
 
+// Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 
 #include "detail/QueueRegistry.hxx"

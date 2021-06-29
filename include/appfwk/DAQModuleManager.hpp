@@ -23,6 +23,7 @@
 
 namespace dunedaq {
 
+// Disable coverage collection LCOV_EXCL_START
 /**
  * @brief A generic DAQModule ERS Issue
  */
@@ -45,6 +46,7 @@ ERS_DECLARE_ISSUE(appfwk,                                                       
                   ((std::string)cmdid)                                                   ///< Message parameters
                   ((std::string)modules)                                                 ///< Message parameters
 )
+// Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
 

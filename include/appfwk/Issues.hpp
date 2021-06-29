@@ -18,6 +18,7 @@
 
 namespace dunedaq {
 
+// Disable coverage collection LCOV_EXCL_START
 // Throw if a CLI receives unexpected usage.  The "what" arg
 // should explain the nature of the error.
 ERS_DECLARE_ISSUE(appfwk, BadCliUsage, what, ((std::string)what))
@@ -42,6 +43,7 @@ ERS_DECLARE_ISSUE(appfwk,
                   "Contract " << who << " violation with command: " << cmd << ": " << what,
                   ((std::string)what)((std::string)cmd)((std::string)who))
 
+// Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 
 #endif // APPFWK_INCLUDE_APPFWK_ISSUES_HPP_

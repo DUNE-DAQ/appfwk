@@ -95,6 +95,7 @@ private:
 };
 
 } // namespace appfwk
+// Disable coverage collection LCOV_EXCL_START
 /**
  * @brief QueueTimeoutExpired ERS Issue
  */
@@ -103,6 +104,7 @@ ERS_DECLARE_ISSUE(appfwk,              // namespace
                   name << ": Unable to " << func_name << " within timeout period (timeout period was " << timeout
                        << " milliseconds)",                                  // message
                   ((std::string)name)((std::string)func_name)((int)timeout)) // NOLINT(readability/casting)
+// Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 
 #endif // APPFWK_INCLUDE_APPFWK_QUEUE_HPP_

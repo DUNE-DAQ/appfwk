@@ -66,6 +66,9 @@ BOOST_AUTO_TEST_CASE(InitialConditions)
   DAQSink<std::string> sink("dummy");
   DAQSource<std::string> source("dummy");
 
+  BOOST_REQUIRE_EQUAL(sink.get_name(), "dummy");
+  BOOST_REQUIRE_EQUAL(source.get_name(), "dummy");
+
   BOOST_REQUIRE(sink.can_push());
   BOOST_REQUIRE(!source.can_pop());
 }
@@ -83,6 +86,14 @@ BOOST_AUTO_TEST_CASE(DataFlow)
   } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
   }
   BOOST_REQUIRE_EQUAL(res, "hello");
+
+  std::string test2 = "hello again";
+  sink.push(test2);
+  try {
+    source.pop(res);
+  } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+  }
+  BOOST_REQUIRE_EQUAL(res, "hello again");
 }
 
 BOOST_AUTO_TEST_CASE(Exceptions)

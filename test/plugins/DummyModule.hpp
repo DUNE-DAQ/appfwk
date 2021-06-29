@@ -20,12 +20,14 @@
 
 namespace dunedaq {
 
+// Disable coverage collection LCOV_EXCL_START
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        DummyModuleUpdate,
                        appfwk::GeneralDAQModuleIssue,
                        message,
                        ((std::string)name),
                        ((std::string)message))
+// Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
 
@@ -40,10 +42,7 @@ public:
 
   void init(const nlohmann::json&) final {}
 
-  virtual void do_stuff(const data_t& /*data*/)
-  {
-    ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyParentModule do_stuff"));
-  };
+  virtual void do_stuff(const data_t& /*data*/) = 0;
 };
 
 class DummyModule : public DummyParentModule
