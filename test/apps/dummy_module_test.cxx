@@ -34,7 +34,14 @@ main()
 
   TLOG() << "Calling stuff on module...";
   dummy_module->execute_command("stuff");
-  
+
+  TLOG() << "Calling bad_stuff on module...";
+  try {
+    dummy_module->execute_command("bad_stuff");
+    TLOG() << "Should have thrown exception";
+  } catch (GeneralDAQModuleIssue&) {
+    TLOG() << "Exception thrown as expected";    
+  }
 
   TLOG() << "Test complete";
 }

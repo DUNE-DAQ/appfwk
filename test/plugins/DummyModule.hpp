@@ -50,7 +50,11 @@ class DummyModule : public DummyParentModule
 public:
   explicit DummyModule(const std::string& name)
     : DummyParentModule(name)
-  {}
+  {
+    register_command("bad_stuff", &DummyModule::do_bad_stuff);
+  }
+
+  void do_bad_stuff(const data_t&) { throw DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_bad_stuff");  }
 
   void do_stuff(const data_t& /*data*/) override
   {

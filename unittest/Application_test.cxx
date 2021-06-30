@@ -93,8 +93,18 @@ BOOST_AUTO_TEST_CASE(Start)
   app.execute(cmd_data);
 
   dunedaq::appfwk::cmd::CmdObj start;
+  dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
+  dunedaq::rcif::cmd::StartParams start_params;
+  start_params.run = 1010;
+  nlohmann::json start_param_data;
+  to_json(start_param_data, start_params);
+
+  addr_cmd.data = start_param_data;
+  addr_cmd.match = "";
+  start.modules.push_back(addr_cmd);
   nlohmann::json start_data;
   to_json(start_data, start);
+
   cmd.id = "start";
   cmd.data = start_data;
   cmd.exit_state = "RUNNING";
@@ -124,9 +134,20 @@ BOOST_AUTO_TEST_CASE(Stop)
 
   app.execute(cmd_data);
 
+  dunedaq::rcif::cmd::StartParams start_params;
+  start_params.run = 1010;
+  nlohmann::json start_param_data;
+  to_json(start_param_data, start_params);
+
+  dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
+  addr_cmd.data = start_param_data;
+  addr_cmd.match = "";
+
   dunedaq::appfwk::cmd::CmdObj start;
+  start.modules.push_back(addr_cmd);
   nlohmann::json start_data;
   to_json(start_data, start);
+
   cmd.id = "start";
   cmd.data = start_data;
   cmd.exit_state = "RUNNING";
@@ -167,8 +188,10 @@ BOOST_AUTO_TEST_CASE(NotInitialized) {
 
   BOOST_REQUIRE_EXCEPTION(
     app.execute(cmd_data), DAQModuleManagerNotInitialized, [&](DAQModuleManagerNotInitialized) { return true; });
-}
 
+  cmd_valid = app.is_cmd_valid(cmd_data);
+  BOOST_REQUIRE_EQUAL(cmd_valid, false);
+}
 
 BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 {
@@ -185,14 +208,99 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
   BOOST_REQUIRE_EQUAL(cmd_valid, false);
 
   BOOST_REQUIRE_EXCEPTION(app.execute(cmd_data), InvalidCommand, [&](InvalidCommand) { return true; });
+  
+  cmd_valid = app.is_cmd_valid(cmd_data);
+  BOOST_REQUIRE_EQUAL(cmd_valid, false);
+}
+
+BOOST_AUTO_TEST_CASE(CommandThrowsException) {
+  QueueRegistry::reset();
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
+
+  dunedaq::appfwk::app::Init init;
+  dunedaq::appfwk::app::ModSpec module_init;
+  module_init.inst = "DummyModule";
+  module_init.plugin = "DummyModule";
+  init.modules.push_back(module_init);
+  nlohmann::json init_data;
+  to_json(init_data, init);
+  
+  dunedaq::rcif::cmd::RCCommand cmd;
+  cmd.id = "init";
+  cmd.data = init_data;
+  cmd.exit_state = "INITIAL";
+  nlohmann::json cmd_data;
+  to_json(cmd_data, cmd);
+
+  app.execute(cmd_data);
+
+  dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
+  addr_cmd.match = "DummyModule";
+
+  dunedaq::appfwk::cmd::CmdObj cmd_obj;
+  cmd_obj.modules.push_back(addr_cmd);
+  nlohmann::json cmd_obj_data;
+  to_json(cmd_obj_data, cmd_obj);
+
+  cmd.id = "stuff";
+  cmd.data = cmd_obj_data;
+  to_json(cmd_data, cmd);
+  app.execute(cmd_data);
+
+  cmd.id = "bad_stuff";
+  to_json(cmd_data, cmd);
+  BOOST_REQUIRE_EXCEPTION(
+    app.execute(cmd_data), CommandDispatchingFailed, [&](CommandDispatchingFailed) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(Stats)
 {
+  QueueRegistry::reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::opmonlib::InfoCollector ic;
   app.gather_stats(ic, 0);
+  BOOST_REQUIRE(!ic.is_empty());
+
+
+  dunedaq::appfwk::app::Init init;
+  nlohmann::json init_data;
+  to_json(init_data, init);
+  dunedaq::rcif::cmd::RCCommand cmd;
+  cmd.id = "init";
+  cmd.data = init_data;
+  cmd.exit_state = "INITIAL";
+  nlohmann::json cmd_data;
+  to_json(cmd_data, cmd);
+
+  bool cmd_valid = app.is_cmd_valid(cmd_data);
+  BOOST_REQUIRE_EQUAL(cmd_valid, true);
+
+  app.execute(cmd_data);
+
+  dunedaq::appfwk::cmd::CmdObj start;
+  dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
+  dunedaq::rcif::cmd::StartParams start_params;
+  start_params.run = 1010;
+  nlohmann::json start_param_data;
+  to_json(start_param_data, start_params);
+  
+  addr_cmd.data = start_param_data;
+  addr_cmd.match = "";
+  start.modules.push_back(addr_cmd);
+  nlohmann::json start_data;
+  to_json(start_data, start);
+
+  cmd.id = "start";
+  cmd.data = start_data;
+  cmd.exit_state = "RUNNING";
+  to_json(cmd_data, cmd);
+
+  cmd_valid = app.is_cmd_valid(cmd_data);
+  BOOST_REQUIRE_EQUAL(cmd_valid, true);
+  app.execute(cmd_data);
+
+  app.gather_stats(ic, 999);
   BOOST_REQUIRE(!ic.is_empty());
 }
 
