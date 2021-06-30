@@ -12,6 +12,7 @@
 
 #include "boost/test/unit_test.hpp"
 
+#include <map>
 #include <string>
 #include <type_traits>
 

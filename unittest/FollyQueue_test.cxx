@@ -13,6 +13,7 @@
 #include "boost/test/included/unit_test.hpp"
 
 #include <chrono>
+#include <utility>
 
 // For a first look at the code, you may want to skip past the
 // contents of the unnamed namespace and move ahead to the actual test

@@ -12,6 +12,7 @@
 
 #include "boost/test/unit_test.hpp"
 
+#include <memory>
 #include <string>
 #include <type_traits>
 
@@ -33,7 +34,7 @@ namespace queuetest {
       size_t get_capacity() const override { return 1; }
       size_t get_num_elements() const override { return 0; }
     };
-}
+} // namespace queuetest
 
 BOOST_AUTO_TEST_CASE(QueueOperations) {
 
