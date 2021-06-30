@@ -56,7 +56,9 @@ main(int argc, char* argv[])
   dunedaq::logging::Logging().setup();
 
   // Setup signals
-  std::signal(SIGABRT, signal_handler);
+  //std::signal(SIGABRT, signal_handler);
+  std::signal(SIGTERM, signal_handler);
+  std::signal(SIGINT, signal_handler);
   std::signal(SIGQUIT, signal_handler);
 
   using namespace dunedaq;
@@ -80,5 +82,6 @@ main(int argc, char* argv[])
   app.init();
   app.run(run_marker);
 
+  TLOG() << "Application " << args.app_name << " exiting.";
   return 0;
 }
