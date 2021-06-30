@@ -88,6 +88,9 @@ public:
   // Gather statistics from queues
   void gather_stats(opmonlib::InfoCollector& ic, int level);
 
+  // ONLY TO BE USED FOR TESTING!
+  static void reset() { s_instance.reset(nullptr); }
+
 private:
   struct QueueEntry
   {
