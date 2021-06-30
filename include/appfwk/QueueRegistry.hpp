@@ -88,6 +88,9 @@ public:
   // Gather statistics from queues
   void gather_stats(opmonlib::InfoCollector& ic, int level);
 
+  // ONLY TO BE USED FOR TESTING!
+  static void reset() { s_instance.reset(nullptr); }
+
 private:
   struct QueueEntry
   {
@@ -115,6 +118,7 @@ private:
 
 } // namespace appfwk
 
+// Disable coverage collection LCOV_EXCL_START
 /**
  * @brief QueueTypeMismatch ERS Issue
  */
@@ -149,6 +153,7 @@ ERS_DECLARE_ISSUE(appfwk,                  // namespace
                   "QueueRegistry already configured",
                   ERS_EMPTY)
 
+// Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 
 #include "detail/QueueRegistry.hxx"

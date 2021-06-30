@@ -244,6 +244,9 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
     this->initialize(cmd.data);
     return;
   }
+  if (m_initialized && cmd.id == "init") {
+    throw DAQModuleManagerAlreadyInitialized(ERS_HERE);
+  }
 
   dispatch_one_match_only(cmd.id, cmd.data);
 

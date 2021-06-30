@@ -1,0 +1,48 @@
+[
+  {
+    "data": {
+      "modules": [
+
+      ],
+      "queues": [
+
+      ]
+    },
+    "id": "init"
+  },
+  {
+    "data": {
+      "modules": [
+        {
+          "data": {},
+          "match": ""
+        }
+      ]
+    },
+    "id": "conf"
+  },
+  {
+    "data": {
+      "modules": [
+        {
+          "data": {
+            "run": 42
+          },
+          "match": ""
+        }
+      ]
+    },
+    "id": "start"
+  },
+  {
+    "data": {
+      "modules": [
+        {
+          "data": {},
+          "match": ""
+        }
+      ]
+    },
+    "id": "stop"
+  }
+]

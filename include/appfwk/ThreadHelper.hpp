@@ -26,6 +26,7 @@
 
 namespace dunedaq {
 
+// Disable coverage collection LCOV_EXCL_START
 /**
  * @brief An ERS Issue raised when a threading state error occurs
  */
@@ -33,6 +34,7 @@ ERS_DECLARE_ISSUE(appfwk,                              // Namespace
                   ThreadingIssue,                      // Issue Class Name
                   "Threading Issue detected: " << err, // Message
                   ((std::string)err))                  // Message parameters
+// Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
 /**

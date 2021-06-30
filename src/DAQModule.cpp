@@ -27,7 +27,7 @@ DAQModule::execute_command(const std::string& name, const data_t& data)
 std::vector<std::string>
 DAQModule::get_commands() const
 {
-  std::vector<std::string> cmds(m_commands.size());
+  std::vector<std::string> cmds;
   for (const auto& [key, value] : m_commands)
     cmds.push_back(key);
   return cmds;

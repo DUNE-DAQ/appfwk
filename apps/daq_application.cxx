@@ -70,6 +70,10 @@ main(int argc, char* argv[])
     exit(-1);
   }
 
+  if (args.help_requested) {
+    exit(0);
+  }
+
   // Set/Update the application name in the environment. Used by logging/ers.
   setenv("DUNEDAQ_APPLICATION_NAME", args.app_name.c_str(), 0);
 

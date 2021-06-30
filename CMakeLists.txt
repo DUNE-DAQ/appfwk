@@ -35,18 +35,23 @@ daq_add_plugin( DummyModule		  duneDAQModule TEST LINK_LIBRARIES appfwk )
 
 # Test applications
 daq_add_application( queue_IO_check queue_IO_check.cxx TEST LINK_LIBRARIES appfwk )
-
+daq_add_application( dummy_module_test dummy_module_test.cxx TEST LINK_LIBRARIES appfwk )
 
 # ##############################################################################
 # Unit tests
 
-daq_add_unit_test(DAQModule_test          LINK_LIBRARIES appfwk )
-daq_add_unit_test(DAQSink_DAQSource_test  LINK_LIBRARIES appfwk )
-daq_add_unit_test(FollyQueue_test         LINK_LIBRARIES appfwk )
-daq_add_unit_test(FollyQueue_metric_test  LINK_LIBRARIES appfwk )
-daq_add_unit_test(Interruptible_test      LINK_LIBRARIES appfwk)
-daq_add_unit_test(StdDeQueue_test         LINK_LIBRARIES appfwk )
-daq_add_unit_test(ThreadHelper_test       LINK_LIBRARIES ers::ers)
+daq_add_unit_test(Application_test            LINK_LIBRARIES appfwk )
+daq_add_unit_test(CommandLineInterpreter_test LINK_LIBRARIES appfwk )
+daq_add_unit_test(DAQModule_test              LINK_LIBRARIES appfwk )
+daq_add_unit_test(DAQModuleManager_test       LINK_LIBRARIES appfwk )
+daq_add_unit_test(DAQSink_DAQSource_test      LINK_LIBRARIES appfwk )
+daq_add_unit_test(FollyQueue_test             LINK_LIBRARIES appfwk )
+daq_add_unit_test(FollyQueue_metric_test      LINK_LIBRARIES appfwk )
+daq_add_unit_test(Interruptible_test          LINK_LIBRARIES appfwk)
+daq_add_unit_test(Queue_test                  LINK_LIBRARIES appfwk )
+daq_add_unit_test(QueueRegistry_test          LINK_LIBRARIES appfwk )
+daq_add_unit_test(StdDeQueue_test             LINK_LIBRARIES appfwk )
+daq_add_unit_test(ThreadHelper_test           LINK_LIBRARIES ers::ers)
 daq_add_unit_test(NamedObject_test        )
 
 ##############################################################################
