@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sys/prctl.h>
 
 /**
  * @brief Using namespace for convenience
@@ -78,6 +79,12 @@ main(int argc, char* argv[])
 
   // Set/Update the application name in the environment. Used by logging/ers.
   setenv("DUNEDAQ_APPLICATION_NAME", args.app_name.c_str(), 0);
+
+  int s;
+  s = prctl(PR_SET_NAME, args.app_name.c_str(), NULL, NULL, NULL);
+  if (s != 0) {
+    TLOG() << "Could not replace process image name with " << args.app_name;
+  }
 
   // Create the Application
   appfwk::Application app(
