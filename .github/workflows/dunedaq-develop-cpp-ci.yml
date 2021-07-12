@@ -15,7 +15,6 @@ on:
   workflow_dispatch:
 
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   Build_against_dev_release:
     # The type of runner that the job will run on
@@ -80,8 +79,8 @@ jobs:
         name: build_log
         path: ${{ github.workspace }}/dev/log/build*.log
 
-   - name: upload linter output file
-     uses: actions/upload-artifact@v2
-     with:
-       name: linting_log
-       path: ${{ github.workspace }}/dev/log/linting*.log
+    - name: upload linter output file
+      uses: actions/upload-artifact@v2
+      with:
+        name: linting_log
+        path: ${{ github.workspace }}/dev/log/linting*.log
