@@ -78,6 +78,7 @@ main(int argc, char* argv[])
 
   // Set/Update the application name in the environment. Used by logging/ers.
   setenv("DUNEDAQ_APPLICATION_NAME", args.app_name.c_str(), 0);
+  setenv("DUNEDAQ_PARTITION", args.partition_name.c_str(), 0);
 
   // Create the Application
   appfwk::Application app(
