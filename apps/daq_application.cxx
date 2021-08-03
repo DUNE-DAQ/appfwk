@@ -76,12 +76,13 @@ main(int argc, char* argv[])
     exit(0);
   }
 
-  // Set/Update the application name in the environment. Used by logging/ers.
+  // Set/Update the application and partition name in the environment. Used by logging/ers.
   setenv("DUNEDAQ_APPLICATION_NAME", args.app_name.c_str(), 0);
+  setenv("DUNEDAQ_PARTITION", args.partition_name.c_str(), 0);
 
   // Create the Application
   appfwk::Application app(
-    args.app_name, args.partition_name, args.command_facility_plugin_name, args.info_service_plugin_name);
+    args.app_name, getenv("DUNEDAQ_PARTITION"), args.command_facility_plugin_name, args.info_service_plugin_name);
 
   app.init();
   app.run(run_marker);

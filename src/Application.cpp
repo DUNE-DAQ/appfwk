@@ -105,14 +105,10 @@ Application::execute(const dataobj_t& cmd_data)
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
       set_state(rc_cmd.exit_state);
-  } catch (DAQModuleManagerNotInitialized& ex) {
+  } catch (ers::Issue& ex) {
     m_busy.store(false);
     m_error.store(true);
-    throw ex;
-  } catch (CommandDispatchingFailed& ex) {
-    m_busy.store(false);
-    m_error.store(true);
-    throw ex;
+    throw;
   }
 }
 
@@ -159,16 +155,7 @@ Application::is_cmd_valid(const dataobj_t& cmd_data)
   std::string entry_state = cmd_data.get<rcif::cmd::RCCommand>().entry_state;
   if (entry_state == "ANY" || state == entry_state)
     return true;
-#if 0 // TODO, Eric Flumerfelt <eflumerf@fnal.gov> May-26-2021: Should this code be removed
-    if( (state == "NONE" && cmd == "init") || (state == "INITIAL" && cmd == "conf")
-        || (state == "CONFIGURED" && (cmd == "start" || cmd == "scrap"))
-        || (state == "RUNNING" && (cmd == "resume" || cmd == "stop" || cmd == "pause"))
-        || (state == "PAUSED" && (cmd == "resume" || cmd == "stop")) ) {
-       return true;
-    }
-    if (!(cmd=="init" || cmd=="conf" || cmd=="start" || cmd=="stop" || cmd == "pause" || cmd == "resume" || cmd ==
-    "scrap")) return true;
-#endif
+  
   return false;
 }
 
