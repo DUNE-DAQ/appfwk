@@ -155,7 +155,7 @@ Application::is_cmd_valid(const dataobj_t& cmd_data)
   std::string entry_state = cmd_data.get<rcif::cmd::RCCommand>().entry_state;
   if (entry_state == "ANY" || state == entry_state)
     return true;
-  
+
   return false;
 }
 
