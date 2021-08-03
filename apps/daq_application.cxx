@@ -56,7 +56,7 @@ main(int argc, char* argv[])
   dunedaq::logging::Logging().setup();
 
   // Setup signals
-  //std::signal(SIGABRT, signal_handler);
+  // std::signal(SIGABRT, signal_handler);
   std::signal(SIGTERM, signal_handler);
   std::signal(SIGINT, signal_handler);
   std::signal(SIGQUIT, signal_handler);

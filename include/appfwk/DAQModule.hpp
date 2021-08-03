@@ -149,7 +149,7 @@ public:
 
   /**
    * @brief DAQModule destructor
-  */
+   */
   virtual ~DAQModule() noexcept = default;
 
   /**

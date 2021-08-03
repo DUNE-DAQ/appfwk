@@ -180,5 +180,4 @@ BOOST_AUTO_TEST_CASE(full_checks, *boost::unit_test::depends_on("empty_checks"))
   if (push_value == test_max_capacity) {
     BOOST_TEST_MESSAGE("Unable to cause push timeout in " << test_max_capacity << " pushes");
   }
-
 }

@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(Commands)
 
   dunedaq::opmonlib::InfoCollector ic;
   gdm.get_info(ic, 0);
-  
+
   gdm.execute_command("stuff", {});
   BOOST_REQUIRE_THROW(gdm.execute_command("other_stuff", {}), UnknownCommand);
 }

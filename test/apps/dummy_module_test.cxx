@@ -17,7 +17,6 @@
 #include <memory>
 #include <string>
 
-
 using namespace dunedaq::appfwk;
 
 int
@@ -44,7 +43,7 @@ main()
     dummy_module->execute_command("bad_stuff");
     TLOG() << "Should have thrown exception";
   } catch (GeneralDAQModuleIssue&) {
-    TLOG() << "Exception thrown as expected";    
+    TLOG() << "Exception thrown as expected";
   }
 
   TLOG() << "Test complete";

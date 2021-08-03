@@ -21,22 +21,23 @@ BOOST_AUTO_TEST_SUITE(Queue_test)
 using namespace dunedaq::appfwk;
 
 namespace queuetest {
-    template<class T>
-    class TestQueue : public Queue<T>
-    {
-    public:
-      explicit TestQueue(const std::string& name)
-        : Queue<T>(name)
-      {}
+template<class T>
+class TestQueue : public Queue<T>
+{
+public:
+  explicit TestQueue(const std::string& name)
+    : Queue<T>(name)
+  {}
 
-      void push(T&& , const std::chrono::milliseconds& ) override {}
-      void pop(T& , const std::chrono::milliseconds& ) override {}
-      size_t get_capacity() const override { return 1; }
-      size_t get_num_elements() const override { return 0; }
-    };
+  void push(T&&, const std::chrono::milliseconds&) override {}
+  void pop(T&, const std::chrono::milliseconds&) override {}
+  size_t get_capacity() const override { return 1; }
+  size_t get_num_elements() const override { return 0; }
+};
 } // namespace queuetest
 
-BOOST_AUTO_TEST_CASE(QueueOperations) {
+BOOST_AUTO_TEST_CASE(QueueOperations)
+{
 
   auto queue_ptr = std::shared_ptr<Queue<int>>(new queuetest::TestQueue<int>("test_queue"));
   BOOST_REQUIRE(queue_ptr != nullptr);

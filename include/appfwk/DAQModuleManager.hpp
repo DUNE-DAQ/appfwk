@@ -29,9 +29,10 @@ ERS_DECLARE_ISSUE(appfwk,                                                   ///<
                   "Command " << cmdid << " received before initialization", ///< Message
                   ((std::string)cmdid)                                      ///< Message parameters
 )
-ERS_DECLARE_ISSUE(appfwk,                                                   ///< Namespace
-                  DAQModuleManagerAlreadyInitialized,                           ///< Issue class name
-                  "\"init\" Command received when already initialized", ERS_EMPTY)                                      ///< Message
+ERS_DECLARE_ISSUE(appfwk,                             ///< Namespace
+                  DAQModuleManagerAlreadyInitialized, ///< Issue class name
+                  "\"init\" Command received when already initialized",
+                  ERS_EMPTY) ///< Message
 
 ERS_DECLARE_ISSUE(appfwk,                                                               ///< Namespace
                   CommandDispatchingFailed,                                             ///< Issue class name
