@@ -31,13 +31,6 @@ jobs:
     steps:
     # Runs a single command using the runners shell
     
-
-    - name: Checkout daq-buildtools
-      uses: actions/checkout@v2
-      with:
-        repository: DUNE-DAQ/daq-buildtools
-        path: daq-buildtools
-
     - name: Checkout daq-release
       uses: actions/checkout@v2
       with:
@@ -46,7 +39,8 @@ jobs:
         
     - name: setup dev area
       run: |
-          source $GITHUB_WORKSPACE/daq-buildtools/env.sh
+          source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
+          setup_dbt latest
           dbt-create.sh -n last_successful dev
           
     - name: checkout package for CI
@@ -57,7 +51,8 @@ jobs:
     - name: setup build env, build and lint the repo against the development release
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-          source $GITHUB_WORKSPACE/daq-buildtools/env.sh
+          source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
+          setup_dbt latest
           cd $GITHUB_WORKSPACE/dev
           dbt-workarea-env || true
           setup_repo_env="SETUP_$REPO"
