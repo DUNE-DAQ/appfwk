@@ -7,6 +7,7 @@
  */
 
 #include "appfwk/DAQModuleManager.hpp"
+#include "networkmanager/NetworkManager.hpp"
 
 #include "cmdlib/cmd/Nljs.hpp"
 
@@ -38,6 +39,7 @@ DAQModuleManager::initialize(const dataobj_t& data)
   auto ini = data.get<app::Init>();
   init_queues(ini.queues);
   init_modules(ini.modules);
+  init_nwconnections(ini.nwconnections);
   this->m_initialized = true;
 }
 
@@ -85,6 +87,13 @@ DAQModuleManager::init_queues(const app::QueueSpecs& qspecs)
   }
   QueueRegistry::get().configure(queue_cfgs);
 }
+
+void
+DAQModuleManager::init_nwconnections(const networkmanager::nwmgr::Connections& nwspecs)
+{
+  networkmanager::NetworkManager::get().configure(nwspecs);
+}
+
 
 void
 DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data)
