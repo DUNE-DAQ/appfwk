@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(Application_test)
 
 using namespace dunedaq::appfwk;
 
-const std::string TEST_JSON_FILE = std::string(getenv("APPFWK_SHARE")) + "/test/scripts/test.json";
+const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json";
 
 BOOST_AUTO_TEST_CASE(Constructor)
 {
