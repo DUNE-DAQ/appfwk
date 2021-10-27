@@ -34,7 +34,7 @@ Application::Application(std::string appname, std::string partition, std::string
   m_runinfo.runno = 0;
   m_runinfo.runtime = 0;
 
-  m_fully_qualified_name = partition + "_" + appname;
+  m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 }
 
