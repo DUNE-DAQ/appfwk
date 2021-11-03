@@ -4,9 +4,12 @@ name: build-develop
 # or API.
 on:
   push:
-    branches: [ develop ]
+    branches: 
+      - develop
+      - patch/*
     paths-ignore:
       - 'docs/**'
+      - '.github/**'
   pull_request:
     branches: [ develop ]
   schedule:
