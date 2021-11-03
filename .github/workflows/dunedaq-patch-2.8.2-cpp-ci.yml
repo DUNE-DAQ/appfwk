@@ -1,0 +1,82 @@
+name: build-patch-2.8.2
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  push:
+    branches: 
+      - patch/2.8.2
+    paths-ignore:
+      - 'docs/**'
+      - '.github/**'
+  schedule:
+    - cron: "0 7 * * *"
+
+  workflow_dispatch:
+
+
+jobs:
+  Build_against_dev_release:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: dunedaq/sl7-minimal:dev
+    defaults:
+      run:
+        shell: bash
+    env:
+      DBT_AREA_FILE: "dbt-settings"
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+    
+    - name: Checkout daq-release
+      uses: actions/checkout@v2
+      with:
+        repository: DUNE-DAQ/daq-release
+        path: daq-release
+        
+    - name: setup dev area
+      run: |
+          source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
+          setup_dbt latest
+          dbt-create.sh -n last_successful dev
+          
+    - name: checkout package for CI
+      uses: actions/checkout@v2
+      with:
+        path: ${{ github.repository }}
+        ref: patch/2.8.2
+    
+    - name: setup build env, build and lint the repo against the development release
+      run: |
+          export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+          source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
+          setup_dbt latest
+          cd $GITHUB_WORKSPACE/dev
+          dbt-workarea-env || true
+          setup_repo_env="SETUP_$REPO"
+          [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
+          cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev/sourcecode
+          dbt-build.sh
+          dbt-build.sh --lint
+          $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev -o /tarballs
+          
+    - name: upload UPS tarball and log file
+      uses: actions/upload-artifact@v2
+      with:
+        name: ups_package
+        path: /tarballs
+
+    - name: upload build log file
+      uses: actions/upload-artifact@v2
+      with:
+        name: build_log
+        path: ${{ github.workspace }}/dev/log/build*.log
+
+    - name: upload linter output file
+      uses: actions/upload-artifact@v2
+      with:
+        name: linting_log
+        path: ${{ github.workspace }}/dev/log/linting*.log
