@@ -41,7 +41,7 @@ jobs:
       run: |
           source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
           setup_dbt latest
-          dbt-create.sh -n last_successful dev
+          dbt-create.sh -c -n last_successful dev
           
     - name: checkout package for CI
       uses: actions/checkout@v2
