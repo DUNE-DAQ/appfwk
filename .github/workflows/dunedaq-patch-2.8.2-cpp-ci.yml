@@ -5,7 +5,7 @@ name: build-patch-2.8.2
 on:
   push:
     branches: 
-      - patch/2.8.2
+      - patch/v2.8.2
     paths-ignore:
       - 'docs/**'
       - '.github/**'
@@ -47,7 +47,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: ${{ github.repository }}
-        ref: patch/2.8.2
+        ref: patch/v2.8.2
     
     - name: setup build env, build and lint the repo against the development release
       run: |
