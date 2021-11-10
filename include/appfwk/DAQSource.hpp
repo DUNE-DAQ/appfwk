@@ -20,6 +20,7 @@
 #include <typeinfo>
 
 namespace dunedaq {
+// Disable coverage collection LCOV_EXCL_START
 /**
  * @brief Define an ERS Issue for when DAQSource is unable to retrieve its Queue
  * handle
@@ -28,6 +29,7 @@ ERS_DECLARE_ISSUE(appfwk,                                             // namespa
                   DAQSourceConstructionFailed,                        // issue class name
                   "Failed to construct DAQSource \"" << name << "\"", // no message
                   ((std::string)name))
+// Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
 

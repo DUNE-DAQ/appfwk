@@ -31,6 +31,7 @@
 
 namespace dunedaq {
 
+// Disable coverage collection LCOV_EXCL_START
 /**
  * @brief A generic Application ERS Issue
  */
@@ -50,6 +51,7 @@ ERS_DECLARE_ISSUE(appfwk,         ///< Namespace
                   ((bool)busy)                      ///< Message parameters // NOLINT
 )
 
+// Re-enable coverage collection LCOV_EXCL_STOP
 namespace appfwk {
 
 class Application

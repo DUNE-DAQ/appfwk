@@ -23,14 +23,16 @@
 
 namespace dunedaq {
 
-/**
- * @brief A generic DAQModule ERS Issue
- */
+// Disable coverage collection LCOV_EXCL_START
 ERS_DECLARE_ISSUE(appfwk,                                                   ///< Namespace
                   DAQModuleManagerNotInitialized,                           ///< Issue class name
                   "Command " << cmdid << " received before initialization", ///< Message
                   ((std::string)cmdid)                                      ///< Message parameters
 )
+ERS_DECLARE_ISSUE(appfwk,                             ///< Namespace
+                  DAQModuleManagerAlreadyInitialized, ///< Issue class name
+                  "\"init\" Command received when already initialized",
+                  ERS_EMPTY) ///< Message
 
 ERS_DECLARE_ISSUE(appfwk,                                                               ///< Namespace
                   CommandDispatchingFailed,                                             ///< Issue class name
@@ -45,6 +47,7 @@ ERS_DECLARE_ISSUE(appfwk,                                                       
                   ((std::string)cmdid)                                                   ///< Message parameters
                   ((std::string)modules)                                                 ///< Message parameters
 )
+// Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
 

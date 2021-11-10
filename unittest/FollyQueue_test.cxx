@@ -13,6 +13,7 @@
 #include "boost/test/included/unit_test.hpp"
 
 #include <chrono>
+#include <utility>
 
 // For a first look at the code, you may want to skip past the
 // contents of the unnamed namespace and move ahead to the actual test
@@ -47,8 +48,12 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
 {
   BOOST_REQUIRE(!queue.can_pop());
 
+  BOOST_REQUIRE_EQUAL(queue.get_capacity(), 10);
+  BOOST_REQUIRE_EQUAL(queue.get_num_elements(), 0);
+
   auto start_time = std::chrono::steady_clock::now();
   try {
+    BOOST_REQUIRE(queue.can_push());
     queue.push(42, timeout);
   } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
     BOOST_TEST_REQUIRE(false, "Test failure: unexpected timeout exception throw from push");
@@ -68,6 +73,7 @@ BOOST_AUTO_TEST_CASE(sanity_checks)
   }
 
   BOOST_REQUIRE(queue.can_pop());
+  BOOST_REQUIRE_EQUAL(queue.get_num_elements(), 1);
 
   start_time = std::chrono::steady_clock::now();
   int popped_value = -999;
@@ -124,4 +130,54 @@ BOOST_AUTO_TEST_CASE(empty_checks, *boost::unit_test::depends_on("sanity_checks"
 
   BOOST_CHECK_GT(fraction_of_pop_timeout_used, 1 - fractional_timeout_tolerance);
   BOOST_CHECK_LT(fraction_of_pop_timeout_used, 1 + fractional_timeout_tolerance);
+}
+
+BOOST_AUTO_TEST_CASE(full_checks, *boost::unit_test::depends_on("empty_checks"))
+{
+  int push_value = 0;
+
+  while (queue.can_push()) {
+
+    try {
+      int push_value_tmp = push_value;
+      queue.push(std::move(push_value_tmp), timeout);
+      push_value++;
+    } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+      BOOST_TEST(false,
+                 "Timeout exception thrown in call to FollyQueue::push(); unable "
+                 "to fill the Queue");
+      break;
+    }
+  }
+
+  BOOST_REQUIRE(!queue.can_push());
+  BOOST_REQUIRE_EQUAL(push_value, queue.get_capacity());
+
+  int test_max_capacity = 1000000;
+  while (push_value < test_max_capacity) {
+    // push to a full Queue
+    auto start_time = std::chrono::steady_clock::now();
+    try {
+      int push_value_tmp = push_value;
+      queue.push(std::move(push_value_tmp), timeout);
+      push_value++;
+    } catch (dunedaq::appfwk::QueueTimeoutExpired&) {
+      auto push_duration = std::chrono::steady_clock::now() - start_time;
+      BOOST_TEST_MESSAGE("Timeout occurred. Capacity is " << queue.get_capacity() << ", current occupancy is "
+                                                          << queue.get_num_elements());
+
+      const double fraction_of_push_timeout_used =
+        static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(push_duration).count()) /
+        std::chrono::duration_cast<std::chrono::nanoseconds>(timeout).count();
+
+      BOOST_TEST_MESSAGE("Attempted push_duration divided by timeout is " << fraction_of_push_timeout_used);
+
+      BOOST_CHECK_GT(fraction_of_push_timeout_used, 1 - fractional_timeout_tolerance);
+      BOOST_CHECK_LT(fraction_of_push_timeout_used, 1 + fractional_timeout_tolerance);
+      break;
+    }
+  }
+  if (push_value == test_max_capacity) {
+    BOOST_TEST_MESSAGE("Unable to cause push timeout in " << test_max_capacity << " pushes");
+  }
 }

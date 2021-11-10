@@ -56,7 +56,9 @@ main(int argc, char* argv[])
   dunedaq::logging::Logging().setup();
 
   // Setup signals
-  std::signal(SIGABRT, signal_handler);
+  // std::signal(SIGABRT, signal_handler);
+  std::signal(SIGTERM, signal_handler);
+  std::signal(SIGINT, signal_handler);
   std::signal(SIGQUIT, signal_handler);
 
   using namespace dunedaq;
@@ -70,15 +72,21 @@ main(int argc, char* argv[])
     exit(-1);
   }
 
-  // Set/Update the application name in the environment. Used by logging/ers.
+  if (args.help_requested) {
+    exit(0);
+  }
+
+  // Set/Update the application and partition name in the environment. Used by logging/ers.
   setenv("DUNEDAQ_APPLICATION_NAME", args.app_name.c_str(), 0);
+  setenv("DUNEDAQ_PARTITION", args.partition_name.c_str(), 0);
 
   // Create the Application
   appfwk::Application app(
-    args.app_name, args.partition_name, args.command_facility_plugin_name, args.info_service_plugin_name);
+    args.app_name, getenv("DUNEDAQ_PARTITION"), args.command_facility_plugin_name, args.info_service_plugin_name);
 
   app.init();
   app.run(run_marker);
 
+  TLOG() << "Application " << args.app_name << " exiting.";
   return 0;
 }

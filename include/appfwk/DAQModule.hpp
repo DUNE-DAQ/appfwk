@@ -56,6 +56,7 @@
 
 namespace dunedaq {
 
+// Disable coverage collection LCOV_EXCL_START
 /**
  * @brief A ERS Issue for DAQModule creation failure
  */
@@ -119,6 +120,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
                        ((std::string)reason)                  ///< Attribute of this class
 )
 
+// Re-enable coverage collection LCOV_EXCL_STOP
 namespace appfwk {
 
 /**
@@ -147,7 +149,7 @@ public:
 
   /**
    * @brief DAQModule destructor
-  */
+   */
   virtual ~DAQModule() noexcept = default;
 
   /**

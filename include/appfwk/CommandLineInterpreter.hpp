@@ -22,11 +22,13 @@ namespace bpo = boost::program_options;
 
 namespace dunedaq {
 
+// Disable coverage collection LCOV_EXCL_START
 ERS_DECLARE_ISSUE(appfwk,                                                             // Namespace
                   CommandLineIssue,                                                   // Class name
                   "Command-line processing issue in " << app_name << ": " << message, // Message
                   ((std::string)app_name)((std::string)message))                      // Args
 
+// Re-enable coverage collection LCOV_EXCL_STOP
 namespace appfwk {
 /**
  * @brief CommandLineInterpreter parses the command-line options given to the
@@ -67,8 +69,9 @@ public:
     }
 
     if (vm.count("help")) {
-      std::cout << desc; // NOLINT
-      exit(0);
+      std::cout << desc << std::endl; // NOLINT
+      output.help_requested = true;
+      return output;
     }
 
     try {
@@ -81,18 +84,17 @@ public:
     output.partition_name = vm["partition"].as<std::string>();
     output.command_facility_plugin_name = vm["commandFacility"].as<std::string>();
     output.info_service_plugin_name = vm["informationService"].as<std::string>();
-    output.is_valid = true;
     return output;
   }
 
-  bool is_valid{ false }; ///< Whether the command line was successfully parsed
+  bool help_requested{ false }; ///< Did the user just ask for help?
 
-  std::string app_name;
-  std::string partition_name;
-  std::string command_facility_plugin_name; ///< Name of the CommandFacility plugin to load
-  std::string info_service_plugin_name;     ///< Name of the InfoService plugin to load
+  std::string app_name{ "" };
+  std::string partition_name{ "" };
+  std::string command_facility_plugin_name{ "" }; ///< Name of the CommandFacility plugin to load
+  std::string info_service_plugin_name{ "" };     ///< Name of the InfoService plugin to load
 
-  std::vector<std::string> other_options; ///< Any other options which were passed and not recognized
+  std::vector<std::string> other_options{}; ///< Any other options which were passed and not recognized
 };
 } // namespace appfwk
 } // namespace dunedaq

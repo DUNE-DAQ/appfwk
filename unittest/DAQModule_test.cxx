@@ -7,7 +7,10 @@
  */
 
 #include "appfwk/DAQModule.hpp"
+#include "appfwk/DAQModuleHelper.hpp"
+#include "appfwk/Issues.hpp"
 #include "appfwk/QueueRegistry.hpp"
+#include "appfwk/app/Nljs.hpp"
 
 #define BOOST_TEST_MODULE DAQModule_test // NOLINT
 
@@ -64,11 +67,48 @@ BOOST_AUTO_TEST_CASE(Construct)
 
 BOOST_AUTO_TEST_CASE(Commands)
 {
-
   daqmoduletest::GoodDAQModule gdm("command_test");
+
+  BOOST_REQUIRE(gdm.has_command("stuff"));
+  auto valid_commands = gdm.get_commands();
+  BOOST_REQUIRE_EQUAL(valid_commands.size(), 1);
+  BOOST_REQUIRE_EQUAL(valid_commands[0], "stuff");
+
+  dunedaq::opmonlib::InfoCollector ic;
+  gdm.get_info(ic, 0);
 
   gdm.execute_command("stuff", {});
   BOOST_REQUIRE_THROW(gdm.execute_command("other_stuff", {}), UnknownCommand);
+}
+
+BOOST_AUTO_TEST_CASE(MakeModule)
+{
+  BOOST_REQUIRE_EXCEPTION(make_module("not_a_real_plugin_name", "error_test"),
+                          DAQModuleCreationFailed,
+                          [&](DAQModuleCreationFailed) { return true; });
+}
+
+BOOST_AUTO_TEST_CASE(QueueInfo)
+{
+
+  app::ModInit data;
+  app::QueueInfo queue_info{ "test_queue", "output", "out" };
+  data.qinfos.push_back(queue_info);
+  nlohmann::json json;
+  to_json(json, data);
+
+  auto infos = queue_infos(json);
+  BOOST_REQUIRE_EQUAL(infos.size(), 1);
+
+  auto index = queue_index(json, std::vector<std::string>{ "output" });
+  BOOST_REQUIRE_EQUAL(index.size(), 1);
+  BOOST_REQUIRE_EQUAL(index["output"].inst, queue_info.inst);
+  BOOST_REQUIRE_EQUAL(index["output"].name, queue_info.name);
+  BOOST_REQUIRE_EQUAL(index["output"].dir, queue_info.dir);
+
+  BOOST_REQUIRE_EXCEPTION(queue_index(json, std::vector<std::string>{ "output", "ERROR" }),
+                          InvalidSchema,
+                          [&](InvalidSchema) { return true; });
 }
 
 BOOST_AUTO_TEST_SUITE_END()

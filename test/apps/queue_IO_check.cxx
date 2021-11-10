@@ -35,10 +35,12 @@ namespace bpo = boost::program_options;
 #include <vector>
 
 namespace dunedaq {
+// Disable coverage collection LCOV_EXCL_START
 ERS_DECLARE_ISSUE(appfwk,               ///< Namespace
                   ParameterDomainIssue, ///< Issue class name
                   "ParameterDomainIssue: \"" << ers_messg << "\"",
                   ((std::string)ers_messg))
+// Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 
 namespace {

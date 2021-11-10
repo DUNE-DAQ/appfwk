@@ -1,4 +1,4 @@
-# Introduction
+# DAQ Application
 
 `daq_application` is the main entry point for all _dunedaq_ processes that contain DAQModules and Queues. At program start, every `daq_application` instance only knows the basic information necessary for it to connect to Run Control and receive more information via the `init` and `conf` commands.
 
