@@ -1,17 +1,14 @@
-name: build-develop
+name: build-patch-2.8.2
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
   push:
     branches: 
-      - develop
-      - patch/*
+      - patch/v2.8.2
     paths-ignore:
       - 'docs/**'
       - '.github/**'
-  pull_request:
-    branches: [ develop ]
   schedule:
     - cron: "0 7 * * *"
 
@@ -44,12 +41,13 @@ jobs:
       run: |
           source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
           setup_dbt latest
-          dbt-create.sh -n last_successful dev
+          dbt-create.sh -c -n last_successful dev
           
     - name: checkout package for CI
       uses: actions/checkout@v2
       with:
         path: ${{ github.repository }}
+        ref: patch/v2.8.2
     
     - name: setup build env, build and lint the repo against the development release
       run: |
