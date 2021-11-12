@@ -6,17 +6,17 @@ local moo = import "moo.jsonnet";
 local s = moo.oschema.schema("dunedaq.appfwk.appinfo");
 
 local info = {
-   state : s.string("state_v", moo.re.ident,
+   state_t : s.string("state_t", moo.re.ident,
                   doc="A string field"), 
-   busy : s.boolean("busy_v",
+   busy_t : s.boolean("busy_t",
                   doc="Busy flag"), 
-   err : s.boolean("error_v",
+   err_t : s.boolean("error_t",
                   doc="Error flag"),
 
    info: s.record("Info", [
-       s.field("state", self.state, doc="State"), 
-       s.field("busy", self.busy, 0,  doc="Busy flag"), 
-       s.field("error", self.err, 0, doc="Error flag")
+       s.field("state", self.state_t, doc="State"), 
+       s.field("busy", self.busy_t, 0,  doc="Busy flag"), 
+       s.field("error", self.err_t, 0, doc="Error flag")
    ], doc="General application information")
 };
 
