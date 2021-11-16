@@ -44,7 +44,7 @@ Application::init()
   m_cmd_fac->set_commanded(*this, get_name());
   m_info_mgr.set_provider(*this);
   // Add partition id as tag
-  m_info_mgr.set_tags({{"partition_id", m_partition}});
+  m_info_mgr.set_tags({ { "partition_id", m_partition } });
   m_initialized = true;
 }
 

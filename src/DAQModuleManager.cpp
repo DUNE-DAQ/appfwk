@@ -94,7 +94,6 @@ DAQModuleManager::init_nwconnections(const networkmanager::nwmgr::Connections& n
   networkmanager::NetworkManager::get().configure(nwspecs);
 }
 
-
 void
 DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data)
 {
