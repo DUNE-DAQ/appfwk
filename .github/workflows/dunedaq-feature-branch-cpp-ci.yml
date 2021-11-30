@@ -1,16 +1,14 @@
-name: build-patch-2.8.2
+name: build-feature-branch-together
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
   push:
     branches: 
-      - patch/v2.8.2
+      - feature/*
     paths-ignore:
       - 'docs/**'
       - '.github/**'
-  schedule:
-    - cron: "0 7 * * *"
 
   workflow_dispatch:
 
@@ -43,11 +41,20 @@ jobs:
           setup_dbt latest
           dbt-create.sh -c -n last_successful dev
           
-    - name: checkout package for CI
-      uses: actions/checkout@v2
-      with:
-        path: ${{ github.repository }}
-        ref: patch/v2.8.2
+          #- name: checkout package for CI
+      #uses: actions/checkout@v2
+      #with:
+              #path: ${{ github.repository }}
+
+    - name: checkout releated repos
+      run: |
+          branch_name="${GITHUB_REF#refs/heads/}"
+          cd $GITHUB_WORKSPACE/daq-release
+          if git ls-remote --exit-code --heads origin $branch_name; then
+              git checkout $branch_name
+          fi
+          mkdir -p $GITHUB_WORKSPACE/sourcecode
+          $GITHUB_WORKSPACE/daq-release/scripts/checkout-package-release.sh -f $GITHUB_WORKSPACE/daq-release/configs/dunedaq-develop/release_manifest.sh -o $GITHUB_WORKSPACE/sourcecode -b $branch_name -a -n
     
     - name: setup build env, build and lint the repo against the development release
       run: |
@@ -58,7 +65,7 @@ jobs:
           dbt-workarea-env || true
           setup_repo_env="SETUP_$REPO"
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
-          cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev/sourcecode
+          cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/sourcecode/* $GITHUB_WORKSPACE/dev/sourcecode
           dbt-build.sh
           dbt-build.sh --lint
           $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev -o /tarballs
