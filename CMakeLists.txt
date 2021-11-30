@@ -6,7 +6,6 @@ find_package(daq-cmake REQUIRED )
 daq_setup_environment()
 
 find_package(Boost COMPONENTS unit_test_framework program_options REQUIRED)
-find_package(TRACE REQUIRED)
 find_package(logging REQUIRED)
 find_package(cetlib REQUIRED)   # Uses the daq-buildtools/cmake/Findcetlib.cmake
 find_package(folly REQUIRED)

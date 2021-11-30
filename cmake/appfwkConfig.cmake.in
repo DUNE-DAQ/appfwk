@@ -4,7 +4,6 @@
 include(CMakeFindDependencyMacro)
 
 find_dependency(Boost COMPONENTS unit_test_framework program_options)
-find_dependency(TRACE)
 
 find_dependency(cetlib)
 find_dependency(folly)
