@@ -3,8 +3,8 @@
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(Boost 1.70.0 COMPONENTS unit_test_framework program_options)
-find_dependency(TRACE 3.15.09)
+find_dependency(Boost COMPONENTS unit_test_framework program_options)
+find_dependency(TRACE)
 
 find_dependency(cetlib)
 find_dependency(folly)
@@ -14,6 +14,7 @@ find_dependency(cmdlib)
 find_dependency(rcif)
 find_dependency(opmonlib)
 find_dependency(nlohmann_json)
+find_dependency(networkmanager)
 
 # Figure out whether or not this dependency is an installed package or
 # in repo form
