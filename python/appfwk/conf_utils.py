@@ -247,7 +247,7 @@ def make_app_deps(the_system, verbose=False):
     return deps
 
 
-def make_app_command_data(app, verbose=False):
+def make_app_command_data(app, nw_specs, verbose=False):
     """Given an App instance, create the 'command data' suitable for
     feeding to nanorc. The needed queues are inferred from from
     connections between modules, as are the start and stop order of the
@@ -330,7 +330,7 @@ def make_app_command_data(app, verbose=False):
 
     # Fill in the "standard" command entries in the command_data structure
 
-    command_data['init'] = appfwk.Init(queues=queue_specs, modules=mod_specs)
+    command_data['init'] = appfwk.Init(queues=queue_specs, modules=mod_specs, nwconnections=None)
 
     # TODO: Conf ordering
     command_data['conf'] = acmd([
@@ -734,7 +734,7 @@ def write_json_files(app_command_datas, system_command_datas, json_dir, verbose=
     console.log(f"System configuration generated in directory '{json_dir}'")
 
 
-def make_apps_json(the_system, json_dir, verbose=False):
+def make_apps_json(the_system, nw_specs, json_dir, verbose=False):
     """Make the json files for all of the applications"""
 
     if verbose:
@@ -757,7 +757,7 @@ def make_apps_json(the_system, json_dir, verbose=False):
         # NB: modifies app's modulegraph in-place
         add_network(app_name, the_system, verbose)
 
-        app_command_datas[app_name] = make_app_command_data(app, verbose)
+        app_command_datas[app_name] = make_app_command_data(app, nw_specs, verbose)
         if verbose:
             console.log(app_command_datas[app_name])
 
