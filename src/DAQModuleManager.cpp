@@ -266,6 +266,7 @@ DAQModuleManager::gather_stats(opmonlib::InfoCollector& ci, int level)
 {
 
   QueueRegistry::get().gather_stats(ci, level);
+  networkmanager::NetworkManager::get().gather_stats(ci, level);
 
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
     opmonlib::InfoCollector tmp_ci;
