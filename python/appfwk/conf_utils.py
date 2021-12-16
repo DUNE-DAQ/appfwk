@@ -18,18 +18,22 @@ moo.otypes.load_types('rcif/cmd.jsonnet')
 moo.otypes.load_types('appfwk/cmd.jsonnet')
 moo.otypes.load_types('appfwk/app.jsonnet')
 
+moo.otypes.load_types('networkmanager/nwmgr.jsonnet')
 moo.otypes.load_types('nwqueueadapters/networktoqueue.jsonnet')
 moo.otypes.load_types('nwqueueadapters/queuetonetwork.jsonnet')
 moo.otypes.load_types('trigger/moduleleveltrigger.jsonnet')
+moo.otypes.load_types('networkmanager/nwmgr.jsonnet')
 
 from appfwk.utils import acmd, mcmd, mspec
 import dunedaq.nwqueueadapters.networkobjectsender as nos
 import dunedaq.nwqueueadapters.queuetonetwork as qton
 import dunedaq.nwqueueadapters.networkobjectreceiver as nor
 import dunedaq.nwqueueadapters.networktoqueue as ntoq
+import dunedaq.networkmanager.nwmgr as nwmgr
 import dunedaq.appfwk.app as appfwk  # AddressedCmd,
 import dunedaq.rcif.cmd as rccmd  # AddressedCmd,
 import dunedaq.trigger.moduleleveltrigger as mlt
+import dunedaq.networkmanager.nwmgr as nwmgr
 
 console = Console()
 
@@ -75,7 +79,26 @@ class Direction(Enum):
     IN = 1
     OUT = 2
 
-Endpoint = namedtuple("Endpoint", [ 'external_name', 'internal_name', 'direction' ])
+class Endpoint:
+    # def __init__(self, **kwargs):
+    #     if kwargs['connection']:
+    #         self.__init_with_nwmgr(**kwargs)
+    #     else:
+    #         self.__init_with_external_name(**kwargs)
+    def __init__(self, external_name, internal_name, direction, topic=[]):
+        self.external_name = external_name
+        self.internal_name = internal_name
+        self.direction = direction
+        self.topic = topic
+
+    def __repr__(self):
+        return f"{self.external_name}/{self.internal_name}"
+    # def __init_with_nwmgr(self, connection, internal_name):
+    #     self.nwmgr_connection = connection
+    #     self.internal_name = internal_name
+    #     self.external_name = None
+    #     self.direction = Direction.IN
+
 GeoID = namedtuple('GeoID', ['system', 'region', 'element'])
 FragmentProducer = namedtuple('FragmentProducer', ['geoid', 'requests_in', 'fragments_out', 'queue_name'])
 
@@ -94,7 +117,7 @@ class ModuleGraph:
     changed without affecting other applications.
 
     """
-    
+
     def __init__(self, modules:[Module]=None, endpoints=None, fragment_producers=None):
         self.modules=modules if modules else []
         self.endpoints=endpoints if endpoints else dict()
@@ -110,17 +133,17 @@ class ModuleGraph:
 
     def set_from_dict(self, module_dict):
         self.modules=module_dict
-        
+
     def digraph(self):
         deps = nx.DiGraph()
         modules_set = set()
-        
+
         for module in self.modules:
             if module.name in modules_set:
                 raise RuntimeError(f"Module {module.name} appears twice in the ModuleGraph")
             deps.add_node(module.name)
             modules_set.add(module.name)
-            
+
         for module in self.modules:
             from_module = module.name
             for connection in module.connections.values():
@@ -150,37 +173,44 @@ class ModuleGraph:
                 deps.nodes[endpoint.external_name]['color'] = 'red'
             else:
                 raise RuntimeError(f"Bad endpoint {endpoint}: internal connection which doesn't connect to any module! Available modules: {modules_set}")
-        
+
         # finally the fragment producers
         for producer in self.fragment_producers.values():
             producer_request_in = producer.requests_in.split(".")
             if len(producer_request_in) != 2:
                 raise RuntimeError(f"Bad fragment producer {producer}: request_in must be specified as module.queue_name")
-            
+
             if producer_request_in[0] in modules_set:
                 deps.add_edge("TriggerRecordBuilder", producer_request_in[0], label='requests')
                 deps.nodes["TriggerRecordBuilder"]['color'] = 'red'
             else:
                 raise RuntimeError(f"Bad FragmentProducer {producer}: request_in doesn't connect to any module! Available modules: {modules_set}")
-            
+
             producer_frag_out = producer.fragments_out.split(".")
             if len(producer_frag_out) != 2:
                 raise RuntimeError(f"Bad fragment producer {producer}: fragments_out must be specified as module.queue_name")
-            
+
             if producer_frag_out[0] in modules_set:
                 deps.add_edge(producer_frag_out[0], "FragmentReceiver", label='fragments')
                 deps.nodes["FragmentReceiver"]['color'] = 'orange'
-            else: 
+            else:
                 raise RuntimeError(f"Bad FragmentProducer {producer}: fragments_out doesn't connect to any module! Available modules: {modules_set}")
-            
+
         return deps
 
-    def module_of_name(self, name):
-        for mod in self.module:
-            if mod.name== name:
+    def get_module(self, name):
+        for mod in self.modules:
+            if mod.name == name:
                 return mod
         return None
-        
+
+    def reset_module(self, name, new_module):
+        for mod in self.modules:
+            if mod.name == name:
+                mod = new_module
+                return
+        raise RuntimeError(f'Module {name} not found!')
+
     def module_names(self):
         return [n.name for n in self.modules]
 
@@ -188,7 +218,7 @@ class ModuleGraph:
         return self.modules
 
     def add_module(self, name, **kwargs):
-        if module_of_name(name):
+        if get_module(name):
             raise RuntimeError(f"Module of name {name} already exists in this modulegraph")
         mod=module(**kwargs)
         self.modules.append(mod)
@@ -196,10 +226,10 @@ class ModuleGraph:
 
     def add_connection(self, from_endpoint, to_endpoint):
         from_mod, from_name=from_endpoint.split(".")
-        self.module_of_name(from_mod).connections[from_name]=Connection(to_endpoint)
+        self.get_module(from_mod).connections[from_name]=Connection(to_endpoint)
 
-    def add_endpoint(self, external_name, internal_name, inout):
-        self.endpoints[external_name]=Endpoint(external_name, internal_name, inout)
+    def add_endpoint(self, external_name, internal_name, inout, topic=[]):
+        self.endpoints[external_name] = Endpoint(external_name, internal_name, inout, topic)
 
     def endpoint_names(self, inout=None):
         if inout is not None:
@@ -231,11 +261,11 @@ class App:
         self.modulegraph = modulegraph if modulegraph else ModuleGraph()
         self.host = host
         self.name = name
-        
+
     def reset_graph(self):
         if self.modulegraph:
             self.digraph = self.modulegraph.digraph()
-        
+
     def export(self, filename):
         if not self.digraph:
             raise RuntimeError("Cannot export a app which doesn't have a valid digraph")
@@ -247,7 +277,8 @@ Publisher = namedtuple(
 Sender = namedtuple("Sender", ['msg_type', 'msg_module_name', 'receiver'])
 
 class System:
-    """A full DAQ system consisting of multiple applications and the
+    """
+    A full DAQ system consisting of multiple applications and the
     connections between them. The `apps` member is a dictionary from
     application name to app object, and the app_connections member is
     a dictionary from upstream endpoint to publisher or sender object
@@ -259,13 +290,14 @@ class System:
     specify this, and leave the mapping to be automatically generated.
 
     The same is true for application start order.
-
     """
+
     def __init__(self, apps=None, app_connections=None, network_endpoints=None, app_start_order=None):
         self.apps=apps if apps else dict()
-        self.app_connections=app_connections if app_connections else dict()
-        self.network_endpoints=network_endpoints
-        self.app_start_order=app_start_order
+        self.app_connections = app_connections if app_connections else dict()
+        self.network_endpoints = network_endpoints
+        self.app_start_order = app_start_order
+        self.digraph = None
 
     def __rich_repr__(self):
         yield "apps", self.apps
@@ -287,40 +319,71 @@ class System:
                 all_producers.append(producer)
         return all_producers
 
+    def make_digraph(self):
+        deps = nx.DiGraph()
+
+        for app_name in self.apps.keys():
+            deps.add_node(app_name)
+
+        for from_app_n, from_app in self.apps.items():
+            for from_ep in from_app.modulegraph.endpoints.values():
+                if from_ep.direction == Direction.OUT:
+                    print("OUT", from_app_n, from_ep.external_name)
+                    for to_app_n, to_app in self.apps.items():
+                        for to_ep in to_app.modulegraph.endpoints.values():
+                            if to_ep.direction == Direction.IN:
+                                if from_ep.external_name == to_ep.external_name:
+                                    deps.add_edge(from_app_n, to_app_n, label=to_ep.external_name)
+                elif from_ep.direction == Direction.IN:
+                    print("IN", from_app_n, from_ep.external_name)
+
+
+        return deps
+
+
+    def export(self, filename):
+        self.digraph = self.make_digraph()
+        nx.drawing.nx_pydot.write_dot(self.digraph, filename)
+
 ########################################################################
 #
 # Functions
 #
 ########################################################################
 
-def make_module_deps(module_dict):
-    """Given a dictionary of `module` objects, produce a dictionary giving
+def make_module_deps(modules):
+    """
+    Given a list of `module` objects, produce a dictionary giving
     the dependencies between them. A dependency is any connection between
     modules (implemented using an appfwk queue). Connections whose
     upstream ends begin with a '!' are not considered dependencies, to
     allow us to break cycles in the DAG.
 
     Returns a networkx DiGraph object where nodes are module names
-
     """
 
     deps = nx.DiGraph()
-    for mod_name in module_dict.keys():
-        deps.add_node(mod_name)
-    for name, mod in module_dict.items():
-        for upstream_name, downstream_connection in mod.connections.items():
+    for module in modules:
+        deps.add_node(module.name)
+
+    print("\n\n\n\nmake_module_deps")
+    for module in modules:
+        print(f"\n{module.name}")
+        for upstream_name, downstream_connection in module.connections.items():
+            print (upstream_name, downstream_connection)
             if downstream_connection.toposort:
                 other_mod = downstream_connection.to.split(".")[0]
-                deps.add_edge(name, other_mod)
+                deps.add_edge(module.name, other_mod)
+
     return deps
 
 
 def make_app_deps(the_system, verbose=False):
-    """Produce a dictionary giving
+    """
+    Produce a dictionary giving
     the dependencies between a set of applications, given their connections.
 
     Returns a networkx DiGraph object where nodes are app names
-
     """
 
     deps = nx.DiGraph()
@@ -328,19 +391,22 @@ def make_app_deps(the_system, verbose=False):
     for app in the_system.apps.keys():
         deps.add_node(app)
 
+    print("\n\n\n\nmake_apps_deps")
     for from_endpoint, conn in the_system.app_connections.items():
         from_app = from_endpoint.split(".")[0]
         if hasattr(conn, "subscribers"):
             for to_app in [ds.split(".")[0] for ds in conn.subscribers]:
+                print(from_app, to_app)
                 deps.add_edge(from_app, to_app)
         elif hasattr(conn, "receiver"):
             to_app = conn.receiver.split(".")[0]
+            print(from_app, to_app)
             deps.add_edge(from_app, to_app)
 
     return deps
 
 
-def make_app_command_data(app, nw_specs, verbose=False):
+def make_app_command_data(system, app, verbose=False):
     """Given an App instance, create the 'command data' suitable for
     feeding to nanorc. The needed queues are inferred from from
     connections between modules, as are the start and stop order of the
@@ -352,7 +418,7 @@ def make_app_command_data(app, nw_specs, verbose=False):
 
     """
 
-    
+
     modules = app.modulegraph.modules
 
     module_deps = make_module_deps(modules)
@@ -360,6 +426,7 @@ def make_app_command_data(app, nw_specs, verbose=False):
         console.log(f"inter-module dependencies are: {module_deps}")
 
     start_order = list(nx.algorithms.dag.topological_sort(module_deps))
+    print(start_order)
     stop_order = start_order[::-1]
 
     if verbose:
@@ -375,7 +442,8 @@ def make_app_command_data(app, nw_specs, verbose=False):
     # Infer the queues we need based on the connections between modules
 
     # Terminology: an "endpoint" is "module.name"
-    for name, mod in modules.items():
+    for mod in modules:
+        name = mod.name
         for from_name, downstream_connection in mod.connections.items():
             # The name might be prefixed with a "!" to indicate that it doesn't participate in dependencies. Remove that here because "!" is illegal in actual queue names
             from_name = from_name.replace("!", "")
@@ -418,8 +486,7 @@ def make_app_command_data(app, nw_specs, verbose=False):
                 app_qinfos[to_mod].append(appfwk.QueueInfo(
                     name=to_name, inst=queue_inst, dir="input"))
 
-    mod_specs = [mspec(name, mod.plugin, app_qinfos[name])
-                 for name, mod in modules.items()]
+    mod_specs = [ mspec(mod.name, mod.plugin, app_qinfos[mod.name]) for mod in modules ]
 
     # Fill in the "standard" command entries in the command_data structure
 
@@ -427,7 +494,7 @@ def make_app_command_data(app, nw_specs, verbose=False):
 
     # TODO: Conf ordering
     command_data['conf'] = acmd([
-        (name, mod.conf) for name, mod in modules.items()
+        (mod.name, mod.conf) for mod in modules
     ])
 
     startpars = rccmd.StartParams(run=1, disable_data_storage=False)
@@ -454,12 +521,14 @@ def data_request_endpoint_name(producer):
     return f"data_request_{geoid_raw_str(producer.geoid)}"
 
 def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
-    """The MLT needs to know the full list of fragment producers in the
-system so it can populate the TriggerDecisions it creates. This
-function gets all the fragment producers in the system and adds their
-GeoIDs to the MLT's config. It assumes that the ModuleLevelTrigger
-lives in an application with name `mlt_app_name` and has the name
-"mlt"."""
+    """
+    The MLT needs to know the full list of fragment producers in the
+    system so it can populate the TriggerDecisions it creates. This
+    function gets all the fragment producers in the system and adds their
+    GeoIDs to the MLT's config. It assumes that the ModuleLevelTrigger
+    lives in an application with name `mlt_app_name` and has the name
+    "mlt".
+    """
     mlt_links = []
     for producer in the_system.get_fragment_producers():
         geoid = producer.geoid
@@ -472,11 +541,11 @@ lives in an application with name `mlt_app_name` and has the name
     # whole thing
     if verbose:
         console.log(f"Adding {len(mlt_links)} links to mlt.links: {mlt_links}")
-    old_mlt = deepcopy(the_system.apps["trigger"].modulegraph.modules["mlt"])
-    the_system.apps[mlt_app_name].modulegraph.modules["mlt"] = Module(plugin=old_mlt.plugin,
-                                                                      conf=mlt.ConfParams(links=mlt_links,
-                                                                                          initial_token_count=old_mlt.conf.initial_token_count),
-                                                                      connections=old_mlt.connections)
+    old_mlt = deepcopy(the_system.apps[mlt_app_name].modulegraph.get_module("mlt"))
+    the_system.apps[mlt_app_name].modulegraph.reset_module("mlt", Module(plugin=old_mlt.plugin,
+                                                                         conf=mlt.ConfParams(links=mlt_links,
+                                                                                             initial_token_count=old_mlt.conf.initial_token_count),
+                                                                         connections=old_mlt.connections))
 
 
 def connect_fragment_producers(app_name, the_system, verbose=False):
@@ -495,28 +564,30 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
             console.log(f"Creating request endpoint {request_endpoint}")
         app.modulegraph.add_endpoint(request_endpoint, producer.requests_in, Direction.IN)
         the_system.app_connections[f"dataflow.{data_request_endpoint_name(producer)}"] = Sender(msg_type="dunedaq::dfmessages::DataRequest",
-                                                                               msg_module_name="DataRequestNQ",
-                                                                               receiver=f"{app_name}.{request_endpoint}")
+                                                                                                msg_module_name="DataRequestNQ",
+                                                                                                receiver=f"{app_name}.{request_endpoint}")
 
         frag_endpoint = f"fragments_{geoid_raw_str(producer.geoid)}"
         if verbose:
             console.log(f"Creating fragment endpoint {frag_endpoint}")
         app.modulegraph.add_endpoint(frag_endpoint, producer.fragments_out, Direction.OUT)
-
         the_system.app_connections[f"{app_name}.{frag_endpoint}"] = Sender(msg_type="std::unique_ptr<dunedaq::daqdataformats::Fragment>",
                                                                            msg_module_name="FragmentNQ",
                                                                            receiver=f"dataflow.fragments")
 
 def connect_all_fragment_producers(the_system, dataflow_name="dataflow", verbose=False):
-    """Connect all fragment producers in the system to the appropriate
-       queues in the dataflow app."""
+    """
+    Connect all fragment producers in the system to the appropriate
+    queues in the dataflow app.
+    """
     for name, app in the_system.apps.items():
         if name==dataflow_name:
             continue
         connect_fragment_producers(name, the_system, verbose)
-            
+
 def assign_network_endpoints(the_system, verbose=False):
-    """Given a set of applications and connections between them, come up
+    """
+    Given a set of applications and connections between them, come up
     with a list of suitable zeromq endpoints. Return value is a mapping
     from name of upstream end of connection to endpoint name.
 
@@ -529,8 +600,8 @@ def assign_network_endpoints(the_system, verbose=False):
     apps, but that's not possible since multiple applications may run
     on the same host, and we don't know the _actual_ host here, just,
     eg "{host_dataflow}", which is later interpreted by nanorc.
-
     """
+
     endpoints = {}
     #host_ports = defaultdict(int)
     port = 12345
@@ -549,7 +620,8 @@ def assign_network_endpoints(the_system, verbose=False):
 
 
 def resolve_endpoint(app, external_name, inout, verbose=False):
-    """Resolve an `external` endpoint name to the corresponding internal "module.sinksource"
+    """
+    Resolve an `external` endpoint name to the corresponding internal "module.sinksource"
     """
     if external_name in app.modulegraph.endpoints:
         e=app.modulegraph.endpoints[external_name]
@@ -570,14 +642,16 @@ def make_unique_name(base, dictionary):
 
     return f"{base}{suffix}"
 
-def add_network(app_name, the_system, verbose=False):
-    """Add the necessary QueueToNetwork and NetworkToQueue objects to the
-       application named `app_name`, based on the inter-application
-       connections specified in `the_system`. NB `the_system` is modified
-       in-place."""
+def add_network(app_name, the_system, partition_name, verbose=False):
+    """
+    Add the necessary QueueToNetwork and NetworkToQueue objects to the
+    application named `app_name`, based on the inter-application
+    connections specified in `the_system`. NB `the_system` is modified
+    in-place.
+    """
 
-    if the_system.network_endpoints is None:
-        the_system.network_endpoints=assign_network_endpoints(the_system)
+    # if the_system.network_endpoints is None:
+    #     the_system.network_endpoints=assign_network_endpoints(the_system)
 
     app = the_system.apps[app_name]
 
@@ -601,6 +675,7 @@ def add_network(app_name, the_system, verbose=False):
 
             if verbose:
                 console.log(f"Adding QueueToNetwork named {qton_name} connected to {from_endpoint} in app {app_name}")
+
             modules_with_network[qton_name] = Module(plugin="QueueToNetwork",
                                                      connections={}, # No outgoing connections
                                                      conf=qton.Conf(msg_type=conn.msg_type,
@@ -609,7 +684,7 @@ def add_network(app_name, the_system, verbose=False):
                                                                                            address=the_system.network_endpoints[conn_name],
                                                                                            topic="foo",
                                                                                            stype="msgpack")))
-            # Connect the module to the QueueToNetwork
+            # connect the module to the QueueToNetwork
             mod_connections = modules_with_network[from_endpoint_module].connections
             mod_connections[from_endpoint_sink] = Connection(f"{qton_name}.input")
 
@@ -638,9 +713,7 @@ def add_network(app_name, the_system, verbose=False):
                                                                  "output": Connection(to_endpoint)},
                                                              conf=ntoq.Conf(msg_type=conn.msg_type,
                                                                             msg_module_name=conn.msg_module_name,
-                                                                            receiver_config=nor.Conf(ipm_plugin_type="ZmqSubscriber",
-                                                                                                     address=the_system.network_endpoints[
-                                                                                                         conn_name],
+                                                                            receiver_config=nor.Conf(name=ntoq_name,
                                                                                                      subscriptions=["foo"])))
 
         if hasattr(conn, "receiver") and app_name == conn.receiver.split(".")[0]:
@@ -662,14 +735,11 @@ def add_network(app_name, the_system, verbose=False):
                                                          "output": Connection(to_endpoint)},
                                                      conf=ntoq.Conf(msg_type=conn.msg_type,
                                                                     msg_module_name=conn.msg_module_name,
-                                                                    receiver_config=nor.Conf(ipm_plugin_type="ZmqReceiver",
-                                                                                             address=the_system.network_endpoints[conn_name]))
-                                                     )
+                                                                    receiver_config=nor.Conf(name=ntoq_name)))
 
     if unconnected_endpoints:
         # TODO: Use proper logging
         console.log(f"Warning: the following endpoints of {app_name} were not connected to anything: {unconnected_endpoints}")
-
     app.modulegraph.modules = modules_with_network
 
 
@@ -827,41 +897,42 @@ def write_json_files(app_command_datas, system_command_datas, json_dir, verbose=
     console.log(f"System configuration generated in directory '{json_dir}'")
 
 
-def make_apps_json(the_system, nw_specs, json_dir, verbose=False):
-    """Make the json files for all of the applications"""
+## PL: COMMENT THIS OUT, IT CONFUSED ME AT THE BEGINNING
+# def make_apps_json(the_system, nw_specs, json_dir, verbose=False):
+#     """Make the json files for all of the applications"""
 
-    if verbose:
-        console.log(f"Input applications:")
-        console.log(the_system.apps)
+#     if verbose:
+#         console.log(f"Input applications:")
+#         console.log(the_system.apps)
 
-    # ==================================================================
-    # Application-level generation
+#     # ==================================================================
+#     # Application-level generation
 
-    app_command_datas = dict()
+#     app_command_datas = dict()
 
-    for app_name, app in the_system.apps.items():
-        console.rule(f"Application generation for {app_name}")
-        # Add the endpoints and connections that are needed for fragment producers
-        #
-        # NB: modifies app's modulegraph in-place
-        connect_fragment_producers(app_name, the_system, verbose)
-        # Add the NetworkToQueue/QueueToNetwork modules that are needed.
-        #
-        # NB: modifies app's modulegraph in-place
-        add_network(app_name, the_system, verbose)
+#     for app_name, app in the_system.apps.items():
+#         console.rule(f"Application generation for {app_name}")
+#         # Add the endpoints and connections that are needed for fragment producers
+#         #
+#         # NB: modifies app's modulegraph in-place
+#         connect_fragment_producers(app_name, the_system, verbose)
+#         # Add the NetworkToQueue/QueueToNetwork modules that are needed.
+#         #
+#         # NB: modifies app's modulegraph in-place
+#         add_network(app_name, the_system, verbose)
 
-        app_command_datas[app_name] = make_app_command_data(app, nw_specs, verbose)
-        if verbose:
-            console.log(app_command_datas[app_name])
+#         app_command_datas[app_name] = make_app_command_data(app, nw_specs, verbose)
+#         if verbose:
+#             console.log(app_command_datas[app_name])
 
-    # ==================================================================
-    # System-level generation
+#     # ==================================================================
+#     # System-level generation
 
-    console.rule("System generation")
+#     console.rule("System generation")
 
-    system_command_datas=make_system_command_datas(the_system, verbose)
+#     system_command_datas=make_system_command_datas(the_system, verbose)
 
-    # ==================================================================
-    # JSON file creation
+#     # ==================================================================
+#     # JSON file creation
 
-    write_json_files(app_command_datas, system_command_datas, json_dir, verbose)
+#     write_json_files(app_command_datas, system_command_datas, json_dir, verbose)
