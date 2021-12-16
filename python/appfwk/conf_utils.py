@@ -289,8 +289,7 @@ def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
         console.log(f"Adding {len(mlt_links)} links to mlt.links: {mlt_links}")
     old_mlt = deepcopy(the_system.apps[mlt_app_name].modulegraph.get_module("mlt"))
     the_system.apps[mlt_app_name].modulegraph.reset_module("mlt", DAQModule(plugin=old_mlt.plugin,
-                                                                            conf=mlt.ConfParams(links=mlt_links,
-                                                                                                initial_token_count=old_mlt.conf.initial_token_count),
+                                                                            conf=mlt.ConfParams(links=mlt_links),
                                                                             connections=old_mlt.connections))
 
 
@@ -595,7 +594,8 @@ def make_system_command_datas(the_system, verbose=False):
 
     if the_system.app_start_order is None:
         app_deps = make_app_deps(the_system, verbose)
-        the_system.app_start_order = list(nx.algorithms.dag.topological_sort(app_deps))
+        # the_system.app_start_order = list(nx.algorithms.dag.topological_sort(app_deps))
+        the_system.app_start_order = list(app_deps.nodes)
 
     system_command_datas=dict()
 
