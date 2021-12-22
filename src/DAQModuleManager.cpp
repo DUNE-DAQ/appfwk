@@ -7,6 +7,7 @@
  */
 
 #include "appfwk/DAQModuleManager.hpp"
+#include "networkmanager/NetworkManager.hpp"
 
 #include "cmdlib/cmd/Nljs.hpp"
 
@@ -38,6 +39,7 @@ DAQModuleManager::initialize(const dataobj_t& data)
   auto ini = data.get<app::Init>();
   init_queues(ini.queues);
   init_modules(ini.modules);
+  init_nwconnections(ini.nwconnections);
   this->m_initialized = true;
 }
 
@@ -84,6 +86,12 @@ DAQModuleManager::init_queues(const app::QueueSpecs& qspecs)
     TLOG_DEBUG(2) << "Adding queue: " << queue_name;
   }
   QueueRegistry::get().configure(queue_cfgs);
+}
+
+void
+DAQModuleManager::init_nwconnections(const networkmanager::nwmgr::Connections& nwspecs)
+{
+  networkmanager::NetworkManager::get().configure(nwspecs);
 }
 
 void
@@ -258,6 +266,7 @@ DAQModuleManager::gather_stats(opmonlib::InfoCollector& ci, int level)
 {
 
   QueueRegistry::get().gather_stats(ci, level);
+  networkmanager::NetworkManager::get().gather_stats(ci, level);
 
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
     opmonlib::InfoCollector tmp_ci;

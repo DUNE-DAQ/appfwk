@@ -40,6 +40,8 @@ folly::DSPSCQueue<int, true> queue(initial_size); ///< Queue instance for the te
 
 } // namespace ""
 
+BOOST_AUTO_TEST_SUITE(FollyQueueMetricTest)
+
 // This test case should run first. Make sure all other test cases depend on
 // this.
 
@@ -83,3 +85,5 @@ BOOST_AUTO_TEST_CASE(three_thread_test)
 
   BOOST_CHECK_GT(read_size, 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

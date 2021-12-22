@@ -9,6 +9,9 @@
 local moo = import "moo.jsonnet";
 local s = moo.oschema.schema("dunedaq.appfwk.app");
 local s_rccmd = import "rcif/cmd.jsonnet";
+local s_nwmgr = import "networkmanager/nwmgr.jsonnet";
+
+local nwmgr = moo.oschema.hier(s_nwmgr).dunedaq.networkmanager.nwmgr;
 local rccmd = moo.oschema.hier(s_rccmd).dunedaq.rcif.cmd;
 local cmd = moo.oschema.hier(s_rccmd).dunedaq.cmdlib.cmd;
 
@@ -35,6 +38,7 @@ local cs = {
         s.field("capacity", self.capacity,
                 doc="The queue capacity"),
     ], doc="Queue specification"),
+
     qspecs: s.sequence("QueueSpecs", self.qspec,
                        doc="A sequence of QueueSpec"),
 
@@ -46,6 +50,7 @@ local cs = {
         s.field("data", cmd.Data, optional=true,
                 doc="Specific to the module implementation"),
     ], doc="Module specification"),
+
     mspecs: s.sequence("ModSpecs", self.mspec,
                        doc="A sequence of ModSpec"),
 
@@ -74,9 +79,11 @@ local cs = {
                 doc="Initial Queue specifications"),
         s.field("modules", self.mspecs,
                 doc="Initial Module specifications"),
+        s.field("nwconnections", nwmgr.Connections, optional=true,
+                doc="Initial NW connections specifications"),
     ], doc="The app-level init command data object struction"),
 
 };
 
 // Output a topologically sorted array.
-s_rccmd + moo.oschema.sort_select(cs)
+s_nwmgr + s_rccmd + moo.oschema.sort_select(cs)
