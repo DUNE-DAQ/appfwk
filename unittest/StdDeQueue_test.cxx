@@ -33,7 +33,7 @@ constexpr double fractional_timeout_tolerance =
  * Don't set the timeout to zero, otherwise the tests will fail since they'd
  * expect the push/pop functions to execute instananeously
  */
-constexpr auto timeout = std::chrono::milliseconds(2);
+constexpr auto timeout = std::chrono::milliseconds(5);
 /**
  * @brief Timeout expressed in microseconds
  */
