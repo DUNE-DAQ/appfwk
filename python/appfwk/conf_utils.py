@@ -89,6 +89,8 @@ Publisher = namedtuple(
 
 Sender = namedtuple("Sender", ['msg_type', 'msg_module_name', 'receiver'])
 
+AppConnection = namedtuple("AppConnection", ['nwmgr_connection', 'receivers', 'msg_type', 'msg_module_name', 'use_nwqa'], defaults=[None, None, True])
+
 ########################################################################
 #
 # Functions
