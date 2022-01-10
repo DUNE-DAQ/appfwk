@@ -387,6 +387,89 @@ def make_unique_name(base, dictionary):
 
     return f"{base}{suffix}"
 
+def add_network2(app_name, the_system, verbose=False):
+    """Add the necessary QueueToNetwork and NetworkToQueue objects to the
+       application named `app_name`, based on the inter-application
+       connections specified in `the_system`. NB `the_system` is modified
+       in-place."""
+
+    # TODO: See how to do this with networkmanager
+    
+    # if the_system.network_endpoints is None:
+    #     the_system.network_endpoints=assign_network_endpoints(the_system)
+
+    app = the_system.apps[app_name]
+
+    modules_with_network = deepcopy(app.modulegraph.modules)
+
+    unconnected_endpoints = set(app.modulegraph.endpoints.keys())
+
+    if verbose:
+        console.log(f"Endpoints to connect are: {unconnected_endpoints}")
+
+    for conn_name, app_connection in the_system.app_connections.items():
+        console.log(f"conn_name {conn_name}, app_connection {app_connection}")                   
+        from_app, from_endpoint = conn_name.split(".", maxsplit=1)
+
+        if from_app == app_name:
+            unconnected_endpoints.remove(from_endpoint)
+            from_endpoint = resolve_endpoint(app, from_endpoint, Direction.OUT)
+            from_endpoint_module_name, from_endpoint_sink = from_endpoint.split(".")
+            # We're a publisher or sender. Make the queue to network
+            qton_name = conn_name.replace(".", "_")
+            qton_name = make_unique_name(qton_name, modules_with_network)
+
+            if verbose:
+                console.log(f"Adding QueueToNetwork named {qton_name} connected to {from_endpoint} in app {app_name}")
+            nwmgr_connection_name = app_connection.nwmgr_connection
+            nwmgr_connection = the_system.get_network_endpoint(nwmgr_connection_name)
+            topic = nwmgr_connection.topics[0] if nwmgr_connection.topics else ""
+            modules_with_network.append(Module(name=qton_name,
+                                               plugin="QueueToNetwork",
+                                               connections={}, # No outgoing connections
+                                               conf=qton.Conf(msg_type=app_connection.msg_type,
+                                                              msg_module_name=app_connection.msg_module_name,
+                                                              sender_config=nos.Conf(name=nwmgr_connection_name,
+                                                                                     topic=topic))))
+            # Connect the module to the QueueToNetwork
+            from_endpoint_module = None
+            for mod in modules_with_network:
+                if mod.name == from_endpoint_module_name:
+                    from_endpoint_module = mod
+                    break
+            mod_connections = from_endpoint_module.connections
+            mod_connections[from_endpoint_sink] = Connection(f"{qton_name}.input")
+
+        for receiver in app_connection.receivers: 
+            to_app, to_endpoint = receiver.split(".", maxsplit=1)
+            if to_app == app_name:
+                if to_endpoint in unconnected_endpoints:
+                    unconnected_endpoints.remove(to_endpoint)
+                to_endpoint = resolve_endpoint(app, to_endpoint, Direction.IN)
+
+                ntoq_name = receiver.replace(".", "_")
+                ntoq_name = make_unique_name(ntoq_name, modules_with_network)
+
+                if verbose:
+                    console.log(f"Adding NetworkToQueue named {ntoq_name} connected to {to_endpoint} in app {app_name}")
+
+                nwmgr_connection_name = app_connection.nwmgr_connection
+                nwmgr_connection = the_system.get_network_endpoint(nwmgr_connection_name)
+   
+                modules_with_network.append(Module(name=ntoq_name,
+                                                   plugin="NetworkToQueue",
+                                                   connections={"output": Connection(to_endpoint)},
+                                                   conf=ntoq.Conf(msg_type=app_connection.msg_type,
+                                                                  msg_module_name=app_connection.msg_module_name,
+                                                                  receiver_config=nor.Conf(name=nwmgr_connection_name,
+                                                                                           subscriptions=nwmgr_connection.topics))))
+
+    if unconnected_endpoints:
+        # TODO: Use proper logging
+        console.log(f"Warning: the following endpoints of {app_name} were not connected to anything: {unconnected_endpoints}")
+
+    app.modulegraph.modules = modules_with_network
+
 def add_network(app_name, the_system, partition_name, verbose=False):
     """
     Add the necessary QueueToNetwork and NetworkToQueue objects to the
