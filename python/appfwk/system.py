@@ -71,3 +71,16 @@ class System:
     def export(self, filename):
         self.digraph = self.make_digraph()
         nx.drawing.nx_pydot.write_dot(self.digraph, filename)
+
+    def get_network_endpoint(self, name):
+        for spec in self.network_endpoints:
+            if spec.name == name:
+                return spec
+        raise ValueError(f"No network endpoint named {name}")
+
+    def has_network_endpoint(self, name):
+        try:
+            self.get_network_endpoint(name)
+            return True
+        except ValueError:
+            return False
