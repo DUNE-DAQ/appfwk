@@ -18,7 +18,6 @@ moo.otypes.load_types('rcif/cmd.jsonnet')
 moo.otypes.load_types('appfwk/cmd.jsonnet')
 moo.otypes.load_types('appfwk/app.jsonnet')
 
-moo.otypes.load_types('networkmanager/nwmgr.jsonnet')
 moo.otypes.load_types('nwqueueadapters/networktoqueue.jsonnet')
 moo.otypes.load_types('nwqueueadapters/queuetonetwork.jsonnet')
 moo.otypes.load_types('trigger/moduleleveltrigger.jsonnet')
@@ -29,7 +28,6 @@ import dunedaq.nwqueueadapters.networkobjectsender as nos
 import dunedaq.nwqueueadapters.queuetonetwork as qton
 import dunedaq.nwqueueadapters.networkobjectreceiver as nor
 import dunedaq.nwqueueadapters.networktoqueue as ntoq
-import dunedaq.networkmanager.nwmgr as nwmgr
 import dunedaq.appfwk.app as appfwk  # AddressedCmd,
 import dunedaq.rcif.cmd as rccmd  # AddressedCmd,
 import dunedaq.trigger.moduleleveltrigger as mlt
