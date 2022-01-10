@@ -17,7 +17,8 @@ class System:
     The same is true for application start order.
     """
 
-    def __init__(self, apps=None, app_connections=None, network_endpoints=None, app_start_order=None):
+    def __init__(self, partition_name, apps=None, app_connections=None, network_endpoints=None, app_start_order=None):
+        self.partition_name = partition_name
         self.apps=apps if apps else dict()
         self.app_connections = app_connections if app_connections else dict()
         self.network_endpoints = network_endpoints
@@ -25,6 +26,7 @@ class System:
         self.digraph = None
 
     def __rich_repr__(self):
+        yield "partition_name", self.partition_name
         yield "apps", self.apps
         yield "app_connections", self.app_connections
         yield "network_endpoints", self.network_endpoints
