@@ -487,7 +487,7 @@ def make_unique_name(base, module_list):
 
     return f"{base}_{suffix}"
 
-def add_network2(app_name, the_system, verbose=False):
+def add_network(app_name, the_system, verbose=False):
     """Add the necessary QueueToNetwork and NetworkToQueue objects to the
        application named `app_name`, based on the inter-application
        connections specified in `the_system`. NB `the_system` is modified
@@ -575,108 +575,6 @@ def add_network2(app_name, the_system, verbose=False):
         console.log(f"Warning: the following endpoints of {app_name} were not connected to anything: {unconnected_endpoints}")
 
     app.modulegraph.modules = modules_with_network
-
-def add_network(app_name, the_system, partition_name, verbose=False):
-    """
-    Add the necessary QueueToNetwork and NetworkToQueue objects to the
-    application named `app_name`, based on the inter-application
-    connections specified in `the_system`. NB `the_system` is modified
-    in-place.
-    """
-
-    # if the_system.network_endpoints is None:
-    #     the_system.network_endpoints=assign_network_endpoints(the_system)
-
-    app = the_system.apps[app_name]
-
-    modules_with_network = deepcopy(app.modulegraph.modules)
-
-    unconnected_endpoints = set(app.modulegraph.endpoints.keys())
-
-    if verbose:
-        console.log(f"Endpoints to connect are: {unconnected_endpoints}")
-
-    for conn_name, conn in the_system.app_connections.items():
-        from_app, from_endpoint = conn_name.split(".", maxsplit=1)
-
-        if from_app == app_name:
-            unconnected_endpoints.remove(from_endpoint)
-            from_endpoint = resolve_endpoint(app, from_endpoint, Direction.OUT)
-            from_endpoint_module, from_endpoint_sink = from_endpoint.split(".")
-            # We're a publisher or sender. Make the queue to network
-            qton_name = conn_name.replace(".", "_")
-            qton_name = make_unique_name(qton_name, modules_with_network)
-
-            if verbose:
-                console.log(f"Adding QueueToNetwork named {qton_name} connected to {from_endpoint} in app {app_name}")
-
-            modules_with_network[qton_name] = DAQModule(plugin="QueueToNetwork",
-                                                        connections={}, # No outgoing connections
-                                                        conf=qton.Conf(msg_type=conn.msg_type,
-                                                                       msg_module_name=conn.msg_module_name,
-                                                                       sender_config=nos.Conf(ipm_plugin_type="ZmqPublisher" if type(conn) == Publisher else "ZmqSender",
-                                                                                              address=the_system.network_endpoints[conn_name],
-                                                                                              topic="foo",
-                                                                                              stype="msgpack")))
-            # connect the module to the QueueToNetwork
-            mod_connections = modules_with_network[from_endpoint_module].connections
-            mod_connections[from_endpoint_sink] = Connection(f"{qton_name}.input")
-
-        if hasattr(conn, "subscribers"):
-            for to_conn in conn.subscribers:
-                to_app, to_endpoint = to_conn.split(".", maxsplit=1)
-
-                if app_name == to_app:
-                    if verbose:
-                        console.log(f"App {app_name} endpoint {to_endpoint} is being connected")
-
-                    # For pub/sub connections, we might connect
-                    # multiple times to the same endpoint, so it might
-                    # already have been removed from the list
-                    if to_endpoint in unconnected_endpoints:
-                        unconnected_endpoints.remove(to_endpoint)
-                    to_endpoint = resolve_endpoint(app, to_endpoint, Direction.IN)
-                    ntoq_name = to_conn.replace(".", "_")
-                    ntoq_name = make_unique_name(ntoq_name, modules_with_network)
-
-                    if verbose:
-                        console.log(f"Adding NetworkToQueue named {ntoq_name} connected to {to_endpoint} in app {app_name}")
-
-                    modules_with_network[ntoq_name] = DAQModule(plugin="NetworkToQueue",
-                                                                connections={
-                                                                    "output": Connection(to_endpoint)},
-                                                                conf=ntoq.Conf(msg_type=conn.msg_type,
-                                                                               msg_module_name=conn.msg_module_name,
-                                                                               receiver_config=nor.Conf(name=ntoq_name,
-                                                                                                        subscriptions=["foo"])))
-
-        if hasattr(conn, "receiver") and app_name == conn.receiver.split(".")[0]:
-            # We're a receiver. Add a NetworkToQueue of receiver type
-            #
-            # TODO: DRY
-            to_app, to_endpoint = conn.receiver.split(".", maxsplit=1)
-            if to_endpoint in unconnected_endpoints:
-                unconnected_endpoints.remove(to_endpoint)
-            to_endpoint = resolve_endpoint(app, to_endpoint, Direction.IN)
-
-            ntoq_name = conn.receiver.replace(".", "_")
-            ntoq_name = make_unique_name(ntoq_name, modules_with_network)
-
-            if verbose:
-                console.log(f"Adding NetworkToQueue named {ntoq_name} connected to {to_endpoint} in app {app_name}")
-            modules_with_network[ntoq_name] = DAQModule(plugin="NetworkToQueue",
-                                                        connections={
-                                                            "output": Connection(to_endpoint)},
-                                                        conf=ntoq.Conf(msg_type=conn.msg_type,
-                                                                       msg_module_name=conn.msg_module_name,
-                                                                       receiver_config=nor.Conf(name=ntoq_name)))
-
-    if unconnected_endpoints:
-        # TODO: Use proper logging
-        console.log(f"Warning: the following endpoints of {app_name} were not connected to anything: {unconnected_endpoints}")
-    app.modulegraph.modules = modules_with_network
-
-
 
 def generate_boot(apps: list, partition_name="${USER}_test", ers_settings=None, info_svc_uri="file://info_${APP_ID}_${APP_PORT}.json",
                   disable_trace=False, use_kafka=False, verbose=False) -> dict:
