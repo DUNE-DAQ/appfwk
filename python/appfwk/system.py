@@ -76,7 +76,7 @@ class System:
         for spec in self.network_endpoints:
             if spec.name == name:
                 return spec
-        raise ValueError(f"No network endpoint named {name}")
+        raise ValueError(f"No network endpoint named {name}. Available endpoints are {[ e.name for e in self.network_endpoints]}")
 
     def has_network_endpoint(self, name):
         try:

@@ -1,5 +1,5 @@
 from .daqmodule import DAQModule
-from .conf_utils import Endpoint, Direction, GeoID, FragmentProducer
+from .conf_utils import Endpoint, Direction, GeoID, FragmentProducer, Connection
 import networkx as nx
 
 class ModuleGraph:
@@ -118,9 +118,9 @@ class ModuleGraph:
         return self.modules
 
     def add_module(self, name, **kwargs):
-        if get_module(name):
+        if self.get_module(name):
             raise RuntimeError(f"Module of name {name} already exists in this modulegraph")
-        mod=module(**kwargs)
+        mod=DAQModule(name=name, **kwargs)
         self.modules.append(mod)
         return mod
 

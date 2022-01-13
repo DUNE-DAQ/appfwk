@@ -22,6 +22,8 @@ moo.otypes.load_types('nwqueueadapters/networktoqueue.jsonnet')
 moo.otypes.load_types('nwqueueadapters/queuetonetwork.jsonnet')
 moo.otypes.load_types('trigger/moduleleveltrigger.jsonnet')
 moo.otypes.load_types('networkmanager/nwmgr.jsonnet')
+moo.otypes.load_types('dfmodules/fragmentreceiver.jsonnet')
+moo.otypes.load_types('dfmodules/requestreceiver.jsonnet')
 
 from appfwk.utils import acmd, mcmd, mspec
 import dunedaq.nwqueueadapters.networkobjectsender as nos
@@ -32,6 +34,8 @@ import dunedaq.appfwk.app as appfwk  # AddressedCmd,
 import dunedaq.rcif.cmd as rccmd  # AddressedCmd,
 import dunedaq.trigger.moduleleveltrigger as mlt
 import dunedaq.networkmanager.nwmgr as nwmgr
+import dunedaq.dfmodules.fragmentreceiver as frcv
+import dunedaq.dfmodules.requestreceiver as rrcv
 
 from appfwk.daqmodule import DAQModule
 
@@ -112,12 +116,12 @@ def make_module_deps(modules):
     for module in modules:
         deps.add_node(module.name)
 
-    print("\n\n\n\nmake_module_deps")
+    console.log("make_module_deps()")
     for module in modules:
-        print(f"\n{module.name}")
+        console.log(f"{module.name}")
         for upstream_name, downstream_connection in module.connections.items():
             print (upstream_name, downstream_connection)
-            if downstream_connection.toposort:
+            if downstream_connection.toposort and downstream_connection.to is not None:
                 other_mod = downstream_connection.to.split(".")[0]
                 deps.add_edge(module.name, other_mod)
 
@@ -137,16 +141,16 @@ def make_app_deps(the_system, verbose=False):
     for app in the_system.apps.keys():
         deps.add_node(app)
 
-    print("\n\n\n\nmake_apps_deps")
+    console.log("make_apps_deps()")
     for from_endpoint, conn in the_system.app_connections.items():
         from_app = from_endpoint.split(".")[0]
         if hasattr(conn, "subscribers"):
             for to_app in [ds.split(".")[0] for ds in conn.subscribers]:
-                print(from_app, to_app)
+                console.log(f"subscribers: {from_app}, {to_app}")
                 deps.add_edge(from_app, to_app)
         elif hasattr(conn, "receiver"):
             to_app = conn.receiver.split(".")[0]
-            print(from_app, to_app)
+            console.log(f"receiver: {from_app}, {to_app}")
             deps.add_edge(from_app, to_app)
 
     return deps
@@ -164,7 +168,9 @@ def make_app_command_data(system, app, verbose=False):
 
     """
 
-
+    if verbose:
+        console.log(f"Making app command data for {app.name}")
+        
     modules = app.modulegraph.modules
 
     module_deps = make_module_deps(modules)
@@ -172,7 +178,7 @@ def make_app_command_data(system, app, verbose=False):
         console.log(f"inter-module dependencies are: {module_deps}")
 
     start_order = list(nx.algorithms.dag.topological_sort(module_deps))
-    print(start_order)
+    # print(start_order)
     stop_order = start_order[::-1]
 
     if verbose:
@@ -195,6 +201,8 @@ def make_app_command_data(system, app, verbose=False):
             from_name = from_name.replace("!", "")
             from_endpoint = ".".join([name, from_name])
             to_endpoint=downstream_connection.to
+            if to_endpoint is None:
+                continue
             to_mod, to_name = to_endpoint.split(".")
             queue_inst = f"{from_endpoint}_to_{to_endpoint}".replace(".", "")
             # Is there already a queue connecting either endpoint? If so, we reuse it
@@ -217,6 +225,7 @@ def make_app_command_data(system, app, verbose=False):
             if not (found_from or found_to):
                 queue_inst = queue_inst if downstream_connection.queue_name is None else downstream_connection.queue_name
                 if verbose:
+                    console.log(f"downstream_connection is {downstream_connection}, its queue_name is {downstream_connection.queue_name}")
                     console.log(f"Creating {downstream_connection.queue_kind}({downstream_connection.queue_capacity}) queue with name {queue_inst} connecting {from_endpoint} to {to_endpoint}")
                 queue_specs.append(appfwk.QueueSpec(
                     inst=queue_inst, kind=downstream_connection.queue_kind, capacity=downstream_connection.queue_capacity))
@@ -232,11 +241,13 @@ def make_app_command_data(system, app, verbose=False):
                 app_qinfos[to_mod].append(appfwk.QueueInfo(
                     name=to_name, inst=queue_inst, dir="input"))
 
+    if verbose:
+        console.log(f"Creating mod_specs for {[ (mod.name, mod.plugin) for mod in modules ]}")
     mod_specs = [ mspec(mod.name, mod.plugin, app_qinfos[mod.name]) for mod in modules ]
 
     # Fill in the "standard" command entries in the command_data structure
 
-    command_data['init'] = appfwk.Init(queues=queue_specs, modules=mod_specs, nwconnections=None)
+    command_data['init'] = appfwk.Init(queues=queue_specs, modules=mod_specs, nwconnections=system.network_endpoints)
 
     # TODO: Conf ordering
     command_data['conf'] = acmd([
@@ -293,6 +304,41 @@ def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
                                                                             connections=old_mlt.connections))
 
 
+# def connect_fragment_producers(app_name, the_system, verbose=False):
+#     """Connect the data request and fragment sending queues from all of
+#        the fragment producers in the app with name `app_name` to the
+#        appropriate endpoints of the dataflow app."""
+#     if verbose:
+#         console.log(f"Connecting fragment producers in {app_name}")
+
+#     app = the_system.apps[app_name]
+#     producers = app.modulegraph.fragment_producers
+
+#     for producer in producers.values():
+#         request_endpoint = data_request_endpoint_name(producer)
+#         if verbose:
+#             console.log(f"Creating request endpoint {request_endpoint}")
+#         app.modulegraph.add_endpoint(request_endpoint, producer.requests_in, Direction.IN)
+#         the_system.app_connections[f"dataflow.{data_request_endpoint_name(producer)}"] = AppConnection(msg_type="dunedaq::dfmessages::DataRequest",
+#                                                                                                 msg_module_name="DataRequestNQ",
+#                                                                                                 receiver=f"{app_name}.{request_endpoint}")
+
+#         frag_endpoint = f"fragments_{geoid_raw_str(producer.geoid)}"
+#         if verbose:
+#             console.log(f"Creating fragment endpoint {frag_endpoint}")
+#         app.modulegraph.add_endpoint(frag_endpoint, producer.fragments_out, Direction.OUT)
+#         the_system.app_connections[f"{app_name}.{frag_endpoint}"] = AppConnection(msg_type="std::unique_ptr<dunedaq::daqdataformats::Fragment>",
+#                                                                            msg_module_name="FragmentNQ",
+#                                                                            receiver=f"dataflow.fragments")
+
+def get_unassigned_port(the_system):
+    max_port = 12345
+    for e in the_system.network_endpoints:
+        address = e.address
+        port = int(address.split(":")[-1])
+        max_port = max(max_port, port)
+    return max_port+1
+                   
 def connect_fragment_producers(app_name, the_system, verbose=False):
     """Connect the data request and fragment sending queues from all of
        the fragment producers in the app with name `app_name` to the
@@ -303,23 +349,76 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
     app = the_system.apps[app_name]
     producers = app.modulegraph.fragment_producers
 
+    # Nothing to do if there are no fragment producers. Return now so we don't create unneeded RequestReceiver and FragmentSender
+    if len(producers) == 0:
+        return
+    
+    # Create fragment sender. We can do this before looping over the
+    # producers because it doesn't need any settings from them
+    app.modulegraph.add_module("fragment_sender",
+                               plugin = "FragmentSender",
+                               conf = None)
+
+    # For each producer, we:
+    # 1. Add it to the GeoID -> queue name map that is used in RequestReceiver
+    # 2. Connect the relevant RequestReceiver output queue to the request input queue of the fragment producer
+    # 3. Connect the fragment output queue of the producer module to the FragmentSender
+
+    geoid_to_queue_inst = []
+    request_receiver_connections = {}
     for producer in producers.values():
-        request_endpoint = data_request_endpoint_name(producer)
-        if verbose:
-            console.log(f"Creating request endpoint {request_endpoint}")
-        app.modulegraph.add_endpoint(request_endpoint, producer.requests_in, Direction.IN)
-        the_system.app_connections[f"dataflow.{data_request_endpoint_name(producer)}"] = Sender(msg_type="dunedaq::dfmessages::DataRequest",
-                                                                                                msg_module_name="DataRequestNQ",
-                                                                                                receiver=f"{app_name}.{request_endpoint}")
+        geoid = producer.geoid
+        queue_inst = f"data_request_q_for_{geoid_raw_str(producer.geoid)}"
+        geoid_to_queue_inst.append(rrcv.geoidinst(region  = geoid.region,
+                                                  element = geoid.element,
+                                                  system  = geoid.system,
+                                                  queueinstance = queue_inst))
+        # It looks like RequestReceiver wants its endpoint names to
+        # start "data_request_" for the purposes of checking the queue
+        # type, but doesn't care what the queue instance name is (as
+        # long as it matches what's in the map above), so we just set
+        # the endpoint name and queue instance name to the same thing
+        request_receiver_connections[queue_inst] = Connection(producer.requests_in,
+                                                              queue_name = queue_inst)
+        producer_mod_name, producer_endpoint_name = producer.requests_in.split(".", maxsplit=1)
+        # Connect the fragment output queue to the fragment sender
+        app.modulegraph.add_connection(producer.fragments_out, "fragment_sender.input_queue")
+        
+    request_connection_name = f"{the_system.partition_name}.data_requests_for_{app_name}"
+    the_system.network_endpoints.append(nwmgr.Connection(name=request_connection_name, topics=[], address=f"tcp://{{host_{app_name}}}:{get_unassigned_port(the_system)}"))
+    fragment_connection_name = f"{the_system.partition_name}.fragments"
+    # Create request receiver
 
-        frag_endpoint = f"fragments_{geoid_raw_str(producer.geoid)}"
-        if verbose:
-            console.log(f"Creating fragment endpoint {frag_endpoint}")
-        app.modulegraph.add_endpoint(frag_endpoint, producer.fragments_out, Direction.OUT)
-        the_system.app_connections[f"{app_name}.{frag_endpoint}"] = Sender(msg_type="std::unique_ptr<dunedaq::daqdataformats::Fragment>",
-                                                                           msg_module_name="FragmentNQ",
-                                                                           receiver=f"dataflow.fragments")
+    if verbose:
+        console.log(f"Creating request_receiver for {app_name} with geoid_to_queue_inst: {geoid_to_queue_inst}, request_receiver_connections: {request_receiver_connections}")
+    app.modulegraph.add_module("request_receiver",
+                               plugin = "RequestReceiver",
+                               conf = rrcv.ConfParams(map = geoid_to_queue_inst,
+                                                      connection_name = request_connection_name),
+                               connections = request_receiver_connections)
+    
+    # Connect request receiver to TRB output in DF app
+    request_endpoint_name = f"dataflow.data_requests_for_{app_name}"
+    app.modulegraph.add_endpoint("data_requests_in",
+                                 internal_name = None, # Agh, request receiver uses nwmgr, so no internal endpoint to connect to
+                                 inout = Direction.IN)
+    the_system.app_connections[request_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
+                                                                      receivers = [f"{app_name}.data_requests_in"],
+                                                                      use_nwqa = False)
 
+    # Connect fragment sender output to TRB in DF app (via FragmentReceiver)
+    fragment_endpoint_name = "{app_name}.fragments"
+    df_mgraph = the_system.apps["dataflow"].modulegraph
+    if df_mgraph.get_module("fragment_receiver") is None:
+        df_mgraph.add_module("fragment_receiver",
+                             plugin = "FragmentReceiver",
+                             conf = frcv.ConfParams(connection_name=fragment_connection_name))
+        df_mgraph.add_endpoint("fragments", None,    Direction.IN)
+        df_mgraph.get_module("fragment_receiver").connections["data_fragments_q"] = Connection("trb.data_fragment_all")
+    the_system.app_connections[fragment_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
+                                                                       receivers = [f"dataflow.fragments"],
+                                                                       use_nwqa = False)
+    
 def connect_all_fragment_producers(the_system, dataflow_name="dataflow", verbose=False):
     """
     Connect all fragment producers in the system to the appropriate
@@ -379,13 +478,14 @@ def resolve_endpoint(app, external_name, inout, verbose=False):
     else:
         raise KeyError(f"Endpoint {external_name} not found")
 
-def make_unique_name(base, dictionary):
+def make_unique_name(base, module_list):
+    module_names = [ mod.name for mod in module_list ]
     suffix=0
-    while f"{base}{suffix}" in dictionary:
+    while f"{base}_{suffix}" in module_names:
         suffix+=1
-    assert f"{base}{suffix}" not in dictionary
+    assert f"{base}_{suffix}" not in module_names
 
-    return f"{base}{suffix}"
+    return f"{base}_{suffix}"
 
 def add_network2(app_name, the_system, verbose=False):
     """Add the necessary QueueToNetwork and NetworkToQueue objects to the
@@ -393,11 +493,11 @@ def add_network2(app_name, the_system, verbose=False):
        connections specified in `the_system`. NB `the_system` is modified
        in-place."""
 
-    # TODO: See how to do this with networkmanager
-    
     # if the_system.network_endpoints is None:
     #     the_system.network_endpoints=assign_network_endpoints(the_system)
 
+    if verbose:
+        console.log(f"---- add_network2 for {app_name} ----")
     app = the_system.apps[app_name]
 
     modules_with_network = deepcopy(app.modulegraph.modules)
@@ -408,7 +508,11 @@ def add_network2(app_name, the_system, verbose=False):
         console.log(f"Endpoints to connect are: {unconnected_endpoints}")
 
     for conn_name, app_connection in the_system.app_connections.items():
-        console.log(f"conn_name {conn_name}, app_connection {app_connection}")                   
+        console.log(f"conn_name {conn_name}, app_connection {app_connection}")
+        if not app_connection.use_nwqa:
+            if verbose:
+                console.log(f"Connection {conn_name} is NetworkManager type; skipping")
+            continue
         from_app, from_endpoint = conn_name.split(".", maxsplit=1)
 
         if from_app == app_name:
@@ -424,13 +528,13 @@ def add_network2(app_name, the_system, verbose=False):
             nwmgr_connection_name = app_connection.nwmgr_connection
             nwmgr_connection = the_system.get_network_endpoint(nwmgr_connection_name)
             topic = nwmgr_connection.topics[0] if nwmgr_connection.topics else ""
-            modules_with_network.append(Module(name=qton_name,
-                                               plugin="QueueToNetwork",
-                                               connections={}, # No outgoing connections
-                                               conf=qton.Conf(msg_type=app_connection.msg_type,
-                                                              msg_module_name=app_connection.msg_module_name,
-                                                              sender_config=nos.Conf(name=nwmgr_connection_name,
-                                                                                     topic=topic))))
+            modules_with_network.append(DAQModule(name=qton_name,
+                                                  plugin="QueueToNetwork",
+                                                  connections={}, # No outgoing connections
+                                                  conf=qton.Conf(msg_type=app_connection.msg_type,
+                                                                 msg_module_name=app_connection.msg_module_name,
+                                                                 sender_config=nos.Conf(name=nwmgr_connection_name,
+                                                                                        topic=topic))))
             # Connect the module to the QueueToNetwork
             from_endpoint_module = None
             for mod in modules_with_network:
@@ -440,6 +544,8 @@ def add_network2(app_name, the_system, verbose=False):
             mod_connections = from_endpoint_module.connections
             mod_connections[from_endpoint_sink] = Connection(f"{qton_name}.input")
 
+        if verbose:
+            console.log(f"app_connection.receivers is {app_connection.receivers}")
         for receiver in app_connection.receivers: 
             to_app, to_endpoint = receiver.split(".", maxsplit=1)
             if to_app == app_name:
@@ -456,13 +562,13 @@ def add_network2(app_name, the_system, verbose=False):
                 nwmgr_connection_name = app_connection.nwmgr_connection
                 nwmgr_connection = the_system.get_network_endpoint(nwmgr_connection_name)
    
-                modules_with_network.append(Module(name=ntoq_name,
-                                                   plugin="NetworkToQueue",
-                                                   connections={"output": Connection(to_endpoint)},
-                                                   conf=ntoq.Conf(msg_type=app_connection.msg_type,
-                                                                  msg_module_name=app_connection.msg_module_name,
-                                                                  receiver_config=nor.Conf(name=nwmgr_connection_name,
-                                                                                           subscriptions=nwmgr_connection.topics))))
+                modules_with_network.append(DAQModule(name=ntoq_name,
+                                                      plugin="NetworkToQueue",
+                                                      connections={"output": Connection(to_endpoint)},
+                                                      conf=ntoq.Conf(msg_type=app_connection.msg_type,
+                                                                     msg_module_name=app_connection.msg_module_name,
+                                                                     receiver_config=nor.Conf(name=nwmgr_connection_name,
+                                                                                              subscriptions=nwmgr_connection.topics))))
 
     if unconnected_endpoints:
         # TODO: Use proper logging
@@ -569,6 +675,7 @@ def add_network(app_name, the_system, partition_name, verbose=False):
         # TODO: Use proper logging
         console.log(f"Warning: the following endpoints of {app_name} were not connected to anything: {unconnected_endpoints}")
     app.modulegraph.modules = modules_with_network
+
 
 
 def generate_boot(apps: list, partition_name="${USER}_test", ers_settings=None, info_svc_uri="file://info_${APP_ID}_${APP_PORT}.json",
