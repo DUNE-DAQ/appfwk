@@ -24,6 +24,7 @@ moo.otypes.load_types('trigger/moduleleveltrigger.jsonnet')
 moo.otypes.load_types('networkmanager/nwmgr.jsonnet')
 moo.otypes.load_types('dfmodules/fragmentreceiver.jsonnet')
 moo.otypes.load_types('dfmodules/requestreceiver.jsonnet')
+moo.otypes.load_types('dfmodules/triggerrecordbuilder.jsonnet')
 
 from appfwk.utils import acmd, mcmd, mspec
 import dunedaq.nwqueueadapters.networkobjectsender as nos
@@ -36,6 +37,7 @@ import dunedaq.trigger.moduleleveltrigger as mlt
 import dunedaq.networkmanager.nwmgr as nwmgr
 import dunedaq.dfmodules.fragmentreceiver as frcv
 import dunedaq.dfmodules.requestreceiver as rrcv
+import dunedaq.dfmodules.triggerrecordbuilder as trb
 
 from appfwk.daqmodule import DAQModule
 
@@ -339,7 +341,10 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
     # 2. Connect the relevant RequestReceiver output queue to the request input queue of the fragment producer
     # 3. Connect the fragment output queue of the producer module to the FragmentSender
 
+    request_connection_name = f"{the_system.partition_name}.data_requests_for_{app_name}"
+    
     geoid_to_queue_inst = []
+    trb_geoid_to_connection = []
     request_receiver_connections = {}
     for producer in producers.values():
         geoid = producer.geoid
@@ -348,6 +353,10 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
                                                   element = geoid.element,
                                                   system  = geoid.system,
                                                   queueinstance = queue_inst))
+        trb_geoid_to_connection.append(trb.geoidinst(region  = geoid.region,
+                                                     element = geoid.element,
+                                                     system  = geoid.system,
+                                                     connection_name = request_connection_name))
         # It looks like RequestReceiver wants its endpoint names to
         # start "data_request_" for the purposes of checking the queue
         # type, but doesn't care what the queue instance name is (as
@@ -359,7 +368,7 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
         # Connect the fragment output queue to the fragment sender
         app.modulegraph.add_connection(producer.fragments_out, "fragment_sender.input_queue")
         
-    request_connection_name = f"{the_system.partition_name}.data_requests_for_{app_name}"
+
     the_system.network_endpoints.append(nwmgr.Connection(name=request_connection_name, topics=[], address=f"tcp://{{host_{app_name}}}:{get_unassigned_port(the_system)}"))
     fragment_connection_name = f"{the_system.partition_name}.fragments"
     # Create request receiver
@@ -393,7 +402,22 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
     the_system.app_connections[fragment_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
                                                                        receivers = [f"dataflow.fragments"],
                                                                        use_nwqa = False)
+
+    # Add the new geoid-to-connections map to the
+    # TriggerRecordBuilder. We have to do the same
+    # replace-the-whole-module trick we use in set_mlt_links (qv)
+    df_mgraph = the_system.apps["dataflow"].modulegraph
+    old_trb = deepcopy(df_mgraph.get_module("trb"))
+    old_trb_map = old_trb.conf.map
+    new_trb_map = old_trb_map + trb_geoid_to_connection
+    df_mgraph.reset_module("trb", DAQModule(name="trb",
+                                            plugin=old_trb.plugin,
+                                            conf=trb.ConfParams(general_queue_timeout=old_trb.conf.general_queue_timeout,
+                                                                reply_connection_name = fragment_connection_name,
+                                                                map=trb.mapgeoidconnections(new_trb_map)),
+                                            connections=old_trb.connections))
     
+
 def connect_all_fragment_producers(the_system, dataflow_name="dataflow", verbose=False):
     """
     Connect all fragment producers in the system to the appropriate
