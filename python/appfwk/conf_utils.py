@@ -306,33 +306,6 @@ def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
                                          connections=old_mlt.connections))
 
 
-# def connect_fragment_producers(app_name, the_system, verbose=False):
-#     """Connect the data request and fragment sending queues from all of
-#        the fragment producers in the app with name `app_name` to the
-#        appropriate endpoints of the dataflow app."""
-#     if verbose:
-#         console.log(f"Connecting fragment producers in {app_name}")
-
-#     app = the_system.apps[app_name]
-#     producers = app.modulegraph.fragment_producers
-
-#     for producer in producers.values():
-#         request_endpoint = data_request_endpoint_name(producer)
-#         if verbose:
-#             console.log(f"Creating request endpoint {request_endpoint}")
-#         app.modulegraph.add_endpoint(request_endpoint, producer.requests_in, Direction.IN)
-#         the_system.app_connections[f"dataflow.{data_request_endpoint_name(producer)}"] = AppConnection(msg_type="dunedaq::dfmessages::DataRequest",
-#                                                                                                 msg_module_name="DataRequestNQ",
-#                                                                                                 receiver=f"{app_name}.{request_endpoint}")
-
-#         frag_endpoint = f"fragments_{geoid_raw_str(producer.geoid)}"
-#         if verbose:
-#             console.log(f"Creating fragment endpoint {frag_endpoint}")
-#         app.modulegraph.add_endpoint(frag_endpoint, producer.fragments_out, Direction.OUT)
-#         the_system.app_connections[f"{app_name}.{frag_endpoint}"] = AppConnection(msg_type="std::unique_ptr<dunedaq::daqdataformats::Fragment>",
-#                                                                            msg_module_name="FragmentNQ",
-#                                                                            receiver=f"dataflow.fragments")
-
 def get_unassigned_port(the_system):
     max_port = 12345
     for e in the_system.network_endpoints:
