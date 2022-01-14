@@ -105,9 +105,9 @@ class ModuleGraph:
         return None
 
     def reset_module(self, name, new_module):
-        for mod in self.modules:
+        for i,mod in enumerate(self.modules):
             if mod.name == name:
-                mod = new_module
+                self.modules[i] = new_module
                 return
         raise RuntimeError(f'Module {name} not found!')
 

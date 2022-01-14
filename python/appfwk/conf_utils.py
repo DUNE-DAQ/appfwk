@@ -298,10 +298,12 @@ def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
     # whole thing
     if verbose:
         console.log(f"Adding {len(mlt_links)} links to mlt.links: {mlt_links}")
-    old_mlt = deepcopy(the_system.apps[mlt_app_name].modulegraph.get_module("mlt"))
-    the_system.apps[mlt_app_name].modulegraph.reset_module("mlt", DAQModule(plugin=old_mlt.plugin,
-                                                                            conf=mlt.ConfParams(links=mlt_links),
-                                                                            connections=old_mlt.connections))
+    mgraph = the_system.apps[mlt_app_name].modulegraph
+    old_mlt = deepcopy(mgraph.get_module("mlt"))
+    mgraph.reset_module("mlt", DAQModule(name="mlt",
+                                         plugin=old_mlt.plugin,
+                                         conf=mlt.ConfParams(links=mlt_links),
+                                         connections=old_mlt.connections))
 
 
 # def connect_fragment_producers(app_name, the_system, verbose=False):
