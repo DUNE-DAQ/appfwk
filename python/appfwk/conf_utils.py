@@ -292,21 +292,11 @@ def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
     for producer in the_system.get_fragment_producers():
         geoid = producer.geoid
         mlt_links.append( mlt.GeoID(system=geoid.system, region=geoid.region, element=geoid.element) )
-    # Now we add the full set of links to the MLT plugin conf. It
-    # would be nice to just modify the `links` attribute of the
-    # mlt.ConfParams object, but moo-derived objects work in a funny
-    # way (returning a copy of the attribute, not returning a
-    # reference to it), which means we have to copy and replace the
-    # whole thing
     if verbose:
         console.log(f"Adding {len(mlt_links)} links to mlt.links: {mlt_links}")
     mgraph = the_system.apps[mlt_app_name].modulegraph
-    old_mlt = deepcopy(mgraph.get_module("mlt"))
-    mgraph.reset_module("mlt", DAQModule(name="mlt",
-                                         plugin=old_mlt.plugin,
-                                         conf=mlt.ConfParams(links=mlt_links),
-                                         connections=old_mlt.connections))
-
+    old_mlt_conf = mgraph.get_module("mlt").conf
+    mgraph.reset_module_conf("mlt", mlt.ConfParams(links=mlt_links))
 
 def get_unassigned_port(the_system):
     max_port = 12345
@@ -404,19 +394,13 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
                                                                        use_nwqa = False)
 
     # Add the new geoid-to-connections map to the
-    # TriggerRecordBuilder. We have to do the same
-    # replace-the-whole-module trick we use in set_mlt_links (qv)
+    # TriggerRecordBuilder.
     df_mgraph = the_system.apps["dataflow"].modulegraph
-    old_trb = deepcopy(df_mgraph.get_module("trb"))
-    old_trb_map = old_trb.conf.map
-    new_trb_map = old_trb_map + trb_geoid_to_connection
-    df_mgraph.reset_module("trb", DAQModule(name="trb",
-                                            plugin=old_trb.plugin,
-                                            conf=trb.ConfParams(general_queue_timeout=old_trb.conf.general_queue_timeout,
-                                                                reply_connection_name = fragment_connection_name,
-                                                                map=trb.mapgeoidconnections(new_trb_map)),
-                                            connections=old_trb.connections))
-    
+    old_trb_conf = df_mgraph.get_module("trb").conf
+    new_trb_map = old_trb_conf.map + trb_geoid_to_connection
+    df_mgraph.reset_module_conf("trb", trb.ConfParams(general_queue_timeout=old_trb_conf.general_queue_timeout,
+                                                      reply_connection_name = fragment_connection_name,
+                                                      map=trb.mapgeoidconnections(new_trb_map)))
 
 def connect_all_fragment_producers(the_system, dataflow_name="dataflow", verbose=False):
     """

@@ -111,6 +111,24 @@ class ModuleGraph:
                 return
         raise RuntimeError(f'Module {name} not found!')
 
+    def reset_module_conf(self, name, new_conf):
+        """Replace the configuration object of the module `name` with the new object `conf`"""
+        # It would be nice to just modify the `conf` attribute of the
+        # DAQModule object directly, but moo-derived objects work in a funny
+        # way (returning a copy of the attribute, not returning a
+        # reference to it), which means we have to copy and replace the
+        # whole module
+                for i,mod in enumerate(self.modules):
+            if mod.name == name:
+                old_module = self.modules[i]
+                new_module = DAQModule(name=name,
+                                       plugin=old_module.plugin,
+                                       conf=new_conf,
+                                       connections=old_module.connections)
+                self.modules[i] = new_module
+                return
+        raise RuntimeError(f'Module {name} not found!')
+
     def module_names(self):
         return [n.name for n in self.modules]
 
