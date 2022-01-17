@@ -118,7 +118,7 @@ class ModuleGraph:
         # way (returning a copy of the attribute, not returning a
         # reference to it), which means we have to copy and replace the
         # whole module
-                for i,mod in enumerate(self.modules):
+        for i,mod in enumerate(self.modules):
             if mod.name == name:
                 old_module = self.modules[i]
                 new_module = DAQModule(name=name,
