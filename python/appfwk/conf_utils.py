@@ -95,7 +95,7 @@ Publisher = namedtuple(
 
 Sender = namedtuple("Sender", ['msg_type', 'msg_module_name', 'receiver'])
 
-AppConnection = namedtuple("AppConnection", ['nwmgr_connection', 'receivers', 'msg_type', 'msg_module_name', 'use_nwqa'], defaults=[None, None, True])
+AppConnection = namedtuple("AppConnection", ['nwmgr_connection', 'receivers', 'topics', 'msg_type', 'msg_module_name', 'use_nwqa'], defaults=[None, None, True])
 
 ########################################################################
 #
@@ -298,14 +298,6 @@ def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
     old_mlt_conf = mgraph.get_module("mlt").conf
     mgraph.reset_module_conf("mlt", mlt.ConfParams(links=mlt_links))
 
-def get_unassigned_port(the_system):
-    max_port = 12345
-    for e in the_system.network_endpoints:
-        address = e.address
-        port = int(address.split(":")[-1])
-        max_port = max(max_port, port)
-    return max_port+1
-                   
 def connect_fragment_producers(app_name, the_system, verbose=False):
     """Connect the data request and fragment sending queues from all of
        the fragment producers in the app with name `app_name` to the
@@ -359,8 +351,11 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
         app.modulegraph.add_connection(producer.fragments_out, "fragment_sender.input_queue")
         
 
-    the_system.network_endpoints.append(nwmgr.Connection(name=request_connection_name, topics=[], address=f"tcp://{{host_{app_name}}}:{get_unassigned_port(the_system)}"))
+    the_system.network_endpoints.append(nwmgr.Connection(name=request_connection_name, topics=[], address=f"tcp://{{host_{app_name}}}:{the_system.next_unassigned_port()}"))
     fragment_connection_name = f"{the_system.partition_name}.fragments"
+    if not the_system.has_network_endpoint(fragment_connection_name):
+        the_system.network_endpoints.append(nwmgr.Connection(name=fragment_connection_name, topics=[], address=f"tcp://{{host_dataflow}}:{the_system.next_unassigned_port()}"))
+
     # Create request receiver
 
     if verbose:
@@ -378,10 +373,12 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
                                  inout = Direction.IN)
     the_system.app_connections[request_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
                                                                       receivers = [f"{app_name}.data_requests_in"],
+                                                                      topics = [],
                                                                       use_nwqa = False)
 
     # Connect fragment sender output to TRB in DF app (via FragmentReceiver)
     fragment_endpoint_name = "{app_name}.fragments"
+        
     df_mgraph = the_system.apps["dataflow"].modulegraph
     if df_mgraph.get_module("fragment_receiver") is None:
         df_mgraph.add_module("fragment_receiver",
@@ -391,6 +388,7 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
         df_mgraph.get_module("fragment_receiver").connections["data_fragments_q"] = Connection("trb.data_fragment_all")
     the_system.app_connections[fragment_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
                                                                        receivers = [f"dataflow.fragments"],
+                                                                       topics = [],
                                                                        use_nwqa = False)
 
     # Add the new geoid-to-connections map to the
@@ -411,40 +409,6 @@ def connect_all_fragment_producers(the_system, dataflow_name="dataflow", verbose
         if name==dataflow_name:
             continue
         connect_fragment_producers(name, the_system, verbose)
-
-def assign_network_endpoints(the_system, verbose=False):
-    """
-    Given a set of applications and connections between them, come up
-    with a list of suitable zeromq endpoints. Return value is a mapping
-    from name of upstream end of connection to endpoint name.
-
-    Algorithm is to make an endpoint name like tcp://host:port, where
-    host is the hostname for the app at the upstream end of the
-    connection, port starts at some fixed value, and increases by 1
-    for each new endpoint.
-
-    You might think that we could reuse port numbers for different
-    apps, but that's not possible since multiple applications may run
-    on the same host, and we don't know the _actual_ host here, just,
-    eg "{host_dataflow}", which is later interpreted by nanorc.
-    """
-
-    endpoints = {}
-    #host_ports = defaultdict(int)
-    port = 12345
-    for conn in the_system.app_connections.keys():
-        app = conn.split(".")[0]
-        #host = the_system.apps[app].host
-        # if host == "localhost":
-        #     host = "127.0.0.1"
-        #port = first_port + host_ports[host]
-        #host_ports[host] += 1
-        endpoints[conn] = f"tcp://{{host_{app}}}:{port}"
-        if verbose:
-            console.log(f"Assigned endpoint {endpoints[conn]} for connection {conn}")
-        port+=1
-    return endpoints
-
 
 def resolve_endpoint(app, external_name, inout, verbose=False):
     """
@@ -492,6 +456,23 @@ def add_network(app_name, the_system, verbose=False):
 
     for conn_name, app_connection in the_system.app_connections.items():
         console.log(f"conn_name {conn_name}, app_connection {app_connection}")
+
+        # Create the nwmgr connection if it doesn't already exist
+        if not the_system.has_network_endpoint(app_connection.nwmgr_connection):
+            # IPM connections have the following confusing behaviour:
+            # whether the connection is pub/sub or direct connection
+            # is determined by whether the list of topics is empty;
+            # and the end that binds is upstream for pub/sub
+            # connections and downstream for direct connections
+            is_pubsub = app_connection.topics != []
+            bind_host = app_name if is_pubsub else app_connection.receivers[0].split(".")[0]
+            port = the_system.next_unassigned_port()
+            address = f"tcp://{{host_{bind_host}}}:{port}"
+            if verbose:
+                console.log(f"Assigning address {address} for connection {app_connection.nwmgr_connection}")
+            the_system.network_endpoints.append(nwmgr.Connection(name=app_connection.nwmgr_connection,
+                                                                 topics=app_connection.topics,
+                                                                 address=address))
         if not app_connection.use_nwqa:
             if verbose:
                 console.log(f"Connection {conn_name} is NetworkManager type; skipping")
