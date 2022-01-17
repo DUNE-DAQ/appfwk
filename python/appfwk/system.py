@@ -22,7 +22,7 @@ class System:
         self.partition_name = partition_name
         self.apps=apps if apps else dict()
         self.app_connections = app_connections if app_connections else dict()
-        self.network_endpoints = network_endpoints
+        self.network_endpoints = network_endpoints if network_endpoints else []
         self.app_start_order = app_start_order
         self._next_port = first_port
         self.digraph = None
