@@ -17,12 +17,14 @@ class System:
     The same is true for application start order.
     """
 
-    def __init__(self, partition_name, apps=None, app_connections=None, network_endpoints=None, app_start_order=None):
+    def __init__(self, partition_name, apps=None, app_connections=None, network_endpoints=None, app_start_order=None,
+                 first_port=12345):
         self.partition_name = partition_name
         self.apps=apps if apps else dict()
         self.app_connections = app_connections if app_connections else dict()
         self.network_endpoints = network_endpoints
         self.app_start_order = app_start_order
+        self._next_port = first_port
         self.digraph = None
 
     def __rich_repr__(self):
@@ -72,6 +74,10 @@ class System:
         self.digraph = self.make_digraph()
         nx.drawing.nx_pydot.write_dot(self.digraph, filename)
 
+    def next_unassigned_port(self):
+        self._next_port += 1
+        return self._next_port
+    
     def get_network_endpoint(self, name):
         for spec in self.network_endpoints:
             if spec.name == name:
