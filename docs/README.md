@@ -98,20 +98,20 @@ This of course raises the question: what _is_ `mydaqmodule::Conf`? It's a `struc
 
 Most DAQ modules are designed to loop over some sort of repeated action when the DAQ enters the running state, and it's in the `do_start` function that this repeated action begins. A very common technique for the `do_start` function is, "Set an atomic boolean stating that we're now in the running state, and then start one or more threads which perform actions in loops which they break out of if they see that the atomic boolean indicates we're no longer in the running state". 
 
-While it's of course possible to accomplish this using the existing concurrency facilities provided by the C++ Standard Library, the appfwk package itself provides a class, `ThreadHelper`, which makes this easier. `ThreadHelper` is covered in detail [here](https://dune-daq-sw.readthedocs.io/en/latest/packages/appfwk/ThreadHelper-Usage-Notes/); when in use the `do_start` function can be as simple as follows:
+While it's of course possible to accomplish this using the existing concurrency facilities provided by the C++ Standard Library, the `utilities` package provides a class, `WorkerThread`, which makes this easier. `WorkerThread` is covered in detail [here](https://dune-daq-sw.readthedocs.io/en/latest/packages/utilities/WorkerThread-Usage-Notes/); when in use the `do_start` function can be as simple as follows:
 ```
 void MyDaqModule::do_start(const data_t& /*args*/) {
-    m_thread.start_working_thread();  // m_thread is an `appfwk::ThreadHelper` member of MyDaqModule
+    m_thread.start_working_thread();  // m_thread is an `utilities::WorkerThread` member of MyDaqModule
 }
 ```
-Note that `start_working_thread` takes an optional argument which gives the `ThreadHelper` instance a name, potentially allowing shifters to keep track of various threads for debugging purposes. 
+Note that `start_working_thread` takes an optional argument which gives the `WorkerThread` instance a name, potentially allowing shifters to keep track of various threads for debugging purposes. 
 
 ### The `do_stop` function
 
 Quite simple, basically the reverse of `do_start`:
 ```
 void MyDaqModule::do_stop(const data_t& /*args*/) {
-    m_thread.stop_working_thread();  // m_thread is an `appfwk::ThreadHelper` member of MyDaqModule
+    m_thread.stop_working_thread();  // m_thread is an `utilities::WorkerThread` member of MyDaqModule
 }
 ```
 Note that if your `do_start` function also allocates any resources (hardware, memory, etc.) it should be deallocated here. Also, the queues which send data to your DAQ module should be drained. The idea is that you want your DAQ module to be able to accept a "start" transition after receiving a "stop" transition without anything from the previous run interfering.  
@@ -160,7 +160,7 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
      void do_scrap(const data_t& scrap_data);
      
      void do_work(std::atomic<bool>&);
-     dunedaq::appfwk::ThreadHelper m_thread; 
+     dunedaq::utilities::WorkerThread m_thread; 
      double m_calibration_scale_factor;
      std::unique_ptr<dunedaq::appfwk::DAQSource<MyType_t>> m_required_input_queue_ptr; 
 };
@@ -182,7 +182,7 @@ void MyDaqModule::do_conf(const data_t& conf_data)
 }
 
 void MyDaqModule::do_start(const data_t& /*args*/) {
-    m_thread.start_working_thread();  // m_thread is an `appfwk::ThreadHelper` member of MyDaqModule
+    m_thread.start_working_thread();  // m_thread is an `utilities::WorkerThread` member of MyDaqModule
 }
 
 void MyDaqModule::do_stop(const data_t& /*args*/) {
