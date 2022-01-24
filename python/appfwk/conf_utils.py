@@ -481,14 +481,21 @@ def add_network(app_name, the_system, verbose=False):
 
         if from_app == app_name:
             unconnected_endpoints.remove(from_endpoint)
-            from_endpoint = resolve_endpoint(app, from_endpoint, Direction.OUT)
-            from_endpoint_module_name, from_endpoint_sink = from_endpoint.split(".")
+            from_endpoint_internal = resolve_endpoint(app, from_endpoint, Direction.OUT)
+            if from_endpoint_internal is None:
+                # The module.endpoint for this external endpoint was
+                # specified as None, so we assume it was a direct
+                # nwmgr sender, and don't make a qton for it
+                if verbose:
+                    console.log(f"{conn_name} specifies its internal endpoint as None, so not creating a QtoN for it")
+                continue
+            from_endpoint_module_name, from_endpoint_sink = from_endpoint_internal.split(".")
             # We're a publisher or sender. Make the queue to network
             qton_name = conn_name.replace(".", "_")
             qton_name = make_unique_name(qton_name, modules_with_network)
 
             if verbose:
-                console.log(f"Adding QueueToNetwork named {qton_name} connected to {from_endpoint} in app {app_name}")
+                console.log(f"Adding QueueToNetwork named {qton_name} connected to {from_endpoint_internal} in app {app_name}")
             nwmgr_connection_name = app_connection.nwmgr_connection
             nwmgr_connection = the_system.get_network_endpoint(nwmgr_connection_name)
             topic = nwmgr_connection.topics[0] if nwmgr_connection.topics else ""

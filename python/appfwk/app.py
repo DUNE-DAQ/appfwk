@@ -61,6 +61,8 @@ class ModuleGraph:
 
         # now moving on to external links
         for endpoint in self.endpoints.values():
+            if endpoint.internal_name is None:
+                continue
             endpoint_internal_data = endpoint.internal_name.split(".")
             if len(endpoint_internal_data) != 2:
                 raise RuntimeError(f'Bad endpoint!: {endpoint} internal_endpoint must be specified as module.queue_name')
