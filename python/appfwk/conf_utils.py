@@ -352,10 +352,7 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
         
 
     the_system.network_endpoints.append(nwmgr.Connection(name=request_connection_name, topics=[], address=f"tcp://{{host_{app_name}}}:{the_system.next_unassigned_port()}"))
-    fragment_connection_name = f"{the_system.partition_name}.fragments"
-    if not the_system.has_network_endpoint(fragment_connection_name):
-        the_system.network_endpoints.append(nwmgr.Connection(name=fragment_connection_name, topics=[], address=f"tcp://{{host_dataflow}}:{the_system.next_unassigned_port()}"))
-
+    
     # Create request receiver
 
     if verbose:
@@ -376,29 +373,37 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
                                                                       topics = [],
                                                                       use_nwqa = False)
 
+    df_apps = [ (name,app) for (name,app) in the_system.apps.items() if name.startswith("dataflow") ]
     # Connect fragment sender output to TRB in DF app (via FragmentReceiver)
     fragment_endpoint_name = "{app_name}.fragments"
-        
-    df_mgraph = the_system.apps["dataflow"].modulegraph
-    if df_mgraph.get_module("fragment_receiver") is None:
-        df_mgraph.add_module("fragment_receiver",
-                             plugin = "FragmentReceiver",
-                             conf = frcv.ConfParams(connection_name=fragment_connection_name))
-        df_mgraph.add_endpoint("fragments", None,    Direction.IN)
-        df_mgraph.get_module("fragment_receiver").connections["data_fragments_q"] = Connection("trb.data_fragment_all")
+
+    for df_name, df_app in df_apps:
+
+        fragment_connection_name = f"{the_system.partition_name}.fragments_to_{df_name}"
+        if not the_system.has_network_endpoint(fragment_connection_name):
+            the_system.network_endpoints.append(nwmgr.Connection(name=fragment_connection_name, topics=[], address=f"tcp://{{host_{df_name}}}:{the_system.next_unassigned_port()}"))
+
+        df_mgraph = df_app.modulegraph
+        if df_mgraph.get_module("fragment_receiver") is None:
+            df_mgraph.add_module("fragment_receiver",
+                                 plugin = "FragmentReceiver",
+                                 conf = frcv.ConfParams(connection_name=fragment_connection_name))
+            df_mgraph.add_endpoint("fragments", None,    Direction.IN)
+            df_mgraph.get_module("fragment_receiver").connections["data_fragments_q"] = Connection("trb.data_fragment_all")
+
+        # Add the new geoid-to-connections map to the
+        # TriggerRecordBuilder.
+        old_trb_conf = df_mgraph.get_module("trb").conf
+        new_trb_map = old_trb_conf.map + trb_geoid_to_connection
+        df_mgraph.reset_module_conf("trb", trb.ConfParams(general_queue_timeout=old_trb_conf.general_queue_timeout,
+                                                          reply_connection_name = fragment_connection_name,
+                                                          map=trb.mapgeoidconnections(new_trb_map)))
+
     the_system.app_connections[fragment_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
-                                                                       receivers = [f"dataflow.fragments"],
+                                                                       receivers = [f"{item[0]}.fragments" for item in df_apps ],
                                                                        topics = [],
                                                                        use_nwqa = False)
 
-    # Add the new geoid-to-connections map to the
-    # TriggerRecordBuilder.
-    df_mgraph = the_system.apps["dataflow"].modulegraph
-    old_trb_conf = df_mgraph.get_module("trb").conf
-    new_trb_map = old_trb_conf.map + trb_geoid_to_connection
-    df_mgraph.reset_module_conf("trb", trb.ConfParams(general_queue_timeout=old_trb_conf.general_queue_timeout,
-                                                      reply_connection_name = fragment_connection_name,
-                                                      map=trb.mapgeoidconnections(new_trb_map)))
 
 def connect_all_fragment_producers(the_system, dataflow_name="dataflow", verbose=False):
     """
