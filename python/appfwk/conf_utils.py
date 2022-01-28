@@ -157,7 +157,18 @@ def make_app_deps(the_system, verbose=False):
 
     return deps
 
+def add_one_command_data(command_data, command, default_params, app, module_order):
+    """Add the command data for one command in one app to the command_data object. The modules to be sent the command are listed in `module_order`. If the module has an entry in its extra_commands dictionary for this command, then that entry is used as the parameters to pass to the command, otherwise the `default_params` object is passed"""
+    mod_and_params=[]
+    for module in module_order:
+        extra_commands = app.modulegraph.get_module(module).extra_commands
+        if command in extra_commands:
+            mod_and_params.append((module, extra_commands[command]))
+        else:
+            mod_and_params.append((module, default_params))
 
+    command_data[command] = acmd(mod_and_params)
+    
 def make_app_command_data(system, app, verbose=False):
     """Given an App instance, create the 'command data' suitable for
     feeding to nanorc. The needed queues are inferred from from
@@ -257,16 +268,13 @@ def make_app_command_data(system, app, verbose=False):
     ])
 
     startpars = rccmd.StartParams(run=1, disable_data_storage=False)
-
-    command_data['start'] = acmd([(name, startpars) for name in start_order])
-    command_data['stop'] = acmd([(name, None) for name in stop_order])
-    command_data['scrap'] = acmd([(name, None) for name in stop_order])
-
-    # Optional commands
-
-    # TODO: What does an empty "acmd" actually imply? Does the command get sent to everyone, or no-one?
-    command_data['pause'] = acmd([])
-    command_data['resume'] = acmd([])
+    resumepars = rccmd.ResumeParams()
+    
+    add_one_command_data(command_data, "start",   startpars,  app, start_order)
+    add_one_command_data(command_data, "stop",    None,       app, stop_order)
+    add_one_command_data(command_data, "scrap",   None,       app, stop_order)
+    add_one_command_data(command_data, "resume",  resumepars, app, start_order)
+    add_one_command_data(command_data, "pause",   None,       app, stop_order)
 
     # TODO: handle modules' `extra_commands`, including "record"
 
