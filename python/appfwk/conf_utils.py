@@ -190,9 +190,9 @@ def make_app_command_data(system, app, verbose=False):
     if verbose:
         console.log(f"inter-module dependencies are: {module_deps}")
 
-    start_order = list(nx.algorithms.dag.topological_sort(module_deps))
+    stop_order = list(nx.algorithms.dag.topological_sort(module_deps))
     # print(start_order)
-    stop_order = start_order[::-1]
+    start_order = stop_order[::-1]
 
     if verbose:
         console.log(f"Inferred module start order is {start_order}")
