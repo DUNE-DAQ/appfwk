@@ -591,6 +591,7 @@ def generate_boot(apps: list, partition_name="${USER}_test", ers_settings=None, 
             "comment": "Application profile using  PATH variables (lower start time)",
             "env":{
                 "CET_PLUGIN_PATH": "getenv",
+                "DETCHANNELMAPS_SHARE": "getenv",
                 "DUNEDAQ_SHARE_PATH": "getenv",
                 "TIMING_SHARE": "getenv",
                 "LD_LIBRARY_PATH": "getenv",
