@@ -397,7 +397,7 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
                                  plugin = "FragmentReceiver",
                                  conf = frcv.ConfParams(connection_name=fragment_connection_name))
             df_mgraph.add_endpoint("fragments", None,    Direction.IN)
-            df_mgraph.get_module("fragment_receiver").connections["data_fragments_q"] = Connection("trb.data_fragment_all")
+            df_mgraph.get_module("fragment_receiver").connections["output"] = Connection("trb.data_fragment_all")
 
         # Add the new geoid-to-connections map to the
         # TriggerRecordBuilder.
