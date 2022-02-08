@@ -1,5 +1,5 @@
 from .daqmodule import DAQModule
-from .conf_utils import Endpoint, Direction, GeoID, FragmentProducer
+from .conf_utils import Endpoint, Direction, GeoID, FragmentProducer, Connection
 import networkx as nx
 
 class ModuleGraph:
@@ -61,6 +61,8 @@ class ModuleGraph:
 
         # now moving on to external links
         for endpoint in self.endpoints.values():
+            if endpoint.internal_name is None:
+                continue
             endpoint_internal_data = endpoint.internal_name.split(".")
             if len(endpoint_internal_data) != 2:
                 raise RuntimeError(f'Bad endpoint!: {endpoint} internal_endpoint must be specified as module.queue_name')
@@ -105,9 +107,27 @@ class ModuleGraph:
         return None
 
     def reset_module(self, name, new_module):
-        for mod in self.modules:
+        for i,mod in enumerate(self.modules):
             if mod.name == name:
-                mod = new_module
+                self.modules[i] = new_module
+                return
+        raise RuntimeError(f'Module {name} not found!')
+
+    def reset_module_conf(self, name, new_conf):
+        """Replace the configuration object of the module `name` with the new object `conf`"""
+        # It would be nice to just modify the `conf` attribute of the
+        # DAQModule object directly, but moo-derived objects work in a funny
+        # way (returning a copy of the attribute, not returning a
+        # reference to it), which means we have to copy and replace the
+        # whole module
+        for i,mod in enumerate(self.modules):
+            if mod.name == name:
+                old_module = self.modules[i]
+                new_module = DAQModule(name=name,
+                                       plugin=old_module.plugin,
+                                       conf=new_conf,
+                                       connections=old_module.connections)
+                self.modules[i] = new_module
                 return
         raise RuntimeError(f'Module {name} not found!')
 
@@ -118,9 +138,9 @@ class ModuleGraph:
         return self.modules
 
     def add_module(self, name, **kwargs):
-        if get_module(name):
+        if self.get_module(name):
             raise RuntimeError(f"Module of name {name} already exists in this modulegraph")
-        mod=module(**kwargs)
+        mod=DAQModule(name=name, **kwargs)
         self.modules.append(mod)
         return mod
 

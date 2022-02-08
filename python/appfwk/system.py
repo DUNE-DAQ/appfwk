@@ -17,14 +17,18 @@ class System:
     The same is true for application start order.
     """
 
-    def __init__(self, apps=None, app_connections=None, network_endpoints=None, app_start_order=None):
+    def __init__(self, partition_name, apps=None, app_connections=None, network_endpoints=None, app_start_order=None,
+                 first_port=12345):
+        self.partition_name = partition_name
         self.apps=apps if apps else dict()
         self.app_connections = app_connections if app_connections else dict()
-        self.network_endpoints = network_endpoints
+        self.network_endpoints = network_endpoints if network_endpoints else []
         self.app_start_order = app_start_order
+        self._next_port = first_port
         self.digraph = None
 
     def __rich_repr__(self):
+        yield "partition_name", self.partition_name
         yield "apps", self.apps
         yield "app_connections", self.app_connections
         yield "network_endpoints", self.network_endpoints
@@ -69,3 +73,20 @@ class System:
     def export(self, filename):
         self.digraph = self.make_digraph()
         nx.drawing.nx_pydot.write_dot(self.digraph, filename)
+
+    def next_unassigned_port(self):
+        self._next_port += 1
+        return self._next_port
+    
+    def get_network_endpoint(self, name):
+        for spec in self.network_endpoints:
+            if spec.name == name:
+                return spec
+        raise ValueError(f"No network endpoint named {name}. Available endpoints are {[ e.name for e in self.network_endpoints]}")
+
+    def has_network_endpoint(self, name):
+        try:
+            self.get_network_endpoint(name)
+            return True
+        except ValueError:
+            return False
