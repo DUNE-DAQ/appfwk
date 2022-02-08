@@ -26,12 +26,11 @@ moo.otypes.load_types('dfmodules/fragmentreceiver.jsonnet')
 moo.otypes.load_types('dfmodules/requestreceiver.jsonnet')
 moo.otypes.load_types('dfmodules/triggerrecordbuilder.jsonnet')
 
-from appfwk.utils import acmd, mcmd, mspec
+from .utils import acmd, mcmd, mspec
 import dunedaq.nwqueueadapters.networkobjectsender as nos
 import dunedaq.nwqueueadapters.queuetonetwork as qton
 import dunedaq.nwqueueadapters.networkobjectreceiver as nor
 import dunedaq.nwqueueadapters.networktoqueue as ntoq
-import dunedaq.appfwk.app as appfwk  # AddressedCmd,
 import dunedaq.rcif.cmd as rccmd  # AddressedCmd,
 import dunedaq.trigger.moduleleveltrigger as mlt
 import dunedaq.networkmanager.nwmgr as nwmgr
@@ -39,7 +38,7 @@ import dunedaq.dfmodules.fragmentreceiver as frcv
 import dunedaq.dfmodules.requestreceiver as rrcv
 import dunedaq.dfmodules.triggerrecordbuilder as trb
 
-from appfwk.daqmodule import DAQModule
+from .daqmodule import DAQModule
 
 console = Console()
 
