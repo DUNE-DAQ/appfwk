@@ -34,9 +34,14 @@ struct DAQSinkDAQSourceTestFixture
 
   void setup()
   {
-    std::map<std::string, QueueConfig> queue_map = { { "dummy", { QueueConfig::queue_kind::kStdDeQueue, 100 } } };
+    app::QueueSpecs test_config;
+    app::QueueSpec qc;
+    qc.kind = app::QueueKind::StdDeQueue;
+    qc.capacity = 100;
+    qc.inst = "dummy";
+    test_config.push_back(qc);
 
-    QueueRegistry::get().configure(queue_map);
+    QueueRegistry::get().configure(test_config);
   }
 };
 

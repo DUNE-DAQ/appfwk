@@ -22,33 +22,38 @@ using namespace dunedaq::appfwk;
 
 BOOST_AUTO_TEST_CASE(Configure)
 {
-  std::map<std::string, QueueConfig> test_map;
-  QueueConfig qc;
-  qc.kind = QueueConfig::kUnknown;
+  app::QueueSpecs test_config;
+  app::QueueSpec qc;
+  qc.kind = app::QueueKind::Unknown;
   qc.capacity = 10;
-  test_map["test_queue_unknown"] = qc;
-  qc.kind = QueueConfig::kStdDeQueue;
+  qc.inst = "test_queue_unknown";
+  test_config.push_back(qc);
+  qc.kind = app::QueueKind::StdDeQueue;
   qc.capacity = 10;
-  test_map["test_queue_stddeque"] = qc;
-  qc.kind = QueueConfig::kFollySPSCQueue;
+  qc.inst = "test_queue_stddeque";
+  test_config.push_back(qc);
+  qc.kind = app::QueueKind::FollySPSCQueue;
   qc.capacity = 10;
-  test_map["test_queue_fspsc"] = qc;
-  qc.kind = QueueConfig::kFollyMPMCQueue;
+  qc.inst = "test_queue_fspsc";
+  test_config.push_back(qc);
+  qc.kind = app::QueueKind::FollyMPMCQueue;
   qc.capacity = 10;
-  test_map["test_queue_fmpmc"] = qc;
+  qc.inst = "test_queue_fmpmc";
+  test_config.push_back(qc);
 
-  QueueRegistry::get().configure(test_map);
+  QueueRegistry::get().configure(test_config);
 
-  BOOST_REQUIRE_EXCEPTION(
-    QueueRegistry::get().configure(test_map), QueueRegistryConfigured, [&](QueueRegistryConfigured) { return true; });
+  BOOST_REQUIRE_EXCEPTION(QueueRegistry::get().configure(test_config),
+                          QueueRegistryConfigured,
+                          [&](QueueRegistryConfigured) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(StoQK)
 {
-  BOOST_REQUIRE_EQUAL(QueueConfig::stoqk("StdDeQueue"), QueueConfig::kStdDeQueue);
-  BOOST_REQUIRE_EQUAL(QueueConfig::stoqk("FollySPSCQueue"), QueueConfig::kFollySPSCQueue);
-  BOOST_REQUIRE_EQUAL(QueueConfig::stoqk("FollyMPMCQueue"), QueueConfig::kFollyMPMCQueue);
-  BOOST_REQUIRE_EXCEPTION(QueueConfig::stoqk("blahblahblah"), QueueKindUnknown, [&](QueueKindUnknown) { return true; });
+  BOOST_REQUIRE(app::parse_QueueKind("StdDeQueue") == app::QueueKind::StdDeQueue);
+  BOOST_REQUIRE(app::parse_QueueKind("FollySPSCQueue") == app::QueueKind::FollySPSCQueue);
+  BOOST_REQUIRE(app::parse_QueueKind("FollyMPMCQueue") == app::QueueKind::FollyMPMCQueue);
+  BOOST_REQUIRE(app::parse_QueueKind("blahblahblah") == app::QueueKind::Unknown);
 }
 
 BOOST_AUTO_TEST_CASE(GatherStats)

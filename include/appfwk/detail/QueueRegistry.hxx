@@ -43,23 +43,23 @@ QueueRegistry::get_queue(const std::string& name)
 
 template<typename T>
 std::shared_ptr<QueueBase>
-QueueRegistry::create_queue(const std::string& name, const QueueConfig& config)
+QueueRegistry::create_queue(const std::string& name, const app::QueueSpec& config)
 {
 
   std::shared_ptr<QueueBase> queue;
   switch (config.kind) {
-    case QueueConfig::kStdDeQueue:
+    case app::QueueKind::StdDeQueue:
       queue = std::make_shared<StdDeQueue<T>>(name, config.capacity);
       break;
-    case QueueConfig::kFollySPSCQueue:
+    case app::QueueKind::FollySPSCQueue:
       queue = std::make_shared<FollySPSCQueue<T>>(name, config.capacity);
       break;
-    case QueueConfig::kFollyMPMCQueue:
+    case app::QueueKind::FollyMPMCQueue:
       queue = std::make_shared<FollyMPMCQueue<T>>(name, config.capacity);
       break;
 
     default:
-      throw QueueKindUnknown(ERS_HERE, std::to_string(config.kind));
+      throw QueueKindUnknown(ERS_HERE, app::str(config.kind));
   }
 
   return queue;

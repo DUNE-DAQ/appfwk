@@ -28,13 +28,15 @@ QueueRegistry::get()
 }
 
 void
-QueueRegistry::configure(const std::map<std::string, QueueConfig>& config_map)
+QueueRegistry::configure(const app::QueueSpecs& qspecs)
 {
   if (m_configured) {
     throw QueueRegistryConfigured(ERS_HERE);
   }
 
-  m_queue_config_map = config_map;
+  for (auto& qspec : qspecs) {
+    m_queue_config_map[qspec.inst] = qspec;
+  }
   m_configured = true;
 }
 
@@ -49,19 +51,6 @@ QueueRegistry::gather_stats(opmonlib::InfoCollector& ic, int level)
       ic.add(name, tmp_ci);
     }
   }
-}
-
-QueueConfig::queue_kind
-QueueConfig::stoqk(const std::string& name)
-{
-  if (name == "StdDeQueue" || name == "std_deque")
-    return queue_kind::kStdDeQueue;
-  else if (name == "FollySPSCQueue")
-    return queue_kind::kFollySPSCQueue;
-  else if (name == "FollyMPMCQueue")
-    return queue_kind::kFollyMPMCQueue;
-  else
-    throw QueueKindUnknown(ERS_HERE, name);
 }
 
 } // namespace dunedaq::appfwk

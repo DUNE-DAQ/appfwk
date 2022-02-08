@@ -13,6 +13,7 @@
 
 #include "appfwk/Queue.hpp"
 
+#include "appfwk/app/Nljs.hpp"
 #include "ers/Issue.hpp"
 #include "opmonlib/InfoCollector.hpp"
 
@@ -22,35 +23,6 @@
 
 namespace dunedaq {
 namespace appfwk {
-
-/**
- * @brief The QueueConfig class encapsulates the basic configuration common to
- * all Queue types
- */
-struct QueueConfig
-{
-  /**
-   * @brief Enumeration of all possible types of Queue
-   */
-  enum queue_kind
-  {
-    kUnknown = -1,
-    kStdDeQueue = 1, ///< The StdDeQueue
-    kFollySPSCQueue = 2,
-    kFollyMPMCQueue = 3,
-  };
-
-  /**
-   * @brief  Transform a string to a queue_kind
-   * @param name Name of the Queue Type
-   * @return Queue type corresponding to the name. Currently only std_deque.
-   */
-  static queue_kind stoqk(const std::string& name);
-
-  QueueConfig::queue_kind kind = queue_kind::kUnknown; ///< The kind of Queue represented by this
-                                                       ///< QueueConfig
-  size_t capacity = 0;                                 ///< The maximum size of the queue
-};
 
 /**
  * @brief The QueueRegistry class manages all Queue instances and gives out
@@ -81,15 +53,17 @@ public:
 
   /**
    * @brief Configure the QueueRegistry
-   * @param configmap Map relating Queue names to their configurations
+   * @param qspecs Queue Specifications
    */
-  void configure(const std::map<std::string, QueueConfig>& config_map);
+  void configure(const app::QueueSpecs& qspecs);
 
   // Gather statistics from queues
   void gather_stats(opmonlib::InfoCollector& ic, int level);
 
   // ONLY TO BE USED FOR TESTING!
   static void reset() { s_instance.reset(nullptr); }
+
+  bool has_queue(std::string const& name) const { return m_queue_registry.count(name); }
 
 private:
   struct QueueEntry
@@ -101,10 +75,10 @@ private:
   QueueRegistry() = default;
 
   template<typename T>
-  std::shared_ptr<QueueBase> create_queue(const std::string& name, const QueueConfig& config);
+  std::shared_ptr<QueueBase> create_queue(const std::string& name, const app::QueueSpec& config);
 
   std::map<std::string, QueueEntry> m_queue_registry;
-  std::map<std::string, QueueConfig> m_queue_config_map;
+  std::map<std::string, app::QueueSpec> m_queue_config_map;
 
   bool m_configured{ false };
 

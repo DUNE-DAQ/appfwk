@@ -57,35 +57,7 @@ DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
 void
 DAQModuleManager::init_queues(const app::QueueSpecs& qspecs)
 {
-  std::map<std::string, QueueConfig> queue_cfgs;
-  for (const auto& qs : qspecs) {
-
-    // N.B.: here we mimic the behavior of daq_application and
-    // ignore the kind.  This requires user configuration to
-    // assure unique queue names across all queue types.
-    const std::string queue_name = qs.inst;
-    // fixme: maybe one day replace QueueConfig with codgen.
-    // Until then, wheeee....
-    QueueConfig qc;
-    switch (qs.kind) {
-      case app::QueueKind::StdDeQueue:
-        qc.kind = QueueConfig::queue_kind::kStdDeQueue;
-        break;
-      case app::QueueKind::FollySPSCQueue:
-        qc.kind = QueueConfig::queue_kind::kFollySPSCQueue;
-        break;
-      case app::QueueKind::FollyMPMCQueue:
-        qc.kind = QueueConfig::queue_kind::kFollyMPMCQueue;
-        break;
-      default:
-        throw MissingComponent(ERS_HERE, "unknown queue type");
-        break;
-    }
-    qc.capacity = qs.capacity;
-    queue_cfgs[queue_name] = qc;
-    TLOG_DEBUG(2) << "Adding queue: " << queue_name;
-  }
-  QueueRegistry::get().configure(queue_cfgs);
+  QueueRegistry::get().configure(qspecs);
 }
 
 void
