@@ -20,10 +20,20 @@ on:
 
 jobs:
   Build_against_dev_release:
+    name: build_against_dev_on_${{ matrix.os_name }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image: "dunedaq/sl7-minimal:dev"
+            os_name: "c7"
+            link: "last_successful"
+          - image: "dunedaq/c8-minimal:dev"
+            os_name: "c8"
+            link: "last_successful_cs8"
     container:
-      image: dunedaq/sl7-minimal:dev
+      image: ${{ matrix.image }}
     defaults:
       run:
         shell: bash
@@ -43,7 +53,7 @@ jobs:
     - name: setup dev area
       run: |
           source /cvmfs/dunedaq.opensciencegrid.org/tools/dbt/latest/env.sh
-          dbt-create.sh -c -n last_successful dev
+          dbt-create.sh -c -n ${{ matrix.link }} dev-${{ matrix.os_name }}
           
     - name: checkout package for CI
       uses: actions/checkout@v2
@@ -53,30 +63,30 @@ jobs:
     - name: setup build env, build and lint the repo against the development release
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-          source /cvmfs/dunedaq.opensciencegrid.org/tools/dbt/latest/env.sh
-          cd $GITHUB_WORKSPACE/dev
+          cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
+          source dbt-env.sh
           dbt-workarea-env || true
           setup_repo_env="SETUP_$REPO"
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
-          cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev/sourcecode
+          cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
           dbt-build.py
           dbt-build.py --lint
-          $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev -o /tarballs
+          $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev-${{ matrix.os_name }} -c ${{ matrix.os_name }} -o /tarballs-${{ matrix.os_name }}
           
     - name: upload UPS tarball and log file
       uses: actions/upload-artifact@v2
       with:
-        name: ups_package
-        path: /tarballs
+        name: ups_package_${{ matrix.os_name }}
+        path: /tarballs-${{ matrix.os_name }}
 
     - name: upload build log file
       uses: actions/upload-artifact@v2
       with:
-        name: build_log
-        path: ${{ github.workspace }}/dev/log/build*.log
+        name: build_log_${{ matrix.os_name }}
+        path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/build*.log
 
     - name: upload linter output file
       uses: actions/upload-artifact@v2
       with:
-        name: linting_log
-        path: ${{ github.workspace }}/dev/log/linting*.log
+        name: linting_log_${{ matrix.os_name }}
+        path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/linting*.log

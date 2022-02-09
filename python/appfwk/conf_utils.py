@@ -118,11 +118,10 @@ def make_module_deps(modules):
     for module in modules:
         deps.add_node(module.name)
 
-    console.log("make_module_deps()")
+    # console.log("make_module_deps()")
     for module in modules:
-        console.log(f"{module.name}")
+        # console.log(f"{module.name}")
         for upstream_name, downstream_connection in module.connections.items():
-            print (upstream_name, downstream_connection)
             if downstream_connection.toposort and downstream_connection.to is not None:
                 other_mod = downstream_connection.to.split(".")[0]
                 deps.add_edge(module.name, other_mod)
@@ -143,16 +142,16 @@ def make_app_deps(the_system, verbose=False):
     for app in the_system.apps.keys():
         deps.add_node(app)
 
-    console.log("make_apps_deps()")
+    if verbose: console.log("make_apps_deps()")
     for from_endpoint, conn in the_system.app_connections.items():
         from_app = from_endpoint.split(".")[0]
         if hasattr(conn, "subscribers"):
             for to_app in [ds.split(".")[0] for ds in conn.subscribers]:
-                console.log(f"subscribers: {from_app}, {to_app}")
+                if verbose: console.log(f"subscribers: {from_app}, {to_app}")
                 deps.add_edge(from_app, to_app)
         elif hasattr(conn, "receiver"):
             to_app = conn.receiver.split(".")[0]
-            console.log(f"receiver: {from_app}, {to_app}")
+            if verbose: console.log(f"receiver: {from_app}, {to_app}")
             deps.add_edge(from_app, to_app)
 
     return deps
@@ -191,7 +190,6 @@ def make_app_command_data(system, app, verbose=False):
         console.log(f"inter-module dependencies are: {module_deps}")
 
     stop_order = list(nx.algorithms.dag.topological_sort(module_deps))
-    # print(start_order)
     start_order = stop_order[::-1]
 
     if verbose:
@@ -470,7 +468,7 @@ def add_network(app_name, the_system, verbose=False):
         console.log(f"Endpoints to connect are: {unconnected_endpoints}")
 
     for conn_name, app_connection in the_system.app_connections.items():
-        console.log(f"conn_name {conn_name}, app_connection {app_connection}")
+        if verbose:console.log(f"conn_name {conn_name}, app_connection {app_connection}")
 
         # Create the nwmgr connection if it doesn't already exist
         if not the_system.has_network_endpoint(app_connection.nwmgr_connection):
@@ -593,6 +591,7 @@ def generate_boot(apps: list, partition_name="${USER}_test", ers_settings=None, 
             "comment": "Application profile using  PATH variables (lower start time)",
             "env":{
                 "CET_PLUGIN_PATH": "getenv",
+                "DETCHANNELMAPS_SHARE": "getenv",
                 "DUNEDAQ_SHARE_PATH": "getenv",
                 "TIMING_SHARE": "getenv",
                 "LD_LIBRARY_PATH": "getenv",
@@ -715,44 +714,3 @@ def write_json_files(app_command_datas, system_command_datas, json_dir, verbose=
             json.dump(cfg, f, indent=4, sort_keys=True)
 
     console.log(f"System configuration generated in directory '{json_dir}'")
-
-
-## PL: COMMENT THIS OUT, IT CONFUSED ME AT THE BEGINNING
-# def make_apps_json(the_system, nw_specs, json_dir, verbose=False):
-#     """Make the json files for all of the applications"""
-
-#     if verbose:
-#         console.log(f"Input applications:")
-#         console.log(the_system.apps)
-
-#     # ==================================================================
-#     # Application-level generation
-
-#     app_command_datas = dict()
-
-#     for app_name, app in the_system.apps.items():
-#         console.rule(f"Application generation for {app_name}")
-#         # Add the endpoints and connections that are needed for fragment producers
-#         #
-#         # NB: modifies app's modulegraph in-place
-#         connect_fragment_producers(app_name, the_system, verbose)
-#         # Add the NetworkToQueue/QueueToNetwork modules that are needed.
-#         #
-#         # NB: modifies app's modulegraph in-place
-#         add_network(app_name, the_system, verbose)
-
-#         app_command_datas[app_name] = make_app_command_data(app, nw_specs, verbose)
-#         if verbose:
-#             console.log(app_command_datas[app_name])
-
-#     # ==================================================================
-#     # System-level generation
-
-#     console.rule("System generation")
-
-#     system_command_datas=make_system_command_datas(the_system, verbose)
-
-#     # ==================================================================
-#     # JSON file creation
-
-#     write_json_files(app_command_datas, system_command_datas, json_dir, verbose)

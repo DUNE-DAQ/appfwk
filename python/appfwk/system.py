@@ -1,4 +1,4 @@
-from .conf_utils import console, Direction
+from .conf_utils import Direction
 import networkx as nx
 
 class System:
@@ -39,7 +39,6 @@ class System:
         all_producers = []
         all_geoids = set()
         for app in self.apps.values():
-            console.log(app)
             producers = app.modulegraph.fragment_producers
             for producer in producers.values():
                 if producer.geoid in all_geoids:
@@ -57,14 +56,11 @@ class System:
         for from_app_n, from_app in self.apps.items():
             for from_ep in from_app.modulegraph.endpoints.values():
                 if from_ep.direction == Direction.OUT:
-                    print("OUT", from_app_n, from_ep.external_name)
                     for to_app_n, to_app in self.apps.items():
                         for to_ep in to_app.modulegraph.endpoints.values():
                             if to_ep.direction == Direction.IN:
                                 if from_ep.external_name == to_ep.external_name:
                                     deps.add_edge(from_app_n, to_app_n, label=to_ep.external_name)
-                elif from_ep.direction == Direction.IN:
-                    print("IN", from_app_n, from_ep.external_name)
 
 
         return deps
