@@ -403,6 +403,7 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
         new_trb_map = old_trb_conf.map + trb_geoid_to_connection
         df_mgraph.reset_module_conf("trb", trb.ConfParams(general_queue_timeout=old_trb_conf.general_queue_timeout,
                                                           reply_connection_name = fragment_connection_name,
+                                                          mon_connection_name=old_trb_conf.mon_connection_name,
                                                           map=trb.mapgeoidconnections(new_trb_map)))
 
     the_system.app_connections[fragment_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
