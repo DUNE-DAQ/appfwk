@@ -212,6 +212,8 @@ def make_app_command_data(system, app, verbose=False):
             from_name = from_name.replace("!", "")
             from_endpoint = ".".join([name, from_name])
             to_endpoint=downstream_connection.to
+            if verbose:
+                console.log(f"Making connection from {from_endpoint} to {to_endpoint}")
             if to_endpoint is None:
                 continue
             to_mod, to_name = to_endpoint.split(".")
@@ -374,7 +376,7 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
     # Connect request receiver to TRB output in DF app
     request_endpoint_name = f"dataflow.data_requests_for_{app_name}"
     app.modulegraph.add_endpoint("data_requests_in",
-                                 internal_name = None, # Agh, request receiver uses nwmgr, so no internal endpoint to connect to
+                                 internal_name = None, # Request receiver uses nwmgr, so no internal endpoint to connect to
                                  inout = Direction.IN)
     the_system.app_connections[request_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
                                                                       receivers = [f"{app_name}.data_requests_in"],
@@ -457,7 +459,7 @@ def add_network(app_name, the_system, verbose=False):
     #     the_system.network_endpoints=assign_network_endpoints(the_system)
 
     if verbose:
-        console.log(f"---- add_network2 for {app_name} ----")
+        console.log(f"---- add_network for {app_name} ----")
     app = the_system.apps[app_name]
 
     modules_with_network = deepcopy(app.modulegraph.modules)
@@ -486,14 +488,11 @@ def add_network(app_name, the_system, verbose=False):
             the_system.network_endpoints.append(nwmgr.Connection(name=app_connection.nwmgr_connection,
                                                                  topics=app_connection.topics,
                                                                  address=address))
-        if not app_connection.use_nwqa:
-            if verbose:
-                console.log(f"Connection {conn_name} is NetworkManager type; skipping")
-            continue
         from_app, from_endpoint = conn_name.split(".", maxsplit=1)
 
         if from_app == app_name:
-            unconnected_endpoints.remove(from_endpoint)
+            if from_endpoint in unconnected_endpoints:
+                unconnected_endpoints.remove(from_endpoint)
             from_endpoint_internal = resolve_endpoint(app, from_endpoint, Direction.OUT)
             if from_endpoint_internal is None:
                 # The module.endpoint for this external endpoint was
@@ -535,20 +534,27 @@ def add_network(app_name, the_system, verbose=False):
             if to_app == app_name:
                 if to_endpoint in unconnected_endpoints:
                     unconnected_endpoints.remove(to_endpoint)
-                to_endpoint = resolve_endpoint(app, to_endpoint, Direction.IN)
+                to_endpoint_internal = resolve_endpoint(app, to_endpoint, Direction.IN)
+                if to_endpoint_internal is None:
+                    # The module.endpoint for this external endpoint was
+                    # specified as None, so we assume it was a direct
+                    # nwmgr sender, and don't make a ntoq for it
+                    if verbose:
+                        console.log(f"{to_endpoint} specifies its internal endpoint as None, so not creating a NtoQ for it")
+                    continue
 
                 ntoq_name = receiver.replace(".", "_")
                 ntoq_name = make_unique_name(ntoq_name, modules_with_network)
 
                 if verbose:
-                    console.log(f"Adding NetworkToQueue named {ntoq_name} connected to {to_endpoint} in app {app_name}")
+                    console.log(f"Adding NetworkToQueue named {ntoq_name} connected to {to_endpoint_internal} in app {app_name}")
 
                 nwmgr_connection_name = app_connection.nwmgr_connection
                 nwmgr_connection = the_system.get_network_endpoint(nwmgr_connection_name)
    
                 modules_with_network.append(DAQModule(name=ntoq_name,
                                                       plugin="NetworkToQueue",
-                                                      connections={"output": Connection(to_endpoint)},
+                                                      connections={"output": Connection(to_endpoint_internal)},
                                                       conf=ntoq.Conf(msg_type=app_connection.msg_type,
                                                                      msg_module_name=app_connection.msg_module_name,
                                                                      receiver_config=nor.Conf(name=nwmgr_connection_name,
@@ -658,6 +664,8 @@ cmd_set = ["init", "conf", "start", "stop", "pause", "resume", "scrap"]
 
 def make_app_json(app_name, app_command_data, data_dir, verbose=False):
     """Make the json files for a single application"""
+    if verbose:
+        console.log(f"make_app_json for app {app_name}")
     for c in cmd_set:
         with open(f'{join(data_dir, app_name)}_{c}.json', 'w') as f:
             json.dump(app_command_data[c].pod(), f, indent=4, sort_keys=True)
