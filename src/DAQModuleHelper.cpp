@@ -35,4 +35,10 @@ queue_infos(const nlohmann::json& iniobj)
 {
   return iniobj.get<app::ModInit>().qinfos;
 }
+
+std::string
+queue_inst(const nlohmann::json& iniobj, const std::string& name)
+{
+  return queue_index(iniobj, { name })[name].inst;
+}
 } // namespace dunedaq::appfwk
