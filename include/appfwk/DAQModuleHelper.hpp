@@ -32,10 +32,7 @@ app::QueueInfos
 queue_infos(const nlohmann::json& iniobj);
 
 std::string
-queue_inst(const nlohmann::json& iniobj, const std::string& name)
-{
-  return queue_index(iniobj, { name })[name].inst;
-}
+queue_inst(const nlohmann::json& iniobj, const std::string& name);
 
 } // namespace appfwk
 
