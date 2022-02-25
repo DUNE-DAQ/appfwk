@@ -118,11 +118,10 @@ def make_module_deps(modules):
     for module in modules:
         deps.add_node(module.name)
 
-    console.log("make_module_deps()")
+    # console.log("make_module_deps()")
     for module in modules:
-        console.log(f"{module.name}")
+        # console.log(f"{module.name}")
         for upstream_name, downstream_connection in module.connections.items():
-            print (upstream_name, downstream_connection)
             if downstream_connection.toposort and downstream_connection.to is not None:
                 other_mod = downstream_connection.to.split(".")[0]
                 deps.add_edge(module.name, other_mod)
@@ -143,16 +142,16 @@ def make_app_deps(the_system, verbose=False):
     for app in the_system.apps.keys():
         deps.add_node(app)
 
-    console.log("make_apps_deps()")
+    if verbose: console.log("make_apps_deps()")
     for from_endpoint, conn in the_system.app_connections.items():
         from_app = from_endpoint.split(".")[0]
         if hasattr(conn, "subscribers"):
             for to_app in [ds.split(".")[0] for ds in conn.subscribers]:
-                console.log(f"subscribers: {from_app}, {to_app}")
+                if verbose: console.log(f"subscribers: {from_app}, {to_app}")
                 deps.add_edge(from_app, to_app)
         elif hasattr(conn, "receiver"):
             to_app = conn.receiver.split(".")[0]
-            console.log(f"receiver: {from_app}, {to_app}")
+            if verbose: console.log(f"receiver: {from_app}, {to_app}")
             deps.add_edge(from_app, to_app)
 
     return deps
@@ -191,7 +190,6 @@ def make_app_command_data(system, app, verbose=False):
         console.log(f"inter-module dependencies are: {module_deps}")
 
     stop_order = list(nx.algorithms.dag.topological_sort(module_deps))
-    # print(start_order)
     start_order = stop_order[::-1]
 
     if verbose:
@@ -214,6 +212,8 @@ def make_app_command_data(system, app, verbose=False):
             from_name = from_name.replace("!", "")
             from_endpoint = ".".join([name, from_name])
             to_endpoint=downstream_connection.to
+            if verbose:
+                console.log(f"Making connection from {from_endpoint} to {to_endpoint}")
             if to_endpoint is None:
                 continue
             to_mod, to_name = to_endpoint.split(".")
@@ -304,7 +304,9 @@ def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
         console.log(f"Adding {len(mlt_links)} links to mlt.links: {mlt_links}")
     mgraph = the_system.apps[mlt_app_name].modulegraph
     old_mlt_conf = mgraph.get_module("mlt").conf
-    mgraph.reset_module_conf("mlt", mlt.ConfParams(links=mlt_links))
+    mgraph.reset_module_conf("mlt", mlt.ConfParams(links=mlt_links, 
+                                                   dfo_connection=old_mlt_conf.dfo_connection, 
+                                                   dfo_busy_connection=old_mlt_conf.dfo_busy_connection))
 
 def connect_fragment_producers(app_name, the_system, verbose=False):
     """Connect the data request and fragment sending queues from all of
@@ -374,7 +376,7 @@ def connect_fragment_producers(app_name, the_system, verbose=False):
     # Connect request receiver to TRB output in DF app
     request_endpoint_name = f"dataflow.data_requests_for_{app_name}"
     app.modulegraph.add_endpoint("data_requests_in",
-                                 internal_name = None, # Agh, request receiver uses nwmgr, so no internal endpoint to connect to
+                                 internal_name = None, # Request receiver uses nwmgr, so no internal endpoint to connect to
                                  inout = Direction.IN)
     the_system.app_connections[request_endpoint_name] = AppConnection(nwmgr_connection = request_connection_name,
                                                                       receivers = [f"{app_name}.data_requests_in"],
@@ -457,7 +459,7 @@ def add_network(app_name, the_system, verbose=False):
     #     the_system.network_endpoints=assign_network_endpoints(the_system)
 
     if verbose:
-        console.log(f"---- add_network2 for {app_name} ----")
+        console.log(f"---- add_network for {app_name} ----")
     app = the_system.apps[app_name]
 
     modules_with_network = deepcopy(app.modulegraph.modules)
@@ -468,7 +470,7 @@ def add_network(app_name, the_system, verbose=False):
         console.log(f"Endpoints to connect are: {unconnected_endpoints}")
 
     for conn_name, app_connection in the_system.app_connections.items():
-        console.log(f"conn_name {conn_name}, app_connection {app_connection}")
+        if verbose:console.log(f"conn_name {conn_name}, app_connection {app_connection}")
 
         # Create the nwmgr connection if it doesn't already exist
         if not the_system.has_network_endpoint(app_connection.nwmgr_connection):
@@ -486,14 +488,11 @@ def add_network(app_name, the_system, verbose=False):
             the_system.network_endpoints.append(nwmgr.Connection(name=app_connection.nwmgr_connection,
                                                                  topics=app_connection.topics,
                                                                  address=address))
-        if not app_connection.use_nwqa:
-            if verbose:
-                console.log(f"Connection {conn_name} is NetworkManager type; skipping")
-            continue
         from_app, from_endpoint = conn_name.split(".", maxsplit=1)
 
         if from_app == app_name:
-            unconnected_endpoints.remove(from_endpoint)
+            if from_endpoint in unconnected_endpoints:
+                unconnected_endpoints.remove(from_endpoint)
             from_endpoint_internal = resolve_endpoint(app, from_endpoint, Direction.OUT)
             if from_endpoint_internal is None:
                 # The module.endpoint for this external endpoint was
@@ -535,20 +534,27 @@ def add_network(app_name, the_system, verbose=False):
             if to_app == app_name:
                 if to_endpoint in unconnected_endpoints:
                     unconnected_endpoints.remove(to_endpoint)
-                to_endpoint = resolve_endpoint(app, to_endpoint, Direction.IN)
+                to_endpoint_internal = resolve_endpoint(app, to_endpoint, Direction.IN)
+                if to_endpoint_internal is None:
+                    # The module.endpoint for this external endpoint was
+                    # specified as None, so we assume it was a direct
+                    # nwmgr sender, and don't make a ntoq for it
+                    if verbose:
+                        console.log(f"{to_endpoint} specifies its internal endpoint as None, so not creating a NtoQ for it")
+                    continue
 
                 ntoq_name = receiver.replace(".", "_")
                 ntoq_name = make_unique_name(ntoq_name, modules_with_network)
 
                 if verbose:
-                    console.log(f"Adding NetworkToQueue named {ntoq_name} connected to {to_endpoint} in app {app_name}")
+                    console.log(f"Adding NetworkToQueue named {ntoq_name} connected to {to_endpoint_internal} in app {app_name}")
 
                 nwmgr_connection_name = app_connection.nwmgr_connection
                 nwmgr_connection = the_system.get_network_endpoint(nwmgr_connection_name)
    
                 modules_with_network.append(DAQModule(name=ntoq_name,
                                                       plugin="NetworkToQueue",
-                                                      connections={"output": Connection(to_endpoint)},
+                                                      connections={"output": Connection(to_endpoint_internal)},
                                                       conf=ntoq.Conf(msg_type=app_connection.msg_type,
                                                                      msg_module_name=app_connection.msg_module_name,
                                                                      receiver_config=nor.Conf(name=nwmgr_connection_name,
@@ -658,6 +664,8 @@ cmd_set = ["init", "conf", "start", "stop", "pause", "resume", "scrap"]
 
 def make_app_json(app_name, app_command_data, data_dir, verbose=False):
     """Make the json files for a single application"""
+    if verbose:
+        console.log(f"make_app_json for app {app_name}")
     for c in cmd_set:
         with open(f'{join(data_dir, app_name)}_{c}.json', 'w') as f:
             json.dump(app_command_data[c].pod(), f, indent=4, sort_keys=True)
@@ -714,44 +722,3 @@ def write_json_files(app_command_datas, system_command_datas, json_dir, verbose=
             json.dump(cfg, f, indent=4, sort_keys=True)
 
     console.log(f"System configuration generated in directory '{json_dir}'")
-
-
-## PL: COMMENT THIS OUT, IT CONFUSED ME AT THE BEGINNING
-# def make_apps_json(the_system, nw_specs, json_dir, verbose=False):
-#     """Make the json files for all of the applications"""
-
-#     if verbose:
-#         console.log(f"Input applications:")
-#         console.log(the_system.apps)
-
-#     # ==================================================================
-#     # Application-level generation
-
-#     app_command_datas = dict()
-
-#     for app_name, app in the_system.apps.items():
-#         console.rule(f"Application generation for {app_name}")
-#         # Add the endpoints and connections that are needed for fragment producers
-#         #
-#         # NB: modifies app's modulegraph in-place
-#         connect_fragment_producers(app_name, the_system, verbose)
-#         # Add the NetworkToQueue/QueueToNetwork modules that are needed.
-#         #
-#         # NB: modifies app's modulegraph in-place
-#         add_network(app_name, the_system, verbose)
-
-#         app_command_datas[app_name] = make_app_command_data(app, nw_specs, verbose)
-#         if verbose:
-#             console.log(app_command_datas[app_name])
-
-#     # ==================================================================
-#     # System-level generation
-
-#     console.rule("System generation")
-
-#     system_command_datas=make_system_command_datas(the_system, verbose)
-
-#     # ==================================================================
-#     # JSON file creation
-
-#     write_json_files(app_command_datas, system_command_datas, json_dir, verbose)
