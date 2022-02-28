@@ -20,7 +20,6 @@ moo.otypes.load_types('appfwk/app.jsonnet')
 
 moo.otypes.load_types('nwqueueadapters/networktoqueue.jsonnet')
 moo.otypes.load_types('nwqueueadapters/queuetonetwork.jsonnet')
-moo.otypes.load_types('trigger/moduleleveltrigger.jsonnet')
 moo.otypes.load_types('networkmanager/nwmgr.jsonnet')
 moo.otypes.load_types('dfmodules/fragmentreceiver.jsonnet')
 moo.otypes.load_types('dfmodules/requestreceiver.jsonnet')
@@ -33,7 +32,6 @@ import dunedaq.nwqueueadapters.networkobjectreceiver as nor
 import dunedaq.nwqueueadapters.networktoqueue as ntoq
 import dunedaq.appfwk.app as appfwk  # AddressedCmd,
 import dunedaq.rcif.cmd as rccmd  # AddressedCmd,
-import dunedaq.trigger.moduleleveltrigger as mlt
 import dunedaq.networkmanager.nwmgr as nwmgr
 import dunedaq.dfmodules.fragmentreceiver as frcv
 import dunedaq.dfmodules.requestreceiver as rrcv
@@ -287,26 +285,6 @@ def geoid_raw_str(geoid):
 def data_request_endpoint_name(producer):
     return f"data_request_{geoid_raw_str(producer.geoid)}"
 
-def set_mlt_links(the_system, mlt_app_name="trigger", verbose=False):
-    """
-    The MLT needs to know the full list of fragment producers in the
-    system so it can populate the TriggerDecisions it creates. This
-    function gets all the fragment producers in the system and adds their
-    GeoIDs to the MLT's config. It assumes that the ModuleLevelTrigger
-    lives in an application with name `mlt_app_name` and has the name
-    "mlt".
-    """
-    mlt_links = []
-    for producer in the_system.get_fragment_producers():
-        geoid = producer.geoid
-        mlt_links.append( mlt.GeoID(system=geoid.system, region=geoid.region, element=geoid.element) )
-    if verbose:
-        console.log(f"Adding {len(mlt_links)} links to mlt.links: {mlt_links}")
-    mgraph = the_system.apps[mlt_app_name].modulegraph
-    old_mlt_conf = mgraph.get_module("mlt").conf
-    mgraph.reset_module_conf("mlt", mlt.ConfParams(links=mlt_links, 
-                                                   dfo_connection=old_mlt_conf.dfo_connection, 
-                                                   dfo_busy_connection=old_mlt_conf.dfo_busy_connection))
 
 def connect_fragment_producers(app_name, the_system, verbose=False):
     """Connect the data request and fragment sending queues from all of
