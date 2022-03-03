@@ -45,18 +45,19 @@ jobs:
     # Runs a single command using the runners shell
     
     - name: Checkout daq-release
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: DUNE-DAQ/daq-release
         path: daq-release
         
     - name: setup dev area
       run: |
-          source /cvmfs/dunedaq.opensciencegrid.org/tools/dbt/latest/env.sh
-          dbt-create.sh -c -n ${{ matrix.link }} dev-${{ matrix.os_name }}
+          source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
+          setup_dbt latest || true
+          dbt-create.py -c -n ${{ matrix.link }} dev-${{ matrix.os_name }}
           
     - name: checkout package for CI
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: ${{ github.repository }}
     
