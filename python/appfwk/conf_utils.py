@@ -159,7 +159,7 @@ def add_one_command_data(command_data, command, default_params, app, module_orde
             mod_and_params.append((module, default_params))
 
     command_data[command] = acmd(mod_and_params)
-    
+
 def make_app_command_data(system, app, verbose=False):
     """Given an App instance, create the 'command data' suitable for
     feeding to nanorc. The needed queues are inferred from from
@@ -174,7 +174,7 @@ def make_app_command_data(system, app, verbose=False):
 
     if verbose:
         console.log(f"Making app command data for {app.name}")
-        
+
     modules = app.modulegraph.modules
 
     module_deps = make_module_deps(modules)
@@ -261,7 +261,7 @@ def make_app_command_data(system, app, verbose=False):
 
     startpars = rccmd.StartParams(run=1, disable_data_storage=False)
     resumepars = rccmd.ResumeParams()
-    
+
     add_one_command_data(command_data, "start",   startpars,  app, start_order)
     add_one_command_data(command_data, "stop",    None,       app, stop_order)
     add_one_command_data(command_data, "scrap",   None,       app, stop_order)
@@ -383,7 +383,7 @@ def add_network(app_name, the_system, verbose=False):
 
         if verbose:
             console.log(f"app_connection.receivers is {app_connection.receivers}")
-        for receiver in app_connection.receivers: 
+        for receiver in app_connection.receivers:
             to_app, to_endpoint = receiver.split(".", maxsplit=1)
             if to_app == app_name:
                 if to_endpoint in unconnected_endpoints:
@@ -405,7 +405,7 @@ def add_network(app_name, the_system, verbose=False):
 
                 nwmgr_connection_name = app_connection.nwmgr_connection
                 nwmgr_connection = the_system.get_network_endpoint(nwmgr_connection_name)
-   
+
                 modules_with_network.append(DAQModule(name=ntoq_name,
                                                       plugin="NetworkToQueue",
                                                       connections={"output": Connection(to_endpoint_internal)},
@@ -421,7 +421,7 @@ def add_network(app_name, the_system, verbose=False):
     app.modulegraph.modules = modules_with_network
 
 def generate_boot(apps: list, partition_name="${USER}_test", ers_settings=None, info_svc_uri="file://info_${APP_ID}_${APP_PORT}.json",
-                  disable_trace=False, use_kafka=False, verbose=False) -> dict:
+                  disable_trace=False, use_kafka=False, verbose=False, extra_env_vars=dict()) -> dict:
     """Generate the dictionary that will become the boot.json file"""
 
     if ers_settings is None:
@@ -498,6 +498,9 @@ def generate_boot(apps: list, partition_name="${USER}_test", ers_settings=None, 
         },
         "exec": daq_app_specs
     }
+
+    boot["exec"]["daq_application"]["env"].update(extra_env_vars)
+    boot["exec"]["daq_application_ups"]["env"].update(extra_env_vars)
 
     if disable_trace:
         del boot["exec"]["daq_application"]["env"]["TRACE_FILE"]
