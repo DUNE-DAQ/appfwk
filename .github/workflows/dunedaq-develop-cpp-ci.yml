@@ -60,8 +60,8 @@ jobs:
       uses: actions/checkout@v3
       with:
         path: ${{ github.repository }}
-
-    - name: building, linting and unit testing
+    
+    - name: setup build env, build and lint the repo against the development release
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
@@ -70,12 +70,9 @@ jobs:
           setup_repo_env="SETUP_$REPO"
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
           cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
-          dbt-build.py --lint --unittest
+          dbt-build.py
+          dbt-build.py --lint
           $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev-${{ matrix.os_name }} -c ${{ matrix.os_name }} -o /tarballs-${{ matrix.os_name }}
-          echo "------------------------------------------------------------------------"
-          echo "-------------------------- Unit Test Summary ---------------------------"
-          cat log/unit_tests*/unit_test_summary.log || true
-          
           
     - name: upload UPS tarball and log file
       uses: actions/upload-artifact@v2
@@ -94,9 +91,3 @@ jobs:
       with:
         name: linting_log_${{ matrix.os_name }}
         path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/linting*
-
-    - name: upload unittest output file
-      uses: actions/upload-artifact@v2
-      with:
-        name: unit_tests_log_${{ matrix.os_name }}
-        path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/unit_tests*
