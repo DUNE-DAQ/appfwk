@@ -60,7 +60,6 @@ jobs:
       uses: actions/checkout@v3
       with:
         path: ${{ github.repository }}
-    
 
     - name: building, linting and unit testing
       run: |
@@ -70,8 +69,8 @@ jobs:
           dbt-workarea-env || true
           setup_repo_env="SETUP_$REPO"
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
+          cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
           dbt-build.py --lint --unittest
-          $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev-${{ matrix.os_name }} -c ${{ matrix.os_name }} -o /tarballs-${{ matrix.os_name }}
           echo "------------------------------------------------------------------------"
           echo "-------------------------- Unit Test Summary ---------------------------"
           cat log/unit_tests*/unit_test_summary.log || true
