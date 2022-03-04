@@ -61,19 +61,8 @@ jobs:
       with:
         path: ${{ github.repository }}
     
-    - name: build the repo
-      run: |
-          export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-          cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
-          source dbt-env.sh
-          dbt-workarea-env || true
-          setup_repo_env="SETUP_$REPO"
-          [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
-          cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
-          dbt-build.py
-          $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev-${{ matrix.os_name }} -c ${{ matrix.os_name }} -o /tarballs-${{ matrix.os_name }}
 
-    - name: linting and unit testing
+    - name: building, linting and unit testing
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
@@ -81,8 +70,8 @@ jobs:
           dbt-workarea-env || true
           setup_repo_env="SETUP_$REPO"
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
-          dbt-build.py --lint
-          dbt-build.py --unittest
+          dbt-build.py --lint --unittest
+          $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev-${{ matrix.os_name }} -c ${{ matrix.os_name }} -o /tarballs-${{ matrix.os_name }}
           echo "------------------------------------------------------------------------"
           echo "-------------------------- Unit Test Summary ---------------------------"
           cat log/unit_tests*/unit_test_summary.log || true
