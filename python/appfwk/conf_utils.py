@@ -479,7 +479,7 @@ def generate_boot(apps: list, partition_name="${USER}_test", ers_settings=None, 
             "DUNEDAQ_ERS_WARNING": ers_settings["WARNING"],
             "DUNEDAQ_ERS_ERROR": ers_settings["ERROR"],
             "DUNEDAQ_ERS_FATAL": ers_settings["FATAL"],
-            "DUNEDAQ_ERS_DEBUG_LEVEL": "getenv:-1",
+            "DUNEDAQ_ERS_DEBUG_LEVEL": "getenv_ifset",
         },
         "apps": {
             name: {
