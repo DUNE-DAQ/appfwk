@@ -24,7 +24,7 @@
 
 namespace dunedaq::appfwk {
 
-template<class T, template<typename, bool> class FollyQueueType>
+template<typename T, typename FollyQueueType>
 class FollyQueue : public Queue<T>
 {
 public:
@@ -68,18 +68,19 @@ public:
   FollyQueue& operator=(FollyQueue&&) = delete;
 
 private:
-  // The boolean argument is `MayBlock`, where "block" appears to mean
-  // "make a system call". With `MayBlock` set to false, the queue
-  // just spin-waits, so we want true
-  FollyQueueType<T, true> m_queue;
+  FollyQueueType m_queue;
   size_t m_capacity;
 };
 
-template<typename T>
-using FollySPSCQueue = FollyQueue<T, folly::DSPSCQueue>;
+// The boolean argument to DSPSCQueue and DMPMCQueue is `MayBlock`,
+// where "block" appears to mean "make a system call". With `MayBlock`
+// set to false, the queue just spin-waits, so we want true
 
 template<typename T>
-using FollyMPMCQueue = FollyQueue<T, folly::DMPMCQueue>;
+using FollySPSCQueue = FollyQueue<T, folly::DSPSCQueue<T, true>>;
+
+template<typename T>
+using FollyMPMCQueue = FollyQueue<T, folly::DMPMCQueue<T, true>>;
 
 } // namespace dunedaq::appfwk
 
