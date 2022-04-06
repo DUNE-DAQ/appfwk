@@ -149,7 +149,12 @@ def make_app_deps(the_system, verbose=False):
     return deps
 
 def add_one_command_data(command_data, command, default_params, app, module_order):
-    """Add the command data for one command in one app to the command_data object. The modules to be sent the command are listed in `module_order`. If the module has an entry in its extra_commands dictionary for this command, then that entry is used as the parameters to pass to the command, otherwise the `default_params` object is passed"""
+    """
+    Add the command data for one command in one app to the command_data object.
+    The modules to be sent the command are listed in `module_order`.
+    If the module has an entry in its extra_commands dictionary for this command,
+    then that entry is used as the parameters to pass to the command, otherwise the `default_params` object is passed
+    """
     mod_and_params=[]
     for module in module_order:
         extra_commands = app.modulegraph.get_module(module).extra_commands
@@ -251,13 +256,13 @@ def make_app_command_data(system, app, verbose=False):
     mod_specs = [ mspec(mod.name, mod.plugin, app_qinfos[mod.name]) for mod in modules ]
 
     # Fill in the "standard" command entries in the command_data structure
-
     command_data['init'] = appfwk.Init(queues=queue_specs, modules=mod_specs, nwconnections=system.network_endpoints)
 
     # TODO: Conf ordering
     command_data['conf'] = acmd([
         (mod.name, mod.conf) for mod in modules
     ])
+
 
     startpars = rccmd.StartParams(run=1, disable_data_storage=False)
     resumepars = rccmd.ResumeParams()
@@ -267,8 +272,11 @@ def make_app_command_data(system, app, verbose=False):
     add_one_command_data(command_data, "scrap",   None,       app, stop_order)
     add_one_command_data(command_data, "resume",  resumepars, app, start_order)
     add_one_command_data(command_data, "pause",   None,       app, stop_order)
-
-    # TODO: handle modules' `extra_commands`, including "record"
+    extra_commands = []
+    for m in app.modulegraph.module_list():
+        for name, data in m.extra_commands.items():
+            console.log(f'Handle \'{name}\' for {app.name}')
+            add_one_command_data(command_data, name, data, app, start_order)
 
     return command_data
 
@@ -523,11 +531,11 @@ def make_app_json(app_name, app_command_data, data_dir, verbose=False):
     """Make the json files for a single application"""
     if verbose:
         console.log(f"make_app_json for app {app_name}")
-    for c in cmd_set:
+    for c in app_command_data.keys():
         with open(f'{join(data_dir, app_name)}_{c}.json', 'w') as f:
             json.dump(app_command_data[c].pod(), f, indent=4, sort_keys=True)
 
-def make_system_command_datas(the_system, verbose=False):
+def make_system_command_datas(the_system, verbose=False, extra_commands={}):
     """Generate the dictionary of commands and their data for the entire system"""
 
     if the_system.app_start_order is None:
@@ -552,13 +560,21 @@ def make_system_command_datas(the_system, verbose=False):
         if verbose:
             console.log(cfg)
 
+    for c, apps in extra_commands.items():
+        console.log(f"Generating system {c} command for {apps}")
+        cfg = {
+            "apps": {app: f'data/{app}_{c}' for app in apps}
+        }
+        system_command_datas[c]=cfg
+
     console.log(f"Generating boot json file")
     system_command_datas['boot'] = generate_boot(the_system.apps, verbose)
 
     return system_command_datas
 
 def write_json_files(app_command_datas, system_command_datas, json_dir, verbose=False):
-    """Write the per-application and whole-system command data as json files in `json_dir`
+    """
+    Write the per-application and whole-system command data as json files in `json_dir`
     """
 
     console.rule("JSON file creation")
