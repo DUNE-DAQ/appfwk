@@ -7,6 +7,7 @@
  */
 
 #include "appfwk/DAQModule.hpp"
+#include "appfwk/DAQModuleHelper.hpp"
 #include "appfwk/Issues.hpp"
 #include "appfwk/app/Nljs.hpp"
 
@@ -84,6 +85,27 @@ BOOST_AUTO_TEST_CASE(MakeModule)
   BOOST_REQUIRE_EXCEPTION(make_module("not_a_real_plugin_name", "error_test"),
                           DAQModuleCreationFailed,
                           [&](DAQModuleCreationFailed) { return true; });
+}
+
+BOOST_AUTO_TEST_CASE(ConnectionRefs)
+{
+  app::ModInit data;
+  dunedaq::iomanager::connection::ConnectionRef ref{ "output", "test_queue", {} };
+  data.cinfos.push_back(ref);
+  nlohmann::json json;
+  to_json(json, data);
+
+  auto infos = connection_refs(json);
+  BOOST_REQUIRE_EQUAL(infos.size(), 1);
+
+  auto index = connection_index(json, std::vector<std::string>{ "output" });
+  BOOST_REQUIRE_EQUAL(index.size(), 1);
+  BOOST_REQUIRE_EQUAL(index["output"].uid, ref.uid);
+  BOOST_REQUIRE_EQUAL(index["output"].name, ref.name);
+
+  BOOST_REQUIRE_EXCEPTION(connection_index(json, std::vector<std::string>{ "output", "ERROR" }),
+                          InvalidSchema,
+                          [&](InvalidSchema) { return true; });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
