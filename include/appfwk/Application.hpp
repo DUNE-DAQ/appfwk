@@ -10,7 +10,7 @@
 #define APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 
 #include "appfwk/DAQModuleManager.hpp"
-#include "appfwk/NamedObject.hpp"
+#include "utilities/NamedObject.hpp"
 #include "appfwk/cmd/Structs.hpp"
 #include "rcif/runinfo/InfoStructs.hpp"
 
@@ -57,7 +57,7 @@ namespace appfwk {
 class Application
   : public cmdlib::CommandedObject
   , public opmonlib::InfoProvider
-  , public NamedObject
+  , public utilities::NamedObject
 {
 public:
   using dataobj_t = nlohmann::json;

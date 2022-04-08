@@ -9,8 +9,8 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
 
-#include "appfwk/Queue.hpp"
-#include "appfwk/QueueRegistry.hpp"
+#include "iomanager/Queue.hpp"
+#include "iomanager/QueueRegistry.hpp"
 
 #include "logging/Logging.hpp"
 
@@ -34,7 +34,7 @@ ERS_DECLARE_ISSUE(appfwk,                                             // namespa
 namespace appfwk {
 
 template<typename T>
-class DAQSource : public Named
+class DAQSource : public utilities::Named
 {
 public:
   using value_t = T;
@@ -51,16 +51,16 @@ public:
   DAQSource& operator=(DAQSource&&) = delete;
 
 private:
-  std::shared_ptr<Queue<T>> m_queue;
+  std::shared_ptr<iomanager::Queue<T>> m_queue;
 };
 
 template<typename T>
 DAQSource<T>::DAQSource(const std::string& name)
 {
   try {
-    m_queue = QueueRegistry::get().get_queue<T>(name);
+    m_queue = iomanager::QueueRegistry::get().get_queue<T>(name);
     TLOG_DEBUG(1, "DAQSource") << "Queue " << name << " is at " << m_queue.get();
-  } catch (QueueTypeMismatch& ex) {
+  } catch (iomanager::QueueTypeMismatch& ex) {
     throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
   }
 }

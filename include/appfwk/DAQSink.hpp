@@ -9,8 +9,8 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
 
-#include "appfwk/Queue.hpp"
-#include "appfwk/QueueRegistry.hpp"
+#include "iomanager/Queue.hpp"
+#include "iomanager/QueueRegistry.hpp"
 
 #include "logging/Logging.hpp"
 
@@ -34,7 +34,7 @@ ERS_DECLARE_ISSUE(appfwk,                                           // namespace
 namespace appfwk {
 
 template<typename T>
-class DAQSink : public Named
+class DAQSink : public utilities::Named
 {
 public:
   using value_t = T;
@@ -52,16 +52,16 @@ public:
   DAQSink& operator=(DAQSink&&) = delete;
 
 private:
-  std::shared_ptr<Queue<T>> m_queue;
+  std::shared_ptr<iomanager::Queue<T>> m_queue;
 };
 
 template<typename T>
 DAQSink<T>::DAQSink(const std::string& name)
 {
   try {
-    m_queue = QueueRegistry::get().get_queue<T>(name);
+    m_queue = iomanager::QueueRegistry::get().get_queue<T>(name);
     TLOG_DEBUG(1, "DAQSink") << "Queue " << name << " is at " << m_queue.get();
-  } catch (const QueueTypeMismatch& ex) {
+  } catch (const iomanager::QueueTypeMismatch& ex) {
     throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
 }

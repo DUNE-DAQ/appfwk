@@ -7,7 +7,6 @@
  */
 
 #include "appfwk/DAQModuleManager.hpp"
-#include "networkmanager/NetworkManager.hpp"
 
 #include "cmdlib/cmd/Nljs.hpp"
 
@@ -16,7 +15,7 @@
 #include "appfwk/cmd/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/QueueRegistry.hpp"
+#include "iomanager/IOManager.hpp"
 
 #include "logging/Logging.hpp"
 
@@ -37,9 +36,8 @@ void
 DAQModuleManager::initialize(const dataobj_t& data)
 {
   auto ini = data.get<app::Init>();
-  init_queues(ini.queues);
   init_modules(ini.modules);
-  init_nwconnections(ini.nwconnections);
+  init_connections(ini.connections);
   this->m_initialized = true;
 }
 
@@ -55,43 +53,9 @@ DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
 }
 
 void
-DAQModuleManager::init_queues(const app::QueueSpecs& qspecs)
+DAQModuleManager::init_connections(const iomanager::connection::ConnectionIds_t conn_specs)
 {
-  std::map<std::string, QueueConfig> queue_cfgs;
-  for (const auto& qs : qspecs) {
-
-    // N.B.: here we mimic the behavior of daq_application and
-    // ignore the kind.  This requires user configuration to
-    // assure unique queue names across all queue types.
-    const std::string queue_name = qs.inst;
-    // fixme: maybe one day replace QueueConfig with codgen.
-    // Until then, wheeee....
-    QueueConfig qc;
-    switch (qs.kind) {
-      case app::QueueKind::StdDeQueue:
-        qc.kind = QueueConfig::queue_kind::kStdDeQueue;
-        break;
-      case app::QueueKind::FollySPSCQueue:
-        qc.kind = QueueConfig::queue_kind::kFollySPSCQueue;
-        break;
-      case app::QueueKind::FollyMPMCQueue:
-        qc.kind = QueueConfig::queue_kind::kFollyMPMCQueue;
-        break;
-      default:
-        throw MissingComponent(ERS_HERE, "unknown queue type");
-        break;
-    }
-    qc.capacity = qs.capacity;
-    queue_cfgs[queue_name] = qc;
-    TLOG_DEBUG(2) << "Adding queue: " << queue_name;
-  }
-  QueueRegistry::get().configure(queue_cfgs);
-}
-
-void
-DAQModuleManager::init_nwconnections(const networkmanager::nwmgr::Connections& nwspecs)
-{
-  networkmanager::NetworkManager::get().configure(nwspecs);
+    iomanager::IOManager::configure(conn_specs);
 }
 
 void
@@ -265,7 +229,7 @@ void
 DAQModuleManager::gather_stats(opmonlib::InfoCollector& ci, int level)
 {
 
-  QueueRegistry::get().gather_stats(ci, level);
+  iomanager::QueueRegistry::get().gather_stats(ci, level);
   networkmanager::NetworkManager::get().gather_stats(ci, level);
 
   for (const auto& [mod_name, mod_ptr] : m_module_map) {

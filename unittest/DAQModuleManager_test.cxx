@@ -10,9 +10,11 @@
 
 #include "appfwk/DAQModuleManager.hpp"
 #include "appfwk/Issues.hpp"
-#include "appfwk/QueueRegistry.hpp"
 #include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
+#include "iomanager/connection/Nljs.hpp"
+
+#include "iomanager/IOManager.hpp"
 
 #define BOOST_TEST_MODULE DAQModuleManager_test // NOLINT
 
@@ -32,7 +34,7 @@ BOOST_AUTO_TEST_CASE(Construct)
 
 BOOST_AUTO_TEST_CASE(Initialized)
 {
-  QueueRegistry::reset();
+  dunedaq::iomanager::IOManager::reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -56,7 +58,7 @@ BOOST_AUTO_TEST_CASE(Initialized)
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
 
-  QueueRegistry::reset();
+  dunedaq::iomanager::IOManager::reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -78,7 +80,7 @@ BOOST_AUTO_TEST_CASE(Stats)
 
 BOOST_AUTO_TEST_CASE(InitializeModules)
 {
-  QueueRegistry::reset();
+  dunedaq::iomanager::IOManager::reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -101,7 +103,7 @@ BOOST_AUTO_TEST_CASE(InitializeModules)
 
 BOOST_AUTO_TEST_CASE(CommandModules)
 {
-  QueueRegistry::reset();
+  dunedaq::iomanager::IOManager::reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -136,7 +138,7 @@ BOOST_AUTO_TEST_CASE(CommandModules)
 
 BOOST_AUTO_TEST_CASE(CommandMatchingModules)
 {
-  QueueRegistry::reset();
+  dunedaq::iomanager::IOManager::reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -179,24 +181,24 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
     mgr.execute(cmd_data), ConflictingCommandMatching, [&](ConflictingCommandMatching) { return true; });
 }
 
-BOOST_AUTO_TEST_CASE(InitializeQueues)
+BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues) 
 {
-  QueueRegistry::reset();
+  dunedaq::iomanager::IOManager::reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::appfwk::app::Init init;
-  dunedaq::appfwk::app::QueueSpec queue_init;
-  queue_init.kind = dunedaq::appfwk::app::QueueKind::StdDeQueue;
-  queue_init.inst = "test_deque";
-  queue_init.capacity = 10;
-  init.queues.push_back(queue_init);
-  queue_init.kind = dunedaq::appfwk::app::QueueKind::FollySPSCQueue;
-  queue_init.inst = "test_spsc";
-  init.queues.push_back(queue_init);
-  queue_init.kind = dunedaq::appfwk::app::QueueKind::FollyMPMCQueue;
-  queue_init.inst = "test_mpmc";
-  init.queues.push_back(queue_init);
+  dunedaq::iomanager::connection::ConnectionId queue_init;
+  queue_init.uid = "test_deque";
+  queue_init.service_type = dunedaq::iomanager::connection::ServiceType::kQueue;
+  queue_init.uri = "queue://StdDeQueue:10";
+  init.connections.push_back(queue_init);
+  queue_init.uid = "test_spsc";
+  queue_init.uri = "queue://FollySPSC:10";
+  init.connections.push_back(queue_init);
+  queue_init.uid = "test_mpmc";
+  queue_init.uri = "queue://FollyMPMC:10";
+  init.connections.push_back(queue_init);
   nlohmann::json init_data;
   to_json(init_data, init);
   dunedaq::cmdlib::cmd::Command cmd;
@@ -209,17 +211,18 @@ BOOST_AUTO_TEST_CASE(InitializeQueues)
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
 
-BOOST_AUTO_TEST_CASE(InitializeUnknownQueueType)
+BOOST_AUTO_TEST_CASE(InitializeIOManager_UnknownQueueType)
 {
-  QueueRegistry::reset();
+  dunedaq::iomanager::IOManager::reset();
   auto mgr = DAQModuleManager();
+  BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::appfwk::app::Init init;
-  dunedaq::appfwk::app::QueueSpec queue_init;
-  queue_init.kind = dunedaq::appfwk::app::QueueKind::Unknown;
-  queue_init.inst = "test_invalid";
-  queue_init.capacity = 10;
-  init.queues.push_back(queue_init);
+  dunedaq::iomanager::connection::ConnectionId conn_init;
+  conn_init.uid = "test_deque";
+  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kQueue;
+  conn_init.uri = "queue://NonExistantQueueType:10";
+  init.connections.push_back(conn_init);
   nlohmann::json init_data;
   to_json(init_data, init);
 
@@ -229,7 +232,73 @@ BOOST_AUTO_TEST_CASE(InitializeUnknownQueueType)
   nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
 
-  BOOST_REQUIRE_EXCEPTION(mgr.execute(cmd_data), MissingComponent, [&](MissingComponent) { return true; });
+  BOOST_REQUIRE_EXCEPTION(mgr.execute(cmd_data),
+                          dunedaq::iomanager::QueueKindUnknown,
+                          [&](dunedaq::iomanager::QueueKindUnknown) { return true; });
+}
+
+BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
+{
+  dunedaq::iomanager::IOManager::reset();
+  auto mgr = DAQModuleManager();
+  BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
+
+  dunedaq::appfwk::app::Init init;
+  dunedaq::iomanager::connection::ConnectionId conn_init;
+  conn_init.uid = "test_inproc";
+  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kNetwork;
+  conn_init.uri = "inproc://foo";
+  init.connections.push_back(conn_init);
+  conn_init.uid = "test_tcp";
+  conn_init.uri = "tcp://localhost:1234";
+  init.connections.push_back(conn_init);
+  nlohmann::json init_data;
+  to_json(init_data, init);
+  dunedaq::cmdlib::cmd::Command cmd;
+  cmd.id = "init";
+  cmd.data = init_data;
+  nlohmann::json cmd_data;
+  to_json(cmd_data, cmd);
+  mgr.execute(cmd_data);
+
+  BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
+}
+
+BOOST_AUTO_TEST_CASE(InitializeIOManager_QueuesAndNetwork)
+{
+  dunedaq::iomanager::IOManager::reset();
+  auto mgr = DAQModuleManager();
+  BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
+
+  dunedaq::appfwk::app::Init init;
+  dunedaq::iomanager::connection::ConnectionId conn_init;
+  conn_init.uid = "test_deque";
+  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kQueue;
+  conn_init.uri = "queue://StdDeQueue:10";
+  init.connections.push_back(conn_init);
+  conn_init.uid = "test_spsc";
+  conn_init.uri = "queue://FollySPSC:10";
+  init.connections.push_back(conn_init);
+  conn_init.uid = "test_mpmc";
+  conn_init.uri = "queue://FollyMPMC:10";
+  init.connections.push_back(conn_init);
+  conn_init.uid = "test_inproc";
+  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kNetwork;
+  conn_init.uri = "inproc://foo";
+  init.connections.push_back(conn_init);
+  conn_init.uid = "test_tcp";
+  conn_init.uri = "tcp://localhost:1234";
+  init.connections.push_back(conn_init);
+  nlohmann::json init_data;
+  to_json(init_data, init);
+  dunedaq::cmdlib::cmd::Command cmd;
+  cmd.id = "init";
+  cmd.data = init_data;
+  nlohmann::json cmd_data;
+  to_json(cmd_data, cmd);
+  mgr.execute(cmd_data);
+
+  BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -73,9 +73,8 @@ protected:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
   void initialize(const dataobj_t& data);
-  void init_queues(const app::QueueSpecs& qspecs);
+  void init_connections(const iomanager::connection::ConnectionIds_t conn_specs);
   void init_modules(const app::ModSpecs& mspecs);
-  void init_nwconnections(const networkmanager::nwmgr::Connections& nwspecs);
 
   void dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t& data);
   void dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data);

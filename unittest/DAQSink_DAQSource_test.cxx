@@ -9,7 +9,8 @@
 
 #include "appfwk/DAQSink.hpp"
 #include "appfwk/DAQSource.hpp"
-#include "appfwk/StdDeQueue.hpp"
+#include "iomanager/StdDeQueue.hpp"
+#include "iomanager/QueueRegistry.hpp"
 
 #include "ers/ers.hpp"
 
@@ -34,9 +35,9 @@ struct DAQSinkDAQSourceTestFixture
 
   void setup()
   {
-    std::map<std::string, QueueConfig> queue_map = { { "dummy", { QueueConfig::queue_kind::kStdDeQueue, 100 } } };
+    std::map<std::string, dunedaq::iomanager::QueueConfig> queue_map = { { "dummy", { dunedaq::iomanager::QueueConfig::queue_kind::kStdDeQueue, 100 } } };
 
-    QueueRegistry::get().configure(queue_map);
+    dunedaq::iomanager::QueueRegistry::get().configure(queue_map);
   }
 };
 
@@ -83,7 +84,7 @@ BOOST_AUTO_TEST_CASE(DataFlow)
   std::string res("undefined");
   try {
     source.pop(res);
-  } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+  } catch (const dunedaq::iomanager::QueueTimeoutExpired& ex) {
   }
   BOOST_REQUIRE_EQUAL(res, "hello");
 
@@ -91,7 +92,7 @@ BOOST_AUTO_TEST_CASE(DataFlow)
   sink.push(test2);
   try {
     source.pop(res);
-  } catch (const dunedaq::appfwk::QueueTimeoutExpired& ex) {
+  } catch (const dunedaq::iomanager::QueueTimeoutExpired& ex) {
   }
   BOOST_REQUIRE_EQUAL(res, "hello again");
 }
@@ -104,7 +105,7 @@ BOOST_AUTO_TEST_CASE(Exceptions)
   std::string res;
 
   BOOST_REQUIRE(!source.can_pop());
-  BOOST_CHECK_THROW(source.pop(res), dunedaq::appfwk::QueueTimeoutExpired);
+  BOOST_CHECK_THROW(source.pop(res), dunedaq::iomanager::QueueTimeoutExpired);
 
   for (int ii = 0; ii < 100; ++ii) {
     bool can_push = sink.can_push();
@@ -115,8 +116,8 @@ BOOST_AUTO_TEST_CASE(Exceptions)
 
   BOOST_REQUIRE(!sink.can_push());
   BOOST_REQUIRE_EXCEPTION(sink.push("bbBbbb"),
-                          dunedaq::appfwk::QueueTimeoutExpired,
-                          [&](dunedaq::appfwk::QueueTimeoutExpired) { return true; });
+                          dunedaq::iomanager::QueueTimeoutExpired,
+                          [&](dunedaq::iomanager::QueueTimeoutExpired) { return true; });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
