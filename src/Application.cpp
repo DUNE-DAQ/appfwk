@@ -44,7 +44,7 @@ Application::init()
   m_cmd_fac->set_commanded(*this, get_name());
   m_info_mgr.set_provider(*this);
   // Add partition id as tag
-  m_info_mgr.set_tags({{"partition_id", m_partition}});
+  m_info_mgr.set_tags({ { "partition_id", m_partition } });
   m_initialized = true;
 }
 
@@ -117,10 +117,7 @@ Application::execute(const dataobj_t& cmd_data)
 void
 Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 {
-  // TODO:Fill application info and add it to ci
   appinfo::Info ai;
-  // ai.partition_name = m_partition;
-  // ai.app_name = get_name();
   ai.state = get_state();
   ai.busy = m_busy.load();
   ai.error = m_error.load();

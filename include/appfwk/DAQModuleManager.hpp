@@ -9,12 +9,13 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 
-#include "appfwk/app/Structs.hpp"
-#include "cmdlib/cmd/Structs.hpp"
-
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 #include "opmonlib/InfoCollector.hpp"
+
+#include "appfwk/app/Structs.hpp"
+#include "cmdlib/cmd/Structs.hpp"
+#include "networkmanager/nwmgr/Structs.hpp"
 
 #include <map>
 #include <memory>
@@ -74,6 +75,7 @@ protected:
   void initialize(const dataobj_t& data);
   void init_queues(const app::QueueSpecs& qspecs);
   void init_modules(const app::ModSpecs& mspecs);
+  void init_nwconnections(const networkmanager::nwmgr::Connections& nwspecs);
 
   void dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t& data);
   void dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data);
