@@ -90,4 +90,7 @@ private:
 
 } // namespace appfwk
 } // namespace dunedaq
+
+#include "detail/DAQModuleManager.hxx"
+
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
