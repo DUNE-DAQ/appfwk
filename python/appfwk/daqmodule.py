@@ -2,15 +2,13 @@
 
 class DAQModule:
     """An individual DAQModule within an application, along with its
-       configuration object and list of outgoing connections to other
-       modules
+       configuration object
     """
 
-    def __init__(self, plugin, conf=None, extra_commands=None, connections=None, name="__module"):
+    def __init__(self, plugin, conf=None, extra_commands=None, name="__module"):
         self.plugin=plugin
         self.name=name
         self.conf=conf
-        self.connections=connections if connections else dict()
         self.extra_commands=extra_commands if extra_commands else dict()
 
     def __repr__(self):
@@ -20,5 +18,4 @@ class DAQModule:
         yield "plugin", self.plugin
         yield "name", self.name
         yield "conf", self.conf
-        yield "connections", self.connections
         yield "extra_commands", self.extra_commands

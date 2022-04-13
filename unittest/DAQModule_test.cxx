@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(ConnectionRefs)
 {
   app::ModInit data;
   dunedaq::iomanager::connection::ConnectionRef ref{ "output", "test_queue", {} };
-  data.cinfos.push_back(ref);
+  data.conn_refs.push_back(ref);
   nlohmann::json json;
   to_json(json, data);
 

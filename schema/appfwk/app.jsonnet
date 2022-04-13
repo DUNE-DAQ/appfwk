@@ -38,7 +38,7 @@ local cs = {
                        doc="A sequence of ModSpec"),
 
     modinit: s.record("ModInit", [
-        s.field("cinfos", iomgr.ConnectionRefs_t,
+        s.field("conn_refs", iomgr.ConnectionRefs_t,
                 doc="Information for a module to find its connection"),
     ], doc="A standardized portion of every ModSpec.data"),
         

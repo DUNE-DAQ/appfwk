@@ -33,7 +33,7 @@ connection_index(const nlohmann::json& iniobj, std::vector<std::string> required
 iomanager::connection::ConnectionRefs_t
 connection_refs(const nlohmann::json& iniobj)
 {
-  return iniobj.get<app::ModInit>().cinfos;
+  return iniobj.get<app::ModInit>().conn_refs;
 }
 
 } // namespace dunedaq::appfwk
