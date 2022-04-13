@@ -17,11 +17,12 @@ class System:
     The same is true for application start order.
     """
 
-    def __init__(self, partition_name, apps=None, connections=None, app_start_order=None,
+    def __init__(self, partition_name, apps=None, connections=None, app_connections=None, app_start_order=None,
                  first_port=12345):
         self.partition_name = partition_name
         self.apps=apps if apps else dict()
         self.connections = connections if connections else dict()
+        self.app_connections = app_connections if app_connections else dict()
         self.app_start_order = app_start_order
         self._next_port = first_port
         self.digraph = None
@@ -30,6 +31,7 @@ class System:
         yield "partition_name", self.partition_name
         yield "apps", self.apps
         yield "connections", self.connections
+        yield "app_connections", self.app_connections
         yield "app_start_order", self.app_start_order
 
     def get_fragment_producers(self):

@@ -39,7 +39,7 @@ struct DAQSinkDAQSourceTestFixture
   {
     std::map<std::string, dunedaq::iomanager::QueueConfig> queue_map = {
       { "dummy", { dunedaq::iomanager::QueueConfig::queue_kind::kStdDeQueue, 100 } },
-      { "short", { dunedaq::iomanagerQueueConfig::queue_kind::kStdDeQueue, 1 } }
+      { "short", { dunedaq::iomanager::QueueConfig::queue_kind::kStdDeQueue, 1 } }
     };
 
     dunedaq::iomanager::QueueRegistry::get().configure(queue_map);
@@ -152,8 +152,7 @@ BOOST_AUTO_TEST_CASE(ShortQueue)
 
   BOOST_CHECK_NO_THROW( sink.push(4, std::chrono::milliseconds(10)) );
 
-  BOOST_CHECK_THROW( future.get(),
-		     dunedaq::appfwk::QueueTimeoutExpired );
+  BOOST_CHECK_THROW( future.get(), dunedaq::iomanager::QueueTimeoutExpired);
   
   BOOST_CHECK_EQUAL(res, 4);
 }

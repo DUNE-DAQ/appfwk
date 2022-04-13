@@ -81,7 +81,8 @@ Publisher = namedtuple(
 
 Sender = namedtuple("Sender", ['msg_type', 'msg_module_name', 'receiver'])
 
-AppConnection = namedtuple("AppConnection", ['nwmgr_connection', 'receivers', 'topics', 'msg_type', 'msg_module_name', 'use_nwqa'], defaults=[None, None, True])
+# AppConnection = namedtuple("AppConnection", ['nwmgr_connection', 'receivers', 'topics', 'msg_type', 'msg_module_name', 'use_nwqa'], defaults=[None, None, True])
+AppConnection = namedtuple("AppConnection", ['bind_apps', 'connect_apps'], defaults=[[],[]])
 
 ########################################################################
 #
@@ -161,8 +162,45 @@ def make_system_connections(the_system):
     endpoint_map = defaultdict(list)
 
     for app in the_system.apps:
-      for endpoint in the_system.apps[app].endpoints.values():
-        endpoint_map[endpoint.external_name] += [{app.name, endpoint.dir}]
+      the_system.connections[app] = []
+      for endpoint in the_system.apps[app].modulegraph.endpoints:
+        console.log(f"Adding endpoint {endpoint.external_name}, app {the_system.apps[app].name}, direction {endpoint.direction}")
+        endpoint_map[endpoint.external_name] += [{"app": the_system.apps[app].name, "endpoint": endpoint}]
+
+    console.log(endpoint_map.items())
+    for endpoint_name,endpoints in endpoint_map.items():
+        console.log(f"Processing {endpoint_name} with defined endpoints {endpoints}")
+        if len(endpoints) < 2:
+            raise ValueError(f"Connection with name {endpoint_name} only has one endpoint!")
+        first_app = endpoints[0]["app"]
+        in_count = 0
+        out_count = 0
+        size = 0
+        for endpoint in endpoints:
+            direction = endpoint['endpoint'].direction
+            console.log(f"Direction is {direction}")
+            if direction == Direction.IN: 
+                in_count += 1
+            else: 
+                out_count += 1
+            if endpoint['endpoint'].size_hint > size:
+                size = endpoint['endpoint'].size_hint
+
+        if in_count == 0:
+            raise ValueError(f"Connection with name {endpoint_name} has no producers!")
+        if out_count == 0:
+            raise ValueError(f"Connection with name {endpoint_name} has no consumers!")
+
+        if all(first_app == elem["app"] for elem in endpoints):
+            if in_count == 1 and out_count == 1:
+                console.log(f"Connection {endpoint_name}, SPSC Queue")
+                the_system.connections[first_app] += [conn.ConnectionId(uid=endpoint_name, service_type="kQueue", data_type="", uri=f"queue://FollySPSC:{size}")]
+            else:
+                console.log(f"Connection {endpoint_name}, MPMC Queue")
+                the_system.connections[first_app] += [conn.ConnectionId(uid=endpoint_name, service_type="kQueue", data_type="", uri=f"queue://FollyMPMC:{size}")]
+        else:
+            console.log(f"Connection {endpoint_name}, Network")
+            the_system.app_connections[endpoint_name] = AppConnection()
         
          
 
@@ -196,9 +234,11 @@ def make_app_command_data(system, app, verbose=False):
 
     command_data = {}
 
+    if len(system.connections) == 0:
+        make_system_connections(system)
+
     app_connrefs = defaultdict(list)
-    for endpointname in app.modulegraph.endpoints:
-        endpoint = app.modulegraph.endpoints[endpointname]
+    for endpoint in app.modulegraph.endpoints:
         module, name = endpoint.internal_name.split(".")
         console.log(f"module, name= {module}, {name}, endpoint.external_name={endpoint.external_name}, endpoint.direction={endpoint.direction}")
         app_connrefs[module] += [conn.ConnectionRef(name=name, uid=endpoint.external_name, dir= "kInput" if endpoint.direction == Direction.IN else "kOutput")]

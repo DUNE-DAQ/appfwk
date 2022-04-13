@@ -20,7 +20,7 @@ class ModuleGraph:
 
     def __init__(self, modules:[DAQModule]=None, endpoints=None, fragment_producers=None):
         self.modules=modules if modules else []
-        self.endpoints=endpoints if endpoints else dict()
+        self.endpoints=endpoints if endpoints else []
         self.fragment_producers = fragment_producers if  fragment_producers else dict()
 
     def __repr__(self):
@@ -44,7 +44,7 @@ class ModuleGraph:
             deps.add_node(module.name)
             modules_set.add(module.name)
 
-        for endpoint in self.endpoints.values():
+        for endpoint in self.endpoints:
             if endpoint.internal_name is None:
                 continue
             endpoint_internal_data = endpoint.internal_name.split(".")
@@ -129,7 +129,7 @@ class ModuleGraph:
         return mod
 
     def add_endpoint(self, external_name, internal_name, inout, topic=[]):
-        self.endpoints[external_name] = Endpoint(external_name, internal_name, inout, topic)
+        self.endpoints += [Endpoint(external_name, internal_name, inout, topic)]
 
     def endpoint_names(self, inout=None):
         if inout is not None:
