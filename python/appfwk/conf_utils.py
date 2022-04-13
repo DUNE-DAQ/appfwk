@@ -532,8 +532,7 @@ def make_system_command_datas(the_system, verbose=False):
 
     if the_system.app_start_order is None:
         app_deps = make_app_deps(the_system, verbose)
-        # the_system.app_start_order = list(nx.algorithms.dag.topological_sort(app_deps))
-        the_system.app_start_order = list(app_deps.nodes)
+        the_system.app_start_order = list(nx.algorithms.dag.topological_sort(app_deps))[::-1]
 
     system_command_datas=dict()
 
