@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(appfwk VERSION 2.3.4)
+project(appfwk VERSION 2.4.0)
 
 find_package(daq-cmake REQUIRED )
 
@@ -53,7 +53,6 @@ daq_add_unit_test(Interruptible_test          LINK_LIBRARIES appfwk)
 daq_add_unit_test(Queue_test                  LINK_LIBRARIES appfwk )
 daq_add_unit_test(QueueRegistry_test          LINK_LIBRARIES appfwk )
 daq_add_unit_test(StdDeQueue_test             LINK_LIBRARIES appfwk )
-#daq_add_unit_test(ThreadHelper_test           LINK_LIBRARIES ers::ers)
 daq_add_unit_test(NamedObject_test        )
 
 ##############################################################################

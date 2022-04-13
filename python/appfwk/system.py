@@ -1,4 +1,4 @@
-from .conf_utils import console, Direction
+from .conf_utils import Direction
 import networkx as nx
 
 class System:
@@ -17,14 +17,18 @@ class System:
     The same is true for application start order.
     """
 
-    def __init__(self, apps=None, app_connections=None, network_endpoints=None, app_start_order=None):
+    def __init__(self, partition_name, apps=None, app_connections=None, network_endpoints=None, app_start_order=None,
+                 first_port=12345):
+        self.partition_name = partition_name
         self.apps=apps if apps else dict()
         self.app_connections = app_connections if app_connections else dict()
-        self.network_endpoints = network_endpoints
+        self.network_endpoints = network_endpoints if network_endpoints else []
         self.app_start_order = app_start_order
+        self._next_port = first_port
         self.digraph = None
 
     def __rich_repr__(self):
+        yield "partition_name", self.partition_name
         yield "apps", self.apps
         yield "app_connections", self.app_connections
         yield "network_endpoints", self.network_endpoints
@@ -35,7 +39,6 @@ class System:
         all_producers = []
         all_geoids = set()
         for app in self.apps.values():
-            console.log(app)
             producers = app.modulegraph.fragment_producers
             for producer in producers.values():
                 if producer.geoid in all_geoids:
@@ -53,14 +56,11 @@ class System:
         for from_app_n, from_app in self.apps.items():
             for from_ep in from_app.modulegraph.endpoints.values():
                 if from_ep.direction == Direction.OUT:
-                    print("OUT", from_app_n, from_ep.external_name)
                     for to_app_n, to_app in self.apps.items():
                         for to_ep in to_app.modulegraph.endpoints.values():
                             if to_ep.direction == Direction.IN:
                                 if from_ep.external_name == to_ep.external_name:
                                     deps.add_edge(from_app_n, to_app_n, label=to_ep.external_name)
-                elif from_ep.direction == Direction.IN:
-                    print("IN", from_app_n, from_ep.external_name)
 
 
         return deps
@@ -69,3 +69,20 @@ class System:
     def export(self, filename):
         self.digraph = self.make_digraph()
         nx.drawing.nx_pydot.write_dot(self.digraph, filename)
+
+    def next_unassigned_port(self):
+        self._next_port += 1
+        return self._next_port
+    
+    def get_network_endpoint(self, name):
+        for spec in self.network_endpoints:
+            if spec.name == name:
+                return spec
+        raise ValueError(f"No network endpoint named {name}. Available endpoints are {[ e.name for e in self.network_endpoints]}")
+
+    def has_network_endpoint(self, name):
+        try:
+            self.get_network_endpoint(name)
+            return True
+        except ValueError:
+            return False
