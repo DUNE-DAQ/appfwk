@@ -21,6 +21,8 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <future>
+#include <thread>
 
 using namespace dunedaq::appfwk;
 
@@ -35,7 +37,10 @@ struct DAQSinkDAQSourceTestFixture
 
   void setup()
   {
-    std::map<std::string, dunedaq::iomanager::QueueConfig> queue_map = { { "dummy", { dunedaq::iomanager::QueueConfig::queue_kind::kStdDeQueue, 100 } } };
+    std::map<std::string, dunedaq::iomanager::QueueConfig> queue_map = {
+      { "dummy", { dunedaq::iomanager::QueueConfig::queue_kind::kStdDeQueue, 100 } },
+      { "short", { dunedaq::iomanagerQueueConfig::queue_kind::kStdDeQueue, 1 } }
+    };
 
     dunedaq::iomanager::QueueRegistry::get().configure(queue_map);
   }
@@ -119,5 +124,39 @@ BOOST_AUTO_TEST_CASE(Exceptions)
                           dunedaq::iomanager::QueueTimeoutExpired,
                           [&](dunedaq::iomanager::QueueTimeoutExpired) { return true; });
 }
+
+BOOST_AUTO_TEST_CASE(ShortQueue)
+{
+
+  DAQSink<int> sink("short");
+  DAQSource<int> source("short");
+
+  int res = 0;
+
+  BOOST_REQUIRE(!source.can_pop());
+  BOOST_REQUIRE(sink.can_push());
+  
+  sink.push(3);
+
+  BOOST_CHECK(!sink.can_push());
+
+  source.pop(res);
+
+  BOOST_REQUIRE(sink.can_push());
+  BOOST_REQUIRE(!source.can_pop());
+
+  
+  auto future = std::async(std::launch::async, 
+    			   [&](){source.pop(res, std::chrono::milliseconds(10));
+				 source.pop(res, std::chrono::milliseconds(10)); });
+
+  BOOST_CHECK_NO_THROW( sink.push(4, std::chrono::milliseconds(10)) );
+
+  BOOST_CHECK_THROW( future.get(),
+		     dunedaq::appfwk::QueueTimeoutExpired );
+  
+  BOOST_CHECK_EQUAL(res, 4);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
