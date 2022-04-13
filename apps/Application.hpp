@@ -9,7 +9,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 #define APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 
-#include "appfwk/DAQModuleManager.hpp"
+#include "DAQModuleManager.hpp"
 #include "appfwk/NamedObject.hpp"
 #include "appfwk/cmd/Structs.hpp"
 #include "rcif/runinfo/InfoStructs.hpp"
@@ -110,4 +110,7 @@ private:
 
 } // namespace appfwk
 } // namespace dunedaq
+
+#include "detail/Application.hxx"
+
 #endif // APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_

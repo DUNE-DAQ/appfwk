@@ -7,8 +7,8 @@
  * received with this code.
  */
 
-#include "appfwk/Application.hpp"
-#include "appfwk/CommandLineInterpreter.hpp"
+#include "Application.hpp"
+#include "CommandLineInterpreter.hpp"
 #include "appfwk/Issues.hpp"
 #include "cmdlib/CommandFacility.hpp"
 #include "logging/Logging.hpp"

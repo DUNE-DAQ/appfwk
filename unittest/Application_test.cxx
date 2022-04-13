@@ -8,7 +8,7 @@
 
 #include "rcif/cmd/Nljs.hpp"
 
-#include "appfwk/Application.hpp"
+#include "apps/Application.hpp"
 #include "appfwk/QueueRegistry.hpp"
 #include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"

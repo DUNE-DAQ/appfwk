@@ -6,7 +6,6 @@
  * received with this code.
  */
 
-#include "appfwk/DAQModuleManager.hpp"
 #include "networkmanager/NetworkManager.hpp"
 
 #include "cmdlib/cmd/Nljs.hpp"
