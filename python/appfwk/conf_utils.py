@@ -173,34 +173,53 @@ def make_system_connections(the_system):
         if len(endpoints) < 2:
             raise ValueError(f"Connection with name {endpoint_name} only has one endpoint!")
         first_app = endpoints[0]["app"]
-        in_count = 0
-        out_count = 0
+        in_apps = []
+        out_apps = []
         size = 0
+        topics = {}
         for endpoint in endpoints:
             direction = endpoint['endpoint'].direction
+            topics.update(endpoint['endpoint'].topic)
             console.log(f"Direction is {direction}")
             if direction == Direction.IN: 
-                in_count += 1
+                in_apps += [endpoint["app"]]
             else: 
-                out_count += 1
+                out_apps += [endpoint["app"]]
             if endpoint['endpoint'].size_hint > size:
                 size = endpoint['endpoint'].size_hint
 
-        if in_count == 0:
+        if len(in_apps) == 0:
             raise ValueError(f"Connection with name {endpoint_name} has no producers!")
-        if out_count == 0:
+        if len(out_apps) == 0:
             raise ValueError(f"Connection with name {endpoint_name} has no consumers!")
 
         if all(first_app == elem["app"] for elem in endpoints):
-            if in_count == 1 and out_count == 1:
+            if len(in_apps) == 1 and len(out_apps) == 1:
                 console.log(f"Connection {endpoint_name}, SPSC Queue")
                 the_system.connections[first_app] += [conn.ConnectionId(uid=endpoint_name, service_type="kQueue", data_type="", uri=f"queue://FollySPSC:{size}")]
             else:
                 console.log(f"Connection {endpoint_name}, MPMC Queue")
                 the_system.connections[first_app] += [conn.ConnectionId(uid=endpoint_name, service_type="kQueue", data_type="", uri=f"queue://FollyMPMC:{size}")]
         else:
-            console.log(f"Connection {endpoint_name}, Network")
-            the_system.app_connections[endpoint_name] = AppConnection()
+            if len(topics) == 0:
+                console.log(f"Connection {endpoint_name}, Network")
+                if len(in_apps) > 1:
+                    raise ValueError(f"Connection with name {endpoint_name} has multiple receivers, which is unsupported for a network connection!")
+                the_system.app_connections[endpoint_name] = AppConnection(bind_apps=in_apps, connect_apps=out_apps)
+                port = the_system.next_unassigned_port()
+                address = f"tcp://{{host_{in_apps[0]}}}:{port}"
+                the_system.connections[in_apps[0]] += [conn.ConnectionId(uid=endpoint_name, service_type="kNetwork", data_type="", uri=address)]
+                for app in set(out_apps):
+                    the_system.connections[app] += [conn.ConnectionId(uid=endpoint_name, service_type="kNetwork", data_type="", uri=address)]
+            else:
+                console.log(f"Connection {endpoint_name}, Pub/Sub")
+                for app in set(out_apps):
+                    the_system.app_connections[endpoint_name] = AppConnection(bind_apps=[app], connect_apps=in_apps)
+                    port = the_system.next_unassigned_port()
+                    address = f"tcp://{{host_{app}}}:{port}"
+                    the_system.connections[app] += [conn.ConnectionId(uid=f"{endpoint_name}.{app}", service_type="kPubSub", data_type="", uri=address, topics=topics)]
+                    for in_app in set(in_apps):
+                        the_system.connections[in_app] += [conn.ConnectionId(uid=f"{endpoint_name}.{app}", service_type="kPubSub", data_type="", uri=address, topics=topics)]
         
          
 
