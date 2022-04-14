@@ -36,8 +36,8 @@ void
 DAQModuleManager::initialize(const dataobj_t& data)
 {
   auto ini = data.get<app::Init>();
-  init_modules(ini.modules);
   init_connections(ini.connections);
+  init_modules(ini.modules);
   this->m_initialized = true;
 }
 
