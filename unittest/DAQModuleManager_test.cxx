@@ -8,7 +8,7 @@
 
 #include "cmdlib/cmd/Nljs.hpp"
 
-#include "apps/DAQModuleManager.hpp"
+#include "DAQModuleManager.hpp"
 #include "appfwk/Issues.hpp"
 #include "appfwk/QueueRegistry.hpp"
 #include "appfwk/app/Nljs.hpp"
