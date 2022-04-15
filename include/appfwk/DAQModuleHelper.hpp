@@ -31,6 +31,9 @@ connection_index(const nlohmann::json& iniobj, std::vector<std::string> required
 iomanager::connection::ConnectionRefs_t
 connection_refs(const nlohmann::json& iniobj);
 
+iomanager::connection::ConnectionRef
+connection_inst(const nlohmann::json& iniobj, const std::string& name);
+
 
 } // namespace appfwk
 

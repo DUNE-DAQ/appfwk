@@ -36,4 +36,10 @@ connection_refs(const nlohmann::json& iniobj)
   return iniobj.get<app::ModInit>().conn_refs;
 }
 
+iomanager::connection::ConnectionRef
+connection_inst(const nlohmann::json& iniobj, const std::string& name)
+{
+  return connection_index(iniobj, { name })[name];
+}
+
 } // namespace dunedaq::appfwk
