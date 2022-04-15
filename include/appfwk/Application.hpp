@@ -10,9 +10,9 @@
 #define APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 
 #include "appfwk/DAQModuleManager.hpp"
-#include "utilities/NamedObject.hpp"
 #include "appfwk/cmd/Structs.hpp"
 #include "rcif/runinfo/InfoStructs.hpp"
+#include "utilities/NamedObject.hpp"
 
 #include "cmdlib/CommandFacility.hpp"
 #include "cmdlib/CommandedObject.hpp"

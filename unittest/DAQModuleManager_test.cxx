@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
     mgr.execute(cmd_data), ConflictingCommandMatching, [&](ConflictingCommandMatching) { return true; });
 }
 
-BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues) 
+BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues)
 {
   dunedaq::iomanager::IOManager::reset();
   auto mgr = DAQModuleManager();

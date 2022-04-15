@@ -9,9 +9,9 @@
 #include "rcif/cmd/Nljs.hpp"
 
 #include "appfwk/Application.hpp"
-#include "iomanager/IOManager.hpp"
 #include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
+#include "iomanager/IOManager.hpp"
 
 #define BOOST_TEST_MODULE Application_test // NOLINT
 

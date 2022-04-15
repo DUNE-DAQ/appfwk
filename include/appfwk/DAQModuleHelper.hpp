@@ -34,7 +34,6 @@ connection_refs(const nlohmann::json& iniobj);
 iomanager::connection::ConnectionRef
 connection_inst(const nlohmann::json& iniobj, const std::string& name);
 
-
 } // namespace appfwk
 
 } // namespace dunedaq
