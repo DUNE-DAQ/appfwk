@@ -67,6 +67,7 @@ public:
   {
     register_command("no_stuff", &AnyDAQModule::do_stuff);
     register_command("any_stuff", &AnyDAQModule::do_stuff, std::set<std::string>{ "ANY" });
+    register_command("any_stuff_oops", &AnyDAQModule::do_stuff, std::set<std::string>{ "ANY", "RUNNING" });
   }
 
   void init(const nlohmann::json&) final {}
@@ -100,13 +101,16 @@ BOOST_AUTO_TEST_CASE(Commands)
   daqmoduletest::AnyDAQModule adm("command_test");
   BOOST_REQUIRE(adm.has_command("any_stuff", "RUNNING"));
   BOOST_REQUIRE(adm.has_command("no_stuff", "RUNNING"));
+  BOOST_REQUIRE(adm.has_command("any_stuff_oops", "CONFIGURED"));
   valid_commands = adm.get_commands();
-  BOOST_REQUIRE_EQUAL(valid_commands.size(), 2);
+  BOOST_REQUIRE_EQUAL(valid_commands.size(), 3);
 
   adm.execute_command("any_stuff", "RUNNING", {});
   adm.execute_command("any_stuff", "CONFIGURED", {});
   adm.execute_command("no_stuff", "RUNNING", {});
   adm.execute_command("no_stuff", "CONFIGURED", {});
+  adm.execute_command("any_stuff_oops", "RUNNING", {});
+  adm.execute_command("any_stuff_oops", "CONFIGURED", {});
 }
 
 BOOST_AUTO_TEST_CASE(MakeModule)
