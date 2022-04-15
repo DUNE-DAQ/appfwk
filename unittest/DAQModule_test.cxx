@@ -51,7 +51,22 @@ public:
   explicit GoodDAQModule(std::string const& name)
     : DAQModule(name)
   {
-    register_command("stuff", &GoodDAQModule::do_stuff, std::set<std::string> {"RUNNING"});
+    register_command("stuff", &GoodDAQModule::do_stuff, std::set<std::string>{ "RUNNING" });
+  }
+
+  void init(const nlohmann::json&) final {}
+
+  void do_stuff(const data_t& /*data*/) {}
+};
+
+class AnyDAQModule : public DAQModule
+{
+public:
+  explicit AnyDAQModule(std::string const& name)
+    : DAQModule(name)
+  {
+    register_command("no_stuff", &AnyDAQModule::do_stuff);
+    register_command("any_stuff", &AnyDAQModule::do_stuff, std::set<std::string>{ "ANY" });
   }
 
   void init(const nlohmann::json&) final {}
@@ -80,6 +95,18 @@ BOOST_AUTO_TEST_CASE(Commands)
 
   gdm.execute_command("stuff", "RUNNING", {});
   BOOST_REQUIRE_THROW(gdm.execute_command("other_stuff", "RUNNING", {}), UnknownCommand);
+  BOOST_REQUIRE_THROW(gdm.execute_command("stuff", "CONFIGURED", {}), InvalidState);
+
+  daqmoduletest::AnyDAQModule adm("command_test");
+  BOOST_REQUIRE(adm.has_command("any_stuff", "RUNNING"));
+  BOOST_REQUIRE(adm.has_command("no_stuff", "RUNNING"));
+  valid_commands = adm.get_commands();
+  BOOST_REQUIRE_EQUAL(valid_commands.size(), 2);
+
+  adm.execute_command("any_stuff", "RUNNING", {});
+  adm.execute_command("any_stuff", "CONFIGURED", {});
+  adm.execute_command("no_stuff", "RUNNING", {});
+  adm.execute_command("no_stuff", "CONFIGURED", {});
 }
 
 BOOST_AUTO_TEST_CASE(MakeModule)
