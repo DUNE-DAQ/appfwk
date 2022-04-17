@@ -111,10 +111,8 @@ jobs:
         include:
           - image: "dunedaq/sl7-minimal:spack-dev"
             os_name: "c7"
-            link: "last_successful"
               #- image: "dunedaq/c8-minimal:spack-dev"
             #os_name: "c8"
-              #link: "last_successful"
     container:
       image: ${{ matrix.image }}
     defaults:
@@ -133,9 +131,9 @@ jobs:
         
     - name: setup dev area
       run: |
-          source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
-          setup_dbt latest-spack || true
-          dbt-create.py -c -n ${{ matrix.link }} dev-${{ matrix.os_name }}
+          source /cvmfs/dunedaq.opensciencegrid.org/tools/dbt/latest-spack/env.sh
+          release_name=`$(basename `readlink -f last_successful`)
+          dbt-create.py -c -n ${release_name} dev-${{ matrix.os_name }}
           
     - name: checkout package for CI
       uses: actions/checkout@v3
