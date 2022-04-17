@@ -111,8 +111,8 @@ jobs:
         include:
           - image: "dunedaq/sl7-minimal:spack-dev"
             os_name: "c7"
-              #- image: "dunedaq/c8-minimal:spack-dev"
-            #os_name: "c8"
+          - image: "dunedaq/c8-minimal:spack-dev"
+            os_name: "c8"
     container:
       image: ${{ matrix.image }}
     defaults:
