@@ -69,7 +69,7 @@ public:
   // Gather statistics from modules
   void gather_stats(opmonlib::InfoCollector& ic, int level);
 
-protected:
+private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
   void initialize(const dataobj_t& data);
@@ -79,7 +79,6 @@ protected:
   void dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t& data);
   void dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data);
 
-private:
   std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id);
 
   bool m_initialized;
@@ -89,4 +88,7 @@ private:
 
 } // namespace appfwk
 } // namespace dunedaq
+
+#include "detail/DAQModuleManager.hxx"
+
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_

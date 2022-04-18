@@ -6,8 +6,6 @@
  * received with this code.
  */
 
-#include "appfwk/DAQModuleManager.hpp"
-
 #include "cmdlib/cmd/Nljs.hpp"
 
 #include "appfwk/Issues.hpp"

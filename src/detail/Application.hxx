@@ -6,8 +6,6 @@
  * received with this code.
  */
 
-#include "appfwk/Application.hpp"
-
 #include "appfwk/Issues.hpp"
 #include "appfwk/appinfo/InfoNljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"

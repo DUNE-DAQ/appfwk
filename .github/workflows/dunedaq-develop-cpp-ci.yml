@@ -19,7 +19,7 @@ on:
 
 
 jobs:
-  Build_against_dev_release:
+  UPS_Build_against_dev_release:
     name: build_against_dev_on_${{ matrix.os_name }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -61,7 +61,7 @@ jobs:
       with:
         path: ${{ github.repository }}
     
-    - name: setup build env, build and lint the repo against the development release
+    - name: building, linting and unit testing
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
@@ -70,9 +70,13 @@ jobs:
           setup_repo_env="SETUP_$REPO"
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
           cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
-          dbt-build.py
-          dbt-build.py --lint
+          dbt-build.py --lint 
+          dbt-workarea-env || true
+          #dbt-build.py --unittest
           $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev-${{ matrix.os_name }} -c ${{ matrix.os_name }} -o /tarballs-${{ matrix.os_name }}
+          #echo "------------------------------------------------------------------------"
+          #echo "-------------------------- Unit Test Summary ---------------------------"
+          #cat log/unit_tests*/unit_test_summary.log || true
           
     - name: upload UPS tarball and log file
       uses: actions/upload-artifact@v2
@@ -91,3 +95,78 @@ jobs:
       with:
         name: linting_log_${{ matrix.os_name }}
         path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/linting*
+
+          #- name: upload unittest output file
+      #uses: actions/upload-artifact@v2
+        #with:
+        #name: unit_tests_log_${{ matrix.os_name }}
+          #path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/unit_tests*
+
+  Spack_Build_against_dev_release:
+    name: spack_build_against_dev_on_${{ matrix.os_name }}
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image: "dunedaq/sl7-minimal:spack-dev"
+            os_name: "c7"
+          - image: "dunedaq/c8-minimal:spack-dev"
+            os_name: "c8"
+    container:
+      image: ${{ matrix.image }}
+    defaults:
+      run:
+        shell: bash
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+    
+    - name: Checkout daq-release
+      uses: actions/checkout@v3
+      with:
+        repository: DUNE-DAQ/daq-release
+        path: daq-release
+        
+    - name: setup dev area
+      run: |
+          source /cvmfs/dunedaq.opensciencegrid.org/tools/dbt/latest-spack/env.sh
+          release_path=$(readlink -f /cvmfs/dunedaq-development.opensciencegrid.org/spack-nightly/last_successful)
+          release_name=`basename $release_path`
+          dbt-create.py -c -n ${release_name} dev-${{ matrix.os_name }}
+          
+    - name: checkout package for CI
+      uses: actions/checkout@v3
+      with:
+        path: ${{ github.repository }}
+    
+    - name: setup build env, build and lint the repo against the development release
+      run: |
+          export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+          cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
+          source dbt-env.sh
+          dbt-workarea-env || true
+          spack unload $REPO
+          cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
+          dbt-build.py --lint
+          dbt-workarea-env
+          #dbt-build.py --unittest
+
+    - name: upload build log file
+      uses: actions/upload-artifact@v2
+      with:
+        name: spack_build_log_${{ matrix.os_name }}
+        path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/build*.log
+
+    - name: upload linter output file
+      uses: actions/upload-artifact@v2
+      with:
+        name: spack_linting_log_${{ matrix.os_name }}
+        path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/linting*
+
+          #- name: upload unittest output file
+          #uses: actions/upload-artifact@v2
+          #with:
+          #name: spack_unit_tests_log_${{ matrix.os_name }}
+          #path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/unit_tests*

@@ -25,7 +25,7 @@ daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hp
 
 ##############################################################################
 # Main library
-daq_add_library(DAQModule*.cpp Application.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
+daq_add_library(DAQModule*.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
 
 # ##############################################################################
 # Applications
@@ -43,7 +43,6 @@ daq_add_application( dummy_module_test dummy_module_test.cxx TEST LINK_LIBRARIES
 
 daq_add_unit_test(Application_test            LINK_LIBRARIES appfwk )
 daq_add_unit_test(CommandLineInterpreter_test LINK_LIBRARIES appfwk )
-daq_add_unit_test(DAQModule_test              LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQModuleManager_test       LINK_LIBRARIES appfwk )
 daq_add_unit_test(Interruptible_test          LINK_LIBRARIES appfwk)
 
