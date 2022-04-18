@@ -43,13 +43,8 @@ daq_add_application( dummy_module_test dummy_module_test.cxx TEST LINK_LIBRARIES
 # Unit tests
 
 daq_add_unit_test(Application_test            LINK_LIBRARIES appfwk )
-target_include_directories(Application_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
 daq_add_unit_test(CommandLineInterpreter_test LINK_LIBRARIES appfwk )
-target_include_directories(CommandLineInterpreter_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
 daq_add_unit_test(DAQModuleManager_test       LINK_LIBRARIES appfwk )
-target_include_directories(DAQModuleManager_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 daq_add_unit_test(DAQModule_test              LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQSink_DAQSource_test      LINK_LIBRARIES appfwk )
