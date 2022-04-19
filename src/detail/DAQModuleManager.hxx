@@ -94,7 +94,7 @@ DAQModuleManager::init_nwconnections(const networkmanager::nwmgr::Connections& n
 }
 
 void
-DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data)
+DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string & state, const dataobj_t& data)
 {
   // The command dispatching: commands and parameters are distributed to all modules that
   // have registered a method corresponding to the command. If no parameters are found, an
@@ -102,7 +102,7 @@ DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& d
   std::string bad_mod_names("");
   auto cmd_obj = data.get<cmd::CmdObj>();
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
-    if (mod_ptr->has_command(id)) {
+    if (mod_ptr->has_command(id, state)) {
       dataobj_t params;
       for (const auto& addressed : cmd_obj.modules) {
         if (addressed.match.empty() || std::regex_match(mod_name.c_str(), std::regex(addressed.match.c_str()))) {
@@ -113,7 +113,7 @@ DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& d
       }
       TLOG_DEBUG(2) << "Dispatch \"" << id << "\" to \"" << mod_ptr->get_name() << "\":\n" << params.dump(4);
       try {
-        mod_ptr->execute_command(id, params);
+        mod_ptr->execute_command(id, state, params);
       } catch (ers::Issue& ex) {
         ers::error(ex);
         bad_mod_names.append(mod_name);
@@ -127,12 +127,12 @@ DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& d
 }
 
 std::vector<std::string>
-DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id)
+DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string & state)
 {
   // Make a convenience array with module names that have the requested command
   std::vector<std::string> mod_names;
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
-    if (mod_ptr->has_command(id))
+    if (mod_ptr->has_command(id, state))
       mod_names.push_back(mod_name);
   }
 
@@ -140,7 +140,7 @@ DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id)
 }
 
 void
-DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t& data)
+DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data)
 {
   // This method ensures that each module is only matched once per command.
   // If multiple matches are found, an ers::Issue is thrown
@@ -152,7 +152,7 @@ DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t
   const dataobj_t dummy{};
 
   // Make a convenience array with module names that have the requested command
-  std::vector<std::string> cmd_mod_names = get_modnames_by_cmdid(id);
+  std::vector<std::string> cmd_mod_names = get_modnames_by_cmdid(id, state);
 
   // containers for error tracking
   std::vector<std::string> unmatched_addr;
@@ -222,7 +222,7 @@ DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t
     for (auto& mod_name : mod_names) {
       try {
         TLOG_DEBUG(2) << "Executing " << id << " -> " << mod_name;
-        m_module_map[mod_name]->execute_command(id, *data_ptr);
+        m_module_map[mod_name]->execute_command(id, state, *data_ptr);
       } catch (ers::Issue& ex) {
         ers::error(ex);
         failed_mod_names.append(mod_name);
@@ -238,7 +238,7 @@ DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t
 }
 
 void
-DAQModuleManager::execute(const dataobj_t& cmd_data)
+DAQModuleManager::execute(const std::string& state, const dataobj_t& cmd_data)
 {
 
   auto cmd = cmd_data.get<cmdlib::cmd::Command>();
@@ -255,7 +255,7 @@ DAQModuleManager::execute(const dataobj_t& cmd_data)
     throw DAQModuleManagerAlreadyInitialized(ERS_HERE);
   }
 
-  dispatch_one_match_only(cmd.id, cmd.data);
+  dispatch_one_match_only(cmd.id, state, cmd.data);
 
   // dispatch(cmd.id, cmd.data);
 }

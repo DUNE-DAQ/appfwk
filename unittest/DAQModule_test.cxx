@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 constexpr auto queue_timeout = std::chrono::milliseconds(10);
 using namespace dunedaq::appfwk;
@@ -32,10 +33,10 @@ public:
   explicit BadDAQModule(std::string const& name)
     : DAQModule(name)
   {
-    register_command("stuff", &BadDAQModule::do_stuff);
+    register_command("stuff", &BadDAQModule::do_stuff, std::set<std::string> {"RUNNING"});
 
     // THIS WILL FAIL
-    register_command("stuff", &BadDAQModule::do_other_stuff);
+    register_command("stuff", &BadDAQModule::do_other_stuff, std::set<std::string> {"RUNNING"});
   }
 
   void init(const nlohmann::json&) final {}
@@ -50,7 +51,23 @@ public:
   explicit GoodDAQModule(std::string const& name)
     : DAQModule(name)
   {
-    register_command("stuff", &GoodDAQModule::do_stuff);
+    register_command("stuff", &GoodDAQModule::do_stuff, std::set<std::string>{ "RUNNING" });
+  }
+
+  void init(const nlohmann::json&) final {}
+
+  void do_stuff(const data_t& /*data*/) {}
+};
+
+class AnyDAQModule : public DAQModule
+{
+public:
+  explicit AnyDAQModule(std::string const& name)
+    : DAQModule(name)
+  {
+    register_command("no_stuff", &AnyDAQModule::do_stuff);
+    register_command("any_stuff", &AnyDAQModule::do_stuff, std::set<std::string>{ "ANY" });
+    register_command("any_stuff_oops", &AnyDAQModule::do_stuff, std::set<std::string>{ "ANY", "RUNNING" });
   }
 
   void init(const nlohmann::json&) final {}
@@ -69,7 +86,7 @@ BOOST_AUTO_TEST_CASE(Commands)
 {
   daqmoduletest::GoodDAQModule gdm("command_test");
 
-  BOOST_REQUIRE(gdm.has_command("stuff"));
+  BOOST_REQUIRE(gdm.has_command("stuff", "RUNNING"));
   auto valid_commands = gdm.get_commands();
   BOOST_REQUIRE_EQUAL(valid_commands.size(), 1);
   BOOST_REQUIRE_EQUAL(valid_commands[0], "stuff");
@@ -77,8 +94,23 @@ BOOST_AUTO_TEST_CASE(Commands)
   dunedaq::opmonlib::InfoCollector ic;
   gdm.get_info(ic, 0);
 
-  gdm.execute_command("stuff", {});
-  BOOST_REQUIRE_THROW(gdm.execute_command("other_stuff", {}), UnknownCommand);
+  gdm.execute_command("stuff", "RUNNING", {});
+  BOOST_REQUIRE_THROW(gdm.execute_command("other_stuff", "RUNNING", {}), UnknownCommand);
+  BOOST_REQUIRE_THROW(gdm.execute_command("stuff", "CONFIGURED", {}), InvalidState);
+
+  daqmoduletest::AnyDAQModule adm("command_test");
+  BOOST_REQUIRE(adm.has_command("any_stuff", "RUNNING"));
+  BOOST_REQUIRE(adm.has_command("no_stuff", "RUNNING"));
+  BOOST_REQUIRE(adm.has_command("any_stuff_oops", "CONFIGURED"));
+  valid_commands = adm.get_commands();
+  BOOST_REQUIRE_EQUAL(valid_commands.size(), 3);
+
+  adm.execute_command("any_stuff", "RUNNING", {});
+  adm.execute_command("any_stuff", "CONFIGURED", {});
+  adm.execute_command("no_stuff", "RUNNING", {});
+  adm.execute_command("no_stuff", "CONFIGURED", {});
+  adm.execute_command("any_stuff_oops", "RUNNING", {});
+  adm.execute_command("any_stuff_oops", "CONFIGURED", {});
 }
 
 BOOST_AUTO_TEST_CASE(MakeModule)
