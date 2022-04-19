@@ -146,12 +146,47 @@ def add_one_command_data(command_data, command, default_params, app, module_orde
 
     command_data[command] = acmd(mod_and_params)
 
+def make_queue_connection(the_system, app, endpoint_name, in_apps, out_apps, size):
+    if len(in_apps) == 1 and len(out_apps) == 1:
+        console.log(f"Connection {endpoint_name}, SPSC Queue")
+        the_system.connections[app] += [conn.ConnectionId(uid=endpoint_name, service_type="kQueue", data_type="", uri=f"queue://FollySPSC:{size}")]
+    else:
+        console.log(f"Connection {endpoint_name}, MPMC Queue")
+        the_system.connections[app] += [conn.ConnectionId(uid=endpoint_name, service_type="kQueue", data_type="", uri=f"queue://FollyMPMC:{size}")]
+
+def make_network_connection(the_system, endpoint_name, in_apps, out_apps, topics):
+    if len(topics) == 0:
+        console.log(f"Connection {endpoint_name}, Network")
+        if len(in_apps) > 1:
+            raise ValueError(f"Connection with name {endpoint_name} has multiple receivers, which is unsupported for a network connection!")
+        the_system.app_connections[endpoint_name] = AppConnection(bind_apps=in_apps, connect_apps=out_apps)
+        port = the_system.next_unassigned_port()
+        address = f"tcp://{{host_{in_apps[0]}}}:{port}"
+        the_system.connections[in_apps[0]] += [conn.ConnectionId(uid=endpoint_name, service_type="kNetwork", data_type="", uri=address)]
+        for app in set(out_apps):
+            the_system.connections[app] += [conn.ConnectionId(uid=endpoint_name, service_type="kNetwork", data_type="", uri=address)]
+    else:
+        console.log(f"Connection {endpoint_name}, Pub/Sub")
+        for app in set(out_apps):
+            the_system.app_connections[endpoint_name] = AppConnection(bind_apps=[app], connect_apps=in_apps)
+            port = the_system.next_unassigned_port()
+            address = f"tcp://{{host_{app}}}:{port}"
+            the_system.connections[app] += [conn.ConnectionId(uid=f"{endpoint_name}.{app}", service_type="kPubSub", data_type="", uri=address, topics=topics)]
+            for in_app in set(in_apps):
+                the_system.connections[in_app] += [conn.ConnectionId(uid=f"{endpoint_name}.{app}", service_type="kPubSub", data_type="", uri=address, topics=topics)]
+
+
 def make_system_connections(the_system):
     """Given a system with defined apps and endpoints, create the 
     set of connections that satisfy the endpoints.
 
     If an endpoint's ID only exists for one application, a queue will
-    be used, otherwise a network connection will be created.
+    be used. 
+
+    If an endpoint's ID exists for multiple applications, a network connection 
+    will be created, unless the inputs and outputs are exactly paired between 
+    those applications. (Each application in the set of applications that has 
+    that endpoint has exactly one input and one output with that endpoint name)
 
     If a queue connection has a single producer and single consumer, it will use FollySPSC,
     otherwise FollyMPMC will be used.
@@ -194,32 +229,28 @@ def make_system_connections(the_system):
             raise ValueError(f"Connection with name {endpoint_name} has no consumers!")
 
         if all(first_app == elem["app"] for elem in endpoints):
-            if len(in_apps) == 1 and len(out_apps) == 1:
-                console.log(f"Connection {endpoint_name}, SPSC Queue")
-                the_system.connections[first_app] += [conn.ConnectionId(uid=endpoint_name, service_type="kQueue", data_type="", uri=f"queue://FollySPSC:{size}")]
-            else:
-                console.log(f"Connection {endpoint_name}, MPMC Queue")
-                the_system.connections[first_app] += [conn.ConnectionId(uid=endpoint_name, service_type="kQueue", data_type="", uri=f"queue://FollyMPMC:{size}")]
+            make_queue_connection(the_system, first_app, endpoint_name, in_apps, out_apps, size)
+        elif len(in_apps) == len(out_apps):
+            paired_exactly = False
+            if len(set(in_apps)) == len(in_apps) and len(set(out_apps)) == len(out_apps):
+                paired_exactly = True
+                for in_app in in_apps:
+                    if(out_apps.count(in_app) != 1):
+                        paired_exactly = False
+                        break
+
+                if paired_exactly:
+                    for in_app in in_apps:
+                        for app_endpoint in the_system.apps[in_app].modulegraph.endpoints:
+                            if app_endpoint.external_name == endpoint_name:
+                                app_endpoint.external_name = f"{in_app}.{endpoint_name}"
+                        make_queue_connection(the_system, in_app, f"{in_app}.{endpoint_name}", [in_app], [in_app], size)
+
+            if paired_exactly == False:
+                make_network_connection(the_system, endpoint_name, in_apps, out_apps, topics)
+
         else:
-            if len(topics) == 0:
-                console.log(f"Connection {endpoint_name}, Network")
-                if len(in_apps) > 1:
-                    raise ValueError(f"Connection with name {endpoint_name} has multiple receivers, which is unsupported for a network connection!")
-                the_system.app_connections[endpoint_name] = AppConnection(bind_apps=in_apps, connect_apps=out_apps)
-                port = the_system.next_unassigned_port()
-                address = f"tcp://{{host_{in_apps[0]}}}:{port}"
-                the_system.connections[in_apps[0]] += [conn.ConnectionId(uid=endpoint_name, service_type="kNetwork", data_type="", uri=address)]
-                for app in set(out_apps):
-                    the_system.connections[app] += [conn.ConnectionId(uid=endpoint_name, service_type="kNetwork", data_type="", uri=address)]
-            else:
-                console.log(f"Connection {endpoint_name}, Pub/Sub")
-                for app in set(out_apps):
-                    the_system.app_connections[endpoint_name] = AppConnection(bind_apps=[app], connect_apps=in_apps)
-                    port = the_system.next_unassigned_port()
-                    address = f"tcp://{{host_{app}}}:{port}"
-                    the_system.connections[app] += [conn.ConnectionId(uid=f"{endpoint_name}.{app}", service_type="kPubSub", data_type="", uri=address, topics=topics)]
-                    for in_app in set(in_apps):
-                        the_system.connections[in_app] += [conn.ConnectionId(uid=f"{endpoint_name}.{app}", service_type="kPubSub", data_type="", uri=address, topics=topics)]
+            make_network_connection(the_system, endpoint_name, in_apps, out_apps, topics)
         
          
 
