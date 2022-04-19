@@ -6,7 +6,7 @@
  * received with this code.
  */
 
-#include "apps/CommandLineInterpreter.hpp"
+#include "CommandLineInterpreter.hpp"
 
 #define BOOST_TEST_MODULE CommandLineInterpreter_test // NOLINT
 
