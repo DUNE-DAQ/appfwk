@@ -37,7 +37,8 @@ public:
   explicit DummyParentModule(const std::string& name)
     : DAQModule(name)
   {
-    register_command("stuff", &DummyParentModule::do_stuff);
+    std::set<std::string> valid_states {"RUNNING"};	  
+    register_command("stuff", &DummyParentModule::do_stuff, valid_states);
   }
 
   void init(const nlohmann::json&) final {}
@@ -54,7 +55,7 @@ public:
     register_command("bad_stuff", &DummyModule::do_bad_stuff);
   }
 
-  void do_bad_stuff(const data_t&) { throw DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_bad_stuff");  }
+  void do_bad_stuff(const data_t&) { throw DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_bad_stuff"); }
 
   void do_stuff(const data_t& /*data*/) override
   {

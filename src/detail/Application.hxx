@@ -6,8 +6,6 @@
  * received with this code.
  */
 
-#include "appfwk/Application.hpp"
-
 #include "appfwk/Issues.hpp"
 #include "appfwk/appinfo/InfoNljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
@@ -34,7 +32,7 @@ Application::Application(std::string appname, std::string partition, std::string
   m_runinfo.runno = 0;
   m_runinfo.runtime = 0;
 
-  m_fully_qualified_name = partition + "_" + appname;
+  m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 }
 
@@ -43,6 +41,8 @@ Application::init()
 {
   m_cmd_fac->set_commanded(*this, get_name());
   m_info_mgr.set_provider(*this);
+  // Add partition id as tag
+  m_info_mgr.set_tags({ { "partition_id", m_partition } });
   m_initialized = true;
 }
 
@@ -101,28 +101,21 @@ Application::execute(const dataobj_t& cmd_data)
   }
 
   try {
-    m_mod_mgr.execute(cmd_data);
+    m_mod_mgr.execute(get_state(), cmd_data);
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
       set_state(rc_cmd.exit_state);
-  } catch (DAQModuleManagerNotInitialized& ex) {
+  } catch (ers::Issue& ex) {
     m_busy.store(false);
     m_error.store(true);
-    throw ex;
-  } catch (CommandDispatchingFailed& ex) {
-    m_busy.store(false);
-    m_error.store(true);
-    throw ex;
+    throw;
   }
 }
 
 void
 Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 {
-  // TODO:Fill application info and add it to ci
   appinfo::Info ai;
-  // ai.partition_name = m_partition;
-  // ai.app_name = get_name();
   ai.state = get_state();
   ai.busy = m_busy.load();
   ai.error = m_error.load();
@@ -159,16 +152,7 @@ Application::is_cmd_valid(const dataobj_t& cmd_data)
   std::string entry_state = cmd_data.get<rcif::cmd::RCCommand>().entry_state;
   if (entry_state == "ANY" || state == entry_state)
     return true;
-#if 0 // TODO, Eric Flumerfelt <eflumerf@fnal.gov> May-26-2021: Should this code be removed
-    if( (state == "NONE" && cmd == "init") || (state == "INITIAL" && cmd == "conf")
-        || (state == "CONFIGURED" && (cmd == "start" || cmd == "scrap"))
-        || (state == "RUNNING" && (cmd == "resume" || cmd == "stop" || cmd == "pause"))
-        || (state == "PAUSED" && (cmd == "resume" || cmd == "stop")) ) {
-       return true;
-    }
-    if (!(cmd=="init" || cmd=="conf" || cmd=="start" || cmd=="stop" || cmd == "pause" || cmd == "resume" || cmd ==
-    "scrap")) return true;
-#endif
+
   return false;
 }
 

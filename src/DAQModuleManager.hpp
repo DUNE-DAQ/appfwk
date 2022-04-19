@@ -9,12 +9,13 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
 
-#include "appfwk/app/Structs.hpp"
-#include "cmdlib/cmd/Structs.hpp"
-
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 #include "opmonlib/InfoCollector.hpp"
+
+#include "appfwk/app/Structs.hpp"
+#include "cmdlib/cmd/Structs.hpp"
+#include "networkmanager/nwmgr/Structs.hpp"
 
 #include <map>
 #include <memory>
@@ -29,9 +30,10 @@ ERS_DECLARE_ISSUE(appfwk,                                                   ///<
                   "Command " << cmdid << " received before initialization", ///< Message
                   ((std::string)cmdid)                                      ///< Message parameters
 )
-ERS_DECLARE_ISSUE(appfwk,                                                   ///< Namespace
-                  DAQModuleManagerAlreadyInitialized,                           ///< Issue class name
-                  "\"init\" Command received when already initialized", ERS_EMPTY)                                      ///< Message
+ERS_DECLARE_ISSUE(appfwk,                             ///< Namespace
+                  DAQModuleManagerAlreadyInitialized, ///< Issue class name
+                  "\"init\" Command received when already initialized",
+                  ERS_EMPTY) ///< Message
 
 ERS_DECLARE_ISSUE(appfwk,                                                               ///< Namespace
                   CommandDispatchingFailed,                                             ///< Issue class name
@@ -62,23 +64,23 @@ public:
   bool initialized() const { return m_initialized; }
 
   // Execute a properly structured command
-  void execute(const dataobj_t& cmd_data);
+  void execute(const std::string& state, const dataobj_t& cmd_data);
 
   // Gather statistics from modules
   void gather_stats(opmonlib::InfoCollector& ic, int level);
 
-protected:
+private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
   void initialize(const dataobj_t& data);
   void init_queues(const app::QueueSpecs& qspecs);
   void init_modules(const app::ModSpecs& mspecs);
+  void init_nwconnections(const networkmanager::nwmgr::Connections& nwspecs);
 
-  void dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t& data);
-  void dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data);
+  void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string & state, const dataobj_t& data);
+  void dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string & state, const dataobj_t& data);
 
-private:
-  std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id);
+  std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string & state);
 
   bool m_initialized;
 
@@ -87,4 +89,7 @@ private:
 
 } // namespace appfwk
 } // namespace dunedaq
+
+#include "detail/DAQModuleManager.hxx"
+
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_

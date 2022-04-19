@@ -8,7 +8,7 @@
 
 #include "rcif/cmd/Nljs.hpp"
 
-#include "appfwk/Application.hpp"
+#include "Application.hpp"
 #include "appfwk/QueueRegistry.hpp"
 #include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(Application_test)
 
 using namespace dunedaq::appfwk;
 
-const std::string TEST_JSON_FILE = std::string(getenv("APPFWK_SHARE")) + "/test/scripts/test.json";
+const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json";
 
 BOOST_AUTO_TEST_CASE(Constructor)
 {
@@ -170,7 +170,8 @@ BOOST_AUTO_TEST_CASE(Stop)
   app.execute(cmd_data);
 }
 
-BOOST_AUTO_TEST_CASE(NotInitialized) {
+BOOST_AUTO_TEST_CASE(NotInitialized)
+{
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::appfwk::cmd::CmdObj start;
@@ -208,12 +209,13 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
   BOOST_REQUIRE_EQUAL(cmd_valid, false);
 
   BOOST_REQUIRE_EXCEPTION(app.execute(cmd_data), InvalidCommand, [&](InvalidCommand) { return true; });
-  
+
   cmd_valid = app.is_cmd_valid(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, false);
 }
 
-BOOST_AUTO_TEST_CASE(CommandThrowsException) {
+BOOST_AUTO_TEST_CASE(CommandThrowsException)
+{
   QueueRegistry::reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
@@ -224,7 +226,7 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException) {
   init.modules.push_back(module_init);
   nlohmann::json init_data;
   to_json(init_data, init);
-  
+
   dunedaq::rcif::cmd::RCCommand cmd;
   cmd.id = "init";
   cmd.data = init_data;
@@ -262,7 +264,6 @@ BOOST_AUTO_TEST_CASE(Stats)
   app.gather_stats(ic, 0);
   BOOST_REQUIRE(!ic.is_empty());
 
-
   dunedaq::appfwk::app::Init init;
   nlohmann::json init_data;
   to_json(init_data, init);
@@ -284,7 +285,7 @@ BOOST_AUTO_TEST_CASE(Stats)
   start_params.run = 1010;
   nlohmann::json start_param_data;
   to_json(start_param_data, start_params);
-  
+
   addr_cmd.data = start_param_data;
   addr_cmd.match = "";
   start.modules.push_back(addr_cmd);
