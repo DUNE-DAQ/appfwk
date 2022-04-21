@@ -64,7 +64,7 @@ public:
   bool initialized() const { return m_initialized; }
 
   // Execute a properly structured command
-  void execute(const dataobj_t& cmd_data);
+  void execute(const std::string& state, const dataobj_t& cmd_data);
 
   // Gather statistics from modules
   void gather_stats(opmonlib::InfoCollector& ic, int level);
@@ -76,10 +76,10 @@ private:
   void init_connections(const iomanager::connection::ConnectionIds_t conn_specs);
   void init_modules(const app::ModSpecs& mspecs);
 
-  void dispatch_one_match_only(cmdlib::cmd::CmdId id, const dataobj_t& data);
-  void dispatch_after_merge(cmdlib::cmd::CmdId id, const dataobj_t& data);
+  void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string & state, const dataobj_t& data);
+  void dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string & state, const dataobj_t& data);
 
-  std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id);
+  std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string & state);
 
   bool m_initialized;
 

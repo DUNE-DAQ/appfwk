@@ -33,6 +33,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <set>
+#include <utility>
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
 // NOLINTNEXTLINE(build/define_used)
@@ -110,6 +112,17 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
 )
 
 /**
+ * @brief The InvalidCommand DAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
+                       InvalidState,                        ///< Issue class name
+                       appfwk::CommandIssue,                  ///< Base class of the issue
+                       "Command is not valid in state " << state,           ///< Log Message from the issue
+                       ((std::string)cmd)((std::string)name), ///< Base class attributes
+	               ((std::string)state)                    ///< Attribute of this class
+)
+
+/**
  * @brief The CommandFailed DAQModule ERS Issue
  */
 ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
@@ -171,11 +184,11 @@ public:
    *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
-  void execute_command(const std::string& name, const data_t& data = {});
+  void execute_command(const std::string& name, const std::string& state, const data_t& data = {});
 
   std::vector<std::string> get_commands() const;
 
-  bool has_command(const std::string& name) const;
+  bool has_command(const std::string& name, const std::string& state) const;
 
   virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; }
 
@@ -185,7 +198,8 @@ protected:
    * Returns whether the command was inserted (false meaning that command `cmd` already exists)
    */
   template<typename Child>
-  void register_command(const std::string& name, void (Child::*f)(const data_t&));
+	  void register_command(const std::string& name, void (Child::*f)(const data_t&), const std::set<std::string>& valid_states = std::set<std::string> {"ANY"});
+
 
   DAQModule(DAQModule const&) = delete;
   DAQModule(DAQModule&&) = delete;
@@ -193,7 +207,7 @@ protected:
   DAQModule& operator=(DAQModule&&) = delete;
 
 private:
-  using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
+  using CommandMap_t = std::map<std::string, std::pair<std::set<std::string>, std::function<void(const data_t&)>>>;
   CommandMap_t m_commands;
 };
 
