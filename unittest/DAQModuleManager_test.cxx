@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
   cmd.data = init_data;
   nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
-  mgr.execute(cmd_data);
+  mgr.execute("NONE", cmd_data);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_QueuesAndNetwork)
   cmd.data = init_data;
   nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
-  mgr.execute(cmd_data);
+  mgr.execute("NONE", cmd_data);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
