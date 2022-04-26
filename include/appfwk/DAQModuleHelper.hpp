@@ -34,6 +34,29 @@ connection_refs(const nlohmann::json& iniobj);
 iomanager::connection::ConnectionRef
 connection_inst(const nlohmann::json& iniobj, const std::string& name);
 
+struct queue_info
+{
+  std::string inst;
+};
+using IndexedQueueInfos_t = std::map<std::string, queue_info>;
+
+[[deprecated("Use connection_index")]] IndexedQueueInfos_t
+queue_index(const nlohmann::json& iniobj, std::vector<std::string> required = {})
+{
+  IndexedQueueInfos_t ret;
+  auto idx = connection_index(iniobj, required);
+  for (auto& i : idx) {
+    ret[i.first].inst = i.second.uid;
+  }
+  return ret;
+}
+
+[[deprecated("Use connection_inst")]] std::string
+queue_inst(const nlohmann::json& iniobj, const std::string& name)
+{
+  return connection_inst(iniobj, name).uid;
+}
+
 } // namespace appfwk
 
 } // namespace dunedaq
