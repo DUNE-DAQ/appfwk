@@ -40,7 +40,7 @@ struct queue_info
 };
 using IndexedQueueInfos_t = std::map<std::string, queue_info>;
 
-[[deprecated("Use connection_index")]] IndexedQueueInfos_t
+[[deprecated("Use connection_index")]] inline IndexedQueueInfos_t
 queue_index(const nlohmann::json& iniobj, std::vector<std::string> required = {})
 {
   IndexedQueueInfos_t ret;
@@ -51,7 +51,7 @@ queue_index(const nlohmann::json& iniobj, std::vector<std::string> required = {}
   return ret;
 }
 
-[[deprecated("Use connection_inst")]] std::string
+[[deprecated("Use connection_inst")]] inline std::string
 queue_inst(const nlohmann::json& iniobj, const std::string& name)
 {
   return connection_inst(iniobj, name).uid;
