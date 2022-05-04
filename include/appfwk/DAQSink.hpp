@@ -60,8 +60,7 @@ template<typename T>
 DAQSink<T>::DAQSink(const std::string& name)
 {
   try {
-    iomanager::IOManager iom;
-    m_queue = iom.get_sender<T>(name);
+    m_queue = get_iom_sender<T>(name);
     TLOG_DEBUG(1, "DAQSink") << "Queue " << name << " is at " << m_queue.get();
   } catch (const ers::Issue& ex) {
     throw DAQSinkConstructionFailed(ERS_HERE, name, ex);

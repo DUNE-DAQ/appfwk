@@ -59,8 +59,7 @@ template<typename T>
 DAQSource<T>::DAQSource(const std::string& name)
 {
   try {
-    iomanager::IOManager iom;
-    m_queue = iom.get_receiver<T>(name);
+    m_queue = get_iom_receiver<T>(name);
     TLOG_DEBUG(1, "DAQSource") << "Queue " << name << " is at " << m_queue.get();
   } catch (ers::Issue& ex) {
     throw DAQSourceConstructionFailed(ERS_HERE, name, ex);

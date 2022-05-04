@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(Construct)
 
 BOOST_AUTO_TEST_CASE(Initialized)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -57,8 +57,7 @@ BOOST_AUTO_TEST_CASE(Initialized)
 
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
-
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -80,7 +79,7 @@ BOOST_AUTO_TEST_CASE(Stats)
 
 BOOST_AUTO_TEST_CASE(InitializeModules)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -103,7 +102,7 @@ BOOST_AUTO_TEST_CASE(InitializeModules)
 
 BOOST_AUTO_TEST_CASE(CommandModules)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -138,7 +137,7 @@ BOOST_AUTO_TEST_CASE(CommandModules)
 
 BOOST_AUTO_TEST_CASE(CommandMatchingModules)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -183,7 +182,7 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -213,7 +212,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues)
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_UnknownQueueType)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -239,7 +238,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_UnknownQueueType)
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -266,7 +265,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_QueuesAndNetwork)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 

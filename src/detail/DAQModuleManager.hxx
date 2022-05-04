@@ -53,7 +53,7 @@ DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
 void
 DAQModuleManager::init_connections(const iomanager::connection::ConnectionIds_t conn_specs)
 {
-  iomanager::IOManager::configure(conn_specs);
+  get_iomanager()->configure(conn_specs);
 }
 
 void

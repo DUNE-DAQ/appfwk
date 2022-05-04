@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(Execute)
 
 BOOST_AUTO_TEST_CASE(Start)
 {
-  dunedaq::iomanager::IOManager::reset();
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::appfwk::app::Init init;
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(Start)
 }
 BOOST_AUTO_TEST_CASE(Stop)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::appfwk::app::Init init;
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 
 BOOST_AUTO_TEST_CASE(CommandThrowsException)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::appfwk::app::Init init;
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
 
 BOOST_AUTO_TEST_CASE(Stats)
 {
-  dunedaq::iomanager::IOManager::reset();
+    dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::opmonlib::InfoCollector ic;
