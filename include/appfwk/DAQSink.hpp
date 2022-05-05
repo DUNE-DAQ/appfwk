@@ -71,7 +71,7 @@ template<typename T>
 void
 DAQSink<T>::push(T&& element, const duration_t& timeout)
 {
-  m_queue->send(std:move(element), timeout);
+  m_queue->send(std::move(element), timeout);
 }
 
 template<typename T>
