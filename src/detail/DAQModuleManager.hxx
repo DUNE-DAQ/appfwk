@@ -57,7 +57,7 @@ DAQModuleManager::init_connections(const iomanager::connection::ConnectionIds_t 
 }
 
 void
-DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string & state, const dataobj_t& data)
+DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data)
 {
   // The command dispatching: commands and parameters are distributed to all modules that
   // have registered a method corresponding to the command. If no parameters are found, an
@@ -90,7 +90,7 @@ DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string 
 }
 
 std::vector<std::string>
-DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string & state)
+DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string& state)
 {
   // Make a convenience array with module names that have the requested command
   std::vector<std::string> mod_names;

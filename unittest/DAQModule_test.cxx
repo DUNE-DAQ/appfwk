@@ -16,9 +16,9 @@
 #include "boost/test/unit_test.hpp"
 #include "nlohmann/json.hpp"
 
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 constexpr auto queue_timeout = std::chrono::milliseconds(10);
 using namespace dunedaq::appfwk;
@@ -32,10 +32,10 @@ public:
   explicit BadDAQModule(std::string const& name)
     : DAQModule(name)
   {
-    register_command("stuff", &BadDAQModule::do_stuff, std::set<std::string> {"RUNNING"});
+    register_command("stuff", &BadDAQModule::do_stuff, std::set<std::string>{ "RUNNING" });
 
     // THIS WILL FAIL
-    register_command("stuff", &BadDAQModule::do_other_stuff, std::set<std::string> {"RUNNING"});
+    register_command("stuff", &BadDAQModule::do_other_stuff, std::set<std::string>{ "RUNNING" });
   }
 
   void init(const nlohmann::json&) final {}

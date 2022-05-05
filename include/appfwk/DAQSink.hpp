@@ -42,13 +42,13 @@ public:
   using duration_t = std::chrono::milliseconds;
 
   explicit DAQSink(const std::string& name);
-  void push(T&& element, const duration_t& timeout = duration_t::zero());
+  void push(T && element, const duration_t& timeout = duration_t::zero());
   void push(const T& element, const duration_t& timeout = duration_t::zero());
   bool can_push() const noexcept;
   const std::string& get_name() const final { return m_queue->get_name(); }
 
   DAQSink(DAQSink const&) = delete;
-  DAQSink(DAQSink&&) = delete;
+  DAQSink(DAQSink &&) = delete;
   DAQSink& operator=(DAQSink const&) = delete;
   DAQSink& operator=(DAQSink&&) = delete;
 

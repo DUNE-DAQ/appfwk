@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(Construct)
 
 BOOST_AUTO_TEST_CASE(Initialized)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -46,18 +46,18 @@ BOOST_AUTO_TEST_CASE(Initialized)
   cmd.data = init_data;
   nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
-  mgr.execute("NONE",cmd_data);
+  mgr.execute("NONE", cmd_data);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 
-  BOOST_REQUIRE_EXCEPTION(mgr.execute("NONE",cmd_data),
+  BOOST_REQUIRE_EXCEPTION(mgr.execute("NONE", cmd_data),
                           DAQModuleManagerAlreadyInitialized,
                           [&](DAQModuleManagerAlreadyInitialized) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -66,8 +66,9 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
   nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
 
-  BOOST_REQUIRE_EXCEPTION(
-    mgr.execute("CONFIGURED", cmd_data), DAQModuleManagerNotInitialized, [&](DAQModuleManagerNotInitialized) { return true; });
+  BOOST_REQUIRE_EXCEPTION(mgr.execute("CONFIGURED", cmd_data),
+                          DAQModuleManagerNotInitialized,
+                          [&](DAQModuleManagerNotInitialized) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(Stats)
@@ -79,7 +80,7 @@ BOOST_AUTO_TEST_CASE(Stats)
 
 BOOST_AUTO_TEST_CASE(InitializeModules)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -102,7 +103,7 @@ BOOST_AUTO_TEST_CASE(InitializeModules)
 
 BOOST_AUTO_TEST_CASE(CommandModules)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -118,18 +119,18 @@ BOOST_AUTO_TEST_CASE(CommandModules)
   cmd.data = init_data;
   nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
-  mgr.execute("NONE",cmd_data);
+  mgr.execute("NONE", cmd_data);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 
   cmd.id = "stuff";
   to_json(cmd_data, cmd);
-  mgr.execute("RUNNING",cmd_data);
+  mgr.execute("RUNNING", cmd_data);
 
   cmd.id = "bad_stuff";
   to_json(cmd_data, cmd);
   BOOST_REQUIRE_EXCEPTION(
-    mgr.execute("RUNNING",cmd_data), CommandDispatchingFailed, [&](CommandDispatchingFailed) { return true; });
+    mgr.execute("RUNNING", cmd_data), CommandDispatchingFailed, [&](CommandDispatchingFailed) { return true; });
 
   dunedaq::opmonlib::InfoCollector ic;
   mgr.gather_stats(ic, 0);
@@ -137,7 +138,7 @@ BOOST_AUTO_TEST_CASE(CommandModules)
 
 BOOST_AUTO_TEST_CASE(CommandMatchingModules)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -153,7 +154,7 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
   cmd.data = init_data;
   nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
-  mgr.execute("NONE",cmd_data);
+  mgr.execute("NONE", cmd_data);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 
@@ -168,7 +169,7 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
   cmd.id = "stuff";
   cmd.data = cmd_obj_data;
   to_json(cmd_data, cmd);
-  mgr.execute("RUNNING",cmd_data);
+  mgr.execute("RUNNING", cmd_data);
 
   addr_cmd.match = ".*Module";
   cmd_obj.modules.push_back(addr_cmd);
@@ -182,7 +183,7 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -212,7 +213,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues)
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_UnknownQueueType)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -238,7 +239,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_UnknownQueueType)
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
@@ -265,7 +266,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_QueuesAndNetwork)
 {
-    dunedaq::get_iomanager()->reset();
+  dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 

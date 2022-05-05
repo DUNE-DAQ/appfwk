@@ -18,9 +18,10 @@ void
 DAQModule::execute_command(const std::string& cmd_name, const std::string& state, const data_t& data)
 {
   if (auto cmd = m_commands.find(cmd_name); cmd != m_commands.end()) {
-    if (cmd->second.first.find("ANY")!= cmd->second.first.end() || (cmd->second.first.find(state)!= cmd->second.first.end())) {
-       std::invoke(cmd->second.second, data);
-       return;
+    if (cmd->second.first.find("ANY") != cmd->second.first.end() ||
+        (cmd->second.first.find(state) != cmd->second.first.end())) {
+      std::invoke(cmd->second.second, data);
+      return;
     }
     throw InvalidState(ERS_HERE, get_name(), cmd_name, state);
   }
@@ -40,11 +41,12 @@ bool
 DAQModule::has_command(const std::string& cmd_name, const std::string& state) const
 {
   if (auto cmd = m_commands.find(cmd_name); cmd != m_commands.end()) {
-	if (cmd->second.first.find("ANY")!= cmd->second.first.end() || (cmd->second.first.find(state)!= cmd->second.first.end())) {
-		return true;
-        }
-	ers::warning(InvalidState(ERS_HERE, get_name(), cmd_name, state));
-  }   
+    if (cmd->second.first.find("ANY") != cmd->second.first.end() ||
+        (cmd->second.first.find(state) != cmd->second.first.end())) {
+      return true;
+    }
+    ers::warning(InvalidState(ERS_HERE, get_name(), cmd_name, state));
+  }
   return false;
 }
 

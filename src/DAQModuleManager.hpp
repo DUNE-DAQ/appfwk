@@ -76,10 +76,10 @@ private:
   void init_connections(const iomanager::connection::ConnectionIds_t conn_specs);
   void init_modules(const app::ModSpecs& mspecs);
 
-  void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string & state, const dataobj_t& data);
-  void dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string & state, const dataobj_t& data);
+  void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
+  void dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
 
-  std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string & state);
+  std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string& state);
 
   bool m_initialized;
 
