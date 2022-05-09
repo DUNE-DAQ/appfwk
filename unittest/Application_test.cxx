@@ -9,9 +9,9 @@
 #include "rcif/cmd/Nljs.hpp"
 
 #include "Application.hpp"
-#include "appfwk/QueueRegistry.hpp"
 #include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
+#include "iomanager/IOManager.hpp"
 
 #define BOOST_TEST_MODULE Application_test // NOLINT
 
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(Execute)
 
 BOOST_AUTO_TEST_CASE(Start)
 {
-  QueueRegistry::reset();
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::appfwk::app::Init init;
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(Start)
 }
 BOOST_AUTO_TEST_CASE(Stop)
 {
-  QueueRegistry::reset();
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::appfwk::app::Init init;
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 
 BOOST_AUTO_TEST_CASE(CommandThrowsException)
 {
-  QueueRegistry::reset();
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::appfwk::app::Init init;
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
 
 BOOST_AUTO_TEST_CASE(Stats)
 {
-  QueueRegistry::reset();
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
 
   dunedaq::opmonlib::InfoCollector ic;

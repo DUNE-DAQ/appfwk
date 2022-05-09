@@ -19,7 +19,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 
-#include "appfwk/NamedObject.hpp"
+#include "utilities/NamedObject.hpp"
 
 #include "opmonlib/InfoCollector.hpp"
 
@@ -31,10 +31,10 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <string>
-#include <vector>
 #include <set>
+#include <string>
 #include <utility>
+#include <vector>
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
 // NOLINTNEXTLINE(build/define_used)
@@ -114,12 +114,12 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
 /**
  * @brief The InvalidCommand DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
-                       InvalidState,                        ///< Issue class name
-                       appfwk::CommandIssue,                  ///< Base class of the issue
-                       "Command is not valid in state " << state,           ///< Log Message from the issue
-                       ((std::string)cmd)((std::string)name), ///< Base class attributes
-	               ((std::string)state)                    ///< Attribute of this class
+ERS_DECLARE_ISSUE_BASE(appfwk,                                    ///< Namespace
+                       InvalidState,                              ///< Issue class name
+                       appfwk::CommandIssue,                      ///< Base class of the issue
+                       "Command is not valid in state " << state, ///< Log Message from the issue
+                       ((std::string)cmd)((std::string)name),     ///< Base class attributes
+                       ((std::string)state)                       ///< Attribute of this class
 )
 
 /**
@@ -147,7 +147,7 @@ namespace appfwk {
  * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
-class DAQModule : public NamedObject
+class DAQModule : public utilities::NamedObject
 {
 public:
   using data_t = nlohmann::json;
@@ -157,7 +157,7 @@ public:
    * @param name Name of the DAQModule
    */
   explicit DAQModule(std::string name)
-    : NamedObject(name)
+    : utilities::NamedObject(name)
   {}
 
   /**
@@ -198,8 +198,9 @@ protected:
    * Returns whether the command was inserted (false meaning that command `cmd` already exists)
    */
   template<typename Child>
-	  void register_command(const std::string& name, void (Child::*f)(const data_t&), const std::set<std::string>& valid_states = std::set<std::string> {"ANY"});
-
+  void register_command(const std::string& name,
+                        void (Child::*f)(const data_t&),
+                        const std::set<std::string>& valid_states = std::set<std::string>{ "ANY" });
 
   DAQModule(DAQModule const&) = delete;
   DAQModule(DAQModule&&) = delete;

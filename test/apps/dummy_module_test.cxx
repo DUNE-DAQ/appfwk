@@ -7,7 +7,6 @@
  */
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/QueueRegistry.hpp"
 #include "appfwk/app/Nljs.hpp"
 
 #include "logging/Logging.hpp" // NOLINT
@@ -24,9 +23,6 @@ main()
 {
   TLOG() << "Creating Module instances...";
   std::shared_ptr<DAQModule> dummy_module = make_module("DummyModule", "dummy");
-
-  std::map<std::string, QueueConfig> queue_map;
-  QueueRegistry::get().configure(queue_map);
 
   // Init
   TLOG() << "Calling init on modules...";

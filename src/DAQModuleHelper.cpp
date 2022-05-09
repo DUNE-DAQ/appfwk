@@ -15,30 +15,31 @@
 
 namespace dunedaq::appfwk {
 
-IndexedQueueInfos_t
-queue_index(const nlohmann::json& iniobj, std::vector<std::string> required)
+IndexedConnectionRefs_t
+connection_index(const nlohmann::json& iniobj, std::vector<std::string> required)
 {
-  IndexedQueueInfos_t ret;
-  for (auto qi : queue_infos(iniobj)) {
-    ret[qi.name] = qi;
+  IndexedConnectionRefs_t ret;
+  for (auto cr : connection_refs(iniobj)) {
+    ret[cr.name] = cr;
   }
   for (auto name : required) {
     if (ret.find(name) == ret.end()) {
-      throw InvalidSchema(ERS_HERE, "missing queue: " + name);
+      throw InvalidSchema(ERS_HERE, "missing connection: " + name);
     }
   }
   return ret;
 }
 
-app::QueueInfos
-queue_infos(const nlohmann::json& iniobj)
+iomanager::connection::ConnectionRefs_t
+connection_refs(const nlohmann::json& iniobj)
 {
-  return iniobj.get<app::ModInit>().qinfos;
+  return iniobj.get<app::ModInit>().conn_refs;
 }
 
-std::string
-queue_inst(const nlohmann::json& iniobj, const std::string& name)
+iomanager::connection::ConnectionRef
+connection_inst(const nlohmann::json& iniobj, const std::string& name)
 {
-  return queue_index(iniobj, { name })[name].inst;
+  return connection_index(iniobj, { name })[name];
 }
+
 } // namespace dunedaq::appfwk

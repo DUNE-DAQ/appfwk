@@ -9,7 +9,6 @@
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/DAQModuleHelper.hpp"
 #include "appfwk/Issues.hpp"
-#include "appfwk/QueueRegistry.hpp"
 #include "appfwk/app/Nljs.hpp"
 
 #define BOOST_TEST_MODULE DAQModule_test // NOLINT
@@ -17,9 +16,9 @@
 #include "boost/test/unit_test.hpp"
 #include "nlohmann/json.hpp"
 
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 constexpr auto queue_timeout = std::chrono::milliseconds(10);
 using namespace dunedaq::appfwk;
@@ -33,10 +32,10 @@ public:
   explicit BadDAQModule(std::string const& name)
     : DAQModule(name)
   {
-    register_command("stuff", &BadDAQModule::do_stuff, std::set<std::string> {"RUNNING"});
+    register_command("stuff", &BadDAQModule::do_stuff, std::set<std::string>{ "RUNNING" });
 
     // THIS WILL FAIL
-    register_command("stuff", &BadDAQModule::do_other_stuff, std::set<std::string> {"RUNNING"});
+    register_command("stuff", &BadDAQModule::do_other_stuff, std::set<std::string>{ "RUNNING" });
   }
 
   void init(const nlohmann::json&) final {}
@@ -120,25 +119,23 @@ BOOST_AUTO_TEST_CASE(MakeModule)
                           [&](DAQModuleCreationFailed) { return true; });
 }
 
-BOOST_AUTO_TEST_CASE(QueueInfo)
+BOOST_AUTO_TEST_CASE(ConnectionRefs)
 {
-
   app::ModInit data;
-  app::QueueInfo queue_info{ "test_queue", "output", "out" };
-  data.qinfos.push_back(queue_info);
+  dunedaq::iomanager::connection::ConnectionRef ref{ "output", "test_queue", {} };
+  data.conn_refs.push_back(ref);
   nlohmann::json json;
   to_json(json, data);
 
-  auto infos = queue_infos(json);
+  auto infos = connection_refs(json);
   BOOST_REQUIRE_EQUAL(infos.size(), 1);
 
-  auto index = queue_index(json, std::vector<std::string>{ "output" });
+  auto index = connection_index(json, std::vector<std::string>{ "output" });
   BOOST_REQUIRE_EQUAL(index.size(), 1);
-  BOOST_REQUIRE_EQUAL(index["output"].inst, queue_info.inst);
-  BOOST_REQUIRE_EQUAL(index["output"].name, queue_info.name);
-  BOOST_REQUIRE_EQUAL(index["output"].dir, queue_info.dir);
+  BOOST_REQUIRE_EQUAL(index["output"].uid, ref.uid);
+  BOOST_REQUIRE_EQUAL(index["output"].name, ref.name);
 
-  BOOST_REQUIRE_EXCEPTION(queue_index(json, std::vector<std::string>{ "output", "ERROR" }),
+  BOOST_REQUIRE_EXCEPTION(connection_index(json, std::vector<std::string>{ "output", "ERROR" }),
                           InvalidSchema,
                           [&](InvalidSchema) { return true; });
 }

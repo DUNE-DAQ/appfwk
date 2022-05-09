@@ -9,8 +9,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQSINK_HPP_
 
-#include "appfwk/Queue.hpp"
-#include "appfwk/QueueRegistry.hpp"
+#include "iomanager/IOManager.hpp"
 
 #include "logging/Logging.hpp"
 
@@ -33,35 +32,37 @@ ERS_DECLARE_ISSUE(appfwk,                                           // namespace
 
 namespace appfwk {
 
+using iomanager::QueueTimeoutExpired;
+
 template<typename T>
-class DAQSink : public Named
+class [[deprecated("Use iomanager::Sender instead")]] DAQSink : public utilities::Named
 {
 public:
   using value_t = T;
   using duration_t = std::chrono::milliseconds;
 
   explicit DAQSink(const std::string& name);
-  void push(T&& element, const duration_t& timeout = duration_t::zero());
+  void push(T && element, const duration_t& timeout = duration_t::zero());
   void push(const T& element, const duration_t& timeout = duration_t::zero());
   bool can_push() const noexcept;
   const std::string& get_name() const final { return m_queue->get_name(); }
 
   DAQSink(DAQSink const&) = delete;
-  DAQSink(DAQSink&&) = delete;
+  DAQSink(DAQSink &&) = delete;
   DAQSink& operator=(DAQSink const&) = delete;
   DAQSink& operator=(DAQSink&&) = delete;
 
 private:
-  std::shared_ptr<Queue<T>> m_queue;
+  std::shared_ptr<iomanager::SenderConcept<T>> m_queue;
 };
 
 template<typename T>
 DAQSink<T>::DAQSink(const std::string& name)
 {
   try {
-    m_queue = QueueRegistry::get().get_queue<T>(name);
+    m_queue = get_iom_sender<T>(name);
     TLOG_DEBUG(1, "DAQSink") << "Queue " << name << " is at " << m_queue.get();
-  } catch (const QueueTypeMismatch& ex) {
+  } catch (const ers::Issue& ex) {
     throw DAQSinkConstructionFailed(ERS_HERE, name, ex);
   }
 }
@@ -70,21 +71,23 @@ template<typename T>
 void
 DAQSink<T>::push(T&& element, const duration_t& timeout)
 {
-  m_queue->push(std::move(element), timeout);
+  m_queue->send(std::move(element), timeout);
 }
 
 template<typename T>
 void
 DAQSink<T>::push(const T& element, const duration_t& timeout)
 {
-  m_queue->push(T(element), timeout);
+  auto copy = T(element);
+  m_queue->send(std::move(copy), timeout);
 }
 
 template<typename T>
 bool
 DAQSink<T>::can_push() const noexcept
 {
-  return m_queue->can_push();
+#pragma message("This method gives false results, use try..catch to check if data was actually sent")
+  return true;
 }
 
 } // namespace appfwk

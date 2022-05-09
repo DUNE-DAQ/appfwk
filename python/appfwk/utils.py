@@ -5,14 +5,16 @@ moo.otypes.load_types('appfwk/cmd.jsonnet', get_moo_model_path())
 moo.otypes.load_types('appfwk/app.jsonnet', get_moo_model_path())
 moo.otypes.load_types('rcif/cmd.jsonnet', get_moo_model_path())
 moo.otypes.load_types('cmdlib/cmd.jsonnet', get_moo_model_path())
+moo.otypes.load_types('iomanager/connection.jsonnet', get_moo_model_path())
 
 import dunedaq.appfwk.cmd as cmd 
 import dunedaq.appfwk.app as app 
 import dunedaq.rcif.cmd as rccmd 
 import dunedaq.cmdlib.cmd as ccmd 
+import dunedaq.iomanager.connection as conn
 
 
-def mspec(inst, plugin, qinfos):
+def mspec(inst, plugin, conn_refs):
     """
     Helper function to create Module Specification objects
     
@@ -20,15 +22,15 @@ def mspec(inst, plugin, qinfos):
     :type       inst:    str
     :param      plugin:  Appfwk Module Plugin name
     :type       plugin:  str
-    :param      qinfos:  List of dunedaq.appfwk.QueueInfo objects
-    :type       qinfos:  list
+    :param      cinfos:  List of dunedaq.iomanager.ConnectionRef objects
+    :type       cinfos:  list
     
     :returns:   A constructed ModSpec object
     :rtype:     dunedaq.appfwk.app.ModSpec
     """
     return app.ModSpec(inst=inst, plugin=plugin,
             data=app.ModInit(
-                qinfos=app.QueueInfos(qinfos)
+                conn_refs=conn.ConnectionRefs_t(conn_refs)
                 )
             )
 

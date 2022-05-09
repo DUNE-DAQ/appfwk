@@ -9,8 +9,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQSOURCE_HPP_
 
-#include "appfwk/Queue.hpp"
-#include "appfwk/QueueRegistry.hpp"
+#include "iomanager/IOManager.hpp"
 
 #include "logging/Logging.hpp"
 
@@ -33,8 +32,10 @@ ERS_DECLARE_ISSUE(appfwk,                                             // namespa
 
 namespace appfwk {
 
+using iomanager::QueueTimeoutExpired;
+
 template<typename T>
-class DAQSource : public Named
+class [[deprecated("Use iomanager::Receiver instead")]] DAQSource : public utilities::Named
 {
 public:
   using value_t = T;
@@ -46,21 +47,21 @@ public:
   const std::string& get_name() const final { return m_queue->get_name(); }
 
   DAQSource(DAQSource const&) = delete;
-  DAQSource(DAQSource&&) = delete;
+  DAQSource(DAQSource &&) = delete;
   DAQSource& operator=(DAQSource const&) = delete;
   DAQSource& operator=(DAQSource&&) = delete;
 
 private:
-  std::shared_ptr<Queue<T>> m_queue;
+  std::shared_ptr<iomanager::ReceiverConcept<T>> m_queue;
 };
 
 template<typename T>
 DAQSource<T>::DAQSource(const std::string& name)
 {
   try {
-    m_queue = QueueRegistry::get().get_queue<T>(name);
+    m_queue = get_iom_receiver<T>(name);
     TLOG_DEBUG(1, "DAQSource") << "Queue " << name << " is at " << m_queue.get();
-  } catch (QueueTypeMismatch& ex) {
+  } catch (ers::Issue& ex) {
     throw DAQSourceConstructionFailed(ERS_HERE, name, ex);
   }
 }
@@ -69,14 +70,15 @@ template<typename T>
 void
 DAQSource<T>::pop(T& val, const duration_t& timeout)
 {
-  m_queue->pop(val, timeout);
+  val = m_queue->receive(timeout);
 }
 
 template<typename T>
 bool
 DAQSource<T>::can_pop() const noexcept
 {
-  return m_queue->can_pop();
+#pragma message("This method gives false results, use try..catch to see if data was received")
+  return true;
 }
 
 } // namespace appfwk
