@@ -54,7 +54,7 @@ jobs:
       run: |
           source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
           setup_dbt latest || true
-          dbt-create -c -n ${{ matrix.link }} dev-${{ matrix.os_name }}
+          dbt-create.py -c -n ${{ matrix.link }} dev-${{ matrix.os_name }}
           
     - name: checkout package for CI
       uses: actions/checkout@v3
@@ -70,9 +70,9 @@ jobs:
           setup_repo_env="SETUP_$REPO"
           [[ -z ${!setup_env_repo+x} ]] || unsetup $REPO
           cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
-          dbt-build --lint 
+          dbt-build.py --lint 
           dbt-workarea-env || true
-          #dbt-build --unittest
+          #dbt-build.py --unittest
           $GITHUB_WORKSPACE/daq-release/scripts/upsify-daq-pkgs.py -w $GITHUB_WORKSPACE/dev-${{ matrix.os_name }} -c ${{ matrix.os_name }} -o /tarballs-${{ matrix.os_name }}
           #echo "------------------------------------------------------------------------"
           #echo "-------------------------- Unit Test Summary ---------------------------"
