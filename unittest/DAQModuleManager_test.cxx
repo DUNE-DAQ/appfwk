@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
   dunedaq::appfwk::app::Init init;
   dunedaq::iomanager::connection::ConnectionId conn_init;
   conn_init.uid = "test_inproc";
-  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kNetwork;
+  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kNetSender;
   conn_init.uri = "inproc://foo";
   init.connections.push_back(conn_init);
   conn_init.uid = "test_tcp";
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_QueuesAndNetwork)
   conn_init.uri = "queue://FollyMPMC:10";
   init.connections.push_back(conn_init);
   conn_init.uid = "test_inproc";
-  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kNetwork;
+  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kNetSender;
   conn_init.uri = "inproc://foo";
   init.connections.push_back(conn_init);
   conn_init.uid = "test_tcp";
