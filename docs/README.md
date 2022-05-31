@@ -67,18 +67,16 @@ A word needs to be said about the concept of a "unique name" here. Looking in [`
 
 ### The `init` function
 
-Already touched upon above, this function takes a `data_t` instance (i.e., JSON) to tell it what objects to make persistent over the DAQ module's lifetime. A very common example of this is the construction of the queues which will pipe data into and out of an instance of the DAQ module. A description of this common use case will illustrate a couple of very important aspects of DAQ module programming. 
+Already touched upon above, this function takes a `data_t` instance (i.e., JSON) to tell it what objects to make persistent over the DAQ module's lifetime. A very common example of this is the construction of the `iomanager` connections which will pipe data into and out of an instance of the DAQ module. A description of this common use case will illustrate a couple of very important aspects of DAQ module programming. 
 
-When a DAQ module writer wants to bring data into a DAQ module, they'll want to pop data off a queue via the [`DAQSource` class](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQSource.hpp), and when they want to send data out of a DAQ module they'll want to push it onto a queue via the [`DAQSink` class](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQSink.hpp). Typically instances of these classes aren't "hardwired" into the DAQ module through creation in the constructor. Instead, they get built in the call to `init` based on the JSON configuration `init` receives . A definition of `init`, then, can look like the following:
+When a DAQ module writer wants to communicate with other DAQ modules, they use the [`iomanager`](https://dune-daq-sw.readthedocs.io/en/latest/packages/iomanager/#connectionid-connectionref). The `iomanager` Sender and Receiver objects needed by a DAQ Module get built in the call to `init` based on the JSON configuration `init` receives . A definition of `init`, then, can look like the following:
 ```
 void MyDaqModule::init(const data_t& init_data) {
-    auto qi = appfwk::queue_index(init_data, {"name_of_required_input_queue"});
-    m_required_input_queue_ptr.reset(new dunedaq::appfwk::DAQSource<MyType_t>(qi["name_of_required_input_queue"].inst));
+    auto ci = appfwk::connection_index(init_data, {"name_of_required_input"});
+    m_required_input_ptr = dunedaq::get_iom_receiver(qi["name_of_required_input"]));
 }
 ```
-In the code above, the call to `queue_index`, defined in [`DAQModuleHelper.cpp`](https://github.com/DUNE-DAQ/appfwk/blob/develop/src/DAQModuleHelper.cpp), returns a map which connects the names of queues with structs which reference the queues. It will throw an exception if any provided names don't appear - so in this case, if `name_of_required_input_queue` isn't found in `init_data`, an exception will be thrown. If the name is found, then `m_required_input_queue_ptr`, which here is an `std::unique` to a `DAQSource` of `MyType_t`s, gets pointed to a newly-allocated `DAQSource`. When the DAQ enters the running state, we could have `MyDaqModule` pop elements of `MyType_t` off of the queue pointed to by `m_required_input_queue_ptr` for processing. 
-
-For a JSON file which (among other things) defines queues, see [this example](https://github.com/DUNE-DAQ/flxlibs/blob/15e256c0df102b1fc93802e9ed79a7cfd8c0ea4a/test/felix_wib2_readout.json), where the two main things defined in the JSON for a queue are (1) its capacity (the maximum number of elements it can hold) and (2) the kind of queue it is. The two primary queue options for DAQ running are "FollySPSCQueue" (Single Producer Single Consumer) and "FollyMPMCQueue" (Multiple Producer Multiple Consumer), both implemented originally for Facebook but found useful for DUNE. 
+In the code above, the call to `connection_index`, defined in [`DAQModuleHelper.cpp`](https://github.com/DUNE-DAQ/appfwk/blob/develop/src/DAQModuleHelper.cpp), returns a map which connects the names of connections with the `ConnectionRef` objects consumed by `IOManager`. It will throw an exception if any provided names don't appear - so in this case, if `name_of_required_input` isn't found in `init_data`, an exception will be thrown. If the name is found, then `m_required_input_ptr`, which here is an `std::shared_ptr_` to a `iomanager::Receiver` of `MyType_t`s, gets pointed to the appropriate `Receiver`. When the DAQ enters the running state, we could have `MyDaqModule` receive `MyType_t` instances from `m_required_input_ptr` for processing.
 
 ### The `do_conf` function
 
@@ -162,15 +160,15 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
      void do_work(std::atomic<bool>&);
      dunedaq::utilities::WorkerThread m_thread; 
      double m_calibration_scale_factor;
-     std::unique_ptr<dunedaq::appfwk::DAQSource<MyType_t>> m_required_input_queue_ptr; 
+     std::shared_ptr<dunedaq::iomanager::Receiver<MyType_t>> m_required_input_ptr; 
 };
 ```
 * `MyDaqModule.cpp`:
 ```
 
 void MyDaqModule::init(const data_t& init_data) {
-    auto qi = appfwk::queue_index(init_data, {"name_of_required_input_queue"});
-    m_required_input_queue_ptr.reset(new dunedaq::appfwk::DAQSource<MyType_t>(qi["name_of_required_input_queue"].inst));
+    auto ci = appfwk::connection_index(init_data, {"name_of_required_input"});
+    m_required_input_ptr = dunedaq::get_iom_receiver(qi["name_of_required_input"]));
 }
 
 void MyDaqModule::do_conf(const data_t& conf_data)
@@ -196,7 +194,7 @@ void MyDaqModule::do_scrap(const data_t& /*args*/) {
 void MyDaqModule::do_work(std::atomic<bool>& running_flag)
 {
    while (running_flag.load()) {
-      // Here we'd pop data off of the queue pointed at by m_required_input_queue_ptr and presumably use m_calibration_scale_factor when processing the data
+      // Here we'd receive data from m_required_input_ptr and presumably use m_calibration_scale_factor when processing the data
    }
 }   
 
@@ -205,6 +203,6 @@ DEFINE_DUNE_DAQ_MODULE(dunedaq::mypackage::MyDaqModule)
 
 ### Final thoughts on writing DAQ modules
 
-Now that you've been given an overview of appfwk and how to write DAQ modules, you're encouraged to look at the various repos to see how other DUNE DAQ developers have written DAQ modules. One package with plenty of DAQ modules to study is [dfmodules](https://github.com/DUNE-DAQ/dfmodules/tree/develop/plugins), modules used for dataflow purposes. Keep in mind that not all DAQ modules will adhere to the model described above, and you can judge for yourself what techniques you feel will make it easiest to write and maintain a DAQ module. 
+Now that you've been given an overview of appfwk and how to write DAQ modules, you're encouraged to look at the various repos to see how other DUNE DAQ developers have written DAQ modules. The [listrev](https://github.com/DUNE-DAQ/listrev) package is maintained as an example of simple DAQ Modules, and another package with plenty of real DAQ modules to study is [dfmodules](https://github.com/DUNE-DAQ/dfmodules/tree/develop/plugins), modules used for dataflow purposes. Keep in mind that not all DAQ modules will adhere to the model described above, and you can judge for yourself what techniques you feel will make it easiest to write and maintain a DAQ module. 
 
 
