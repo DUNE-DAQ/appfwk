@@ -15,7 +15,6 @@
 
 #include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
-#include "networkmanager/nwmgr/Structs.hpp"
 
 #include <map>
 #include <memory>
