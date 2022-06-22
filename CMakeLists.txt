@@ -11,16 +11,15 @@ find_package(cetlib REQUIRED)   # Uses the daq-buildtools/cmake/Findcetlib.cmake
 find_package(ers REQUIRED)
 find_package(cmdlib REQUIRED)
 find_package(rcif REQUIRED)
-find_package(networkmanager REQUIRED)
 find_package(iomanager REQUIRED)
 find_package(opmonlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
 
 #set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging Folly::folly cmdlib::cmdlib rcif::rcif networkmanager::networkmanager opmonlib::opmonlib nlohmann_json::nlohmann_json pthread)
-set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif networkmanager::networkmanager iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json)
+set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json)
 
 
-daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS iomanager networkmanager rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
+daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS iomanager rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
 daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hpp.j2 opmonlib/InfoNljs.hpp.j2 )
 
 ##############################################################################
