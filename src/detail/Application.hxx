@@ -19,10 +19,11 @@
 namespace dunedaq {
 namespace appfwk {
 
-Application::Application(std::string appname, std::string partition, std::string cmdlibimpl, std::string opmonlibimpl)
+Application::Application(std::string appname, std::string partition, std::string cmdlibimpl, std::string opmonlibimpl, std::string confimpl)
   : NamedObject(appname)
   , m_partition(partition)
   , m_info_mgr(opmonlibimpl)
+  , m_conf(confimpl, appname)
   , m_state("NONE")
   , m_busy(false)
   , m_error(false)
@@ -34,6 +35,7 @@ Application::Application(std::string appname, std::string partition, std::string
 
   m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
+
 }
 
 void
@@ -43,6 +45,11 @@ Application::init()
   m_info_mgr.set_provider(*this);
   // Add partition id as tag
   m_info_mgr.set_tags({ { "partition_id", m_partition } });
+
+  // load the init params and init the app
+  dataobj_t init_data = m_conf.get_data("init");
+  m_mod_mgr.initialize(init_data);
+  set_state("INITIAL");
   m_initialized = true;
 }
 
@@ -101,7 +108,16 @@ Application::execute(const dataobj_t& cmd_data)
   }
 
   try {
-    m_mod_mgr.execute(get_state(), cmd_data);
+    dataobj_t params;
+    if (cmdname == "conf") {
+      // load the conf params
+      params = m_conf.get_data(cmdname);
+    }
+    else {
+      params = rc_cmd.data;
+    }
+	  
+    m_mod_mgr.execute(get_state(), cmdname, params);
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
       set_state(rc_cmd.exit_state);

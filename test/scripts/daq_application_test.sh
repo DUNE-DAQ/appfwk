@@ -29,7 +29,7 @@ echo
 echo "INFO: Testing daq_application with stdin command facility"
 echo
 
-echo "status"|daq_application --name "Test App" -c "stdin://${SCRIPT_DIR}/test.json"
+echo "status"|daq_application --name "TestApp" -c "stdin://${SCRIPT_DIR}/test.json" -d "file://${SCRIPT_DIR}/confdata"
 ret=$?
 
 if [ $ret -ne 0 ]; then
@@ -43,7 +43,7 @@ echo "INFO: Testing daq_application signal handling"
 echo
 
 mkfifo input && trap "rm input" EXIT
-tail -f input|daq_application --name "Test App" -c "stdin://${SCRIPT_DIR}/test.json" & PID=$!
+tail -f input|daq_application --name "TestApp" -c "stdin://${SCRIPT_DIR}/test.json"  -d "file://${SCRIPT_DIR}/confdata" & PID=$!
 
 echo "init" >input
 sleep 1

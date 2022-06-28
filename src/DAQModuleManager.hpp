@@ -59,11 +59,12 @@ public:
   using dataobj_t = nlohmann::json;
 
   DAQModuleManager();
-
+  
+  void initialize(const dataobj_t& data);
   bool initialized() const { return m_initialized; }
 
   // Execute a properly structured command
-  void execute(const std::string& state, const dataobj_t& cmd_data);
+  void execute(const std::string& state, const std::string& cmd, const dataobj_t& cmd_data);
 
   // Gather statistics from modules
   void gather_stats(opmonlib::InfoCollector& ic, int level);
@@ -71,7 +72,6 @@ public:
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
-  void initialize(const dataobj_t& data);
   void init_connections(const iomanager::connection::ConnectionIds_t conn_specs);
   void init_modules(const app::ModSpecs& mspecs);
 

@@ -25,16 +25,16 @@ BOOST_AUTO_TEST_SUITE(Application_test)
 using namespace dunedaq::appfwk;
 
 const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json";
+const std::string TEST_JSON_DIR = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/confdata";
 
 BOOST_AUTO_TEST_CASE(Constructor)
 {
-
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 }
 
 BOOST_AUTO_TEST_CASE(Init)
 {
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
 }
 
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(Run)
 {
   std::atomic<bool> end_marker = false;
 
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 
   BOOST_REQUIRE_EXCEPTION(
     app.run(end_marker), ApplicationNotInitialized, [&](ApplicationNotInitialized) { return true; });
@@ -52,45 +52,11 @@ BOOST_AUTO_TEST_CASE(Run)
   app.run(end_marker);
 }
 
-BOOST_AUTO_TEST_CASE(Execute)
-{
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
-
-  dunedaq::appfwk::app::Init init;
-  nlohmann::json init_data;
-  to_json(init_data, init);
-  dunedaq::rcif::cmd::RCCommand cmd;
-  cmd.id = "init";
-  cmd.data = init_data;
-  cmd.exit_state = "INITIAL";
-  nlohmann::json cmd_data;
-  to_json(cmd_data, cmd);
-
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
-  BOOST_REQUIRE_EQUAL(cmd_valid, true);
-
-  app.execute(cmd_data);
-}
-
 BOOST_AUTO_TEST_CASE(Start)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
-
-  dunedaq::appfwk::app::Init init;
-  nlohmann::json init_data;
-  to_json(init_data, init);
-  dunedaq::rcif::cmd::RCCommand cmd;
-  cmd.id = "init";
-  cmd.data = init_data;
-  cmd.exit_state = "INITIAL";
-  nlohmann::json cmd_data;
-  to_json(cmd_data, cmd);
-
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
-  BOOST_REQUIRE_EQUAL(cmd_valid, true);
-
-  app.execute(cmd_data);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
+  app.init();
 
   dunedaq::appfwk::cmd::CmdObj start;
   dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
@@ -104,35 +70,22 @@ BOOST_AUTO_TEST_CASE(Start)
   start.modules.push_back(addr_cmd);
   nlohmann::json start_data;
   to_json(start_data, start);
-
+  dunedaq::rcif::cmd::RCCommand cmd;
+  nlohmann::json cmd_data;
   cmd.id = "start";
   cmd.data = start_data;
   cmd.exit_state = "RUNNING";
   to_json(cmd_data, cmd);
 
-  cmd_valid = app.is_cmd_valid(cmd_data);
+  bool cmd_valid = app.is_cmd_valid(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
   app.execute(cmd_data);
 }
 BOOST_AUTO_TEST_CASE(Stop)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
-
-  dunedaq::appfwk::app::Init init;
-  nlohmann::json init_data;
-  to_json(init_data, init);
-  dunedaq::rcif::cmd::RCCommand cmd;
-  cmd.id = "init";
-  cmd.data = init_data;
-  cmd.exit_state = "INITIAL";
-  nlohmann::json cmd_data;
-  to_json(cmd_data, cmd);
-
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
-  BOOST_REQUIRE_EQUAL(cmd_valid, true);
-
-  app.execute(cmd_data);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
+  app.init();
 
   dunedaq::rcif::cmd::StartParams start_params;
   start_params.run = 1010;
@@ -148,12 +101,15 @@ BOOST_AUTO_TEST_CASE(Stop)
   nlohmann::json start_data;
   to_json(start_data, start);
 
+  dunedaq::rcif::cmd::RCCommand cmd;
+  nlohmann::json cmd_data;
+
   cmd.id = "start";
   cmd.data = start_data;
   cmd.exit_state = "RUNNING";
   to_json(cmd_data, cmd);
 
-  cmd_valid = app.is_cmd_valid(cmd_data);
+  bool cmd_valid = app.is_cmd_valid(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
   app.execute(cmd_data);
 
@@ -172,16 +128,16 @@ BOOST_AUTO_TEST_CASE(Stop)
 
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
+  dunedaq::rcif::cmd::RCCommand cmd;
+  nlohmann::json cmd_data;
 
   dunedaq::appfwk::cmd::CmdObj start;
   nlohmann::json start_data;
   to_json(start_data, start);
-  dunedaq::rcif::cmd::RCCommand cmd;
   cmd.id = "start";
   cmd.data = start_data;
   cmd.exit_state = "RUNNING";
-  nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
 
   bool cmd_valid = app.is_cmd_valid(cmd_data);
@@ -197,7 +153,8 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
 BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 {
 
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
+  app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
   cmd.id = "badCommand";
@@ -217,24 +174,11 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 BOOST_AUTO_TEST_CASE(CommandThrowsException)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
-
-  dunedaq::appfwk::app::Init init;
-  dunedaq::appfwk::app::ModSpec module_init;
-  module_init.inst = "DummyModule";
-  module_init.plugin = "DummyModule";
-  init.modules.push_back(module_init);
-  nlohmann::json init_data;
-  to_json(init_data, init);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
+  app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
-  cmd.id = "init";
-  cmd.data = init_data;
-  cmd.exit_state = "INITIAL";
   nlohmann::json cmd_data;
-  to_json(cmd_data, cmd);
-
-  app.execute(cmd_data);
 
   dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
   addr_cmd.match = "DummyModule";
@@ -258,26 +202,15 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
 BOOST_AUTO_TEST_CASE(Stats)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 
   dunedaq::opmonlib::InfoCollector ic;
   app.gather_stats(ic, 0);
   BOOST_REQUIRE(!ic.is_empty());
 
-  dunedaq::appfwk::app::Init init;
-  nlohmann::json init_data;
-  to_json(init_data, init);
+  app.init();
   dunedaq::rcif::cmd::RCCommand cmd;
-  cmd.id = "init";
-  cmd.data = init_data;
-  cmd.exit_state = "INITIAL";
   nlohmann::json cmd_data;
-  to_json(cmd_data, cmd);
-
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
-  BOOST_REQUIRE_EQUAL(cmd_valid, true);
-
-  app.execute(cmd_data);
 
   dunedaq::appfwk::cmd::CmdObj start;
   dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
@@ -297,7 +230,7 @@ BOOST_AUTO_TEST_CASE(Stats)
   cmd.exit_state = "RUNNING";
   to_json(cmd_data, cmd);
 
-  cmd_valid = app.is_cmd_valid(cmd_data);
+  bool cmd_valid = app.is_cmd_valid(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
   app.execute(cmd_data);
 
@@ -307,7 +240,7 @@ BOOST_AUTO_TEST_CASE(Stats)
 
 BOOST_AUTO_TEST_CASE(State)
 {
-  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat");
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 
   std::string state_in = "state";
   app.set_state(state_in);

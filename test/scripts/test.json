@@ -1,23 +1,11 @@
 [
   {
     "data": {
-      "modules": [
-
-      ],
-      "queues": [
-
-      ]
     },
     "id": "init"
   },
   {
     "data": {
-      "modules": [
-        {
-          "data": {},
-          "match": ""
-        }
-      ]
     },
     "id": "conf"
   },

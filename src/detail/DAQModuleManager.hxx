@@ -201,24 +201,16 @@ DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::stri
 }
 
 void
-DAQModuleManager::execute(const std::string& state, const dataobj_t& cmd_data)
+DAQModuleManager::execute(const std::string& state, const std::string& cmd, const dataobj_t& cmd_data)
 {
 
-  auto cmd = cmd_data.get<cmdlib::cmd::Command>();
-  TLOG_DEBUG(1) << "Command id:" << cmd.id;
+  TLOG_DEBUG(1) << "Command id:" << cmd;
 
   if (!m_initialized) {
-    if (cmd.id != "init") {
-      throw DAQModuleManagerNotInitialized(ERS_HERE, cmd.id);
-    }
-    this->initialize(cmd.data);
-    return;
-  }
-  if (m_initialized && cmd.id == "init") {
-    throw DAQModuleManagerAlreadyInitialized(ERS_HERE);
+      throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
   }
 
-  dispatch_one_match_only(cmd.id, state, cmd.data);
+  dispatch_one_match_only(cmd, state, cmd_data);
 
   // dispatch(cmd.id, cmd.data);
 }

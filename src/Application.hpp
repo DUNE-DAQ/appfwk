@@ -9,7 +9,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 #define APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 
-#include "DAQModuleManager.hpp"
+
 #include "appfwk/cmd/Structs.hpp"
 #include "rcif/runinfo/InfoStructs.hpp"
 #include "utilities/NamedObject.hpp"
@@ -17,9 +17,12 @@
 #include "cmdlib/CommandFacility.hpp"
 #include "cmdlib/CommandedObject.hpp"
 
+#include "DAQModuleManager.hpp"
+#include "ConfigurationWrapper.hpp"
+
 #include "opmonlib/InfoManager.hpp"
 #include "opmonlib/InfoProvider.hpp"
-
+ 
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 
@@ -62,7 +65,7 @@ class Application
 public:
   using dataobj_t = nlohmann::json;
 
-  Application(std::string app_name, std::string partition_name, std::string cmdlibimpl, std::string opmonlibimpl);
+  Application(std::string app_name, std::string partition_name, std::string cmdlibimpl, std::string opmonlibimpl, std::string confimpl);
 
   // Initialize the application services
   void init();
@@ -97,6 +100,7 @@ private:
   std::mutex m_mutex;
   std::string m_partition;
   opmonlib::InfoManager m_info_mgr;
+  ConfigurationWrapper m_conf;
   std::string m_state;
   std::atomic<bool> m_busy;
   std::atomic<bool> m_error;
