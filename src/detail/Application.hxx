@@ -132,7 +132,7 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 
   if (level == 0) {
     // give only generic application info
-  } else if (ai.state == "CONFIGURED" || ai.state == "RUNNING") {
+  } else if (ai.state != "INITIAL" ) {
     try {
       m_mod_mgr.gather_stats(tmp_ci, level);
     } catch (ers::Issue& ex) {
