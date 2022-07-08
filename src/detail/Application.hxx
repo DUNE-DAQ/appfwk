@@ -140,7 +140,7 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 
   tmp_ci.add(ai);
 
-  if (ai.state == "RUNNING") {
+  if (ai.state == "RUNNING" || ai.state == "READY") {
     auto now = std::chrono::steady_clock::now();
     m_runinfo.runtime = std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count();
   }
@@ -148,7 +148,7 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 
   if (level == 0) {
     // give only generic application info
-  } else if (ai.state == "CONFIGURED" || ai.state == "RUNNING") {
+  } else if (ai.state != "NONE" && ai.state != "INITIAL") {
     try {
       m_mod_mgr.gather_stats(tmp_ci, level);
     } catch (ers::Issue& ex) {
