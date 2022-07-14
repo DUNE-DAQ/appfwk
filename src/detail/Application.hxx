@@ -109,7 +109,7 @@ Application::execute(const dataobj_t& cmd_data)
   try {
     dataobj_t params;
     if (cmdname == "conf") {
-	std::string uri = cmd_obj.data;
+	std::string uri = rc_cmd.data;
       // load the conf params
       params = m_conf_fac->get_data(get_name(), cmdname, uri); 
     }
