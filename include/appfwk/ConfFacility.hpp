@@ -53,18 +53,19 @@ public:
     delete; ///< ConfFacility is not move-assignable
 
 
-  virtual nlohmann::json get_data(onst std::string& app_name, const std::string& cmd, std::string& uri="") = 0;
+  virtual nlohmann::json get_data(const std::string& app_name, const std::string& cmd, const std::string& uri) = 0;
 
 private:
 
 };
 
 std::shared_ptr<ConfFacility>
-make_configuration_facility(std::string const& uri)
+make_conf_facility(std::string const& uri)
 {
   auto sep = uri.find("://");
   std::string scheme;
   if (sep == std::string::npos) {
+	  ers::error(ConfFacilityCreationFailed(ERS_HERE, uri, "Invalid URI"));
       throw ConfFacilityCreationFailed(ERS_HERE, uri, "Invalid URI");
   } else { // with scheme
       scheme = uri.substr(0, sep);
@@ -75,11 +76,15 @@ make_configuration_facility(std::string const& uri)
   try {
     cf_ptr = bpf.makePlugin<std::shared_ptr<ConfFacility>>(plugin_name, uri);
   } catch (const cet::exception &cexpt) {
+    ers::error(ConfFacilityCreationFailed(ERS_HERE, uri, cexpt));
     throw ConfFacilityCreationFailed(ERS_HERE, uri, cexpt);
   } catch (const ers::Issue &iexpt) {
+	  ers::error(ConfFacilityCreationFailed(ERS_HERE, uri, iexpt));
     throw ConfFacilityCreationFailed(ERS_HERE, uri, iexpt);
   } catch (...) {  // NOLINT JCF Jan-27-2021 violates letter of the law but not the spirit
-    throw ConfFacilityCreationFailed(ERS_HERE, uri, "Unknown error.");
+          ers::error(ConfFacilityCreationFailed(ERS_HERE, uri));
+
+      	  throw ConfFacilityCreationFailed(ERS_HERE, uri, "Unknown error.");
   }
   return cf_ptr;
 }

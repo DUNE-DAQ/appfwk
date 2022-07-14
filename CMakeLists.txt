@@ -27,6 +27,11 @@ daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hp
 # Main library
 daq_add_library(DAQModule*.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
 
+##############################################################################
+# Plugins
+daq_add_plugin(fileConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json)
+daq_add_plugin(dbConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json pistache_shared)
+
 # ##############################################################################
 # Applications
 daq_add_application( daq_application daq_application.cxx LINK_LIBRARIES appfwk )

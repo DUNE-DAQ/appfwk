@@ -11,25 +11,30 @@
 
 #include "logging/Logging.hpp"
 
+#include <fstream>
+
 using namespace dunedaq::appfwk;
 
 class fileConfFacility: public ConfFacility {
 
 public:
     explicit fileConfFacility(std::string uri) : ConfFacility(uri) {
-	// Allocate resources as needed
-        auto col = uri.find_last_of(':');
-        auto sep = uri.find("://");
-        if (col == std::string::npos || sep == std::string::npos) { // assume filename
-                m_dirname = m_conf_uri;
-        } else {
-                m_dirname = m_conf_uri.substr(sep+3);
-        }
-
+	m_uri = uri;
     } 
 
-    nlohmann::json get_data(const std::string & app_name, const std::string & cmd) {
-    	std::string fname = m_dirname + "/" + app_name + "_" + cmd + ".json"; 
+    nlohmann::json get_data(const std::string & app_name, const std::string & cmd, const std::string & uri) {
+        if(!uri.empty())
+		m_uri = uri;
+
+        auto sep = m_uri.find("://");
+	std::string dirname;
+        if (sep == std::string::npos) { // bad URI!
+		throw InvalidConfigurationURI(ERS_HERE, uri);
+        } else {
+                dirname = m_uri.substr(sep+3);
+        }
+
+	std::string fname = dirname + "/" + app_name + "_" + cmd + ".json"; 
     	TLOG() <<"Loading parameters from file: " << fname;
    
     	std::ifstream ifs;
@@ -46,7 +51,15 @@ public:
     	}
     	return data;
     }
-private:
-    std::string m_dirname;
-} 
+protected:
+    typedef ConfFacility inherited;
 
+private:
+    std::string m_uri;
+}; 
+
+extern "C" {
+    std::shared_ptr<dunedaq::appfwk::ConfFacility> make(std::string uri) {
+        return std::shared_ptr<dunedaq::appfwk::ConfFacility>(new fileConfFacility(uri));
+    }
+}

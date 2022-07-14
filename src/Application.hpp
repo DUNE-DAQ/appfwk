@@ -18,7 +18,7 @@
 #include "cmdlib/CommandedObject.hpp"
 
 #include "DAQModuleManager.hpp"
-#include "ConfigurationWrapper.hpp"
+#include "appfwk/ConfFacility.hpp"
 
 #include "opmonlib/InfoManager.hpp"
 #include "opmonlib/InfoProvider.hpp"
@@ -100,7 +100,6 @@ private:
   std::mutex m_mutex;
   std::string m_partition;
   opmonlib::InfoManager m_info_mgr;
-  ConfigurationWrapper m_conf;
   std::string m_state;
   std::atomic<bool> m_busy;
   std::atomic<bool> m_error;
@@ -110,6 +109,7 @@ private:
   std::string m_fully_qualified_name;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
+  std::shared_ptr<ConfFacility> m_conf_fac;
 };
 
 } // namespace appfwk

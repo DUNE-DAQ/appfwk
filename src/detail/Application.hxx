@@ -23,7 +23,6 @@ Application::Application(std::string appname, std::string partition, std::string
   : NamedObject(appname)
   , m_partition(partition)
   , m_info_mgr(opmonlibimpl)
-  , m_conf(confimpl, appname)
   , m_state("NONE")
   , m_busy(false)
   , m_error(false)
@@ -36,7 +35,6 @@ Application::Application(std::string appname, std::string partition, std::string
   m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
   m_conf_fac = appfwk::make_conf_facility(confimpl);
-
 }
 
 void
@@ -48,7 +46,7 @@ Application::init()
   m_info_mgr.set_tags({ { "partition_id", m_partition } });
 
   // load the init params and init the app
-  dataobj_t init_data = m_conf.get_data("init");
+  dataobj_t init_data = m_conf_fac->get_data(get_name(), "init", "");
   m_mod_mgr.initialize(init_data);
   set_state("INITIAL");
   m_initialized = true;
@@ -111,8 +109,9 @@ Application::execute(const dataobj_t& cmd_data)
   try {
     dataobj_t params;
     if (cmdname == "conf") {
+	std::string uri = cmd_obj.data;
       // load the conf params
-      params = m_conf.get_data(cmdname);
+      params = m_conf_fac->get_data(get_name(), cmdname, uri); 
     }
     else {
       params = rc_cmd.data;
