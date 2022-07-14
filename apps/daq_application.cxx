@@ -10,7 +10,6 @@
 #include "CommandLineInterpreter.hpp"
 #include "Application.hpp"
 #include "appfwk/Issues.hpp"
-//#include "cmdlib/CommandFacility.hpp"
 #include "logging/Logging.hpp"
 
 #include "nlohmann/json.hpp"

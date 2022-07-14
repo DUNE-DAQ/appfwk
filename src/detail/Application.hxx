@@ -35,6 +35,7 @@ Application::Application(std::string appname, std::string partition, std::string
 
   m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
+  m_conf_fac = appfwk::make_conf_facility(confimpl);
 
 }
 

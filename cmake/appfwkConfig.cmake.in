@@ -13,6 +13,7 @@ find_dependency(cmdlib)
 find_dependency(rcif)
 find_dependency(opmonlib)
 find_dependency(nlohmann_json)
+find_dependency(Pistache)
 find_dependency(iomanager)
 
 # Figure out whether or not this dependency is an installed package or
