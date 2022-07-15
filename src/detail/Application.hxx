@@ -19,7 +19,7 @@
 namespace dunedaq {
 namespace appfwk {
 
-Application::Application(std::string appname, std::string partition, std::string cmdlibimpl, std::string opmonlibimpl)
+Application::Application(std::string appname, std::string partition, std::string cmdlibimpl, std::string opmonlibimpl, std::string confimpl)
   : NamedObject(appname)
   , m_partition(partition)
   , m_info_mgr(opmonlibimpl)
@@ -34,6 +34,7 @@ Application::Application(std::string appname, std::string partition, std::string
 
   m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
+  m_conf_fac = appfwk::make_conf_facility(confimpl);
 }
 
 void
@@ -43,6 +44,11 @@ Application::init()
   m_info_mgr.set_provider(*this);
   // Add partition id as tag
   m_info_mgr.set_tags({ { "partition_id", m_partition } });
+
+  // load the init params and init the app
+  dataobj_t init_data = m_conf_fac->get_data(get_name(), "init", "");
+  m_mod_mgr.initialize(init_data);
+  set_state("INITIAL");
   m_initialized = true;
 }
 
@@ -101,7 +107,18 @@ Application::execute(const dataobj_t& cmd_data)
   }
 
   try {
-    m_mod_mgr.execute(get_state(), cmd_data);
+    dataobj_t params;
+    if (cmdname == "conf") {
+	//std::string uri = rc_cmd.data;
+	std::string uri = "";
+      // load the conf params
+      params = m_conf_fac->get_data(get_name(), cmdname, uri); 
+    }
+    else {
+      params = rc_cmd.data;
+    }
+	  
+    m_mod_mgr.execute(get_state(), cmdname, params);
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
       set_state(rc_cmd.exit_state);
@@ -124,7 +141,7 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 
   tmp_ci.add(ai);
 
-  if (ai.state == "RUNNING") {
+  if (ai.state == "RUNNING" || ai.state == "READY") {
     auto now = std::chrono::steady_clock::now();
     m_runinfo.runtime = std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count();
   }
@@ -132,7 +149,7 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 
   if (level == 0) {
     // give only generic application info
-  } else if (ai.state == "CONFIGURED" || ai.state == "RUNNING") {
+  } else if (ai.state != "NONE" && ai.state != "INITIAL") {
     try {
       m_mod_mgr.gather_stats(tmp_ci, level);
     } catch (ers::Issue& ex) {

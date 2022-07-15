@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(appfwk VERSION 2.6.1)
+project(appfwk VERSION 2.7.0)
 
 find_package(daq-cmake REQUIRED )
 
@@ -14,9 +14,10 @@ find_package(rcif REQUIRED)
 find_package(iomanager REQUIRED)
 find_package(opmonlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
+find_package(Pistache REQUIRED)
 
 #set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging Folly::folly cmdlib::cmdlib rcif::rcif networkmanager::networkmanager opmonlib::opmonlib nlohmann_json::nlohmann_json pthread)
-set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json)
+set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json pistache_shared)
 
 
 daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS iomanager rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
@@ -25,6 +26,11 @@ daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hp
 ##############################################################################
 # Main library
 daq_add_library(DAQModule*.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
+
+##############################################################################
+# Plugins
+daq_add_plugin(fileConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json)
+daq_add_plugin(dbConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json pistache_shared)
 
 # ##############################################################################
 # Applications
