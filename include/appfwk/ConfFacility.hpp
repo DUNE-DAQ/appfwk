@@ -42,7 +42,7 @@ class ConfFacility
 {
 public:
   explicit ConfFacility(std::string /*uri*/) {}
-  ~ConfFacility();
+  ~ConfFacility() {}
   ConfFacility(const ConfFacility&) = 
     delete; ///< ConfFacility is not copy-constructible
   ConfFacility& operator=(const ConfFacility&) =
