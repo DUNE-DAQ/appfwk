@@ -35,7 +35,7 @@ public:
         }
 
 	std::string fname = dirname + "/" + app_name + "_" + cmd + ".json";
-    	TLOG() <<"Loading parameters from file: " << fname;
+    	TLOG_DEBUG() <<"Loading parameters from file: " << fname;
 
     	std::ifstream ifs;
     	ifs.open(fname, std::fstream::in);
@@ -49,7 +49,7 @@ public:
     	} catch (const std::exception& ex) {
       		throw CannotParseData(ERS_HERE, ex.what());
     	}
-        TLOG(10) << app_name << " received " << cmd << " : " << data;
+        TLOG_DEBUG(10) << app_name << " received " << cmd << " : " << data;
     	return data;
     }
 protected:
