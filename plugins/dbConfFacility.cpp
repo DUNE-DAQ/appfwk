@@ -54,15 +54,14 @@ public:
 	    auto opts = Http::Client::options().threads(1).keepAlive(true).maxConnectionsPerHost(8);
     	    client.init(opts);
 
-	    std::cout << "Http client instanciated and options set. " << std::endl;
+	    TLOG_DEBUG() << "HTTP client instanciated and options set " << m_uri;
 	    auto resp = client.get(m_uri+"&app_name="+app_name+"&cmd_name="+cmd).send();
 	    nlohmann::json data;
-
             std::vector<Async::Promise<Http::Response>> responses;
 
 	    resp.then(
             [&](Http::Response response) {
-                data = response.body();
+              data = nlohmann::json::parse(response.body());
             },
             [&](std::exception_ptr e) {
 	    	try {
@@ -78,16 +77,17 @@ public:
 	    barrier.wait_for(std::chrono::seconds(5));
 	    client.shutdown();
 
+            TLOG_DEBUG(10) << app_name << " received " << cmd << " : " << data;
      	    return data;
     }
 protected:
     typedef ConfFacility inherited;
 private:
-    std::string m_uri; 
+    std::string m_uri;
 };
 
 extern "C" {
-    std::shared_ptr<dunedaq::appfwk::ConfFacility> make(std::string uri) { 
+    std::shared_ptr<dunedaq::appfwk::ConfFacility> make(std::string uri) {
         return std::shared_ptr<dunedaq::appfwk::ConfFacility>(new dbConfFacility(uri));
     }
 }
