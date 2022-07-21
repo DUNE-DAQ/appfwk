@@ -28,6 +28,11 @@ public:
   {}
 
   /**
+   * @brief Interruptible destructor
+   */
+  virtual ~Interruptible() noexcept = default;
+
+  /**
    * @brief Send a notification that an interrupt is requested.
    *
    * This function is virtual to allow classes which inherit from Interruptible to implement
