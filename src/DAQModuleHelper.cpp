@@ -15,12 +15,12 @@
 
 namespace dunedaq::appfwk {
 
-IndexedConnectionRefs_t
+NameUidMap_t
 connection_index(const nlohmann::json& iniobj, std::vector<std::string> required)
 {
-  IndexedConnectionRefs_t ret;
+  NameUidMap_t ret;
   for (auto cr : connection_refs(iniobj)) {
-    ret[cr.name] = cr;
+    ret[cr.name] = cr.uid;
   }
   for (auto name : required) {
     if (ret.find(name) == ret.end()) {
@@ -30,14 +30,14 @@ connection_index(const nlohmann::json& iniobj, std::vector<std::string> required
   return ret;
 }
 
-iomanager::connection::ConnectionRefs_t
+app::ConnectionReferences_t
 connection_refs(const nlohmann::json& iniobj)
 {
   return iniobj.get<app::ModInit>().conn_refs;
 }
 
-iomanager::connection::ConnectionRef
-connection_inst(const nlohmann::json& iniobj, const std::string& name)
+std::string
+connection_uid(const nlohmann::json& iniobj, const std::string& name)
 {
   return connection_index(iniobj, { name })[name];
 }

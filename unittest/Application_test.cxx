@@ -27,6 +27,12 @@ using namespace dunedaq::appfwk;
 const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json";
 const std::string TEST_JSON_DIR = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/confdata";
 
+struct EnvFixture
+{
+  EnvFixture() { setenv("DUNEDAQ_PARTITION", "Application_test", 0); }
+};
+BOOST_TEST_GLOBAL_FIXTURE(EnvFixture);
+
 BOOST_AUTO_TEST_CASE(Constructor)
 {
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
@@ -34,6 +40,7 @@ BOOST_AUTO_TEST_CASE(Constructor)
 
 BOOST_AUTO_TEST_CASE(Init)
 {
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
 }
@@ -42,6 +49,7 @@ BOOST_AUTO_TEST_CASE(Run)
 {
   std::atomic<bool> end_marker = false;
 
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 
   BOOST_REQUIRE_EXCEPTION(
@@ -128,6 +136,7 @@ BOOST_AUTO_TEST_CASE(Stop)
 
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   dunedaq::rcif::cmd::RCCommand cmd;
   nlohmann::json cmd_data;
@@ -153,6 +162,7 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
 BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 {
 
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
 
@@ -240,6 +250,7 @@ BOOST_AUTO_TEST_CASE(Stats)
 
 BOOST_AUTO_TEST_CASE(State)
 {
+  dunedaq::get_iomanager()->reset();
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 
   std::string state_in = "state";

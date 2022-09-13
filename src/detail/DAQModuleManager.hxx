@@ -34,7 +34,7 @@ void
 DAQModuleManager::initialize(const dataobj_t& data)
 {
   auto ini = data.get<app::Init>();
-  init_connections(ini.connections);
+  init_connections(ini.queues, ini.connections);
   init_modules(ini.modules);
   this->m_initialized = true;
 }
@@ -51,9 +51,9 @@ DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
 }
 
 void
-DAQModuleManager::init_connections(const iomanager::connection::ConnectionIds_t conn_specs)
+DAQModuleManager::init_connections(const iomanager::connection::Queues_t queue_specs, const iomanager::connection::Connections_t conn_specs)
 {
-  get_iomanager()->configure(conn_specs);
+  get_iomanager()->configure(queue_specs, conn_specs);
 }
 
 void

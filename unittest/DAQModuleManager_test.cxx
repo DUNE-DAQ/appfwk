@@ -27,6 +27,12 @@ BOOST_AUTO_TEST_SUITE(DAQModuleManager_test)
 
 using namespace dunedaq::appfwk;
 
+struct EnvFixture
+{
+  EnvFixture() { setenv("DUNEDAQ_PARTITION", "DAQModulesManager_test", 0); }
+};
+BOOST_TEST_GLOBAL_FIXTURE(EnvFixture);
+
 BOOST_AUTO_TEST_CASE(Construct)
 {
   auto mgr = DAQModuleManager();
@@ -170,41 +176,21 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues)
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::appfwk::app::Init init;
-  dunedaq::iomanager::connection::ConnectionId queue_init;
-  queue_init.uid = "test_deque";
-  queue_init.service_type = dunedaq::iomanager::connection::ServiceType::kQueue;
-  queue_init.uri = "queue://StdDeQueue:10";
-  init.connections.push_back(queue_init);
-  queue_init.uid = "test_spsc";
-  queue_init.uri = "queue://FollySPSC:10";
-  init.connections.push_back(queue_init);
-  queue_init.uid = "test_mpmc";
-  queue_init.uri = "queue://FollyMPMC:10";
-  init.connections.push_back(queue_init);
+  dunedaq::iomanager::connection::QueueConfig queue_init;
+  queue_init.id.uid = "test_deque";
+  queue_init.queue_type = dunedaq::iomanager::connection::QueueType::kStdDeQueue;
+  queue_init.capacity = 10;
+  init.queues.push_back(queue_init);
+  queue_init.id.uid = "test_spsc";
+  queue_init.queue_type = dunedaq::iomanager::connection::QueueType::kFollySPSCQueue;
+  init.queues.push_back(queue_init);
+  queue_init.id.uid = "test_mpmc";
+  queue_init.queue_type = dunedaq::iomanager::connection::QueueType::kFollyMPMCQueue;
+  init.queues.push_back(queue_init);
   nlohmann::json init_data;
   to_json(init_data, init);
   mgr.initialize(init_data);
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
-}
-
-BOOST_AUTO_TEST_CASE(InitializeIOManager_UnknownQueueType)
-{
-  dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
-  BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
-
-  dunedaq::appfwk::app::Init init;
-  dunedaq::iomanager::connection::ConnectionId conn_init;
-  conn_init.uid = "test_deque";
-  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kQueue;
-  conn_init.uri = "queue://NonExistantQueueType:10";
-  init.connections.push_back(conn_init);
-  nlohmann::json init_data;
-  to_json(init_data, init);
-
-  BOOST_REQUIRE_EXCEPTION(mgr.initialize(init_data),
-                          dunedaq::iomanager::QueueKindUnknown,
-                          [&](dunedaq::iomanager::QueueKindUnknown) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
@@ -214,12 +200,12 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_Network)
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::appfwk::app::Init init;
-  dunedaq::iomanager::connection::ConnectionId conn_init;
-  conn_init.uid = "test_inproc";
-  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kNetSender;
+  dunedaq::iomanager::connection::Connection conn_init;
+  conn_init.id.uid = "test_inproc";
+  conn_init.connection_type = dunedaq::iomanager::connection::ConnectionType::kSendRecv;
   conn_init.uri = "inproc://foo";
   init.connections.push_back(conn_init);
-  conn_init.uid = "test_tcp";
+  conn_init.id.uid = "test_tcp";
   conn_init.uri = "tcp://localhost:1234";
   init.connections.push_back(conn_init);
   nlohmann::json init_data;
@@ -236,22 +222,24 @@ BOOST_AUTO_TEST_CASE(InitializeIOManager_QueuesAndNetwork)
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::appfwk::app::Init init;
-  dunedaq::iomanager::connection::ConnectionId conn_init;
-  conn_init.uid = "test_deque";
-  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kQueue;
-  conn_init.uri = "queue://StdDeQueue:10";
-  init.connections.push_back(conn_init);
-  conn_init.uid = "test_spsc";
-  conn_init.uri = "queue://FollySPSC:10";
-  init.connections.push_back(conn_init);
-  conn_init.uid = "test_mpmc";
-  conn_init.uri = "queue://FollyMPMC:10";
-  init.connections.push_back(conn_init);
-  conn_init.uid = "test_inproc";
-  conn_init.service_type = dunedaq::iomanager::connection::ServiceType::kNetSender;
+  dunedaq::iomanager::connection::QueueConfig queue_init;
+  queue_init.id.uid = "test_deque";
+  queue_init.queue_type = dunedaq::iomanager::connection::QueueType::kStdDeQueue;
+  queue_init.capacity = 10;
+  init.queues.push_back(queue_init);
+  queue_init.id.uid = "test_spsc";
+  queue_init.queue_type = dunedaq::iomanager::connection::QueueType::kFollySPSCQueue;
+  init.queues.push_back(queue_init);
+  queue_init.id.uid = "test_mpmc";
+  queue_init.queue_type = dunedaq::iomanager::connection::QueueType::kFollyMPMCQueue;
+  init.queues.push_back(queue_init);
+
+  dunedaq::iomanager::connection::Connection conn_init;
+  conn_init.id.uid = "test_inproc";
+  conn_init.connection_type = dunedaq::iomanager::connection::ConnectionType::kSendRecv;
   conn_init.uri = "inproc://foo";
   init.connections.push_back(conn_init);
-  conn_init.uid = "test_tcp";
+  conn_init.id.uid = "test_tcp";
   conn_init.uri = "tcp://localhost:1234";
   init.connections.push_back(conn_init);
   nlohmann::json init_data;

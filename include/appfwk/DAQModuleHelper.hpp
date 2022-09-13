@@ -19,20 +19,20 @@ namespace dunedaq {
 
 namespace appfwk {
 
-using IndexedConnectionRefs_t = std::map<std::string, iomanager::connection::ConnectionRef>;
+using NameUidMap_t = std::map<std::string, std::string>;
 
 /// @brief Return map of QueueInfo indexed by their "name".
 ///
 /// The iniobj is as given to a module's init() method.
-IndexedConnectionRefs_t
+NameUidMap_t
 connection_index(const nlohmann::json& iniobj, std::vector<std::string> required = {});
 
 /// @brief Return vector of QueueInfo from the init() object
-iomanager::connection::ConnectionRefs_t
+app::ConnectionReferences_t
 connection_refs(const nlohmann::json& iniobj);
 
-iomanager::connection::ConnectionRef
-connection_inst(const nlohmann::json& iniobj, const std::string& name);
+std::string
+connection_uid(const nlohmann::json& iniobj, const std::string& name);
 
 } // namespace appfwk
 
