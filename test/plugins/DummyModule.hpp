@@ -37,7 +37,7 @@ public:
   explicit DummyParentModule(const std::string& name)
     : DAQModule(name)
   {
-    std::set<std::string> valid_states{ "RUNNING" };
+    std::set<std::string> valid_states{ "INITIAL", "RUNNING" };
     register_command("stuff", &DummyParentModule::do_stuff, valid_states);
   }
 

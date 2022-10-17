@@ -1,8 +1,15 @@
 {
       "modules": [
 
+        {
+          "data": {
+            "conn_refs": [            ]
+          },
+          "inst": "dummy_module_0",
+          "plugin": "DummyModule"
+        }
       ],
-      "queues": [
+      "connections": [
 
       ]
 }

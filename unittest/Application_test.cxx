@@ -36,6 +36,8 @@ BOOST_AUTO_TEST_CASE(Init)
 {
   Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
+
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_CASE(Run)
@@ -50,6 +52,7 @@ BOOST_AUTO_TEST_CASE(Run)
   app.init();
 
   app.run(end_marker);
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_CASE(Start)
@@ -80,6 +83,7 @@ BOOST_AUTO_TEST_CASE(Start)
   bool cmd_valid = app.is_cmd_valid(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
   app.execute(cmd_data);
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 BOOST_AUTO_TEST_CASE(Stop)
 {
@@ -124,6 +128,7 @@ BOOST_AUTO_TEST_CASE(Stop)
   cmd_valid = app.is_cmd_valid(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
   app.execute(cmd_data);
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_CASE(NotInitialized)
@@ -148,6 +153,7 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
 
   cmd_valid = app.is_cmd_valid(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, false);
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_CASE(InvalidCommandTest)
@@ -169,6 +175,7 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 
   cmd_valid = app.is_cmd_valid(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, false);
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_CASE(CommandThrowsException)
@@ -181,7 +188,7 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
   nlohmann::json cmd_data;
 
   dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
-  addr_cmd.match = "DummyModule";
+  addr_cmd.match = "dummy_module_0";
 
   dunedaq::appfwk::cmd::CmdObj cmd_obj;
   cmd_obj.modules.push_back(addr_cmd);
@@ -197,6 +204,7 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
   to_json(cmd_data, cmd);
   BOOST_REQUIRE_EXCEPTION(
     app.execute(cmd_data), CommandDispatchingFailed, [&](CommandDispatchingFailed) { return true; });
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_CASE(Stats)
@@ -236,6 +244,7 @@ BOOST_AUTO_TEST_CASE(Stats)
 
   app.gather_stats(ic, 999);
   BOOST_REQUIRE(!ic.is_empty());
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_CASE(State)
@@ -246,6 +255,7 @@ BOOST_AUTO_TEST_CASE(State)
   app.set_state(state_in);
   std::string state = app.get_state();
   BOOST_REQUIRE_EQUAL(state_in, state);
+  dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
