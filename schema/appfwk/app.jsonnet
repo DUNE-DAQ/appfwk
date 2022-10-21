@@ -24,6 +24,7 @@ local cs = {
                    doc="Name of a target instance of a kind"),
     label: s.string("Label", moo.re.ident_only,
                    doc="A label hard-wired into code"),
+    switch: s.boolean("Switch", doc="A boolean switch"),
     
     mspec: s.record("ModSpec", [
         s.field("plugin", self.plugin,
@@ -54,6 +55,8 @@ local cs = {
         s.field("queues", iomgr.Queues_t, doc="Queue specifications"),
         s.field("connections", iomgr.Connections_t, optional=true,
                 doc="Initial network connection specifications"),
+        s.field("use_connectivity_service", self.switch, default=true, 
+                doc="Whether to use the ConnectivityService to register/request connections"),
     ], doc="The app-level init command data object struction"),
 
 };
