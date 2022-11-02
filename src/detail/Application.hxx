@@ -138,8 +138,11 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
   ai.state = get_state();
   ai.busy = m_busy.load();
   ai.error = m_error.load();
-  ai.host = getenv("HOSTNAME");
-
+  auto host = getenv("HOSTNAME");
+  std::string hoststr = "Unknown";
+  if(host) { hoststr = std::string(host); }
+  ai.host = hoststr;
+  
   opmonlib::InfoCollector tmp_ci;
 
   tmp_ci.add(ai);
