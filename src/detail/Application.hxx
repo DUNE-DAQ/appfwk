@@ -15,8 +15,8 @@
 #include "logging/Logging.hpp"
 
 #include <string>
+#include <cstdlib>
 
-#include "boost/asio.hpp"
 
 namespace dunedaq {
 namespace appfwk {
@@ -138,7 +138,7 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
   ai.state = get_state();
   ai.busy = m_busy.load();
   ai.error = m_error.load();
-  ai.host = boost::asio::ip::host_name();
+  ai.host = getenv("HOSTNAME");
 
   opmonlib::InfoCollector tmp_ci;
 
