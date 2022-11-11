@@ -14,7 +14,8 @@ local info = {
                   doc="Error flag"),
 
    info: s.record("Info", [
-       s.field("state", self.state_t, doc="State"), 
+       s.field("state", self.state_t, doc="State"),
+       s.field("host",  self.state_t, doc="hostname of the application"),
        s.field("busy", self.busy_t, 0,  doc="Busy flag"), 
        s.field("error", self.err_t, 0, doc="Error flag")
    ], doc="General application information")

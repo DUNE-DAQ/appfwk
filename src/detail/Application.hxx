@@ -15,6 +15,8 @@
 #include "logging/Logging.hpp"
 
 #include <string>
+#include <unistd.h>
+
 
 namespace dunedaq {
 namespace appfwk {
@@ -137,6 +139,11 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
   ai.busy = m_busy.load();
   ai.error = m_error.load();
 
+  char hostname[256];
+  auto res = gethostname(hostname, 256);
+  if ( res < 0 ) ai.host = "Unknown";
+  else ai.host = std::string(hostname);
+  
   opmonlib::InfoCollector tmp_ci;
 
   tmp_ci.add(ai);
