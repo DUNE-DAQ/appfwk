@@ -74,6 +74,7 @@ Application::run(std::atomic<bool>& end_marker)
   m_info_mgr.start(interval, level);
   m_cmd_fac->run(end_marker);
   m_info_mgr.stop();
+  m_mod_mgr.cleanup();
 }
 
 void

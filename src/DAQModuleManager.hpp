@@ -62,6 +62,7 @@ public:
   
   void initialize(const dataobj_t& data);
   bool initialized() const { return m_initialized; }
+  void cleanup();
 
   // Execute a properly structured command
   void execute(const std::string& state, const std::string& cmd, const dataobj_t& cmd_data);

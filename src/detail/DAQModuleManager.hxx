@@ -51,6 +51,13 @@ DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
 }
 
 void
+DAQModuleManager::cleanup()
+{
+  get_iomanager()->reset();
+  this->m_initialized = false;
+}
+
+void
 DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data)
 {
   // The command dispatching: commands and parameters are distributed to all modules that
