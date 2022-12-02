@@ -5,13 +5,11 @@ moo.otypes.load_types('appfwk/cmd.jsonnet', get_moo_model_path())
 moo.otypes.load_types('appfwk/app.jsonnet', get_moo_model_path())
 moo.otypes.load_types('rcif/cmd.jsonnet', get_moo_model_path())
 moo.otypes.load_types('cmdlib/cmd.jsonnet', get_moo_model_path())
-moo.otypes.load_types('iomanager/connection.jsonnet', get_moo_model_path())
 
 import dunedaq.appfwk.cmd as cmd 
 import dunedaq.appfwk.app as app 
 import dunedaq.rcif.cmd as rccmd 
 import dunedaq.cmdlib.cmd as ccmd 
-import dunedaq.iomanager.connection as conn
 
 
 def mspec(inst, plugin, conn_refs):
@@ -30,7 +28,7 @@ def mspec(inst, plugin, conn_refs):
     """
     return app.ModSpec(inst=inst, plugin=plugin,
             data=app.ModInit(
-                conn_refs=conn.ConnectionRefs_t(conn_refs)
+                conn_refs=app.ConnectionReferences_t(conn_refs)
                 )
             )
 

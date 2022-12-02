@@ -62,6 +62,7 @@ public:
   
   void initialize(const dataobj_t& data);
   bool initialized() const { return m_initialized; }
+  void cleanup();
 
   // Execute a properly structured command
   void execute(const std::string& state, const std::string& cmd, const dataobj_t& cmd_data);
@@ -72,7 +73,6 @@ public:
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
-  void init_connections(const iomanager::connection::ConnectionIds_t conn_specs);
   void init_modules(const app::ModSpecs& mspecs);
 
   void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
