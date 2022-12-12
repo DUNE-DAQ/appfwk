@@ -59,7 +59,7 @@ public:
   using dataobj_t = nlohmann::json;
 
   DAQModuleManager();
-  
+
   void initialize(const dataobj_t& data);
   bool initialized() const { return m_initialized; }
   void cleanup();
