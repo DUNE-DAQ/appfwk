@@ -158,8 +158,7 @@ public:
    */
   explicit DAQModule(std::string name)
     : utilities::NamedObject(name)
-  {
-  }
+  {}
 
   /**
    * @brief DAQModule destructor

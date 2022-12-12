@@ -9,6 +9,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 #define APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 
+
 #include "appfwk/cmd/Structs.hpp"
 #include "rcif/runinfo/InfoStructs.hpp"
 #include "utilities/NamedObject.hpp"
@@ -21,7 +22,7 @@
 
 #include "opmonlib/InfoManager.hpp"
 #include "opmonlib/InfoProvider.hpp"
-
+ 
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 
@@ -64,11 +65,7 @@ class Application
 public:
   using dataobj_t = nlohmann::json;
 
-  Application(std::string app_name,
-              std::string partition_name,
-              std::string cmdlibimpl,
-              std::string opmonlibimpl,
-              std::string confimpl);
+  Application(std::string app_name, std::string partition_name, std::string cmdlibimpl, std::string opmonlibimpl, std::string confimpl);
 
   // Initialize the application services
   void init();

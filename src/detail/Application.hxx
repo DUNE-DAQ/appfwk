@@ -17,14 +17,11 @@
 #include <string>
 #include <unistd.h>
 
+
 namespace dunedaq {
 namespace appfwk {
 
-Application::Application(std::string appname,
-                         std::string partition,
-                         std::string cmdlibimpl,
-                         std::string opmonlibimpl,
-                         std::string confimpl)
+Application::Application(std::string appname, std::string partition, std::string cmdlibimpl, std::string opmonlibimpl, std::string confimpl)
   : NamedObject(appname)
   , m_partition(partition)
   , m_info_mgr(opmonlibimpl)
@@ -115,14 +112,15 @@ Application::execute(const dataobj_t& cmd_data)
   try {
     dataobj_t params;
     if (cmdname == "conf") {
-      // std::string uri = rc_cmd.data;
-      std::string uri = "";
+	//std::string uri = rc_cmd.data;
+	std::string uri = "";
       // load the conf params
-      params = m_conf_fac->get_data(get_name(), cmdname, uri);
-    } else {
+      params = m_conf_fac->get_data(get_name(), cmdname, uri); 
+    }
+    else {
       params = rc_cmd.data;
     }
-
+	  
     m_mod_mgr.execute(get_state(), cmdname, params);
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
@@ -144,11 +142,9 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 
   char hostname[256];
   auto res = gethostname(hostname, 256);
-  if (res < 0)
-    ai.host = "Unknown";
-  else
-    ai.host = std::string(hostname);
-
+  if ( res < 0 ) ai.host = "Unknown";
+  else ai.host = std::string(hostname);
+  
   opmonlib::InfoCollector tmp_ci;
 
   tmp_ci.add(ai);

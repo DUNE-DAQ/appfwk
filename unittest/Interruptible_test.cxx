@@ -28,8 +28,7 @@ class TestInterruptible : public Interruptible
 public:
   explicit TestInterruptible(bool initial_condition = false)
     : m_wait_condition(initial_condition)
-  {
-  }
+  {}
 
   void set_end_wait_condition() { m_wait_condition = true; }
 
