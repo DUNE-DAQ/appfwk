@@ -7,8 +7,8 @@
  * received with this code.
  */
 
-#include "CommandLineInterpreter.hpp"
 #include "Application.hpp"
+#include "CommandLineInterpreter.hpp"
 #include "appfwk/Issues.hpp"
 #include "logging/Logging.hpp"
 
@@ -81,8 +81,11 @@ main(int argc, char* argv[])
   setenv("DUNEDAQ_PARTITION", args.partition_name.c_str(), 0);
 
   // Create the Application
-  appfwk::Application app(
-    args.app_name, getenv("DUNEDAQ_PARTITION"), args.command_facility_plugin_name, args.info_service_plugin_name, args.conf_service_plugin_name);
+  appfwk::Application app(args.app_name,
+                          getenv("DUNEDAQ_PARTITION"),
+                          args.command_facility_plugin_name,
+                          args.info_service_plugin_name,
+                          args.conf_service_plugin_name);
 
   app.init();
   app.run(run_marker);

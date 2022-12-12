@@ -43,25 +43,18 @@ ERS_DECLARE_ISSUE(appfwk,
                   "Contract " << who << " violation with command: " << cmd << ": " << what,
                   ((std::string)what)((std::string)cmd)((std::string)who))
 
-ERS_DECLARE_ISSUE(appfwk, BadFile,
-                     "Can not open file: " << filename,
-                      ((std::string)filename))
+ERS_DECLARE_ISSUE(appfwk, BadFile, "Can not open file: " << filename, ((std::string)filename))
 
-ERS_DECLARE_ISSUE(appfwk, CannotParseData,
-                     "Can not parse data: " << reason,
-                      ((std::string)reason))
+ERS_DECLARE_ISSUE(appfwk, CannotParseData, "Can not parse data: " << reason, ((std::string)reason))
 
-ERS_DECLARE_ISSUE(appfwk, ConfFacilityCreationFailed,
-                     "Cannot instance a configuration handling plugin using URI " << uri,
-                      ((std::string)uri))
+ERS_DECLARE_ISSUE(appfwk,
+                  ConfFacilityCreationFailed,
+                  "Cannot instance a configuration handling plugin using URI " << uri,
+                  ((std::string)uri))
 
-ERS_DECLARE_ISSUE(appfwk, InvalidConfigurationURI,
-                     "Cannot get a configuration using URI " << uri,
-                      ((std::string)uri))
+ERS_DECLARE_ISSUE(appfwk, InvalidConfigurationURI, "Cannot get a configuration using URI " << uri, ((std::string)uri))
 
-ERS_DECLARE_ISSUE(appfwk, ConfigurationRetreival,
-                     "Failed to retrieve configuration: " << uri,
-                      ((std::string)uri))
+ERS_DECLARE_ISSUE(appfwk, ConfigurationRetreival, "Failed to retrieve configuration: " << uri, ((std::string)uri))
 // Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 
