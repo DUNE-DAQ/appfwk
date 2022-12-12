@@ -35,15 +35,13 @@ BOOST_TEST_GLOBAL_FIXTURE(EnvFixture);
 
 BOOST_AUTO_TEST_CASE(Constructor)
 {
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 }
 
 BOOST_AUTO_TEST_CASE(Init)
 {
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
 
   dunedaq::iomanager::IOManager::get()->reset();
@@ -54,8 +52,7 @@ BOOST_AUTO_TEST_CASE(Run)
   std::atomic<bool> end_marker = false;
 
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 
   BOOST_REQUIRE_EXCEPTION(
     app.run(end_marker), ApplicationNotInitialized, [&](ApplicationNotInitialized) { return true; });
@@ -69,8 +66,7 @@ BOOST_AUTO_TEST_CASE(Run)
 BOOST_AUTO_TEST_CASE(Start)
 {
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
 
   dunedaq::appfwk::cmd::CmdObj start;
@@ -100,8 +96,7 @@ BOOST_AUTO_TEST_CASE(Start)
 BOOST_AUTO_TEST_CASE(Stop)
 {
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
 
   dunedaq::rcif::cmd::StartParams start_params;
@@ -147,8 +142,7 @@ BOOST_AUTO_TEST_CASE(Stop)
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   dunedaq::rcif::cmd::RCCommand cmd;
   nlohmann::json cmd_data;
 
@@ -175,8 +169,7 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 {
 
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
@@ -198,8 +191,7 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 BOOST_AUTO_TEST_CASE(CommandThrowsException)
 {
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
   app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
@@ -228,8 +220,7 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
 BOOST_AUTO_TEST_CASE(Stats)
 {
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 
   dunedaq::opmonlib::InfoCollector ic;
   app.gather_stats(ic, 0);
@@ -269,8 +260,7 @@ BOOST_AUTO_TEST_CASE(Stats)
 BOOST_AUTO_TEST_CASE(State)
 {
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://" + TEST_JSON_DIR);
+  Application app("app_name", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "file://"+TEST_JSON_DIR);
 
   std::string state_in = "state";
   app.set_state(state_in);

@@ -25,8 +25,7 @@ public:
   Interruptible()
     : m_wait_cv()
     , m_wait_mutex()
-  {
-  }
+  {}
 
   /**
    * @brief Interruptible destructor

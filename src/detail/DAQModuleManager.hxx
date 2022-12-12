@@ -28,8 +28,7 @@ namespace appfwk {
 
 DAQModuleManager::DAQModuleManager()
   : m_initialized(false)
-{
-}
+{}
 
 void
 DAQModuleManager::initialize(const dataobj_t& data)
@@ -209,7 +208,7 @@ DAQModuleManager::execute(const std::string& state, const std::string& cmd, cons
   TLOG_DEBUG(1) << "Command id:" << cmd;
 
   if (!m_initialized) {
-    throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
+      throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
   }
 
   dispatch_one_match_only(cmd, state, cmd_data);
