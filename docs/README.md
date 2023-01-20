@@ -12,6 +12,8 @@ appfwk provides the scaffolding on which all DUNE DAQ software processes can be 
 
 `daq_application` is designed as a flexible container of "DAQ modules" (units of code designed to perform specific tasks) and "connections" (designed to move data between DAQ modules and DAQ applications). These specific tasks can vary widely; they include [producing fake data for testing purposes](https://github.com/DUNE-DAQ/readoutmodules/blob/develop/plugins/FakeCardReader.hpp), [putting data into long term storage](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataWriter.hpp), and so forth. DAQ modules will typically execute user-defined functions when receiving standard transitions from Run Control: "conf", "start", etc. appfwk provides the `DAQModule` base class which users should derive their DAQ module class from in their own packages.  
 
+![daq_application](https://github.com/DUNE-DAQ/appfwk/raw/develop/docs/application.png)
+
 ## Running `daq_application`
 
 In general, in a full blown DAQ system users won't be running `daq_application` from the command line. However, it can be instructive to know what options `daq_application` takes. Details can be found [here](Daq-Application.md).
