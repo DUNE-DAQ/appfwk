@@ -34,7 +34,7 @@ void
 DAQModuleManager::initialize(const dataobj_t& data)
 {
   auto ini = data.get<app::Init>();
-  get_iomanager()->configure(ini.queues, ini.connections, ini.use_connectivity_service);
+  get_iomanager()->configure(ini.queues, ini.connections, ini.use_connectivity_service, std::chrono::milliseconds(ini.connectivity_service_interval_ms));
   init_modules(ini.modules);
   this->m_initialized = true;
 }
