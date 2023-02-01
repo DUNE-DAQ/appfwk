@@ -27,9 +27,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: "dunedaq/sl7-minimal:spack-dev"
+          - image: "ghcr.io/dune-daq/sl7-slim-externals:spack-dev"
             os_name: "c7"
-          - image: "dunedaq/c8-minimal:spack-dev"
+          - image: "ghcr.io/dune-daq/c8-slim-externals:spack-dev"
             os_name: "c8"
     container:
       image: ${{ matrix.image }}
