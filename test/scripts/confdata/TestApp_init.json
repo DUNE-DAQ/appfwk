@@ -1,15 +1,16 @@
 {
-      "modules": [
+  "modules": [
 
-        {
-          "data": {
-            "conn_refs": [            ]
-          },
-          "inst": "dummy_module_0",
-          "plugin": "DummyModule"
-        }
-      ],
-      "connections": [
+    {
+      "data": {
+        "conn_refs": []
+      },
+      "inst": "dummy_module_0",
+      "plugin": "DummyModule"
+    }
+  ],
+  "connections": [
 
-      ]
+  ],
+  "use_connectivity_service": false
 }

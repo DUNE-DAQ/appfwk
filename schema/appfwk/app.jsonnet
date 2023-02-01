@@ -25,6 +25,7 @@ local cs = {
     label: s.string("Label", moo.re.ident_only,
                    doc="A label hard-wired into code"),
     switch: s.boolean("Switch", doc="A boolean switch"),
+    count: s.number("Count", "i8", doc="A count of things"),
     
     mspec: s.record("ModSpec", [
         s.field("plugin", self.plugin,
@@ -57,6 +58,8 @@ local cs = {
                 doc="Initial network connection specifications"),
         s.field("use_connectivity_service", self.switch, default=true, 
                 doc="Whether to use the ConnectivityService to register/request connections"),
+        s.field("connectivity_service_interval_ms", self.count, default=1000,
+                doc="Interval with which the connectivity service client will republish connections as a keep-alive and check for new publishers for its subscribers")
     ], doc="The app-level init command data object struction"),
 
 };
