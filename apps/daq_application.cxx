@@ -11,6 +11,7 @@
 #include "Application.hpp"
 #include "appfwk/Issues.hpp"
 #include "logging/Logging.hpp"
+#include "ers/Issue.hpp"
 
 #include "nlohmann/json.hpp"
 
@@ -32,16 +33,19 @@ using json = nlohmann::json;
  */
 std::atomic<bool> run_marker{ true };
 
+ERS_DECLARE_ISSUE(main_daq_app, SignalReceived, "Signal received: "<< signal, ((int64_t)signal))
+ERS_DECLARE_ISSUE(main_daq_app, Exiting, app_name << " exiting", ((std::string)app_name))
+
 /**
  * @brief Signal handler for graceful stop
  */
 static void
 signal_handler(int signal)
 {
+  ers::info(main_daq_app::SignalReceived(ERS_HERE, signal));
   TLOG() << "Signal received: " << signal;
   run_marker.store(false);
 }
-
 /**
  * @brief Entry point for daq_application
  * @param argc Number of arguments
@@ -86,6 +90,8 @@ main(int argc, char* argv[])
 
   app.init();
   app.run(run_marker);
+
+  ers::info(main_daq_app::Exiting(ERS_HERE, args.app_name));
 
   TLOG() << "Application " << args.app_name << " exiting.";
   return 0;
