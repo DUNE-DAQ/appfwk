@@ -26,6 +26,8 @@
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 
+#include "oksdbinterfaces/Configuration.hpp"
+
 #include <atomic>
 #include <chrono>
 #include <memory>
@@ -110,6 +112,7 @@ private:
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
   std::shared_ptr<ConfFacility> m_conf_fac;
+  ::Configuration* m_confdb;
 };
 
 } // namespace appfwk

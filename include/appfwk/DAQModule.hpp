@@ -27,6 +27,8 @@
 #include "cetlib/compiler_macros.h"
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "dunedaqdal/DaqModule.hpp"
 
 #include <functional>
 #include <map>
@@ -171,6 +173,7 @@ public:
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
   virtual void init(const data_t&) = 0;
+  virtual void init(const dunedaq::dal::DaqModule* conf) = 0;
 
   /**
    * @brief Execute a command in this DAQModule

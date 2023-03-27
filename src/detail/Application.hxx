@@ -29,6 +29,7 @@ Application::Application(std::string appname, std::string partition, std::string
   , m_busy(false)
   , m_error(false)
   , m_initialized(false)
+  , m_mod_mgr(appname)
 {
   m_runinfo.running = false;
   m_runinfo.runno = 0;
@@ -36,7 +37,19 @@ Application::Application(std::string appname, std::string partition, std::string
 
   m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
-  m_conf_fac = appfwk::make_conf_facility(confimpl);
+
+  if (confimpl.find("oks") != std::string::npos) {
+    TLOG() << "Application: cmdlibimpl=<" << cmdlibimpl
+           << "> confimpl=<" << confimpl << "> using OKS for configuration";
+    m_confdb = new Configuration(confimpl);
+    TLOG() << "Application loaded OKS configuration";
+    m_conf_fac = nullptr;
+  }
+  else {
+    TLOG() << "Application: confimpl=<" << confimpl << "> using JSON for configuration";
+    m_conf_fac = appfwk::make_conf_facility(confimpl);
+    m_confdb = nullptr;
+  }
 }
 
 void
@@ -47,9 +60,16 @@ Application::init()
   // Add partition id as tag
   m_info_mgr.set_tags({ { "partition_id", m_partition } });
 
-  // load the init params and init the app
-  dataobj_t init_data = m_conf_fac->get_data(get_name(), "init", "");
-  m_mod_mgr.initialize(init_data);
+  if (m_conf_fac != nullptr) {
+    // load the init params and init the app
+    dataobj_t init_data = m_conf_fac->get_data(get_name(), "init", "");
+    m_mod_mgr.initialize(init_data);
+  }
+  if (m_confdb != nullptr) {
+    // pass the whole OKS DB to the module manager
+    TLOG() << "Application::init() initialising module manager";
+    m_mod_mgr.initialize(m_partition, m_confdb);
+  }
   set_state("INITIAL");
   m_initialized = true;
 }
@@ -111,7 +131,7 @@ Application::execute(const dataobj_t& cmd_data)
 
   try {
     dataobj_t params;
-    if (cmdname == "conf") {
+    if (cmdname == "conf" && m_conf_fac != nullptr) {
 	//std::string uri = rc_cmd.data;
 	std::string uri = "";
       // load the conf params

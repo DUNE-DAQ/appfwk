@@ -16,6 +16,9 @@
 #include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
 
+#include "oksdbinterfaces/Configuration.hpp"
+#include "dunedaqdal/DaqModule.hpp"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -58,9 +61,10 @@ class DAQModuleManager
 public:
   using dataobj_t = nlohmann::json;
 
-  DAQModuleManager();
+  DAQModuleManager(std::string name="");
   
   void initialize(const dataobj_t& data);
+  void initialize(std::string& session, Configuration* data);
   bool initialized() const { return m_initialized; }
   void cleanup();
 
@@ -74,7 +78,7 @@ private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
   void init_modules(const app::ModSpecs& mspecs);
-
+  void init_modules(std::vector<const dunedaq::dal::DaqModule*>& modules);
   void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
   void dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
 
@@ -83,6 +87,7 @@ private:
   bool m_initialized;
 
   DAQModuleMap_t m_module_map;
+  const std::string m_name;
 };
 
 } // namespace appfwk

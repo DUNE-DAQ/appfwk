@@ -17,6 +17,13 @@
 
 #include "logging/Logging.hpp"
 
+#include "oksdbinterfaces/Configuration.hpp"
+#include "dunedaqdal/Session.hpp"
+#include "dunedaqdal/DaqApplication.hpp"
+#include "dunedaqdal/DaqModule.hpp"
+#include "dunedaqdal/NetworkConnection.hpp"
+#include "dunedaqdal/Queue.hpp"
+
 #include <map>
 #include <regex>
 #include <string>
@@ -26,8 +33,9 @@
 namespace dunedaq {
 namespace appfwk {
 
-DAQModuleManager::DAQModuleManager()
+DAQModuleManager::DAQModuleManager(std::string name)
   : m_initialized(false)
+  , m_name(name)
 {}
 
 void
@@ -40,6 +48,80 @@ DAQModuleManager::initialize(const dataobj_t& data)
 }
 
 void
+DAQModuleManager::initialize(std::string& sessionName, Configuration* conf)
+{
+  TLOG() << "DAQModuleManager::initialize() session name " << sessionName
+         << " application name " << m_name;
+  TLOG() << "DAQModuleManager::initialize() getting session";
+  auto session = conf->get<dunedaq::dal::Session>(sessionName);
+  if (session == nullptr) {
+    TLOG() << "DAQModuleManager::initialize() failed to get session";
+    exit(0);
+  }
+  
+  TLOG() << "DAQModuleManager::initialize() getting app";
+  auto app = conf->get<dunedaq::dal::DaqApplication>(m_name);
+  if (app == nullptr) {
+    TLOG() << "DAQModuleManager::initialize() failed to get app";
+    exit(0);
+  }
+  TLOG() << "DAQModuleManager::initialize() getting modules";
+  auto modules = app->get_modules();
+
+  iomanager::Queues_t queues;
+  iomanager::Connections_t networkconnections;
+  for (auto mod: modules) {
+    TLOG() << "initialising module " << mod->UID();
+    for (auto input: mod->get_inputs()) {
+      auto queue = conf->cast<dunedaq::dal::Queue>(input);
+      if (queue) {
+        TLOG() << "Adding queue " << queue->UID();
+        queues.emplace_back(iomanager::QueueConfig{
+            {queue->UID(),input->get_data_type()},
+            iomanager::parse_QueueType(queue->get_queue_type()),
+            queue->get_capacity()});
+      }
+      auto netCon = conf->cast<dunedaq::dal::NetworkConnection>(input);
+      if (netCon) {
+        TLOG() << "Adding network connection " << netCon->UID();
+        networkconnections.emplace_back(iomanager::Connection{
+            {netCon->UID(),input->get_data_type()},
+            netCon->get_uri(),
+            iomanager::parse_ConnectionType(netCon->get_connection_type())
+          });
+      }
+    }
+    for (auto output: mod->get_outputs()) {
+      auto queue = conf->cast<dunedaq::dal::Queue>(output);
+      if (queue) {
+        TLOG() << "Adding queue " << queue->UID();
+        queues.emplace_back(iomanager::QueueConfig{
+            {queue->UID(),output->get_data_type()},
+            iomanager::parse_QueueType(queue->get_queue_type()),
+            queue->get_capacity()});
+      }
+      auto netCon = conf->cast<dunedaq::dal::NetworkConnection>(output);
+      if (netCon) {
+        TLOG() << "Adding network connection " << netCon->UID();
+        networkconnections.emplace_back(iomanager::Connection{
+            {netCon->UID(),output->get_data_type()},
+            netCon->get_uri(),
+            iomanager::parse_ConnectionType(netCon->get_connection_type())
+          });
+      }
+    }
+
+  }
+  get_iomanager()->configure(queues,
+                             networkconnections,
+                             session->get_use_connectivity_server(),
+                             std::chrono::milliseconds(session->get_connectivity_service_interval_ms()));
+  init_modules(modules);
+  this->m_initialized = true;
+  TLOG() << "DAQModuleManager::initialize() completed";
+}
+
+void
 DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
 {
   for (const auto& mspec : mspecs) {
@@ -47,6 +129,17 @@ DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
     auto mptr = make_module(mspec.plugin, mspec.inst);
     m_module_map.emplace(mspec.inst, mptr);
     mptr->init(mspec.data);
+  }
+}
+
+void
+DAQModuleManager::init_modules(std::vector<const dunedaq::dal::DaqModule*>& modules)
+{
+  for (const auto& mspec : modules) {
+    TLOG_DEBUG(0) << "construct: " << mspec->get_plugin() << " : " << mspec->UID();
+    auto mptr = make_module(mspec->get_plugin(), mspec->UID());
+    m_module_map.emplace(mspec->UID(), mptr);
+    mptr->init(mspec);
   }
 }
 

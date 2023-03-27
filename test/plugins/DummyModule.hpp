@@ -42,6 +42,7 @@ public:
   }
 
   void init(const nlohmann::json&) final {}
+  void init(const dunedaq::dal::DaqModule*) final {}
 
   virtual void do_stuff(const data_t& /*data*/) = 0;
 };
