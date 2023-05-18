@@ -72,6 +72,15 @@ ERS_DECLARE_ISSUE(appfwk,                  ///< Namespace
 )
 
 /**
+ * @brief An ERS Issue in case OKS was requested but doesn't exist for this module
+ */
+ERS_DECLARE_ISSUE(appfwk,
+		  OKSConfigNotImplemented,
+		  "OKS configuration hasn't been implemented for this module: " << plugin_name,
+		  ((std::string)plugin_name))
+
+
+/**
  * @brief A generic DAQModule ERS Issue
  */
 ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
@@ -173,7 +182,9 @@ public:
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
   virtual void init(const data_t&) = 0;
-  virtual void init(const dunedaq::dal::DaqModule* conf) { };
+  virtual void init(const dunedaq::dal::DaqModule* conf) {
+    throw OKSConfigNotImplemented(ERS_HERE, get_name());
+  };
 
   /**
    * @brief Execute a command in this DAQModule
