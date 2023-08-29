@@ -53,8 +53,8 @@ jobs:
           source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
           setup_dbt latest|| true
           release_name="last_fddaq"
-          nd_config=$GITHUB_WORKSPACE/daq-release/configs/nddaq/nddaq-develop/release.yaml
-          if grep -q "name: ${REPO}\n" $nd_config; then release_name="last_nddaq"; fi
+          #nd_config=$GITHUB_WORKSPACE/daq-release/configs/nddaq/nddaq-develop/release.yaml
+          #if grep -q "name: ${REPO}\n" $nd_config; then release_name="last_nddaq"; fi
           dbt-create -n $release_name dev-${{ matrix.os_name }}
 
     - name: checkout package for CI
@@ -68,7 +68,7 @@ jobs:
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
           source env.sh || true
-          spack unload $REPO
+          spack unload $REPO || true
           cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
           dbt-build
           #[[ $REPO == "daq-cmake" ]] && dbt-build || dbt-build --lint
