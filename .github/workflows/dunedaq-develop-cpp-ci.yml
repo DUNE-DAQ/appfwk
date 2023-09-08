@@ -27,10 +27,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: "ghcr.io/dune-daq/sl7-slim-externals:spack-dev-split"
+          - image: "ghcr.io/dune-daq/sl7-slim-externals:spack-dev-v1.1"
             os_name: "c7"
-          - image: "ghcr.io/dune-daq/alma9-slim-externals:spack-dev-split"
-            os_name: "al9"
+          - image: "ghcr.io/dune-daq/c8-slim-externals:spack-dev-v1.1"
+            os_name: "c8"
     container:
       image: ${{ matrix.image }}
     defaults:
