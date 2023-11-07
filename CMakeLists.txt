@@ -29,8 +29,8 @@ daq_add_library(DAQModule*.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
 
 ##############################################################################
 # Plugins
-daq_add_plugin(fileConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json)
-daq_add_plugin(dbConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json pistache_shared)
+daq_add_plugin(fileConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json ${CETLIB} ${CETLIB_EXCEPT})
+daq_add_plugin(dbConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json pistache_shared ${CETLIB} ${CETLIB_EXCEPT})
 
 # ##############################################################################
 # Applications
