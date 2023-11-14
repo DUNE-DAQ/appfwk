@@ -16,7 +16,7 @@
 #include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
 
-#include "detail/ConfigurationHandler.hxx"
+#include "appfwk/ConfigurationHandler.hpp"
 
 #include <map>
 #include <memory>

@@ -1,4 +1,13 @@
-#include "ConfigurationHandler.hpp"
+/**
+ * @file ConfigurationHandler.cpp ConfigurationHandler class
+ * implementation
+ *
+ * This is part of the DUNE DAQ Software Suite, copyright 2023.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
+ */
+
+#include "appfwk/ConfigurationHandler.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
 #include "coredal/Session.hpp"
 #include "coredal/DaqApplication.hpp"
@@ -91,18 +100,3 @@ ConfigurationHandler::ConfigurationHandler(std::string& configSpec,
   }
 }
 
-
-const dunedaq::iomanager::Queues_t&
-ConfigurationHandler::queues() {
-  return m_queues;
-}
-
-const dunedaq::iomanager::Connections_t&
-ConfigurationHandler::networkconnections() {
-  return m_networkconnections;
-}
-
-const std::vector<const dunedaq::coredal::DaqModule*>&
-ConfigurationHandler::modules() {
-  return m_modules;
-}
