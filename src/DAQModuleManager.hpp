@@ -62,7 +62,10 @@ public:
 
   DAQModuleManager();
   
-  void initialize(const dataobj_t& data);
+  void initialize(std::shared_ptr<oksdbinterfaces::Configuration> confdb, 
+                  std::string configSpec,
+                  std::string appName,
+                  std::string sessionName);
   bool initialized() const { return m_initialized; }
   void cleanup();
 
@@ -75,8 +78,7 @@ public:
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
-  void init_modules(const app::ModSpecs& mspecs);
-
+  void init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules);
   void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
   void dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
 

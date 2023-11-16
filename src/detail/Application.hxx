@@ -36,7 +36,11 @@ Application::Application(std::string appname, std::string partition, std::string
 
   m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
-  m_conf_fac = appfwk::make_conf_facility(confimpl);
+
+  m_confdb.reset(new oksdbinterfaces::Configuration(confimpl));
+  auto cpos = confimpl.find(":");
+  m_oksFile = confimpl.substr(cpos); // strip "oksconfig:"
+
 }
 
 void
@@ -47,9 +51,7 @@ Application::init()
   // Add partition id as tag
   m_info_mgr.set_tags({ { "partition_id", m_partition } });
 
-  // load the init params and init the app
-  dataobj_t init_data = m_conf_fac->get_data(get_name(), "init", "");
-  m_mod_mgr.initialize(init_data);
+  m_mod_mgr.initialize(m_confdb, m_oksFile, get_name(), m_partition);
   set_state("INITIAL");
   m_initialized = true;
 }
@@ -110,18 +112,7 @@ Application::execute(const dataobj_t& cmd_data)
   }
 
   try {
-    dataobj_t params;
-    if (cmdname == "conf") {
-	//std::string uri = rc_cmd.data;
-	std::string uri = "";
-      // load the conf params
-      params = m_conf_fac->get_data(get_name(), cmdname, uri); 
-    }
-    else {
-      params = rc_cmd.data;
-    }
-	  
-    m_mod_mgr.execute(get_state(), cmdname, params);
+    m_mod_mgr.execute(get_state(), cmdname, rc_cmd.data);
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
       set_state(rc_cmd.exit_state);

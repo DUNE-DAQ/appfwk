@@ -19,17 +19,23 @@
 
 using namespace dunedaq::appfwk;
 
-ConfigurationHandler::ConfigurationHandler(std::string& configSpec,
-                             std::string& appName,
-                             std::string& sessionName)
-  : m_confdb(configSpec)
-  , m_appName(appName)
-  , m_sessionName(sessionName)
+std::shared_ptr<ConfigurationHandler> ConfigurationHandler::s_instance;
+
+void
+ConfigurationHandler::initialise(std::shared_ptr<oksdbinterfaces::Configuration> confdb,
+                                 std::string& configSpec,
+                                 std::string& appName,
+                                 std::string& sessionName)
 {
+  m_confdb = confdb;
+  m_appName = appName;
+  m_sessionName = sessionName;
+
+
   TLOG() << "session name " << sessionName
          << " application name " << appName;
   TLOG_DBG(5) << "getting session";
-  m_session = m_confdb.get<coredal::Session>(sessionName);
+  m_session = m_confdb->get<coredal::Session>(sessionName);
   if (m_session == nullptr) {
     // Throw an ers Issue here!!
     TLOG() << "Failed to get session";
@@ -37,7 +43,7 @@ ConfigurationHandler::ConfigurationHandler(std::string& configSpec,
   }
   
   TLOG_DBG(5) << "getting app";
-  m_application = m_confdb.get<coredal::DaqApplication>(appName);
+  m_application = m_confdb->get<coredal::DaqApplication>(appName);
   if (m_application == nullptr) {
     // Throw an ers Issue here!!
     TLOG() << "Failed to get app";
@@ -52,7 +58,7 @@ ConfigurationHandler::ConfigurationHandler(std::string& configSpec,
   auto smartDaqApp = m_application->cast<appdal::SmartDaqApplication>();
   if (smartDaqApp) {
     std::string oksFile = configSpec.substr(9); // Strip off "oksconfig:"
-    m_modules = smartDaqApp->generate_modules(&m_confdb, oksFile, m_session);
+    m_modules = smartDaqApp->generate_modules(m_confdb.get(), oksFile, m_session);
   }
   auto resSet = m_application->cast<coredal::ResourceSet>();
   if (resSet) {
@@ -65,7 +71,7 @@ ConfigurationHandler::ConfigurationHandler(std::string& configSpec,
           m_modules.push_back(mod);
         }
         else {
-          // ers::warning(NotADaqModule(ERS_HERE,res->UID()));
+          ers::warning(NotADaqModule(ERS_HERE,res->UID()));
         }
       }
       else {
@@ -79,7 +85,7 @@ ConfigurationHandler::ConfigurationHandler(std::string& configSpec,
     auto outputs = mod->get_outputs();
     connections.insert(connections.end(), outputs.begin(), outputs.end());
     for (auto con: connections) {
-      auto queue = m_confdb.cast<coredal::Queue>(con);
+      auto queue = m_confdb->cast<coredal::Queue>(con);
       if (queue) {
         TLOG() << "Adding queue " << queue->UID();
         m_queues.emplace_back(iomanager::QueueConfig{
@@ -87,7 +93,7 @@ ConfigurationHandler::ConfigurationHandler(std::string& configSpec,
             iomanager::parse_QueueType(queue->get_queue_type()),
             queue->get_capacity()});
       }
-      auto netCon = m_confdb.cast<coredal::NetworkConnection>(con);
+      auto netCon = m_confdb->cast<coredal::NetworkConnection>(con);
       if (netCon) {
         TLOG() << "Adding network connection " << netCon->UID();
         m_networkconnections.emplace_back(iomanager::Connection{

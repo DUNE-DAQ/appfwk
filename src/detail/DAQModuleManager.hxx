@@ -13,6 +13,9 @@
 #include "appfwk/cmd/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
+
+#include "coredal/Session.hpp"
+
 #include "iomanager/IOManager.hpp"
 
 #include "logging/Logging.hpp"
@@ -30,23 +33,32 @@ DAQModuleManager::DAQModuleManager()
   : m_initialized(false)
 {}
 
+
 void
-DAQModuleManager::initialize(const dataobj_t& data)
+DAQModuleManager::initialize(std::shared_ptr<oksdbinterfaces::Configuration> confdb, 
+                             std::string configSpec,
+                             std::string appName,
+                             std::string sessionName)
 {
-  auto ini = data.get<app::Init>();
-  get_iomanager()->configure(ini.queues, ini.connections, ini.use_connectivity_service, std::chrono::milliseconds(ini.connectivity_service_interval_ms));
-  init_modules(ini.modules);
+  auto cfg = ConfigurationHandler::get();
+  cfg->initialise(confdb, configSpec, appName, sessionName);
+  auto csInterval = cfg->session()->get_connectivity_service_interval_ms();
+  get_iomanager()->configure(cfg->queues(), cfg->networkconnections(),
+                             true,
+                             std::chrono::milliseconds(csInterval));
+  init_modules(cfg->modules());
   this->m_initialized = true;
 }
 
+
 void
-DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
+DAQModuleManager::init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules)
 {
-  for (const auto& mspec : mspecs) {
-    TLOG_DEBUG(0) << "construct: " << mspec.plugin << " : " << mspec.inst;
-    auto mptr = make_module(mspec.plugin, mspec.inst);
-    m_module_map.emplace(mspec.inst, mptr);
-    mptr->init(mspec.data);
+  for (const auto mod : modules) {
+    TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
+    auto mptr = make_module(mod->class_name(), mod->UID());
+    m_module_map.emplace(mod->UID(), mptr);
+    mptr->init();
   }
 }
 
