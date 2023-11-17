@@ -79,12 +79,18 @@ ConfigurationHandler::initialise(std::shared_ptr<oksdbinterfaces::Configuration>
       }
     }
   }
+  std::set<std::string> connectionsAdded;
   for (auto mod : m_modules) {
     TLOG() << "initialising " << mod->class_name() << " module " << mod->UID();
     auto connections = mod->get_inputs();
     auto outputs = mod->get_outputs();
     connections.insert(connections.end(), outputs.begin(), outputs.end());
     for (auto con: connections) {
+      auto [c, inserted] = connectionsAdded.insert(con->UID());
+      if (!inserted) {
+        // Already handled this connection, don't add it again
+        continue;
+      }
       auto queue = m_confdb->cast<coredal::Queue>(con);
       if (queue) {
         TLOG() << "Adding queue " << queue->UID();
