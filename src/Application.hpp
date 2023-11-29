@@ -109,8 +109,6 @@ private:
   std::string m_fully_qualified_name;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
-  std::string m_oksFile;
-  std::shared_ptr<oksdbinterfaces::Configuration> m_confdb;
 };
 
 } // namespace appfwk

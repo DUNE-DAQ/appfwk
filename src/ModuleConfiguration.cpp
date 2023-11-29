@@ -1,5 +1,5 @@
 /**
- * @file ConfigurationHandler.cpp ConfigurationHandler class
+ * @file ModuleConfiguration.cpp ModuleConfiguration class
  * implementation
  *
  * This is part of the DUNE DAQ Software Suite, copyright 2023.
@@ -7,7 +7,7 @@
  * received with this code.
  */
 
-#include "appfwk/ConfigurationHandler.hpp"
+#include "appfwk/ModuleConfiguration.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
 #include "coredal/Session.hpp"
 #include "coredal/DaqApplication.hpp"
@@ -19,53 +19,34 @@
 
 using namespace dunedaq::appfwk;
 
-std::shared_ptr<ConfigurationHandler> ConfigurationHandler::s_instance;
+std::shared_ptr<ModuleConfiguration> ModuleConfiguration::s_instance;
 
 void
-ConfigurationHandler::initialise(std::shared_ptr<oksdbinterfaces::Configuration> confdb,
-                                 std::string& configSpec,
-                                 std::string& appName,
-                                 std::string& sessionName)
+ModuleConfiguration::initialise()
 {
-  m_confdb = confdb;
-  m_appName = appName;
-  m_sessionName = sessionName;
+  auto cfMgr = ConfigurationManager::get();
+  auto session = cfMgr->session();
+  auto application = cfMgr->application();
+  std::shared_ptr<oksdbinterfaces::Configuration> confdb = cfMgr->confdb();
 
-
-  TLOG() << "session name " << sessionName
-         << " application name " << appName;
-  TLOG_DBG(5) << "getting session";
-  m_session = m_confdb->get<coredal::Session>(sessionName);
-  if (m_session == nullptr) {
-    // Throw an ers Issue here!!
-    TLOG() << "Failed to get session";
-    exit(0);
-  }
-  
-  TLOG_DBG(5) << "getting app";
-  m_application = m_confdb->get<coredal::DaqApplication>(appName);
-  if (m_application == nullptr) {
-    // Throw an ers Issue here!!
-    TLOG() << "Failed to get app";
-    exit(0);
-  }
 
   TLOG_DBG(5) << "getting modules";
-  auto daqApp = m_application->cast<coredal::DaqApplication>();
+  auto daqApp = application->cast<coredal::DaqApplication>();
   if (daqApp) {
     m_modules = daqApp->get_modules();
   }
-  auto smartDaqApp = m_application->cast<appdal::SmartDaqApplication>();
+  auto smartDaqApp = application->cast<appdal::SmartDaqApplication>();
   if (smartDaqApp) {
+    auto configSpec = cfMgr->oks_config_spec();
     std::string oksFile = configSpec.substr(9); // Strip off "oksconfig:"
-    m_modules = smartDaqApp->generate_modules(m_confdb.get(), oksFile, m_session);
+    m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
   }
-  auto resSet = m_application->cast<coredal::ResourceSet>();
+  auto resSet = application->cast<coredal::ResourceSet>();
   if (resSet) {
     auto resources = resSet->get_contains();
     for (auto resiter=resources.begin(); resiter!=resources.end(); ++resiter) {
       auto res = *resiter;
-      if (!res->disabled(*m_session)) {
+      if (!res->disabled(*session)) {
         auto mod = res->cast<coredal::DaqModule>();
         if (mod) {
           m_modules.push_back(mod);
@@ -91,7 +72,7 @@ ConfigurationHandler::initialise(std::shared_ptr<oksdbinterfaces::Configuration>
         // Already handled this connection, don't add it again
         continue;
       }
-      auto queue = m_confdb->cast<coredal::Queue>(con);
+      auto queue = confdb->cast<coredal::Queue>(con);
       if (queue) {
         TLOG() << "Adding queue " << queue->UID();
         m_queues.emplace_back(iomanager::QueueConfig{
@@ -99,7 +80,7 @@ ConfigurationHandler::initialise(std::shared_ptr<oksdbinterfaces::Configuration>
             iomanager::parse_QueueType(queue->get_queue_type()),
             queue->get_capacity()});
       }
-      auto netCon = m_confdb->cast<coredal::NetworkConnection>(con);
+      auto netCon = confdb->cast<coredal::NetworkConnection>(con);
       if (netCon) {
         TLOG() << "Adding network connection " << netCon->UID();
         m_networkconnections.emplace_back(iomanager::Connection{

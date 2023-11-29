@@ -35,18 +35,16 @@ DAQModuleManager::DAQModuleManager()
 
 
 void
-DAQModuleManager::initialize(std::shared_ptr<oksdbinterfaces::Configuration> confdb, 
-                             std::string configSpec,
-                             std::string appName,
-                             std::string sessionName)
+DAQModuleManager::initialize()
 {
-  auto cfg = ConfigurationHandler::get();
-  cfg->initialise(confdb, configSpec, appName, sessionName);
-  auto csInterval = cfg->session()->get_connectivity_service_interval_ms();
-  get_iomanager()->configure(cfg->queues(), cfg->networkconnections(),
+  auto cfgMgr = ConfigurationManager::get();
+  auto csInterval = cfgMgr->session()->get_connectivity_service_interval_ms();
+  auto modCfg = ModuleConfiguration::get();
+  modCfg->initialise();
+  get_iomanager()->configure(modCfg->queues(), modCfg->networkconnections(),
                              true,
                              std::chrono::milliseconds(csInterval));
-  init_modules(cfg->modules());
+  init_modules(modCfg->modules());
   this->m_initialized = true;
 }
 

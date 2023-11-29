@@ -1,5 +1,5 @@
 /**
- * @file ConfigurationHandler.hpp ConfigurationHandler class definition
+ * @file ModuleConfiguration.hpp ModuleConfiguration class definition
  *
  * 
  *
@@ -8,6 +8,10 @@
  * received with this code.
  */
 
+#ifndef APPFWK_INCLUDE_MODULECONFIGURATION_HPP_
+#define APPFWK_INCLUDE_MODULECONFIGURATION_HPP_
+
+#include "appfwk/ConfigurationManager.hpp"
 #include "coredal/DaqModule.hpp"
 #include "iomanager/IOManager.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
@@ -30,25 +34,17 @@ namespace coredal {
 }
 namespace appfwk {
 
-  class ConfigurationHandler {
-    std::shared_ptr<oksdbinterfaces::Configuration> m_confdb;
-    std::string m_appName;
-    std::string m_sessionName;
-    const coredal::Session* m_session;
-    const coredal::Application* m_application;
+  class ModuleConfiguration {
     std::vector<const dunedaq::coredal::DaqModule*> m_modules;
     iomanager::Queues_t m_queues;
     iomanager::Connections_t m_networkconnections;
-    static std::shared_ptr<ConfigurationHandler> s_instance;
-    ConfigurationHandler(){}
+    static std::shared_ptr<ModuleConfiguration> s_instance;
+    ModuleConfiguration(){}
   public:
-    void initialise(std::shared_ptr<oksdbinterfaces::Configuration> confdb,
-                    std::string& configSpec,
-                    std::string& appName,
-                    std::string& sessionName);
-    static std::shared_ptr<ConfigurationHandler> get() {
+    void initialise();
+    static std::shared_ptr<ModuleConfiguration> get() {
       if (!s_instance) {
-        s_instance.reset(new ConfigurationHandler);
+        s_instance.reset(new ModuleConfiguration);
       }
       return s_instance;
     }
@@ -56,14 +52,14 @@ namespace appfwk {
     const iomanager::Connections_t& networkconnections() {
       return m_networkconnections;
     }
-    const coredal::Session* session() {return m_session;}
-    const coredal::Application* application() {return m_application;}
     const std::vector<const coredal::DaqModule*>& modules() {return m_modules;}
 
     template<typename T> const T* module(const std::string& name){
-      return m_confdb->get<T>(name);
+      return ConfigurationManager::get()->get_dal<T>(name);
     }
   };
 
 } // namespace appfwk
 } // namespace dunedaq
+
+#endif // APPFWK_INCLUDE_MODULECONFIGURATION_HPP_

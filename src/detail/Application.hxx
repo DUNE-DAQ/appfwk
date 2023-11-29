@@ -37,10 +37,8 @@ Application::Application(std::string appname, std::string partition, std::string
   m_fully_qualified_name = partition + "." + appname;
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 
-  m_confdb.reset(new oksdbinterfaces::Configuration(confimpl));
-  auto cpos = confimpl.find(":");
-  m_oksFile = confimpl.substr(cpos); // strip "oksconfig:"
-
+  TLOG() << "confimpl=<" << confimpl << ">\n";
+  ConfigurationManager::get()->initialise(confimpl, appname, partition);
 }
 
 void
@@ -51,7 +49,7 @@ Application::init()
   // Add partition id as tag
   m_info_mgr.set_tags({ { "partition_id", m_partition } });
 
-  m_mod_mgr.initialize(m_confdb, m_oksFile, get_name(), m_partition);
+  m_mod_mgr.initialize();
   set_state("INITIAL");
   m_initialized = true;
 }

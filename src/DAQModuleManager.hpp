@@ -13,10 +13,13 @@
 #include "nlohmann/json.hpp"
 #include "opmonlib/InfoCollector.hpp"
 
+#include "coredal/DaqModule.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "appfwk/ConfigurationManager.hpp"
+#include "appfwk/ModuleConfiguration.hpp"
+
 #include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
-
-#include "appfwk/ConfigurationHandler.hpp"
 
 #include <map>
 #include <memory>
@@ -62,10 +65,7 @@ public:
 
   DAQModuleManager();
   
-  void initialize(std::shared_ptr<oksdbinterfaces::Configuration> confdb, 
-                  std::string configSpec,
-                  std::string appName,
-                  std::string sessionName);
+  void initialize();
   bool initialized() const { return m_initialized; }
   void cleanup();
 
