@@ -27,7 +27,7 @@ ModuleConfiguration::initialise()
   auto cfMgr = ConfigurationManager::get();
   auto session = cfMgr->session();
   auto application = cfMgr->application();
-  std::shared_ptr<oksdbinterfaces::Configuration> confdb = cfMgr->confdb();
+  std::shared_ptr<oksdbinterfaces::Configuration> confdb = cfMgr->m_confdb;
 
 
   TLOG_DBG(5) << "getting modules";
@@ -37,8 +37,7 @@ ModuleConfiguration::initialise()
   }
   auto smartDaqApp = application->cast<appdal::SmartDaqApplication>();
   if (smartDaqApp) {
-    auto configSpec = cfMgr->oks_config_spec();
-    std::string oksFile = configSpec.substr(9); // Strip off "oksconfig:"
+    std::string oksFile = cfMgr->m_oksConfigSpec.substr(9); // Strip off "oksconfig:"
     m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
   }
   auto resSet = application->cast<coredal::ResourceSet>();

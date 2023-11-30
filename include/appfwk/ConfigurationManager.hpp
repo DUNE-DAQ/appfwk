@@ -27,14 +27,17 @@ namespace coredal {
 namespace appfwk {
 
   class ConfigurationManager {
+    friend class ModuleConfiguration;
+
     std::shared_ptr<oksdbinterfaces::Configuration> m_confdb;
     std::string m_appName;
     std::string m_sessionName;
     std::string m_oksConfigSpec;
     const coredal::Session* m_session;
     const coredal::Application* m_application;
-    static std::shared_ptr<ConfigurationManager> s_instance;
 
+    static std::shared_ptr<ConfigurationManager> s_instance;
+    ConfigurationManager();
   public:
     static std::shared_ptr<ConfigurationManager> get() {
       if (!s_instance) {
@@ -45,11 +48,10 @@ namespace appfwk {
     void initialise(std::string& configSpec,
                     std::string& appName,
                     std::string& sessionName) ;
-    std::shared_ptr<oksdbinterfaces::Configuration> confdb() {return m_confdb;}
+
     const coredal::Session* session() {return m_session;}
     const coredal::Application* application() {return m_application;}
     template<typename T> const T* get_dal(const std::string& name) {return m_confdb->get<T>(name);}
-    std::string oks_config_spec() {return m_oksConfigSpec;}
   };
 
 } // namespace appfwk
