@@ -18,6 +18,11 @@
 #include "coredal/Service.hpp"
 #include "appdal/SmartDaqApplication.hpp"
 
+#include <ifaddrs.h>
+#include <netdb.h>
+#include <cerrno>
+
+
 using namespace dunedaq::appfwk;
 
 std::shared_ptr<ModuleConfiguration> ModuleConfiguration::s_instance;
@@ -89,8 +94,25 @@ ModuleConfiguration::initialise()
           port = std::to_string(service->get_port());
         }
         std::string ipaddr = "0.0.0.0";
-        if (service->get_eth_device_name() != "") {
+        auto iface = service->get_eth_device_name();
+        if (iface != "") {
           // Work out which ip address goes with this device  TODO
+          struct ifaddrs *ifaddr;
+          getifaddrs(&ifaddr);
+          for (auto ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+            if (ifa->ifa_addr == NULL) {
+              continue;
+            }
+            if (std::string(ifa->ifa_name) == iface) {
+              char ip[NI_MAXHOST];
+              int status = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), ip, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+              if (status != 0) {
+                continue;
+              }
+              ipaddr = std::string(ip);
+              break;
+            }
+          }
         }
         std::string uri(service->get_protocol() + "://" + ipaddr + ":" + port);
         m_networkconnections.emplace_back(iomanager::Connection{
