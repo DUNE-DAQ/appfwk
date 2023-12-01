@@ -15,6 +15,7 @@
 #include "coredal/NetworkConnection.hpp"
 #include "coredal/Queue.hpp"
 #include "coredal/ResourceSet.hpp"
+#include "coredal/Service.hpp"
 #include "appdal/SmartDaqApplication.hpp"
 
 using namespace dunedaq::appfwk;
@@ -82,9 +83,19 @@ ModuleConfiguration::initialise()
       auto netCon = confdb->cast<coredal::NetworkConnection>(con);
       if (netCon) {
         TLOG() << "Adding network connection " << netCon->UID();
+        auto service = netCon->get_associated_service();
+        std::string port = "*";
+        if (service->get_port()) {
+          port = std::to_string(service->get_port());
+        }
+        std::string ipaddr = "0.0.0.0";
+        if (service->get_eth_device_name() != "") {
+          // Work out which ip address goes with this device  TODO
+        }
+        std::string uri(service->get_protocol() + "://" + ipaddr + ":" + port);
         m_networkconnections.emplace_back(iomanager::Connection{
-            {netCon->UID(), netCon->get_data_type()},
-            netCon->get_uri(),
+            {netCon->UID(), service->get_data_type()},
+            uri,
             iomanager::parse_ConnectionType(netCon->get_connection_type())
           });
       }

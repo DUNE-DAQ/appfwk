@@ -37,7 +37,7 @@ namespace appfwk {
     const coredal::Application* m_application;
 
     static std::shared_ptr<ConfigurationManager> s_instance;
-    ConfigurationManager();
+    ConfigurationManager(){}
   public:
     static std::shared_ptr<ConfigurationManager> get() {
       if (!s_instance) {
