@@ -96,7 +96,7 @@ ModuleConfiguration::initialise()
         std::string ipaddr = "0.0.0.0";
         auto iface = service->get_eth_device_name();
         if (iface != "") {
-          // Work out which ip address goes with this device  TODO
+          // Work out which ip address goes with this device
           struct ifaddrs *ifaddr;
           getifaddrs(&ifaddr);
           for (auto ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
@@ -116,7 +116,7 @@ ModuleConfiguration::initialise()
         }
         std::string uri(service->get_protocol() + "://" + ipaddr + ":" + port);
         m_networkconnections.emplace_back(iomanager::Connection{
-            {netCon->UID(), service->get_data_type()},
+            {netCon->UID(), con->get_data_type()},
             uri,
             iomanager::parse_ConnectionType(netCon->get_connection_type())
           });
