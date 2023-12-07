@@ -8,33 +8,28 @@
  */
 
 #include "appfwk/ModuleConfiguration.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
-#include "coredal/Session.hpp"
+#include "appdal/SmartDaqApplication.hpp"
 #include "coredal/DaqApplication.hpp"
 #include "coredal/DaqModule.hpp"
 #include "coredal/NetworkConnection.hpp"
 #include "coredal/Queue.hpp"
 #include "coredal/ResourceSet.hpp"
 #include "coredal/Service.hpp"
-#include "appdal/SmartDaqApplication.hpp"
+#include "coredal/Session.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
 
+#include <cerrno>
 #include <ifaddrs.h>
 #include <netdb.h>
-#include <cerrno>
-
 
 using namespace dunedaq::appfwk;
 
-std::shared_ptr<ModuleConfiguration> ModuleConfiguration::s_instance;
-
-void
-ModuleConfiguration::initialise()
+ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> cfMgr)
+  : m_config_mgr(cfMgr)
 {
-  auto cfMgr = ConfigurationManager::get();
   auto session = cfMgr->session();
   auto application = cfMgr->application();
   std::shared_ptr<oksdbinterfaces::Configuration> confdb = cfMgr->m_confdb;
-
 
   TLOG_DBG(5) << "getting modules";
   auto daqApp = application->cast<coredal::DaqApplication>();
@@ -49,18 +44,16 @@ ModuleConfiguration::initialise()
   auto resSet = application->cast<coredal::ResourceSet>();
   if (resSet) {
     auto resources = resSet->get_contains();
-    for (auto resiter=resources.begin(); resiter!=resources.end(); ++resiter) {
+    for (auto resiter = resources.begin(); resiter != resources.end(); ++resiter) {
       auto res = *resiter;
       if (!res->disabled(*session)) {
         auto mod = res->cast<coredal::DaqModule>();
         if (mod) {
           m_modules.push_back(mod);
+        } else {
+          ers::warning(NotADaqModule(ERS_HERE, res->UID()));
         }
-        else {
-          ers::warning(NotADaqModule(ERS_HERE,res->UID()));
-        }
-      }
-      else {
+      } else {
         TLOG() << "Ignoring disabled resource " << res->UID();
       }
     }
@@ -71,7 +64,7 @@ ModuleConfiguration::initialise()
     auto connections = mod->get_inputs();
     auto outputs = mod->get_outputs();
     connections.insert(connections.end(), outputs.begin(), outputs.end());
-    for (auto con: connections) {
+    for (auto con : connections) {
       auto [c, inserted] = connectionsAdded.insert(con->UID());
       if (!inserted) {
         // Already handled this connection, don't add it again
@@ -80,10 +73,9 @@ ModuleConfiguration::initialise()
       auto queue = confdb->cast<coredal::Queue>(con);
       if (queue) {
         TLOG() << "Adding queue " << queue->UID();
-        m_queues.emplace_back(iomanager::QueueConfig{
-            {queue->UID(), queue->get_data_type()},
-            iomanager::parse_QueueType(queue->get_queue_type()),
-            queue->get_capacity()});
+        m_queues.emplace_back(iomanager::QueueConfig{ { queue->UID(), queue->get_data_type() },
+                                                      iomanager::parse_QueueType(queue->get_queue_type()),
+                                                      queue->get_capacity() });
       }
       auto netCon = confdb->cast<coredal::NetworkConnection>(con);
       if (netCon) {
@@ -97,7 +89,7 @@ ModuleConfiguration::initialise()
         auto iface = service->get_eth_device_name();
         if (iface != "") {
           // Work out which ip address goes with this device
-          struct ifaddrs *ifaddr;
+          struct ifaddrs* ifaddr;
           getifaddrs(&ifaddr);
           for (auto ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
             if (ifa->ifa_addr == NULL) {
@@ -105,7 +97,8 @@ ModuleConfiguration::initialise()
             }
             if (std::string(ifa->ifa_name) == iface) {
               char ip[NI_MAXHOST];
-              int status = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), ip, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+              int status =
+                getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), ip, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
               if (status != 0) {
                 continue;
               }
@@ -115,13 +108,11 @@ ModuleConfiguration::initialise()
           }
         }
         std::string uri(service->get_protocol() + "://" + ipaddr + ":" + port);
-        m_networkconnections.emplace_back(iomanager::Connection{
-            {netCon->UID(), con->get_data_type()},
-            uri,
-            iomanager::parse_ConnectionType(netCon->get_connection_type())
-          });
+        m_networkconnections.emplace_back(
+          iomanager::Connection{ { netCon->UID(), con->get_data_type() },
+                                 uri,
+                                 iomanager::parse_ConnectionType(netCon->get_connection_type()) });
       }
     }
   }
 }
-

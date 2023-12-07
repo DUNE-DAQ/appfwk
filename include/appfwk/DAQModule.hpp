@@ -19,6 +19,8 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 
+#include "appfwk/ModuleConfiguration.hpp"
+
 #include "utilities/NamedObject.hpp"
 
 #include "opmonlib/InfoCollector.hpp"
@@ -158,7 +160,8 @@ public:
    */
   explicit DAQModule(std::string name)
     : utilities::NamedObject(name)
-  {}
+  {
+  }
 
   /**
    * @brief DAQModule destructor
@@ -170,8 +173,7 @@ public:
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
-  virtual void init(const data_t&) {}
-  virtual void init() {}
+  virtual void init(std::shared_ptr<ModuleConfiguration> /*mcfg*/) {}
 
   /**
    * @brief Execute a command in this DAQModule

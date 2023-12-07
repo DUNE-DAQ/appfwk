@@ -25,7 +25,10 @@ find_package(appdal REQUIRED)
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json pistache_shared
   coredal::coredal appdal::appdal oksdbinterfaces::oksdbinterfaces okssystem::okssystem)
 
-include_directories(${CMAKE_BINARY_DIR}/coredal ${CMAKE_BINARY_DIR}/appdal)
+include_directories(${CMAKE_BINARY_DIR}/coredal ${CMAKE_BINARY_DIR}/appdal ${CMAKE_BINARY_DIR}/appfwk)
+find_package(genconfig REQUIRED)
+daq_oks_codegen(appfwk.schema.xml TEST NAMESPACE dunedaq::appfwk::dal
+  DALDIR dal DEP_PKGS coredal)
 
 daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS iomanager rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
 daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hpp.j2 opmonlib/InfoNljs.hpp.j2 )

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="us-ascii"?>
+
+<!-- oks-schema version 2.2 -->
+
+
+<!DOCTYPE oks-schema [
+	<!ELEMENT oks-schema (info, (include)?, (comments)?, (class)+)>
+	<!ELEMENT info EMPTY>
+	<!ATTLIST info
+      name CDATA #IMPLIED
+      type CDATA #IMPLIED
+      num-of-items CDATA #REQUIRED
+      oks-format CDATA #FIXED "schema"
+      oks-version CDATA #REQUIRED
+      created-by CDATA #IMPLIED
+      created-on CDATA #IMPLIED
+      creation-time CDATA #IMPLIED
+      last-modified-by CDATA #IMPLIED
+      last-modified-on CDATA #IMPLIED
+      last-modification-time CDATA #IMPLIED
+  >
+	<!ELEMENT include (file)+>
+	<!ELEMENT file EMPTY>
+	<!ATTLIST file
+      path CDATA #REQUIRED
+  >
+	<!ELEMENT comments (comment)+>
+	<!ELEMENT comment EMPTY>
+	<!ATTLIST comment
+      creation-time CDATA #REQUIRED
+      created-by CDATA #REQUIRED
+      created-on CDATA #REQUIRED
+      author CDATA #REQUIRED
+      text CDATA #REQUIRED
+  >
+	<!ELEMENT class (superclass | attribute | relationship | method)*>
+	<!ATTLIST class
+      name CDATA #REQUIRED
+      description CDATA ""
+      is-abstract (yes|no) "no"
+  >
+	<!ELEMENT superclass EMPTY>
+	<!ATTLIST superclass name CDATA #REQUIRED>
+	<!ELEMENT attribute EMPTY>
+	<!ATTLIST attribute
+      name CDATA #REQUIRED
+      description CDATA ""
+      type (bool|s8|u8|s16|u16|s32|u32|s64|u64|float|double|date|time|string|uid|enum|class) #REQUIRED
+      range CDATA ""
+      format (dec|hex|oct) "dec"
+      is-multi-value (yes|no) "no"
+      init-value CDATA ""
+      is-not-null (yes|no) "no"
+      ordered (yes|no) "no"
+  >
+	<!ELEMENT relationship EMPTY>
+	<!ATTLIST relationship
+      name CDATA #REQUIRED
+      description CDATA ""
+      class-type CDATA #REQUIRED
+      low-cc (zero|one) #REQUIRED
+      high-cc (one|many) #REQUIRED
+      is-composite (yes|no) #REQUIRED
+      is-exclusive (yes|no) #REQUIRED
+      is-dependent (yes|no) #REQUIRED
+      ordered (yes|no) "no"
+  >
+	<!ELEMENT method (method-implementation*)>
+	<!ATTLIST method
+      name CDATA #REQUIRED
+      description CDATA ""
+  >
+	<!ELEMENT method-implementation EMPTY>
+	<!ATTLIST method-implementation
+      language CDATA #REQUIRED
+      prototype CDATA #REQUIRED
+      body CDATA ""
+  >
+]>
+
+<oks-schema>
+
+	<info name="" type="" num-of-items="5" oks-format="schema" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231110T125843" last-modified-by="gjc" last-modified-on="thinkpad" last-modification-time="20231115T112943"/>
+
+	<include>
+		<file path="schema/coredal/dunedaq.schema.xml"/>
+	</include>
+
+
+	<class name="DummyModule">
+		<superclass name="DaqModule"/>
+	</class>
+
+</oks-schema>

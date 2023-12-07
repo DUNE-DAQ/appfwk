@@ -44,10 +44,7 @@ BOOST_AUTO_TEST_CASE(Initialized)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
-  dunedaq::appfwk::app::Init init;
-  nlohmann::json init_data;
-  to_json(init_data, init);
-  mgr.initialize(init_data);
+  mgr.initialize(nullptr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
@@ -58,10 +55,10 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
-  //dunedaq::cmdlib::cmd::Command cmd;
-  //cmd.id = "start";
+  // dunedaq::cmdlib::cmd::Command cmd;
+  // cmd.id = "start";
   nlohmann::json cmd_data;
-  //to_json(cmd_data, cmd);
+  // to_json(cmd_data, cmd);
 
   BOOST_REQUIRE_EXCEPTION(mgr.execute("CONFIGURED", "start", cmd_data),
                           DAQModuleManagerNotInitialized,
@@ -88,11 +85,11 @@ BOOST_AUTO_TEST_CASE(InitializeModules)
   init.modules.push_back(module_init);
   nlohmann::json init_data;
   to_json(init_data, init);
-  //dunedaq::cmdlib::cmd::Command cmd;
-  //cmd.id = "init";
-  //cmd.data = init_data;
-  //nlohmann::json cmd_data;
-  //to_json(cmd_data, cmd);
+  // dunedaq::cmdlib::cmd::Command cmd;
+  // cmd.id = "init";
+  // cmd.data = init_data;
+  // nlohmann::json cmd_data;
+  // to_json(cmd_data, cmd);
   mgr.initialize(init_data);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
@@ -111,19 +108,20 @@ BOOST_AUTO_TEST_CASE(CommandModules)
   init.modules.push_back(module_init);
   nlohmann::json init_data;
   to_json(init_data, init);
-  //dunedaq::cmdlib::cmd::Command cmd;
-  //cmd.id = "init";
-  //cmd.data = init_data;
-  //nlohmann::json cmd_data;
-  //to_json(cmd_data, cmd);
+  // dunedaq::cmdlib::cmd::Command cmd;
+  // cmd.id = "init";
+  // cmd.data = init_data;
+  // nlohmann::json cmd_data;
+  // to_json(cmd_data, cmd);
   mgr.initialize(init_data);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
   nlohmann::json cmd_data;
   mgr.execute("RUNNING", "stuff", cmd_data);
 
-  BOOST_REQUIRE_EXCEPTION(
-    mgr.execute("RUNNING", "bad_stuff", cmd_data), CommandDispatchingFailed, [&](CommandDispatchingFailed) { return true; });
+  BOOST_REQUIRE_EXCEPTION(mgr.execute("RUNNING", "bad_stuff", cmd_data),
+                          CommandDispatchingFailed,
+                          [&](CommandDispatchingFailed) { return true; });
 
   dunedaq::opmonlib::InfoCollector ic;
   mgr.gather_stats(ic, 0);
@@ -143,11 +141,11 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
   nlohmann::json init_data;
   to_json(init_data, init);
   dunedaq::cmdlib::cmd::Command cmd;
-  //cmd.id = "init";
-  //cmd.data = init_data;
-  //nlohmann::json cmd_data;
-  //to_json(cmd_data, cmd);
-  //mgr.execute("NONE", cmd_data);
+  // cmd.id = "init";
+  // cmd.data = init_data;
+  // nlohmann::json cmd_data;
+  // to_json(cmd_data, cmd);
+  // mgr.execute("NONE", cmd_data);
   mgr.initialize(init_data);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
@@ -165,8 +163,9 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
   addr_cmd.match = ".*Module";
   cmd_obj.modules.push_back(addr_cmd);
   to_json(cmd_obj_data, cmd_obj);
-  BOOST_REQUIRE_EXCEPTION(
-    mgr.execute("RUNNING", "bad_stuff", cmd_obj_data), ConflictingCommandMatching, [&](ConflictingCommandMatching) { return true; });
+  BOOST_REQUIRE_EXCEPTION(mgr.execute("RUNNING", "bad_stuff", cmd_obj_data),
+                          ConflictingCommandMatching,
+                          [&](ConflictingCommandMatching) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(InitializeIOManager_Queues)

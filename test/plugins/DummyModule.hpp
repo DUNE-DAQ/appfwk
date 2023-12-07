@@ -41,7 +41,7 @@ public:
     register_command("stuff", &DummyParentModule::do_stuff, valid_states);
   }
 
-  void init(const nlohmann::json&) final {}
+  void init(std::shared_ptr<ModuleConfiguration>) final {}
 
   virtual void do_stuff(const data_t& /*data*/) = 0;
 };

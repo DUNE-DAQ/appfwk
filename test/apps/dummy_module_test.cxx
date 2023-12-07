@@ -26,10 +26,7 @@ main()
 
   // Init
   TLOG() << "Calling init on modules...";
-  app::ModInit dummy_init_data;
-  nlohmann::json dummy_init_json;
-  to_json(dummy_init_json, dummy_init_data);
-  dummy_module->init(dummy_init_json);
+  dummy_module->init(nullptr);
 
   TLOG() << "Calling stuff on module...";
   dummy_module->execute_command("stuff", "RUNNING");
