@@ -42,7 +42,7 @@ class ModuleConfiguration
   std::shared_ptr<ConfigurationManager> m_config_mgr;
 
 public:
-  ModuleConfiguration(std::shared_ptr<ConfigurationManager> mgr);
+  explicit ModuleConfiguration(std::shared_ptr<ConfigurationManager> mgr);
 
   const iomanager::Queues_t& queues() { return m_queues; }
   const iomanager::Connections_t& networkconnections() { return m_networkconnections; }
