@@ -48,6 +48,8 @@ public:
   const iomanager::Connections_t& networkconnections() { return m_networkconnections; }
   const std::vector<const coredal::DaqModule*>& modules() { return m_modules; }
 
+  std::shared_ptr<ConfigurationManager> configuration_manager() { return m_config_mgr; }
+
   template<typename T>
   const T* module(const std::string& name)
   {
