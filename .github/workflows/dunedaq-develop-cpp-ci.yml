@@ -52,9 +52,9 @@ jobs:
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
           setup_dbt latest|| true
-          release_name="last_fddaq"
-          #nd_config=$GITHUB_WORKSPACE/daq-release/configs/nddaq/nddaq-develop/release.yaml
-          #if grep -q "name: ${REPO}\n" $nd_config; then release_name="last_nddaq"; fi
+          release_name="last_fddaq_c8"
+          nd_config=$GITHUB_WORKSPACE/daq-release/configs/nddaq/nddaq-develop/release.yaml
+          if grep -q "name: ${REPO}\n" $nd_config; then release_name="last_nddaq_c8"; fi
           dbt-create -n $release_name dev-${{ matrix.os_name }}
 
     - name: checkout package for CI
