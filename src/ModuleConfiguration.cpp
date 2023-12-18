@@ -43,7 +43,7 @@ ModuleConfiguration::initialise()
   }
   auto smartDaqApp = application->cast<appdal::SmartDaqApplication>();
   if (smartDaqApp) {
-    std::string oksFile = cfMgr->m_oksConfigSpec.substr(9); // Strip off "oksconfig:"
+    std::string oksFile = cfMgr->m_oks_config_spec.substr(9); // Strip off "oksconfig:"
     m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
   }
   auto resSet = application->cast<coredal::ResourceSet>();

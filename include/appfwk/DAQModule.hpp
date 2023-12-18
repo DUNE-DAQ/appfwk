@@ -170,8 +170,7 @@ public:
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
-  virtual void init(const data_t&) {}
-  virtual void init() {}
+  virtual void init() = 0;
 
   /**
    * @brief Execute a command in this DAQModule

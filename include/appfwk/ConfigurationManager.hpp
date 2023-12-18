@@ -30,9 +30,9 @@ namespace appfwk {
     friend class ModuleConfiguration;
 
     std::shared_ptr<oksdbinterfaces::Configuration> m_confdb;
-    std::string m_appName;
-    std::string m_sessionName;
-    std::string m_oksConfigSpec;
+    std::string m_app_name;
+    std::string m_session_name;
+    std::string m_oks_config_spec;
     const coredal::Session* m_session;
     const coredal::Application* m_application;
 

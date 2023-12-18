@@ -17,22 +17,20 @@ using namespace dunedaq::appfwk;
 std::shared_ptr<ConfigurationManager> ConfigurationManager::s_instance;
 
 void
-ConfigurationManager::initialise(std::string& configSpec,
-                                 std::string& appName,
-                                 std::string& sessionName)
+ConfigurationManager::initialise(std::string& config_spec,
+                                 std::string& app_name,
+                                 std::string& session_name)
 {
-  TLOG() << "configSpec <" << configSpec
-         << "> session name " << sessionName
-         << " application name " << appName;
+  TLOG() << "configSpec <" << config_spec << "> session name " << session_name << " application name " << app_name;
 
-  m_oksConfigSpec = configSpec;
-  m_appName = appName;
-  m_sessionName = sessionName;
+  m_oks_config_spec = config_spec;
+  m_app_name = app_name;
+  m_session_name = session_name;
 
-  m_confdb.reset(new oksdbinterfaces::Configuration(configSpec));
+  m_confdb.reset(new oksdbinterfaces::Configuration(config_spec));
 
   TLOG_DBG(5) << "getting session";
-  m_session = m_confdb->get<coredal::Session>(sessionName);
+  m_session = m_confdb->get<coredal::Session>(session_name);
   if (m_session == nullptr) {
     // Throw an ers Issue here!!
     TLOG() << "Failed to get session";
@@ -40,7 +38,7 @@ ConfigurationManager::initialise(std::string& configSpec,
   }
   
   TLOG_DBG(5) << "getting app";
-  m_application = m_confdb->get<coredal::DaqApplication>(appName);
+  m_application = m_confdb->get<coredal::DaqApplication>(app_name);
   if (m_application == nullptr) {
     // Throw an ers Issue here!!
     TLOG() << "Failed to get app";

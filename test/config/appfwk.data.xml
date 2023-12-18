@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ASCII"?>
+
+<!-- oks-data version 2.2 -->
+
+
+<!DOCTYPE oks-data [
+  <!ELEMENT oks-data (info, (include)?, (comments)?, (obj)+)>
+  <!ELEMENT info EMPTY>
+  <!ATTLIST info
+      name CDATA #IMPLIED
+      type CDATA #IMPLIED
+      num-of-items CDATA #REQUIRED
+      oks-format CDATA #FIXED "data"
+      oks-version CDATA #REQUIRED
+      created-by CDATA #IMPLIED
+      created-on CDATA #IMPLIED
+      creation-time CDATA #IMPLIED
+      last-modified-by CDATA #IMPLIED
+      last-modified-on CDATA #IMPLIED
+      last-modification-time CDATA #IMPLIED
+  >
+  <!ELEMENT include (file)*>
+  <!ELEMENT file EMPTY>
+  <!ATTLIST file
+      path CDATA #REQUIRED
+  >
+  <!ELEMENT comments (comment)*>
+  <!ELEMENT comment EMPTY>
+  <!ATTLIST comment
+      creation-time CDATA #REQUIRED
+      created-by CDATA #REQUIRED
+      created-on CDATA #REQUIRED
+      author CDATA #REQUIRED
+      text CDATA #REQUIRED
+  >
+  <!ELEMENT obj (attr | rel)*>
+  <!ATTLIST obj
+      class CDATA #REQUIRED
+      id CDATA #REQUIRED
+  >
+  <!ELEMENT attr (data)*>
+  <!ATTLIST attr
+      name CDATA #REQUIRED
+      type (bool|s8|u8|s16|u16|s32|u32|s64|u64|float|double|date|time|string|uid|enum|class|-) "-"
+      val CDATA ""
+  >
+  <!ELEMENT data EMPTY>
+  <!ATTLIST data
+      val CDATA #REQUIRED
+  >
+  <!ELEMENT rel (ref)*>
+  <!ATTLIST rel
+      name CDATA #REQUIRED
+      class CDATA ""
+      id CDATA ""
+  >
+  <!ELEMENT ref EMPTY>
+  <!ATTLIST ref
+      class CDATA #REQUIRED
+      id CDATA #REQUIRED
+  >
+]>
+
+<oks-data>
+
+  <info name="" type="" num-of-items="23" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231110T143339" last-modified-by="gjc" last-modified-on="thinkpad" last-modification-time="20231201T123554"/>
+
+  <include>
+    <file path="schema/coredal/dunedaq.schema.xml"/>
+    <file path="test/schema/appfwk/appfwk.schema.xml"/>
+  </include>
+
+  <comments>
+    <comment creation-time="20231110T151441" created-by="gjc" created-on="thinkpad" author="gjc" text="initial version"/>
+    <comment creation-time="20231201T123322" created-by="gjc" created-on="thinkpad" author="gjc" text="h"/>
+    <comment creation-time="20231201T123357" created-by="gjc" created-on="thinkpad" author="gjc" text="j"/>
+    <comment creation-time="20231201T123554" created-by="gjc" created-on="thinkpad" author="gjc" text="h"/>
+  </comments>
+
+
+  <obj class="DaqApplication" id="TestApp">
+    <attr name="application_name" type="string" val="daq_application"/>
+    <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+    <rel name="modules">
+      <ref class="DummyModule" id="dummy_module_0"/>
+    </rel>
+  </obj>
+
+  <obj class="DummyModule" id="dummy_module_0">
+  </obj>
+
+</oks-data>
