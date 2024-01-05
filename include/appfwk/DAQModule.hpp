@@ -173,7 +173,7 @@ public:
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
-  virtual void init(std::shared_ptr<ModuleConfiguration> /*mcfg*/) {}
+  virtual void init(std::shared_ptr<ModuleConfiguration> /*mcfg*/) = 0;
 
   /**
    * @brief Execute a command in this DAQModule
