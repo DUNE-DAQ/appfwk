@@ -31,23 +31,21 @@ namespace appfwk {
 
 DAQModuleManager::DAQModuleManager()
   : m_initialized(false)
-{}
-
-
-void
-DAQModuleManager::initialize()
 {
-  auto cfgMgr = ConfigurationManager::get();
-  auto csInterval = cfgMgr->session()->get_connectivity_service_interval_ms();
-  auto modCfg = ModuleConfiguration::get();
-  modCfg->initialise();
-  get_iomanager()->configure(modCfg->queues(), modCfg->networkconnections(),
-                             true,
-                             std::chrono::milliseconds(csInterval));
-  init_modules(modCfg->modules());
-  this->m_initialized = true;
 }
 
+void
+DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr)
+{
+  auto csInterval = cfgMgr->session()->get_connectivity_service_interval_ms();
+  m_module_configuration = std::make_shared<ModuleConfiguration>(cfgMgr);
+  get_iomanager()->configure(m_module_configuration->queues(),
+                             m_module_configuration->networkconnections(),
+                             true,
+                             std::chrono::milliseconds(csInterval));
+  init_modules(m_module_configuration->modules());
+  this->m_initialized = true;
+}
 
 void
 DAQModuleManager::init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules)
@@ -56,7 +54,7 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::coredal::DaqModu
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
     auto mptr = make_module(mod->class_name(), mod->UID());
     m_module_map.emplace(mod->UID(), mptr);
-    mptr->init();
+    mptr->init(m_module_configuration);
   }
 }
 
@@ -218,7 +216,7 @@ DAQModuleManager::execute(const std::string& state, const std::string& cmd, cons
   TLOG_DEBUG(1) << "Command id:" << cmd;
 
   if (!m_initialized) {
-      throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
+    throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
   }
 
   dispatch_one_match_only(cmd, state, cmd_data);

@@ -17,11 +17,14 @@
 #include <string>
 #include <unistd.h>
 
-
 namespace dunedaq {
 namespace appfwk {
 
-Application::Application(std::string appname, std::string partition, std::string cmdlibimpl, std::string opmonlibimpl, std::string confimpl)
+Application::Application(std::string appname,
+                         std::string partition,
+                         std::string cmdlibimpl,
+                         std::string opmonlibimpl,
+                         std::string confimpl)
   : NamedObject(appname)
   , m_partition(partition)
   , m_info_mgr(opmonlibimpl)
@@ -29,6 +32,7 @@ Application::Application(std::string appname, std::string partition, std::string
   , m_busy(false)
   , m_error(false)
   , m_initialized(false)
+  , m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, appname, partition))
 {
   m_runinfo.running = false;
   m_runinfo.runno = 0;
@@ -38,7 +42,6 @@ Application::Application(std::string appname, std::string partition, std::string
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 
   TLOG() << "confimpl=<" << confimpl << ">\n";
-  ConfigurationManager::get()->initialise(confimpl, appname, partition);
 }
 
 void
@@ -49,7 +52,7 @@ Application::init()
   // Add partition id as tag
   m_info_mgr.set_tags({ { "partition_id", m_partition } });
 
-  m_mod_mgr.initialize();
+  m_mod_mgr.initialize(m_config_mgr);
   set_state("INITIAL");
   m_initialized = true;
 }
@@ -131,9 +134,11 @@ Application::gather_stats(opmonlib::InfoCollector& ci, int level)
 
   char hostname[256];
   auto res = gethostname(hostname, 256);
-  if ( res < 0 ) ai.host = "Unknown";
-  else ai.host = std::string(hostname);
-  
+  if (res < 0)
+    ai.host = "Unknown";
+  else
+    ai.host = std::string(hostname);
+
   opmonlib::InfoCollector tmp_ci;
 
   tmp_ci.add(ai);

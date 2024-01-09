@@ -52,3 +52,4 @@ test/src/appfwk/fakedataproducerdaqmodule/Nljs.hpp
 test/src/appfwk/fakedataproducerdaqmodule/Structs.hpp
 test/src/appfwk/fakedataconsumerdaqmodule/Nljs.hpp
 test/src/appfwk/fakedataconsumerdaqmodule/Structs.hpp
+.DS_Store

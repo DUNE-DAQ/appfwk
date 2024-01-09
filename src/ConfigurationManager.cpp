@@ -8,18 +8,13 @@
  */
 
 #include "appfwk/ConfigurationManager.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
-#include "coredal/Session.hpp"
 #include "coredal/DaqApplication.hpp"
+#include "coredal/Session.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
 
 using namespace dunedaq::appfwk;
 
-std::shared_ptr<ConfigurationManager> ConfigurationManager::s_instance;
-
-void
-ConfigurationManager::initialise(std::string& config_spec,
-                                 std::string& app_name,
-                                 std::string& session_name)
+ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& session_name)
 {
   TLOG() << "configSpec <" << config_spec << "> session name " << session_name << " application name " << app_name;
 
@@ -36,7 +31,7 @@ ConfigurationManager::initialise(std::string& config_spec,
     TLOG() << "Failed to get session";
     exit(0);
   }
-  
+
   TLOG_DBG(5) << "getting app";
   m_application = m_confdb->get<coredal::DaqApplication>(app_name);
   if (m_application == nullptr) {
@@ -45,4 +40,3 @@ ConfigurationManager::initialise(std::string& config_spec,
     exit(0);
   }
 }
-

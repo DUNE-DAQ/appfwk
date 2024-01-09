@@ -26,7 +26,7 @@ main()
 
   // Init
   TLOG() << "Calling init on modules...";
-  dummy_module->init();
+  dummy_module->init(nullptr);
 
   TLOG() << "Calling stuff on module...";
   dummy_module->execute_command("stuff", "RUNNING");
