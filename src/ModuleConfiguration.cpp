@@ -32,32 +32,22 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
   std::shared_ptr<oksdbinterfaces::Configuration> confdb = cfMgr->m_confdb;
 
   TLOG_DBG(5) << "getting modules";
-  auto daqApp = application->cast<coredal::DaqApplication>();
-  if (daqApp) {
-    m_modules = daqApp->get_modules();
-  }
   auto smartDaqApp = application->cast<appdal::SmartDaqApplication>();
   if (smartDaqApp) {
-    std::string oksFile = cfMgr->m_oks_config_spec.substr(9); // Strip off "oksconfig:"
+    auto cpos = cfMgr->m_oks_config_spec.find(":") + 1;
+    std::string oksFile = cfMgr->m_oks_config_spec.substr(cpos); // Strip off "oksconfig:"
     m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
   }
-  auto resSet = application->cast<coredal::ResourceSet>();
-  if (resSet) {
-    auto resources = resSet->get_contains();
-    for (auto resiter = resources.begin(); resiter != resources.end(); ++resiter) {
-      auto res = *resiter;
-      if (!res->disabled(*session)) {
-        auto mod = res->cast<coredal::DaqModule>();
-        if (mod) {
-          m_modules.push_back(mod);
-        } else {
-          ers::warning(NotADaqModule(ERS_HERE, res->UID()));
-        }
-      } else {
-        TLOG() << "Ignoring disabled resource " << res->UID();
-      }
+  else {
+    auto daqApp = application->cast<coredal::DaqApplication>();
+    if (daqApp) {
+      m_modules = daqApp->get_modules();
+    }
+    else {
+      throw (NotADaqApplication(ERS_HERE, application->UID()));
     }
   }
+
   std::set<std::string> connectionsAdded;
   for (auto mod : m_modules) {
     TLOG() << "initialising " << mod->class_name() << " module " << mod->UID();

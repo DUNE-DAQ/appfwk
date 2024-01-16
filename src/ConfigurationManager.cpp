@@ -33,7 +33,7 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
   }
 
   TLOG_DBG(5) << "getting app";
-  m_application = m_confdb->get<coredal::DaqApplication>(app_name);
+  m_application = m_confdb->get<coredal::Application>(app_name);
   if (m_application == nullptr) {
     // Throw an ers Issue here!!
     TLOG() << "Failed to get app";
