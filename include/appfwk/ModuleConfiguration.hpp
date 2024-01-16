@@ -26,6 +26,11 @@ ERS_DECLARE_ISSUE(appfwk,                                                       
                   "Application contains a resource " << res << " that is not a DaqModule", ///< Message
                   ((std::string)res)                                                       ///< Message parameters
 )
+ERS_DECLARE_ISSUE(appfwk,                                                                  ///< Namespace
+                  NotADaqApplication,                                                           ///< Issue class name
+                  "Application " << app << " is neither a DaqApplication nor a SmartDaqApplication ", ///< Message
+                  ((std::string)app)                                                       ///< Message parameters
+)
 
 namespace coredal {
 class DaqModule;
