@@ -14,6 +14,10 @@
 #include "coredal/DaqModule.hpp"
 #include "iomanager/IOManager.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/ConfigObject.hpp"
+#include "oksdbinterfaces/Schema.hpp"
+
+#include "nlohmann/json.hpp"
 
 #include <string>
 #include <vector>
@@ -46,6 +50,26 @@ public:
   const T* get_dal(const std::string& name)
   {
     return m_confdb->get<T>(name);
+  }
+
+
+  nlohmann::json get_json_config(const std::string& class_name,
+                                 const std::string& uid,
+                                 bool direct_only = false);
+  template <typename T> void add_value(oksdbinterfaces::ConfigObject& obj,
+                                      std::string& name,
+                                      bool multi_value,
+                                      nlohmann::json& attributes){
+    if (!multi_value) {
+      T value;
+      obj.get(name, value);
+      attributes[name] = value;
+    }
+    else {
+      std::vector<T> value_vector;
+      obj.get(name, value_vector);
+      attributes[name] = nlohmann::json(value_vector);
+    }
   }
 };
 
