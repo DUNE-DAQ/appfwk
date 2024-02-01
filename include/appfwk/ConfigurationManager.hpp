@@ -56,10 +56,10 @@ public:
   nlohmann::json get_json_config(const std::string& class_name,
                                  const std::string& uid,
                                  bool direct_only = false);
-  template <typename T> void add_value(oksdbinterfaces::ConfigObject& obj,
-                                      std::string& name,
-                                      bool multi_value,
-                                      nlohmann::json& attributes){
+  template <typename T> void add_json_value(oksdbinterfaces::ConfigObject& obj,
+                                            std::string& name,
+                                            bool multi_value,
+                                            nlohmann::json& attributes) {
     if (!multi_value) {
       T value;
       obj.get(name, value);

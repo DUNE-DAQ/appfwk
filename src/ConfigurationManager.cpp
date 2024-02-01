@@ -54,44 +54,44 @@ nlohmann::json ConfigurationManager::get_json_config(const std::string& class_na
   m_confdb->get(class_name, uid, obj);
   for (auto attr : class_info.p_attributes) {
     if (attr.p_type == type_t::u8_type) {
-      add_value<uint8_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<uint8_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::u16_type) {
-      add_value<uint16_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<uint16_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::u32_type) {
-      add_value<uint32_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<uint32_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::u64_type) {
-      add_value<uint64_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<uint64_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::s8_type) {
-      add_value<int8_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<int8_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::s16_type) {
-      add_value<int16_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<int16_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::s32_type ||
              attr.p_type == type_t::s16_type) {
-      add_value<int32_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<int32_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::s64_type) {
-      add_value<int64_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<int64_t>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::float_type) {
-      add_value<float>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<float>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::double_type) {
-      add_value<double>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<double>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if (attr.p_type == type_t::bool_type) {
-      add_value<bool>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<bool>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
     else if ((attr.p_type == type_t::string_type) ||
              (attr.p_type == type_t::enum_type) ||
              (attr.p_type == type_t::date_type) ||
              (attr.p_type == type_t::time_type)) {
-      add_value<std::string>(obj, attr.p_name, attr.p_is_multi_value, attributes);
+      add_json_value<std::string>(obj, attr.p_name, attr.p_is_multi_value, attributes);
     }
   }
   if (!direct_only) {
