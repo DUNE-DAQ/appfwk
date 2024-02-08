@@ -225,7 +225,18 @@ DAQModuleManager::gather_stats(opmonlib::InfoCollector& ci, int level)
 
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
     opmonlib::InfoCollector tmp_ci;
-    mod_ptr->get_info(tmp_ci, level);
+    try {
+      mod_ptr->get_info(tmp_ci, level);
+    }
+    catch( ers::Issue & i ) {
+      ers::error( FailedInfoGathering(ERS_HERE, mod_name, i) );
+    }
+    catch( std::exception & ex ) {
+      ers::error( ExceptionWhileInfoGathering(ERS_HERE, mod_name, ex.what()) );
+    }
+    catch( ... ) {
+      ers::error( FailedInfoGathering(ERS_HERE, mod_name) );
+    }
     if (!tmp_ci.is_empty()) {
       ci.add(mod_name, tmp_ci);
     }
