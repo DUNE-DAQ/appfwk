@@ -14,14 +14,16 @@
 
 using namespace dunedaq::appfwk;
 
-ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& session_name)
+ConfigurationManager::ConfigurationManager(std::string& config_spec,
+                                           std::string& app_name,
+                                           std::string& session_name)
+  : m_app_name(app_name)
+  , m_session_name(session_name)
+  , m_oks_config_spec(config_spec)
+  , m_application(nullptr)
 {
-  TLOG() << "configSpec <" << config_spec << "> session name " << session_name << " application name " << app_name;
-
-  m_oks_config_spec = config_spec;
-  m_app_name = app_name;
-  m_session_name = session_name;
-
+  TLOG() << "configSpec <" << m_oks_config_spec << "> session name "
+         << m_session_name << " application name " << m_app_name;
   m_confdb.reset(new oksdbinterfaces::Configuration(config_spec));
 
   TLOG_DBG(5) << "getting session";
@@ -33,7 +35,13 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
   }
 
   TLOG_DBG(5) << "getting app";
-  m_application = m_confdb->get<coredal::Application>(app_name);
+  // m_application = m_confdb->get<coredal::Application>(app_name);
+  for (auto app: m_session->get_all_applications()) {
+    if (app->UID() == app_name) {
+      m_application = app;
+      break;
+    }
+  }
   if (m_application == nullptr) {
     // Throw an ers Issue here!!
     TLOG() << "Failed to get app";

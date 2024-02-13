@@ -17,6 +17,7 @@
 #include "coredal/Service.hpp"
 #include "coredal/Session.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
+#include "oks/kernel.hpp"
 
 #include <cerrno>
 #include <ifaddrs.h>
@@ -32,11 +33,12 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
   std::shared_ptr<oksdbinterfaces::Configuration> confdb = cfMgr->m_confdb;
 
   TLOG_DBG(5) << "getting modules";
-  auto smartDaqApp = application->cast<appdal::SmartDaqApplication>();
+  auto smartDaqApp = dynamic_cast<const appdal::SmartDaqApplication*>(application);
   if (smartDaqApp) {
+    oks::OksFile::set_nolock_mode(true);
     auto cpos = cfMgr->m_oks_config_spec.find(":") + 1;
     std::string oksFile = cfMgr->m_oks_config_spec.substr(cpos); // Strip off "oksconfig:"
-    m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
+    m_modules = smartDaqApp->generate_modules(oksFile, session);
   }
   else {
     auto daqApp = application->cast<coredal::DaqApplication>();
