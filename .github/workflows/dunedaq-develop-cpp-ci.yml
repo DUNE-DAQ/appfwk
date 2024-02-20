@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: "ghcr.io/dune-daq/nightly-release-alma9:latest"
+          - image: "ghcr.io/dune-daq/nightly-release-alma9:development_v5"
             os_name: "a9"
     container:
       image: ${{ matrix.image }}
@@ -66,6 +66,7 @@ jobs:
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
           source env.sh || true
+          test $REPO == "dbe" && spack load dbe || true
           spack unload $REPO || true
           cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
           dbt-build # --unittest # --lint
