@@ -52,6 +52,20 @@ ERS_DECLARE_ISSUE(appfwk,                                                       
                   ((std::string)cmdid)                                                   ///< Message parameters
                   ((std::string)modules)                                                 ///< Message parameters
 )
+
+ERS_DECLARE_ISSUE(appfwk,                                                                ///< Namespace
+                  FailedInfoGathering,                                                   ///< Issue class name
+                  "Info gathering failed for module: " << module,                        ///< Message
+                  ((std::string)module)                                                  ///< Message parameters
+)
+
+ERS_DECLARE_ISSUE_BASE(appfwk,                                                           ///< Namespace  
+		       ExceptionWhileInfoGathering,                                      ///< Issue class name
+		       FailedInfoGathering,                                              ///< Base Issue class name
+		       module << " threw exception while info gathering: " << message,   ///< Message
+		       ((std::string)module),                                            ///< Base Issue params
+		       ((std::string)message)                                            ///< This class params
+)
 // Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
