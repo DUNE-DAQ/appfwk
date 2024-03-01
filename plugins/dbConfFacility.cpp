@@ -50,8 +50,8 @@ public:
       		m_uri = "http" + uri.substr(sep);
 	    }
 
-	    Http::Client client;
-	    auto opts = Http::Client::options().threads(1).keepAlive(true).maxConnectionsPerHost(8);
+	    Http::Experimental::Client client;
+	    auto opts = Http::Experimental::Client::options().threads(1).keepAlive(true).maxConnectionsPerHost(8);
     	    client.init(opts);
 
 	    TLOG_DEBUG() << "HTTP client instanciated and options set " << m_uri;
