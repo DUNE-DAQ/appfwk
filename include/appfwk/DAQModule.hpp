@@ -19,6 +19,8 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 
+#include "appfwk/ModuleConfiguration.hpp"
+
 #include "utilities/NamedObject.hpp"
 
 #include "opmonlib/InfoCollector.hpp"
@@ -133,6 +135,17 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
                        ((std::string)reason)                  ///< Attribute of this class
 )
 
+/**
+ * @brief The MissingConnection DAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
+                       MissingConnection,                         ///< Type of the Issue
+                       appfwk::GeneralDAQModuleIssue,                  ///< Base class of the Issue
+                       "Required Connection Not Found. Type: " << type << ", direction: " << direction,   ///< Log Message from the issue
+                       ((std::string)name), ///< Base class attributes
+                       ((std::string)type)((std::string)direction)                  ///< Attribute of this class
+)
+
 // Re-enable coverage collection LCOV_EXCL_STOP
 namespace appfwk {
 
@@ -158,7 +171,8 @@ public:
    */
   explicit DAQModule(std::string name)
     : utilities::NamedObject(name)
-  {}
+  {
+  }
 
   /**
    * @brief DAQModule destructor
@@ -170,7 +184,7 @@ public:
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
-  virtual void init(const data_t&) = 0;
+  virtual void init(std::shared_ptr<ModuleConfiguration> /*mcfg*/) = 0;
 
   /**
    * @brief Execute a command in this DAQModule

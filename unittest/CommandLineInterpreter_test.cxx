@@ -63,8 +63,9 @@ BOOST_AUTO_TEST_CASE(ParseCommandFacility)
 BOOST_AUTO_TEST_CASE(ParseName)
 {
 
-  char** arg_list =
-    new char* [5] { (char*)("CommandLineInterpreter_test"), (char*)("-n"), (char*)("cli_test"), (char*)("-d"), (char*)("file://"), }; // NOLINT
+  char** arg_list = new char* [5] {
+    (char*)("CommandLineInterpreter_test"), (char*)("-n"), (char*)("cli_test"), (char*)("-d"), (char*)("file://"),
+  }; // NOLINT
   BOOST_REQUIRE_EXCEPTION(CommandLineInterpreter::parse(5, arg_list),
                           dunedaq::appfwk::CommandLineIssue,
                           [&](dunedaq::appfwk::CommandLineIssue) { return true; });
@@ -77,7 +78,7 @@ BOOST_AUTO_TEST_CASE(ParseNameAndCommandFacility)
   char** arg_list = new char* [7] {
     (char*)("CommandLineInterpreter_test"), // NOLINT
       (char*)("-c"), (char*)("stdin://"),   // NOLINT
-      (char*)("-d"), (char*)("file://"),   // NOLINT
+      (char*)("-d"), (char*)("file://"),    // NOLINT
       (char*)("-n"), (char*)("cli_test")    // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(7, arg_list);
@@ -98,7 +99,7 @@ BOOST_AUTO_TEST_CASE(ParseInfoService)
   char** arg_list = new char* [9] {
     (char*)("CommandLineInterpreter_test"),     // NOLINT
       (char*)("-c"), (char*)("stdin://"),       // NOLINT
-      (char*)("-d"), (char*)("file://"),       // NOLINT
+      (char*)("-d"), (char*)("file://"),        // NOLINT
       (char*)("-n"), (char*)("cli_test"),       // NOLINT
       (char*)("-i"), (char*)("info_service://") // NOLINT
   };
@@ -119,7 +120,7 @@ BOOST_AUTO_TEST_CASE(ParsePartition)
   char** arg_list = new char* [9] {
     (char*)("CommandLineInterpreter_test"),    // NOLINT
       (char*)("-c"), (char*)("stdin://"),      // NOLINT
-      (char*)("-d"), (char*)("file://"),   // NOLINT
+      (char*)("-d"), (char*)("file://"),       // NOLINT
       (char*)("-n"), (char*)("cli_test"),      // NOLINT
       (char*)("-p"), (char*)("test_partition") // NOLINT
   };
@@ -140,7 +141,7 @@ BOOST_AUTO_TEST_CASE(ParseOtherOption)
   char** arg_list = new char* [8] {
     (char*)("CommandLineInterpreter_test"), // NOLINT
       (char*)("-c"), (char*)("stdin://"),   // NOLINT
-      (char*)("-d"), (char*)("file://"),   // NOLINT
+      (char*)("-d"), (char*)("file://"),    // NOLINT
       (char*)("-n"), (char*)("cli_test"),   // NOLINT
       (char*)("--some-other-option")        // NOLINT
   };
@@ -162,7 +163,7 @@ BOOST_AUTO_TEST_CASE(ParseMultipleOtherOptions)
   char** arg_list = new char* [11] {
     (char*)("CommandLineInterpreter_test"), // NOLINT
       (char*)("-c"), (char*)("stdin://"),   // NOLINT
-      (char*)("-d"), (char*)("file://"),   // NOLINT
+      (char*)("-d"), (char*)("file://"),    // NOLINT
       (char*)("-n"), (char*)("cli_test"),   // NOLINT
       (char*)("--some-other-option"),       // NOLINT
       (char*)("--yet-another-option=4"),    // NOLINT

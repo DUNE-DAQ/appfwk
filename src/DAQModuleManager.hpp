@@ -13,6 +13,11 @@
 #include "nlohmann/json.hpp"
 #include "opmonlib/InfoCollector.hpp"
 
+#include "appfwk/ConfigurationManager.hpp"
+#include "appfwk/ModuleConfiguration.hpp"
+#include "coredal/DaqModule.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+
 #include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
 
@@ -73,8 +78,8 @@ public:
   using dataobj_t = nlohmann::json;
 
   DAQModuleManager();
-  
-  void initialize(const dataobj_t& data);
+
+  void initialize(std::shared_ptr<ConfigurationManager> mgr);
   bool initialized() const { return m_initialized; }
   void cleanup();
 
@@ -87,12 +92,12 @@ public:
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
-  void init_modules(const app::ModSpecs& mspecs);
-
+  void init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules);
   void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
   void dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
 
   std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string& state);
+  std::shared_ptr<ModuleConfiguration> m_module_configuration;
 
   bool m_initialized;
 

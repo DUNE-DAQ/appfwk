@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="ASCII"?>
+
+<!-- oks-data version 2.2 -->
+
+
+<!DOCTYPE oks-data [
+  <!ELEMENT oks-data (info, (include)?, (comments)?, (obj)+)>
+  <!ELEMENT info EMPTY>
+  <!ATTLIST info
+      name CDATA #IMPLIED
+      type CDATA #IMPLIED
+      num-of-items CDATA #REQUIRED
+      oks-format CDATA #FIXED "data"
+      oks-version CDATA #REQUIRED
+      created-by CDATA #IMPLIED
+      created-on CDATA #IMPLIED
+      creation-time CDATA #IMPLIED
+      last-modified-by CDATA #IMPLIED
+      last-modified-on CDATA #IMPLIED
+      last-modification-time CDATA #IMPLIED
+  >
+  <!ELEMENT include (file)*>
+  <!ELEMENT file EMPTY>
+  <!ATTLIST file
+      path CDATA #REQUIRED
+  >
+  <!ELEMENT comments (comment)*>
+  <!ELEMENT comment EMPTY>
+  <!ATTLIST comment
+      creation-time CDATA #REQUIRED
+      created-by CDATA #REQUIRED
+      created-on CDATA #REQUIRED
+      author CDATA #REQUIRED
+      text CDATA #REQUIRED
+  >
+  <!ELEMENT obj (attr | rel)*>
+  <!ATTLIST obj
+      class CDATA #REQUIRED
+      id CDATA #REQUIRED
+  >
+  <!ELEMENT attr (data)*>
+  <!ATTLIST attr
+      name CDATA #REQUIRED
+      type (bool|s8|u8|s16|u16|s32|u32|s64|u64|float|double|date|time|string|uid|enum|class|-) "-"
+      val CDATA ""
+  >
+  <!ELEMENT data EMPTY>
+  <!ATTLIST data
+      val CDATA #REQUIRED
+  >
+  <!ELEMENT rel (ref)*>
+  <!ATTLIST rel
+      name CDATA #REQUIRED
+      class CDATA ""
+      id CDATA ""
+  >
+  <!ELEMENT ref EMPTY>
+  <!ATTLIST ref
+      class CDATA #REQUIRED
+      id CDATA #REQUIRED
+  >
+]>
+
+<oks-data>
+
+  <info name="" type="" num-of-items="51" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231116T105446" last-modified-by="gjc" last-modified-on="thinkpad" last-modification-time="20231117T121356"/>
+
+  <include>
+    <file path="schema/coredal/dunedaq.schema.xml"/>
+    <file path="test/config/appfwk.data.xml"/>
+  </include>
+
+  <comments>
+    <comment creation-time="20231116T122331" created-by="gjc" created-on="thinkpad" author="gjc" text="k"/>
+    <comment creation-time="20231117T105205" created-by="gjc" created-on="thinkpad" author="gjc" text="ff"/>
+    <comment creation-time="20231117T120703" created-by="gjc" created-on="thinkpad" author="gjc" text="n"/>
+    <comment creation-time="20231117T121356" created-by="gjc" created-on="thinkpad" author="gjc" text="rename"/>
+  </comments>
+
+
+  <obj class="ConnectionService" id="connectionservice">
+    <attr name="enabled" type="bool" val="1"/>
+    <attr name="application_name" type="string" val="gunicorn"/>
+    <attr name="commandline_parameters" type="string" val="--bind=0.0.0.0:15000 --workers=1 --worker-class=gthread --threads=2 --timeout=0 --pid=connectionservice_15000.pid connection-service.connection-flask:app"/>
+    <attr name="port" type="u16" val="15000"/>
+    <attr name="threads" type="u16" val="1"/>
+    <rel name="applicationEnvironment">
+      <ref class="VariableSet" id="consvc_ssh"/>
+    </rel>
+    <rel name="runs_on" class="VirtualHost" id="connectionservice"/>
+  </obj>
+
+  <obj class="DetectorConfig" id="dummy-detector">
+    <attr name="tpg_channel_map" type="string" val="PD2HDChannelMap"/>
+    <attr name="clock_speed_hz" type="u32" val="62500000"/>
+    <attr name="op_env" type="string" val="swtest"/>
+  </obj>
+
+  <obj class="FSMCommand" id="conf">
+    <attr name="cmd" type="string" val="conf"/>
+    <attr name="optional" type="bool" val="1"/>
+  </obj>
+
+  <obj class="FSMCommand" id="disable_triggers">
+    <attr name="cmd" type="string" val="disable_triggers"/>
+    <attr name="optional" type="bool" val="1"/>
+  </obj>
+
+  <obj class="FSMCommand" id="drain_dataflow">
+    <attr name="cmd" type="string" val="drain_dataflow"/>
+    <attr name="optional" type="bool" val="0"/>
+  </obj>
+
+  <obj class="FSMCommand" id="enable_triggers">
+    <attr name="cmd" type="string" val="enable_triggers"/>
+    <attr name="optional" type="bool" val="0"/>
+  </obj>
+
+  <obj class="FSMCommand" id="scrap">
+    <attr name="cmd" type="string" val="scrap"/>
+    <attr name="optional" type="bool" val="1"/>
+  </obj>
+
+  <obj class="FSMCommand" id="start">
+    <attr name="cmd" type="string" val="start"/>
+    <attr name="optional" type="bool" val="0"/>
+  </obj>
+
+  <obj class="FSMCommand" id="stop">
+    <attr name="cmd" type="string" val="stop"/>
+    <attr name="optional" type="bool" val="0"/>
+  </obj>
+
+  <obj class="FSMCommand" id="stop_trigger_sources">
+    <attr name="cmd" type="string" val="stop_trigger_sources"/>
+    <attr name="optional" type="bool" val="0"/>
+  </obj>
+
+  <obj class="FSMconfiguration" id="fsmConf-1">
+    <attr name="states" type="string">
+      <data val="initial"/>
+      <data val="configured"/>
+      <data val="ready"/>
+      <data val="running"/>
+      <data val="paused"/>
+      <data val="dataflow_drained"/>
+      <data val="trigger_sources_stopped"/>
+      <data val="error"/>
+    </attr>
+    <attr name="initial_state" type="string" val="initial"/>
+    <rel name="transitions">
+      <ref class="FSMtransition" id="conf"/>
+      <ref class="FSMtransition" id="start"/>
+      <ref class="FSMtransition" id="enable_triggers"/>
+      <ref class="FSMtransition" id="disable_triggers"/>
+      <ref class="FSMtransition" id="drain_dataflow"/>
+      <ref class="FSMtransition" id="stop_trigger_sources"/>
+      <ref class="FSMtransition" id="stop"/>
+      <ref class="FSMtransition" id="scrap"/>
+    </rel>
+    <rel name="command_sequences">
+      <ref class="FSMsequence" id="shutdown"/>
+      <ref class="FSMsequence" id="start_run"/>
+      <ref class="FSMsequence" id="stop_run"/>
+    </rel>
+    <rel name="pre_transitions">
+      <ref class="FSMxTransition" id="start"/>
+    </rel>
+  </obj>
+
+  <obj class="FSMinterface" id="dummy-if">
+    <attr name="name" type="string" val="user-provided-run-number"/>
+  </obj>
+
+  <obj class="FSMsequence" id="shutdown">
+    <rel name="sequence">
+      <ref class="FSMCommand" id="disable_triggers"/>
+      <ref class="FSMCommand" id="drain_dataflow"/>
+      <ref class="FSMCommand" id="stop_trigger_sources"/>
+      <ref class="FSMCommand" id="stop"/>
+      <ref class="FSMCommand" id="scrap"/>
+    </rel>
+  </obj>
+
+  <obj class="FSMsequence" id="start_run">
+    <rel name="sequence">
+      <ref class="FSMCommand" id="conf"/>
+      <ref class="FSMCommand" id="start"/>
+      <ref class="FSMCommand" id="enable_triggers"/>
+    </rel>
+  </obj>
+
+  <obj class="FSMsequence" id="stop_run">
+    <rel name="sequence">
+      <ref class="FSMCommand" id="disable_triggers"/>
+      <ref class="FSMCommand" id="drain_dataflow"/>
+      <ref class="FSMCommand" id="stop_trigger_sources"/>
+      <ref class="FSMCommand" id="stop"/>
+    </rel>
+  </obj>
+
+  <obj class="FSMtransition" id="conf">
+    <attr name="source" type="string" val="initial"/>
+    <attr name="dest" type="string" val="configured"/>
+  </obj>
+
+  <obj class="FSMtransition" id="disable_triggers">
+    <attr name="source" type="string" val="running"/>
+    <attr name="dest" type="string" val="ready"/>
+  </obj>
+
+  <obj class="FSMtransition" id="drain_dataflow">
+    <attr name="source" type="string" val="ready"/>
+    <attr name="dest" type="string" val="dataflow_drained"/>
+  </obj>
+
+  <obj class="FSMtransition" id="enable_triggers">
+    <attr name="source" type="string" val="ready"/>
+    <attr name="dest" type="string" val="running"/>
+  </obj>
+
+  <obj class="FSMtransition" id="scrap">
+    <attr name="source" type="string" val="configured"/>
+    <attr name="dest" type="string" val="initial"/>
+  </obj>
+
+  <obj class="FSMtransition" id="start">
+    <attr name="source" type="string" val="configured"/>
+    <attr name="dest" type="string" val="ready"/>
+  </obj>
+
+  <obj class="FSMtransition" id="stop">
+    <attr name="source" type="string" val="trigger_sources_stopped"/>
+    <attr name="dest" type="string" val="configured"/>
+  </obj>
+
+  <obj class="FSMtransition" id="stop_trigger_sources">
+    <attr name="source" type="string" val="dataflow_drained"/>
+    <attr name="dest" type="string" val="trigger_sources_stopped"/>
+  </obj>
+
+  <obj class="FSMxTransition" id="start">
+    <attr name="order" type="string">
+      <data val="user-provided-run-number"/>
+    </attr>
+    <attr name="mandatory" type="string">
+      <data val="user-provided-run-number"/>
+    </attr>
+  </obj>
+
+  <obj class="PhysicalHost" id="localhost">
+    <rel name="contains">
+      <ref class="ProcessingResource" id="cpus"/>
+    </rel>
+  </obj>
+
+  <obj class="ProcessingResource" id="cpus">
+    <attr name="cpu_cores" type="u16">
+      <data val="0"/>
+      <data val="1"/>
+      <data val="2"/>
+      <data val="3"/>
+    </attr>
+  </obj>
+
+  <obj class="RCApplication" id="my-controller">
+    <attr name="commandline_parameters" type="string" val="file:///home/gjc/DUNE/fddaq-v4.2.0-a9/listrev/controller.json ${PORT} my-controller partition_name"/>
+    <attr name="application_name" type="string" val="drunc-controller"/>
+    <rel name="runs_on" class="VirtualHost" id="controller"/>
+    <rel name="fsm" class="FSMconfiguration" id="fsmConf-1"/>
+    <rel name="broadcaster" class="RCBroadcatser" id="bcaster"/>
+  </obj>
+
+  <obj class="RCBroadcatser" id="bcaster">
+    <attr name="type" type="enum" val="kafka"/>
+    <attr name="address" type="string" val="monkafka.cern.ch:30092"/>
+    <attr name="publish_timeout" type="u32" val="2"/>
+  </obj>
+
+  <obj class="ReadoutGroup" id="dummyRog">
+  </obj>
+
+  <obj class="ReadoutMap" id="dummyRoMap">
+    <rel name="groups">
+      <ref class="ReadoutGroup" id="dummyRog"/>
+    </rel>
+  </obj>
+
+  <obj class="Segment" id="generated-segment">
+    <rel name="applications">
+      <ref class="DaqApplication" id="TestApp"/>
+    </rel>
+    <rel name="controller" class="RCApplication" id="my-controller"/>
+  </obj>
+
+  <obj class="Session" id="partition_name">
+    <attr name="use_connectivity_server" type="bool" val="0"/>
+    <attr name="connectivity_service_interval_ms" type="u32" val="2000"/>
+    <attr name="data_request_timeout_ms" type="u32" val="1000"/>
+    <attr name="data_rate_slowdown_factor" type="u32" val="1"/>
+    <attr name="rte_script" type="string" val="/home/gjc/DUNE/fddaq-v4.2.0-a9/install/daq_app_rte.sh"/>
+    <rel name="environment">
+      <ref class="VariableSet" id="common-env"/>
+    </rel>
+    <rel name="segment" class="Segment" id="generated-segment"/>
+    <rel name="detector_configuration" class="DetectorConfig" id="dummy-detector"/>
+    <rel name="readout_map" class="ReadoutMap" id="dummyRoMap"/>
+  </obj>
+
+  <obj class="Variable" id="CMD_FAC">
+    <attr name="name" type="string" val="CMD_FAC"/>
+    <attr name="value" type="string" val="rest://localhost:{port}"/>
+  </obj>
+
+  <obj class="Variable" id="CONNECTION_FLASK_DEBUG">
+    <attr name="name" type="string" val="CONNECTION_FLASK_DEBUG"/>
+    <attr name="value" type="string" val="2"/>
+  </obj>
+
+  <obj class="Variable" id="CONNECTION_SERVER">
+    <attr name="name" type="string" val="CONNECTION_SERVER"/>
+    <attr name="value" type="string" val="thinkpad"/>
+  </obj>
+
+  <obj class="Variable" id="DETCHANNELMAPS_SHARE">
+    <attr name="name" type="string" val="DETCHANNELMAPS_SHARE"/>
+    <attr name="value" type="string" val="/cvmfs/dunedaq.opensciencegrid.org/spack/releases/dunedaq-v4.2.0-a9/spack-0.20.0-gcc-12.1.0-b1/spack-0.20.0/opt/spack/linux-almalinux9-x86_64/gcc-12.1.0/detchannelmaps-v1.6.0-snk3mvgrxdgdxleffzpmu2bbcp6yr3az/share"/>
+  </obj>
+
+  <obj class="Variable" id="DUNEDAQ_ERS_ERROR">
+    <attr name="name" type="string" val="DUNEDAQ_ERS_ERROR"/>
+    <attr name="value" type="string" val="erstrace,throttle,lstdout"/>
+  </obj>
+
+  <obj class="Variable" id="DUNEDAQ_ERS_FATAL">
+    <attr name="name" type="string" val="DUNEDAQ_ERS_FATAL"/>
+    <attr name="value" type="string" val="erstrace,lstdout"/>
+  </obj>
+
+  <obj class="Variable" id="DUNEDAQ_ERS_INFO">
+    <attr name="name" type="string" val="DUNEDAQ_ERS_INFO"/>
+    <attr name="value" type="string" val="erstrace,throttle,lstdout"/>
+  </obj>
+
+  <obj class="Variable" id="DUNEDAQ_ERS_VERBOSITY_LEVEL">
+    <attr name="name" type="string" val="DUNEDAQ_ERS_VERBOSITY_LEVEL"/>
+    <attr name="value" type="string" val="1"/>
+  </obj>
+
+  <obj class="Variable" id="DUNEDAQ_ERS_WARNING">
+    <attr name="name" type="string" val="DUNEDAQ_ERS_WARNING"/>
+    <attr name="value" type="string" val="erstrace,throttle,lstdout"/>
+  </obj>
+
+  <obj class="Variable" id="DUNEDAQ_PARTITION">
+    <attr name="name" type="string" val="DUNEDAQ_PARTITION"/>
+    <attr name="value" type="string" val="lrSession"/>
+  </obj>
+
+  <obj class="Variable" id="INFO_SVC">
+    <attr name="name" type="string" val="INFO_SVC"/>
+    <attr name="value" type="string" val="file://info_{name}_{port}.json"/>
+  </obj>
+
+  <obj class="Variable" id="TIMING_SHARE">
+    <attr name="name" type="string" val="TIMING_SHARE"/>
+    <attr name="value" type="string" val="/cvmfs/dunedaq.opensciencegrid.org/spack/releases/dunedaq-v4.2.0-a9/spack-0.20.0-gcc-12.1.0-b1/spack-0.20.0/opt/spack/linux-almalinux9-x86_64/gcc-12.1.0/timing-v7.4.1-3ppt4izwxv5ydbgnyqxtzacwrsxv5zwg/share"/>
+  </obj>
+
+  <obj class="Variable" id="TRACE_FILE">
+    <attr name="name" type="string" val="TRACE_FILE"/>
+    <attr name="value" type="string" val="/tmp/trace_buffer_{host}_lrSession"/>
+  </obj>
+
+  <obj class="VariableSet" id="common-env">
+    <rel name="contains">
+      <ref class="Variable" id="DUNEDAQ_ERS_ERROR"/>
+      <ref class="Variable" id="DUNEDAQ_ERS_FATAL"/>
+      <ref class="Variable" id="DUNEDAQ_ERS_INFO"/>
+      <ref class="Variable" id="DUNEDAQ_ERS_VERBOSITY_LEVEL"/>
+      <ref class="Variable" id="DUNEDAQ_ERS_WARNING"/>
+      <ref class="Variable" id="DUNEDAQ_PARTITION"/>
+    </rel>
+  </obj>
+
+  <obj class="VariableSet" id="consvc_ssh">
+    <rel name="contains">
+      <ref class="Variable" id="CONNECTION_FLASK_DEBUG"/>
+    </rel>
+  </obj>
+
+  <obj class="VariableSet" id="daq_application_ssh">
+    <rel name="contains">
+      <ref class="Variable" id="CMD_FAC"/>
+      <ref class="Variable" id="CONNECTION_SERVER"/>
+      <ref class="Variable" id="DETCHANNELMAPS_SHARE"/>
+      <ref class="Variable" id="INFO_SVC"/>
+      <ref class="Variable" id="TIMING_SHARE"/>
+      <ref class="Variable" id="TRACE_FILE"/>
+    </rel>
+  </obj>
+
+  <obj class="VirtualHost" id="connectionservice">
+    <rel name="uses">
+      <ref class="ProcessingResource" id="cpus"/>
+    </rel>
+    <rel name="runs_on" class="PhysicalHost" id="localhost"/>
+  </obj>
+
+  <obj class="VirtualHost" id="controller">
+    <rel name="uses">
+      <ref class="ProcessingResource" id="cpus"/>
+    </rel>
+    <rel name="runs_on" class="PhysicalHost" id="localhost"/>
+  </obj>
+
+  <obj class="VirtualHost" id="vlocalhost">
+    <rel name="uses">
+      <ref class="ProcessingResource" id="cpus"/>
+    </rel>
+    <rel name="runs_on" class="PhysicalHost" id="localhost"/>
+  </obj>
+
+</oks-data>

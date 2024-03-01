@@ -15,17 +15,26 @@ find_package(iomanager REQUIRED)
 find_package(opmonlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
 find_package(Pistache REQUIRED)
+find_package(okssystem REQUIRED)
+find_package(oksdbinterfaces REQUIRED)
+find_package(coredal REQUIRED)
+find_package(appdal REQUIRED)
 
-#set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging Folly::folly cmdlib::cmdlib rcif::rcif networkmanager::networkmanager opmonlib::opmonlib nlohmann_json::nlohmann_json pthread)
-set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json pistache_shared)
 
+set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json pistache_shared
+  coredal::coredal appdal::appdal oksdbinterfaces::oksdbinterfaces okssystem::okssystem)
+
+find_package(genconfig REQUIRED)
+daq_oks_codegen(appfwk.schema.xml TEST NAMESPACE dunedaq::appfwk::dal
+  DALDIR dal DEP_PKGS coredal)
 
 daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS iomanager rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
 daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hpp.j2 opmonlib/InfoNljs.hpp.j2 )
 
 ##############################################################################
 # Main library
-daq_add_library(DAQModule*.cpp LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
+daq_add_library(DAQModule*.cpp ConfigurationManager.cpp ModuleConfiguration.cpp
+  LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
 
 ##############################################################################
 # Plugins
@@ -49,7 +58,7 @@ daq_add_application( dummy_module_test dummy_module_test.cxx TEST LINK_LIBRARIES
 daq_add_unit_test(Application_test            LINK_LIBRARIES appfwk )
 daq_add_unit_test(CommandLineInterpreter_test LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQModuleManager_test       LINK_LIBRARIES appfwk )
-daq_add_unit_test(Interruptible_test          LINK_LIBRARIES appfwk)
+daq_add_unit_test(Interruptible_test          LINK_LIBRARIES appfwk )
 
 ##############################################################################
 

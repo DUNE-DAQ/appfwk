@@ -13,6 +13,9 @@
 #include "appfwk/cmd/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
+
+#include "coredal/Session.hpp"
+
 #include "iomanager/IOManager.hpp"
 
 #include "logging/Logging.hpp"
@@ -28,25 +31,30 @@ namespace appfwk {
 
 DAQModuleManager::DAQModuleManager()
   : m_initialized(false)
-{}
+{
+}
 
 void
-DAQModuleManager::initialize(const dataobj_t& data)
+DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr)
 {
-  auto ini = data.get<app::Init>();
-  get_iomanager()->configure(ini.queues, ini.connections, ini.use_connectivity_service, std::chrono::milliseconds(ini.connectivity_service_interval_ms));
-  init_modules(ini.modules);
+  auto csInterval = cfgMgr->session()->get_connectivity_service_interval_ms();
+  m_module_configuration = std::make_shared<ModuleConfiguration>(cfgMgr);
+  get_iomanager()->configure(m_module_configuration->queues(),
+                             m_module_configuration->networkconnections(),
+                             true,
+                             std::chrono::milliseconds(csInterval));
+  init_modules(m_module_configuration->modules());
   this->m_initialized = true;
 }
 
 void
-DAQModuleManager::init_modules(const app::ModSpecs& mspecs)
+DAQModuleManager::init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules)
 {
-  for (const auto& mspec : mspecs) {
-    TLOG_DEBUG(0) << "construct: " << mspec.plugin << " : " << mspec.inst;
-    auto mptr = make_module(mspec.plugin, mspec.inst);
-    m_module_map.emplace(mspec.inst, mptr);
-    mptr->init(mspec.data);
+  for (const auto mod : modules) {
+    TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
+    auto mptr = make_module(mod->class_name(), mod->UID());
+    m_module_map.emplace(mod->UID(), mptr);
+    mptr->init(m_module_configuration);
   }
 }
 
@@ -208,7 +216,7 @@ DAQModuleManager::execute(const std::string& state, const std::string& cmd, cons
   TLOG_DEBUG(1) << "Command id:" << cmd;
 
   if (!m_initialized) {
-      throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
+    throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
   }
 
   dispatch_one_match_only(cmd, state, cmd_data);
