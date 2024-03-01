@@ -76,6 +76,10 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
           port = std::to_string(service->get_port());
         }
         std::string ipaddr = "0.0.0.0";
+        char hostname[256];
+        if (gethostname(&hostname[0], 256) == 0) {
+          ipaddr = std::string(hostname);
+        }
         auto iface = service->get_eth_device_name();
         if (iface != "") {
           // Work out which ip address goes with this device
