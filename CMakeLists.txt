@@ -33,7 +33,7 @@ daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hp
 
 ##############################################################################
 # Main library
-daq_add_library(DAQModule*.cpp ConfigurationManager.cpp ModuleConfiguration.cpp
+daq_add_library(Application.cpp DAQModule.cpp DAQModuleManager.cpp ConfigurationManager.cpp ModuleConfiguration.cpp
   LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
 
 ##############################################################################

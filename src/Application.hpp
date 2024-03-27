@@ -118,6 +118,4 @@ private:
 } // namespace appfwk
 } // namespace dunedaq
 
-#include "detail/Application.hxx"
-
 #endif // APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_

@@ -6,6 +6,8 @@
  * received with this code.
  */
 
+#include "DAQModuleManager.hpp"
+
 #include "cmdlib/cmd/Nljs.hpp"
 
 #include "appfwk/Issues.hpp"
@@ -14,12 +16,15 @@
 
 #include "appfwk/DAQModule.hpp"
 
+#include "coredal/Action.hpp"
+#include "coredal/ActionStep.hpp"
 #include "coredal/Session.hpp"
 
 #include "iomanager/IOManager.hpp"
 
 #include "logging/Logging.hpp"
 
+#include <future>
 #include <map>
 #include <regex>
 #include <string>
@@ -44,6 +49,25 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr)
                              true,
                              std::chrono::milliseconds(csInterval));
   init_modules(m_module_configuration->modules());
+
+  for (auto& plan_pair : m_module_configuration->action_plans()) {
+    auto cmd = plan_pair.first;
+
+    for (auto& step : plan_pair.second->get_steps()) {
+      for (auto& action : step->get_actions()) {
+        if (action->get_module() == "")
+          continue;
+        if (!m_module_map.count(action->get_module())) {
+          throw ActionPlanValidationFailed(ERS_HERE, cmd, action->get_module(), "Module does not exist");
+        }
+        if (!m_module_map[action->get_module()]->has_command(action->get_method_name())) {
+          throw ActionPlanValidationFailed(
+            ERS_HERE, cmd, action->get_module(), "Module does not have method " + action->get_method_name());
+        }
+      }
+    }
+  }
+
   this->m_initialized = true;
 }
 
@@ -65,46 +89,80 @@ DAQModuleManager::cleanup()
   this->m_initialized = false;
 }
 
-void
-DAQModuleManager::dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data)
+DAQModuleManager::dataobj_t
+DAQModuleManager::get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data)
 {
-  // The command dispatching: commands and parameters are distributed to all modules that
-  // have registered a method corresponding to the command. If no parameters are found, an
-  // empty dataobj_t is passed.
-  std::string bad_mod_names("");
-  auto cmd_obj = data.get<cmd::CmdObj>();
-  for (const auto& [mod_name, mod_ptr] : m_module_map) {
-    if (mod_ptr->has_command(id, state)) {
-      dataobj_t params;
-      for (const auto& addressed : cmd_obj.modules) {
-        if (addressed.match.empty() || std::regex_match(mod_name.c_str(), std::regex(addressed.match.c_str()))) {
-          for (nlohmann::json::const_iterator it = addressed.data.begin(); it != addressed.data.end(); ++it) {
-            params[it.key()] = it.value();
-          }
+  auto cmd_obj = cmd_data.get<cmd::CmdObj>();
+  const dataobj_t dummy{};
+
+  if (!cmd_obj.modules.empty()) {
+    for (const auto& addressed : cmd_obj.modules) {
+
+      // First exception: empty = `all`
+      if (addressed.match.empty()) {
+        return addressed.data;
+      } else {
+        // match module name with regex
+        if (std::regex_match(mod_name, std::regex(addressed.match))) {
+          return addressed.data;
         }
-      }
-      TLOG_DEBUG(2) << "Dispatch \"" << id << "\" to \"" << mod_ptr->get_name() << "\":\n" << params.dump(4);
-      try {
-        mod_ptr->execute_command(id, state, params);
-      } catch (ers::Issue& ex) {
-        ers::error(ex);
-        bad_mod_names.append(mod_name);
-        bad_mod_names.append(", ");
       }
     }
   }
-  if (!bad_mod_names.empty()) {
-    throw CommandDispatchingFailed(ERS_HERE, id, bad_mod_names);
+  // No matches
+  return dummy;
+}
+
+bool
+DAQModuleManager::execute_action(const std::string& module_name, const std::string& action, const dataobj_t& data_obj)
+{
+  try {
+    TLOG_DEBUG(2) << "Executing " << module_name << " -> " << action;
+    m_module_map[module_name]->execute_command(action, data_obj);
+  } catch (ers::Issue& ex) {
+    ers::error(ex);
+    return false;
+  }
+  return true;
+}
+
+void
+DAQModuleManager::execute_action_plan_step(std::string const& cmd, const coredal::ActionStep* step, const dataobj_t& cmd_data)
+{
+  std::string failed_mod_names("");
+  std::unordered_map<std::string, std::future<bool>> futures;
+
+  for (auto& action : step->get_actions()) {
+    auto data_obj = get_dataobj_for_module(action->get_module(), cmd_data);
+    futures[action->get_module()] = std::async(std::launch::async,
+                                               &DAQModuleManager::execute_action,
+                                               this,
+                                               action->get_module(),
+                                               action->get_method_name(),
+                                               data_obj);
+  }
+
+  for (auto& future : futures) {
+    future.second.wait();
+    auto ret = future.second.get();
+    if (!ret) {
+      failed_mod_names.append(future.first);
+      failed_mod_names.append(", ");
+    }
+  }
+  // Throw if any dispatching failed
+  if (!failed_mod_names.empty()) {
+    throw CommandDispatchingFailed(ERS_HERE, cmd, failed_mod_names);
   }
 }
 
 std::vector<std::string>
-DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string& state)
+DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id)
 {
   // Make a convenience array with module names that have the requested command
   std::vector<std::string> mod_names;
   for (const auto& [mod_name, mod_ptr] : m_module_map) {
-    if (mod_ptr->has_command(id, state))
+    if (mod_ptr->has_command(id))
       mod_names.push_back(mod_name);
   }
 
@@ -112,7 +170,7 @@ DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string
 }
 
 void
-DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data)
+DAQModuleManager::check_cmd_data(const std::string& id, const dataobj_t& cmd_data)
 {
   // This method ensures that each module is only matched once per command.
   // If multiple matches are found, an ers::Issue is thrown
@@ -120,49 +178,26 @@ DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::stri
   // multiple-matches detection logic. The author is painfully aware that it can be
   // vastly improved, in style if not in performance.
 
-  auto cmd_obj = data.get<cmd::CmdObj>();
+  auto cmd_obj = cmd_data.get<cmd::CmdObj>();
   const dataobj_t dummy{};
 
   // Make a convenience array with module names that have the requested command
-  std::vector<std::string> cmd_mod_names = get_modnames_by_cmdid(id, state);
+  std::vector<std::string> cmd_mod_names = get_modnames_by_cmdid(id);
 
   // containers for error tracking
-  std::vector<std::string> unmatched_addr;
   std::map<std::string, std::vector<std::string>> mod_to_re;
-
-  std::vector<std::pair<std::vector<std::string>, const dataobj_t*>> mod_seq;
 
   if (!cmd_obj.modules.empty()) {
     for (const auto& addressed : cmd_obj.modules) {
-
-      // Module names matching the 'match' regex
-      std::vector<std::string> matches;
-
-      // First exception: empty = `all`
-      if (addressed.match.empty()) {
-        matches = cmd_mod_names;
-      } else {
+      if (!addressed.match.empty()) {
         // Find module names matching the regex
         for (const std::string& mod_name : cmd_mod_names) {
           // match module name with regex
           if (std::regex_match(mod_name, std::regex(addressed.match))) {
-            matches.push_back(mod_name);
             mod_to_re[mod_name].push_back(addressed.match);
           }
         }
-
-        // Keep track of unmatched expressions
-        if (matches.empty()) {
-          unmatched_addr.push_back(addressed.match);
-          continue;
-        }
       }
-      mod_seq.emplace_back(matches, &addressed.data);
-    }
-
-    if (!unmatched_addr.empty()) {
-      // say something!
-      // or not?
     }
 
     // Select modules with multiple matches
@@ -182,35 +217,11 @@ DAQModuleManager::dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::stri
       }
       throw ConflictingCommandMatching(ERS_HERE, id, mod_names);
     }
-
-  } else {
-    mod_seq.emplace_back(cmd_mod_names, &dummy);
-  }
-
-  std::string failed_mod_names("");
-
-  // All sorted, execute!
-  for (auto& [mod_names, data_ptr] : mod_seq) {
-    for (auto& mod_name : mod_names) {
-      try {
-        TLOG_DEBUG(2) << "Executing " << id << " -> " << mod_name;
-        m_module_map[mod_name]->execute_command(id, state, *data_ptr);
-      } catch (ers::Issue& ex) {
-        ers::error(ex);
-        failed_mod_names.append(mod_name);
-        failed_mod_names.append(", ");
-      }
-    }
-  }
-
-  // Throw if any dispatching failed
-  if (!failed_mod_names.empty()) {
-    throw CommandDispatchingFailed(ERS_HERE, id, failed_mod_names);
   }
 }
 
 void
-DAQModuleManager::execute(const std::string& state, const std::string& cmd, const dataobj_t& cmd_data)
+DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
 {
 
   TLOG_DEBUG(1) << "Command id:" << cmd;
@@ -219,9 +230,17 @@ DAQModuleManager::execute(const std::string& state, const std::string& cmd, cons
     throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
   }
 
-  dispatch_one_match_only(cmd, state, cmd_data);
+  check_cmd_data(cmd, cmd_data);
 
-  // dispatch(cmd.id, cmd.data);
+  auto action_plan = m_module_configuration->action_plan(cmd);
+  if (action_plan == nullptr) {
+    throw ActionPlanNotFound(ERS_HERE, cmd);
+  }
+
+  // We validated the action plans already
+  for (auto& step : action_plan->get_steps()) {
+    execute_action_plan_step(cmd, step, cmd_data);
+  }
 }
 
 void
@@ -236,17 +255,14 @@ DAQModuleManager::gather_stats(opmonlib::InfoCollector& ci, int level)
       opmonlib::InfoCollector tmp_ci;
       mod_ptr->get_info(tmp_ci, level);
       if (!tmp_ci.is_empty()) {
-	ci.add(mod_name, tmp_ci);
+        ci.add(mod_name, tmp_ci);
       }
-    }
-    catch( ers::Issue & i ) {
-      ers::warning( FailedInfoGathering(ERS_HERE, mod_name, i) );
-    }
-    catch( std::exception & ex ) {
-      ers::warning( ExceptionWhileInfoGathering(ERS_HERE, mod_name, ex.what()) );
-    }
-    catch( ... ) {
-      ers::warning( FailedInfoGathering(ERS_HERE, mod_name) );
+    } catch (ers::Issue& i) {
+      ers::warning(FailedInfoGathering(ERS_HERE, mod_name, i));
+    } catch (std::exception& ex) {
+      ers::warning(ExceptionWhileInfoGathering(ERS_HERE, mod_name, ex.what()));
+    } catch (...) {
+      ers::warning(FailedInfoGathering(ERS_HERE, mod_name));
     }
   }
 }

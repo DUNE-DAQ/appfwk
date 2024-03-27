@@ -63,30 +63,103 @@
 
 <oks-data>
 
-  <info name="" type="" num-of-items="23" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231110T143339" last-modified-by="gjc" last-modified-on="thinkpad" last-modification-time="20231201T123554"/>
+<info name="" type="" num-of-items="5" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231110T143339" last-modified-by="eflumerf" last-modified-on="ironvirt9.mshome.net" last-modification-time="20240327T151851"/>
 
-  <include>
-    <file path="schema/coredal/dunedaq.schema.xml"/>
-    <file path="test/schema/appfwk/appfwk.schema.xml"/>
-  </include>
+<include>
+ <file path="schema/coredal/dunedaq.schema.xml"/>
+ <file path="test/schema/appfwk/appfwk.schema.xml"/>
+</include>
 
-  <comments>
-    <comment creation-time="20231110T151441" created-by="gjc" created-on="thinkpad" author="gjc" text="initial version"/>
-    <comment creation-time="20231201T123322" created-by="gjc" created-on="thinkpad" author="gjc" text="h"/>
-    <comment creation-time="20231201T123357" created-by="gjc" created-on="thinkpad" author="gjc" text="j"/>
-    <comment creation-time="20231201T123554" created-by="gjc" created-on="thinkpad" author="gjc" text="h"/>
-  </comments>
+<comments>
+ <comment creation-time="20231110T151441" created-by="gjc" created-on="thinkpad" author="gjc" text="initial version"/>
+ <comment creation-time="20231201T123322" created-by="gjc" created-on="thinkpad" author="gjc" text="h"/>
+ <comment creation-time="20231201T123357" created-by="gjc" created-on="thinkpad" author="gjc" text="j"/>
+ <comment creation-time="20231201T123554" created-by="gjc" created-on="thinkpad" author="gjc" text="h"/>
+ <comment creation-time="20240327T150346" created-by="eflumerf" created-on="ironvirt9.mshome.net" author="eflumerf" text="Fix action"/>
+ <comment creation-time="20240327T150434" created-by="eflumerf" created-on="ironvirt9.mshome.net" author="eflumerf" text="Add plan and step"/>
+ <comment creation-time="20240327T151851" created-by="eflumerf" created-on="ironvirt9.mshome.net" author="eflumerf" text="Add stuff command to TestApp"/>
+</comments>
 
 
-  <obj class="DaqApplication" id="TestApp">
+<obj class="Action" id="dummy_module_0_stuff">
+ <attr name="method_name" type="string" val="stuff"/>
+ <attr name="module" type="string" val="dummy_module_0"/>
+</obj>
+  <obj class="Action" id="dummy_module_0_bad_stuff">
+    <attr name="method_name" type="string" val="bad_stuff"/>
+    <attr name="module" type="string" val="dummy_module_0"/>
+  </obj>
+  <obj class="Action" id="dummy_module_0_bad_cmd">
+    <attr name="method_name" type="string" val="bad_cmd"/>
+    <attr name="module" type="string" val="dummy_module_0"/>
+  </obj>
+
+<obj class="ActionPlan" id="stuff">
+ <rel name="steps">
+  <ref class="ActionStep" id="stuff_step_1"/>
+ </rel>
+</obj>
+  <obj class="ActionPlan" id="bad_action">
+    <rel name="steps">
+      <ref class="ActionStep" id="bad_action_step_1"/>
+    </rel>
+  </obj>
+  
+  <obj class="ActionPlan" id="bad_stuff">
+    <rel name="steps">
+      <ref class="ActionStep" id="bad_stuff_step_1"/>
+    </rel>
+  </obj>
+
+<obj class="ActionStep" id="stuff_step_1">
+ <rel name="actions">
+  <ref class="Action" id="dummy_module_0_stuff"/>
+ </rel>
+</obj>
+
+  <obj class="ActionStep" id="bad_action_step_1">
+    <rel name="actions">
+      <ref class="Action" id="dummy_module_0_bad_cmd"/>
+    </rel>
+  </obj>
+  <obj class="ActionStep" id="bad_stuff_step_1">
+    <rel name="actions">
+      <ref class="Action" id="dummy_module_0_bad_stuff"/>
+    </rel>
+  </obj>
+
+<obj class="DaqApplication" id="TestApp">
+ <attr name="application_name" type="string" val="daq_application"/>
+ <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+ <rel name="modules">
+  <ref class="DummyModule" id="dummy_module_0"/>
+ </rel>
+ <rel name="action_plans">
+  <ref class="ActionPlan" id="stuff"/>
+   <ref class="ActionPlan" id="bad_stuff"/>
+ </rel>
+</obj>
+  
+  <obj class="DaqApplication" id="MissingModuleApp">
+    <attr name="application_name" type="string" val="daq_application"/>
+    <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+    <rel name="modules">
+    </rel>
+    <rel name="action_plans">
+      <ref class="ActionPlan" id="stuff"/>
+    </rel>
+  </obj>
+  <obj class="DaqApplication" id="MissingMethodApp">
     <attr name="application_name" type="string" val="daq_application"/>
     <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
     <rel name="modules">
       <ref class="DummyModule" id="dummy_module_0"/>
     </rel>
+    <rel name="action_plans">
+      <ref class="ActionPlan" id="bad_action"/>
+    </rel>
   </obj>
-
-  <obj class="DummyModule" id="dummy_module_0">
-  </obj>
+<obj class="DummyModule" id="dummy_module_0">
+</obj>
 
 </oks-data>

@@ -198,11 +198,11 @@ public:
    *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
-  void execute_command(const std::string& name, const std::string& state, const data_t& data = {});
+  void execute_command(const std::string& name, const data_t& data = {});
 
   std::vector<std::string> get_commands() const;
 
-  bool has_command(const std::string& name, const std::string& state) const;
+  bool has_command(const std::string& name) const;
 
   virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; }
 
@@ -213,8 +213,7 @@ protected:
    */
   template<typename Child>
   void register_command(const std::string& name,
-                        void (Child::*f)(const data_t&),
-                        const std::set<std::string>& valid_states = std::set<std::string>{ "ANY" });
+                        void (Child::*f)(const data_t&));
 
   DAQModule(DAQModule const&) = delete;
   DAQModule(DAQModule&&) = delete;
@@ -222,7 +221,7 @@ protected:
   DAQModule& operator=(DAQModule&&) = delete;
 
 private:
-  using CommandMap_t = std::map<std::string, std::pair<std::set<std::string>, std::function<void(const data_t&)>>>;
+  using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
   CommandMap_t m_commands;
 };
 

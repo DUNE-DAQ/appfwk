@@ -16,6 +16,7 @@
 #include "appfwk/ConfigurationManager.hpp"
 #include "appfwk/ModuleConfiguration.hpp"
 #include "coredal/DaqModule.hpp"
+#include "coredal/ActionStep.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
 
 #include "appfwk/app/Structs.hpp"
@@ -66,6 +67,14 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                                  
 		       ((std::string)module),                                            ///< Base Issue params
 		       ((std::string)message)                                            ///< This class params
 )
+
+ERS_DECLARE_ISSUE(appfwk, ActionPlanNotFound, "No action plan found for command " << cmd, ((std::string)cmd))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  ActionPlanValidationFailed,
+                  "Error validating action plan " << cmd << ", module " << module << ": " << message,
+                  ((std::string)cmd)((std::string)module)((std::string)message)
+)
 // Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
@@ -84,7 +93,7 @@ public:
   void cleanup();
 
   // Execute a properly structured command
-  void execute(const std::string& state, const std::string& cmd, const dataobj_t& cmd_data);
+  void execute(const std::string& cmd, const dataobj_t& cmd_data);
 
   // Gather statistics from modules
   void gather_stats(opmonlib::InfoCollector& ic, int level);
@@ -93,10 +102,13 @@ private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
   void init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules);
-  void dispatch_one_match_only(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
-  void dispatch_after_merge(cmdlib::cmd::CmdId id, const std::string& state, const dataobj_t& data);
 
-  std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id, const std::string& state);
+  void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
+  dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);
+  bool execute_action(const std::string& mod_name, const std::string& action, const dataobj_t& data_obj);
+  void execute_action_plan_step(const std::string& cmd, const coredal::ActionStep* step, const dataobj_t& cmd_data);
+
+  std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id);
   std::shared_ptr<ModuleConfiguration> m_module_configuration;
 
   bool m_initialized;
@@ -106,7 +118,5 @@ private:
 
 } // namespace appfwk
 } // namespace dunedaq
-
-#include "detail/DAQModuleManager.hxx"
 
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
