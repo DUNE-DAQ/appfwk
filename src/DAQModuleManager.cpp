@@ -256,8 +256,7 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
     return;
 #else
     // Emulate old behavior
-    ers::info(
-      ActionPlanNotFound(ERS_HERE, cmd, "Executing action on all modules in parallel"));
+    ers::info(ActionPlanNotFound(ERS_HERE, cmd, "Executing action on all modules in parallel"));
     std::string failed_mod_names("");
     std::unordered_map<std::string, std::future<bool>> futures;
 

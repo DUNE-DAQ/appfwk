@@ -12,8 +12,8 @@
 #define APPFWK_INCLUDE_MODULECONFIGURATION_HPP_
 
 #include "appfwk/ConfigurationManager.hpp"
-#include "coredal/DaqModule.hpp"
 #include "coredal/ActionPlan.hpp"
+#include "coredal/DaqModule.hpp"
 #include "iomanager/IOManager.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
 
@@ -27,10 +27,10 @@ ERS_DECLARE_ISSUE(appfwk,                                                       
                   "Application contains a resource " << res << " that is not a DaqModule", ///< Message
                   ((std::string)res)                                                       ///< Message parameters
 )
-ERS_DECLARE_ISSUE(appfwk,                                                                  ///< Namespace
-                  NotADaqApplication,                                                           ///< Issue class name
+ERS_DECLARE_ISSUE(appfwk,             ///< Namespace
+                  NotADaqApplication, ///< Issue class name
                   "Application " << app << " is neither a DaqApplication nor a SmartDaqApplication ", ///< Message
-                  ((std::string)app)                                                       ///< Message parameters
+                  ((std::string)app) ///< Message parameters
 )
 
 namespace coredal {

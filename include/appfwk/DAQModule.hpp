@@ -138,12 +138,13 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
 /**
  * @brief The MissingConnection DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
-                       MissingConnection,                         ///< Type of the Issue
-                       appfwk::GeneralDAQModuleIssue,                  ///< Base class of the Issue
-                       "Required Connection Not Found. Type: " << type << ", direction: " << direction,   ///< Log Message from the issue
-                       ((std::string)name), ///< Base class attributes
-                       ((std::string)type)((std::string)direction)                  ///< Attribute of this class
+ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
+                       MissingConnection,             ///< Type of the Issue
+                       appfwk::GeneralDAQModuleIssue, ///< Base class of the Issue
+                       "Required Connection Not Found. Type: " << type << ", direction: "
+                                                               << direction, ///< Log Message from the issue
+                       ((std::string)name),                                  ///< Base class attributes
+                       ((std::string)type)((std::string)direction)           ///< Attribute of this class
 )
 
 // Re-enable coverage collection LCOV_EXCL_STOP
@@ -212,8 +213,7 @@ protected:
    * Returns whether the command was inserted (false meaning that command `cmd` already exists)
    */
   template<typename Child>
-  void register_command(const std::string& name,
-                        void (Child::*f)(const data_t&));
+  void register_command(const std::string& name, void (Child::*f)(const data_t&));
 
   DAQModule(DAQModule const&) = delete;
   DAQModule(DAQModule&&) = delete;
