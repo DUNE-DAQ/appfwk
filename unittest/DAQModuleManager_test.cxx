@@ -94,6 +94,7 @@ BOOST_AUTO_TEST_CASE(InitializeModules)
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE(NoActionPlan)
 {
 
@@ -109,6 +110,7 @@ BOOST_AUTO_TEST_CASE(NoActionPlan)
   BOOST_REQUIRE_EXCEPTION(
     mgr.execute("unknown_cmd", cmd_data), ActionPlanNotFound, [&](ActionPlanNotFound) { return true; });
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(InvalidActionPlan)
 {

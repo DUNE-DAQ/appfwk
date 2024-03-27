@@ -127,19 +127,34 @@ DAQModuleManager::execute_action(const std::string& module_name, const std::stri
 }
 
 void
-DAQModuleManager::execute_action_plan_step(std::string const& cmd, const coredal::ActionStep* step, const dataobj_t& cmd_data)
+DAQModuleManager::execute_action_plan_step(std::string const& cmd,
+                                           const coredal::ActionStep* step,
+                                           const dataobj_t& cmd_data)
 {
   std::string failed_mod_names("");
   std::unordered_map<std::string, std::future<bool>> futures;
 
   for (auto& action : step->get_actions()) {
-    auto data_obj = get_dataobj_for_module(action->get_module(), cmd_data);
-    futures[action->get_module()] = std::async(std::launch::async,
-                                               &DAQModuleManager::execute_action,
-                                               this,
-                                               action->get_module(),
-                                               action->get_method_name(),
-                                               data_obj);
+    auto mod_name = action->get_module();
+
+    if (mod_name == "" || mod_name == "*") {
+      auto mods = get_modnames_by_cmdid(action->get_method_name());
+      for (auto& mod : mods) {
+        TLOG_DEBUG(1) << "Executing action " << action->get_method_name() << " on module " << mod;
+        auto data_obj = get_dataobj_for_module(mod, cmd_data);
+        futures[mod] = std::async(
+          std::launch::async, &DAQModuleManager::execute_action, this, mod, action->get_method_name(), data_obj);
+      }
+    } else {
+      auto data_obj = get_dataobj_for_module(action->get_module(), cmd_data);
+      TLOG_DEBUG(1) << "Executing action " << action->get_method_name() << " on module " << action->get_module();
+      futures[action->get_module()] = std::async(std::launch::async,
+                                                 &DAQModuleManager::execute_action,
+                                                 this,
+                                                 action->get_module(),
+                                                 action->get_method_name(),
+                                                 data_obj);
+    }
   }
 
   for (auto& future : futures) {
@@ -234,12 +249,43 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
 
   auto action_plan = m_module_configuration->action_plan(cmd);
   if (action_plan == nullptr) {
-    throw ActionPlanNotFound(ERS_HERE, cmd);
-  }
+#if 0
+    throw ActionPlanNotFound(ERS_HERE, cmd, "Throwing exception");
+#elif 0
+    ers::warning(ActionPlanNotFound(ERS_HERE, cmd, "Returning without executing actions"));
+    return;
+#else
+    // Emulate old behavior
+    ers::info(
+      ActionPlanNotFound(ERS_HERE, cmd, "Executing action on all modules in parallel"));
+    std::string failed_mod_names("");
+    std::unordered_map<std::string, std::future<bool>> futures;
 
-  // We validated the action plans already
-  for (auto& step : action_plan->get_steps()) {
-    execute_action_plan_step(cmd, step, cmd_data);
+    auto mods = get_modnames_by_cmdid(cmd);
+    for (auto& mod : mods) {
+      TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod;
+      auto data_obj = get_dataobj_for_module(mod, cmd_data);
+      futures[mod] = std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod, cmd, data_obj);
+    }
+
+    for (auto& future : futures) {
+      future.second.wait();
+      auto ret = future.second.get();
+      if (!ret) {
+        failed_mod_names.append(future.first);
+        failed_mod_names.append(", ");
+      }
+    }
+    // Throw if any dispatching failed
+    if (!failed_mod_names.empty()) {
+      throw CommandDispatchingFailed(ERS_HERE, cmd, failed_mod_names);
+    }
+#endif
+  } else {
+    // We validated the action plans already
+    for (auto& step : action_plan->get_steps()) {
+      execute_action_plan_step(cmd, step, cmd_data);
+    }
   }
 }
 

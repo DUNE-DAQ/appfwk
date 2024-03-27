@@ -15,8 +15,8 @@
 
 #include "appfwk/ConfigurationManager.hpp"
 #include "appfwk/ModuleConfiguration.hpp"
-#include "coredal/DaqModule.hpp"
 #include "coredal/ActionStep.hpp"
+#include "coredal/DaqModule.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
 
 #include "appfwk/app/Structs.hpp"
@@ -54,27 +54,29 @@ ERS_DECLARE_ISSUE(appfwk,                                                       
                   ((std::string)modules)                                                 ///< Message parameters
 )
 
-ERS_DECLARE_ISSUE(appfwk,                                                                ///< Namespace
-                  FailedInfoGathering,                                                   ///< Issue class name
-                  "Info gathering failed for module: " << module,                        ///< Message
-                  ((std::string)module)                                                  ///< Message parameters
+ERS_DECLARE_ISSUE(appfwk,                                         ///< Namespace
+                  FailedInfoGathering,                            ///< Issue class name
+                  "Info gathering failed for module: " << module, ///< Message
+                  ((std::string)module)                           ///< Message parameters
 )
 
-ERS_DECLARE_ISSUE_BASE(appfwk,                                                           ///< Namespace  
-		       ExceptionWhileInfoGathering,                                      ///< Issue class name
-		       FailedInfoGathering,                                              ///< Base Issue class name
-		       module << " threw exception while info gathering: " << message,   ///< Message
-		       ((std::string)module),                                            ///< Base Issue params
-		       ((std::string)message)                                            ///< This class params
+ERS_DECLARE_ISSUE_BASE(appfwk,                                                         ///< Namespace
+                       ExceptionWhileInfoGathering,                                    ///< Issue class name
+                       FailedInfoGathering,                                            ///< Base Issue class name
+                       module << " threw exception while info gathering: " << message, ///< Message
+                       ((std::string)module),                                          ///< Base Issue params
+                       ((std::string)message)                                          ///< This class params
 )
 
-ERS_DECLARE_ISSUE(appfwk, ActionPlanNotFound, "No action plan found for command " << cmd, ((std::string)cmd))
+ERS_DECLARE_ISSUE(appfwk,
+                  ActionPlanNotFound,
+                  "No action plan found for command " << cmd << ", taking the following action: " << message,
+                  ((std::string)cmd)((std::string)message))
 
 ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanValidationFailed,
                   "Error validating action plan " << cmd << ", module " << module << ": " << message,
-                  ((std::string)cmd)((std::string)module)((std::string)message)
-)
+                  ((std::string)cmd)((std::string)module)((std::string)message))
 // Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
