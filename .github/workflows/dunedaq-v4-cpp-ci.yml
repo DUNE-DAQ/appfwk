@@ -5,7 +5,7 @@ name: build-develop
 on:
   push:
     branches: 
-      - develop
+      - production/v4
       - patch/*
       - prep-release/*
     paths-ignore:
