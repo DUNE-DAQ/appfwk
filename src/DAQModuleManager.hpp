@@ -18,7 +18,6 @@
 #include "coredal/DaqModule.hpp"
 #include "oksdbinterfaces/Configuration.hpp"
 
-#include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
 
 #include <map>

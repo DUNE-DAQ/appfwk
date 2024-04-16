@@ -9,7 +9,6 @@
 #include "cmdlib/cmd/Nljs.hpp"
 
 #include "appfwk/Issues.hpp"
-#include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
