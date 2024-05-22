@@ -168,7 +168,7 @@
     </rel>
   </obj>
 
-  <obj class="FSMinterface" id="dummy-if">
+  <obj class="FSMaction" id="dummy-if">
     <attr name="name" type="string" val="user-provided-run-number"/>
   </obj>
 
