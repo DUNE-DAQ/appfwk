@@ -13,7 +13,7 @@
 
 #include "coredal/DaqModule.hpp"
 #include "iomanager/IOManager.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include <string>
 #include <vector>
@@ -30,7 +30,7 @@ class ConfigurationManager
 {
   friend class ModuleConfiguration;
 
-  std::shared_ptr<oksdbinterfaces::Configuration> m_confdb;
+  std::shared_ptr<conffwk::Configuration> m_confdb;
   std::string m_app_name;
   std::string m_session_name;
   std::string m_oks_config_spec;

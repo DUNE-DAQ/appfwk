@@ -16,7 +16,7 @@ find_dependency(nlohmann_json)
 find_dependency(Pistache)
 find_dependency(iomanager)
 find_dependency(okssystem)
-find_dependency(oksdbinterfaces)
+find_dependency(conffwk)
 find_dependency(coredal)
 find_dependency(appdal)
 

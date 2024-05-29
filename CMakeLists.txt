@@ -16,15 +16,15 @@ find_package(opmonlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
 find_package(Pistache REQUIRED)
 find_package(okssystem REQUIRED)
-find_package(oksdbinterfaces REQUIRED)
+find_package(conffwk REQUIRED)
 find_package(coredal REQUIRED)
 find_package(appdal REQUIRED)
 
 
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json pistache_shared
-  coredal::coredal appdal::appdal oksdbinterfaces::oksdbinterfaces okssystem::okssystem)
+  coredal::coredal appdal::appdal conffwk::conffwk okssystem::okssystem)
 
-find_package(genconfig REQUIRED)
+find_package(oksdalgen REQUIRED)
 daq_oks_codegen(appfwk.schema.xml TEST NAMESPACE dunedaq::appfwk::dal
   DALDIR dal DEP_PKGS coredal)
 

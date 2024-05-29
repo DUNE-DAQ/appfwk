@@ -10,7 +10,7 @@
 #include "appfwk/ConfigurationManager.hpp"
 #include "coredal/DaqApplication.hpp"
 #include "coredal/Session.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
 using namespace dunedaq::appfwk;
 
@@ -22,7 +22,7 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
   m_app_name = app_name;
   m_session_name = session_name;
 
-  m_confdb.reset(new oksdbinterfaces::Configuration(config_spec));
+  m_confdb.reset(new conffwk::Configuration(config_spec));
 
   TLOG_DBG(5) << "getting session";
   m_session = m_confdb->get<coredal::Session>(session_name);
