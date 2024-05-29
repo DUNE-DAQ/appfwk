@@ -14,7 +14,7 @@
 #include "appfwk/ConfigurationManager.hpp"
 #include "coredal/DaqModule.hpp"
 #include "iomanager/IOManager.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include <string>
 #include <vector>

@@ -16,7 +16,7 @@
 #include "appfwk/ConfigurationManager.hpp"
 #include "appfwk/ModuleConfiguration.hpp"
 #include "coredal/DaqModule.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
