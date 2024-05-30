@@ -49,7 +49,7 @@ jobs:
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
-          setup_dbt latest || true
+          setup_dbt latest_v4 || true
           release_name="last_fddaq"
 
           dbt-create -n $release_name dev-${{ matrix.os_name }}
