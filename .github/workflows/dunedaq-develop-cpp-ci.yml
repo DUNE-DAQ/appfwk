@@ -49,7 +49,7 @@ jobs:
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           source /cvmfs/dunedaq.opensciencegrid.org/setup_dunedaq.sh
-          setup_dbt latest || true
+          setup_dbt latest_v5 || true
           release_name="last_fddaq"
 
           if [[ -n $( sed -r -n '/- name: '$REPO'$/p' daq-release/configs/nddaq/nddaq-develop/release.yaml ) ]] ; then release_name="last_nddaq"; fi
