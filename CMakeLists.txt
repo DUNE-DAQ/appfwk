@@ -17,16 +17,16 @@ find_package(nlohmann_json REQUIRED )
 find_package(Pistache REQUIRED)
 find_package(okssystem REQUIRED)
 find_package(conffwk REQUIRED)
-find_package(coredal REQUIRED)
-find_package(appdal REQUIRED)
+find_package(confmodel REQUIRED)
+find_package(appmodel REQUIRED)
 
 
 set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json pistache_shared
-  coredal::coredal appdal::appdal conffwk::conffwk okssystem::okssystem)
+  confmodel::confmodel appmodel::appmodel conffwk::conffwk okssystem::okssystem)
 
 find_package(oksdalgen REQUIRED)
 daq_oks_codegen(appfwk.schema.xml TEST NAMESPACE dunedaq::appfwk::dal
-  DALDIR dal DEP_PKGS coredal)
+  DALDIR dal DEP_PKGS confmodel)
 
 daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS iomanager rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
 daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hpp.j2 opmonlib/InfoNljs.hpp.j2 )

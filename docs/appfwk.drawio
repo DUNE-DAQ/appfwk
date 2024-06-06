@@ -106,7 +106,7 @@
         <mxCell id="WQRtGv24dR7d1xBzSItW-34" value="+gather_stats(ic:opmonlib::InfoCollector&amp;amp;, level:int): void" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="WQRtGv24dR7d1xBzSItW-25" vertex="1">
           <mxGeometry y="204" width="700" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="WQRtGv24dR7d1xBzSItW-35" value="-init_modules(modules: const std::vector&amp;lt;const dunedaq::coredal::DaqModule*&amp;gt;&amp;amp;): void" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="WQRtGv24dR7d1xBzSItW-25" vertex="1">
+        <mxCell id="WQRtGv24dR7d1xBzSItW-35" value="-init_modules(modules: const std::vector&amp;lt;const dunedaq::confmodel::DaqModule*&amp;gt;&amp;amp;): void" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="WQRtGv24dR7d1xBzSItW-25" vertex="1">
           <mxGeometry y="224" width="700" height="20" as="geometry" />
         </mxCell>
         <mxCell id="WQRtGv24dR7d1xBzSItW-36" value="-dispatch_one_match_only(id:cmdlib::cmd::CmdId, state:const std::string&amp;amp;, data:const nlohmann::json&amp;amp;): void" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="WQRtGv24dR7d1xBzSItW-25" vertex="1">
@@ -272,10 +272,10 @@
         <mxCell id="-mDNt5EjHj4JfryYOKX5-34" value="-m_oks_config_spec: std::string" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
           <mxGeometry y="90" width="710" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="-mDNt5EjHj4JfryYOKX5-35" value="-m_session: const coredal::Session*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
+        <mxCell id="-mDNt5EjHj4JfryYOKX5-35" value="-m_session: const confmodel::Session*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
           <mxGeometry y="110" width="710" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="-mDNt5EjHj4JfryYOKX5-1" value="-m_application: const coredal::Application*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
+        <mxCell id="-mDNt5EjHj4JfryYOKX5-1" value="-m_application: const confmodel::Application*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
           <mxGeometry y="130" width="710" height="20" as="geometry" />
         </mxCell>
         <mxCell id="-mDNt5EjHj4JfryYOKX5-8" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
@@ -284,10 +284,10 @@
         <mxCell id="-mDNt5EjHj4JfryYOKX5-36" value="+ConfigurationManager(config_spec: std::string&amp;amp;, app_name: std::string&amp;amp;, session_name: std::string&amp;amp;)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
           <mxGeometry y="158" width="710" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="-mDNt5EjHj4JfryYOKX5-37" value="+session(): const coredal::Session*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
+        <mxCell id="-mDNt5EjHj4JfryYOKX5-37" value="+session(): const confmodel::Session*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
           <mxGeometry y="178" width="710" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="-mDNt5EjHj4JfryYOKX5-38" value="+application(): const coredal::Application*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
+        <mxCell id="-mDNt5EjHj4JfryYOKX5-38" value="+application(): const confmodel::Application*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
           <mxGeometry y="198" width="710" height="20" as="geometry" />
         </mxCell>
         <mxCell id="-mDNt5EjHj4JfryYOKX5-9" value="+get_dal(name: const std::string&amp;amp;): const template&amp;lt;typename&amp;gt;*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-0" vertex="1">
@@ -296,7 +296,7 @@
         <mxCell id="-mDNt5EjHj4JfryYOKX5-10" value="&lt;b&gt;ModuleConfiguration&lt;br&gt;&lt;/b&gt;" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontFamily=Helvetica;fontSize=14;strokeWidth=2;fillColor=default;" parent="WQRtGv24dR7d1xBzSItW-1" vertex="1">
           <mxGeometry x="920" y="570" width="490" height="218" as="geometry" />
         </mxCell>
-        <mxCell id="-mDNt5EjHj4JfryYOKX5-23" value="-m_modules: std::vector&amp;lt;const dunedaq::coredal::DaqModule*&amp;gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-10" vertex="1">
+        <mxCell id="-mDNt5EjHj4JfryYOKX5-23" value="-m_modules: std::vector&amp;lt;const dunedaq::confmodel::DaqModule*&amp;gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-10" vertex="1">
           <mxGeometry y="30" width="490" height="20" as="geometry" />
         </mxCell>
         <mxCell id="-mDNt5EjHj4JfryYOKX5-24" value="-m_queues: iomanager::Queues_t" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-10" vertex="1">
@@ -320,7 +320,7 @@
         <mxCell id="-mDNt5EjHj4JfryYOKX5-28" value="+networkconnections(): const iomanager::Connections_t" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-10" vertex="1">
           <mxGeometry y="158" width="490" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="-mDNt5EjHj4JfryYOKX5-29" value="+modules(): const std::vector&amp;lt;const coredal::DaqModules*&amp;gt;&amp;amp;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-10" vertex="1">
+        <mxCell id="-mDNt5EjHj4JfryYOKX5-29" value="+modules(): const std::vector&amp;lt;const confmodel::DaqModules*&amp;gt;&amp;amp;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-10" vertex="1">
           <mxGeometry y="178" width="490" height="20" as="geometry" />
         </mxCell>
         <mxCell id="-mDNt5EjHj4JfryYOKX5-19" value="+module(name: const std::string&amp;amp;): const template&amp;lt;typename&amp;gt;*" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Helvetica;fontSize=14;" parent="-mDNt5EjHj4JfryYOKX5-10" vertex="1">

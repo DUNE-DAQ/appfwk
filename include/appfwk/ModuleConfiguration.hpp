@@ -12,7 +12,7 @@
 #define APPFWK_INCLUDE_MODULECONFIGURATION_HPP_
 
 #include "appfwk/ConfigurationManager.hpp"
-#include "coredal/DaqModule.hpp"
+#include "confmodel/DaqModule.hpp"
 #include "iomanager/IOManager.hpp"
 #include "conffwk/Configuration.hpp"
 
@@ -32,7 +32,7 @@ ERS_DECLARE_ISSUE(appfwk,                                                       
                   ((std::string)app)                                                       ///< Message parameters
 )
 
-namespace coredal {
+namespace confmodel {
 class DaqModule;
 class Session;
 class Application;
@@ -41,7 +41,7 @@ namespace appfwk {
 
 class ModuleConfiguration
 {
-  std::vector<const dunedaq::coredal::DaqModule*> m_modules;
+  std::vector<const dunedaq::confmodel::DaqModule*> m_modules;
   iomanager::Queues_t m_queues;
   iomanager::Connections_t m_networkconnections;
   std::shared_ptr<ConfigurationManager> m_config_mgr;
@@ -51,7 +51,7 @@ public:
 
   const iomanager::Queues_t& queues() { return m_queues; }
   const iomanager::Connections_t& networkconnections() { return m_networkconnections; }
-  const std::vector<const coredal::DaqModule*>& modules() { return m_modules; }
+  const std::vector<const confmodel::DaqModule*>& modules() { return m_modules; }
 
   std::shared_ptr<ConfigurationManager> configuration_manager() { return m_config_mgr; }
 
