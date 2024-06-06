@@ -17,8 +17,8 @@ find_dependency(Pistache)
 find_dependency(iomanager)
 find_dependency(okssystem)
 find_dependency(conffwk)
-find_dependency(coredal)
-find_dependency(appdal)
+find_dependency(confmodel)
+find_dependency(appmodel)
 
 # Figure out whether or not this dependency is an installed package or
 # in repo form

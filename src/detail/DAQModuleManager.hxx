@@ -14,7 +14,7 @@
 
 #include "appfwk/DAQModule.hpp"
 
-#include "coredal/Session.hpp"
+#include "confmodel/Session.hpp"
 
 #include "iomanager/IOManager.hpp"
 
@@ -48,7 +48,7 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr)
 }
 
 void
-DAQModuleManager::init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules)
+DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules)
 {
   for (const auto mod : modules) {
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
