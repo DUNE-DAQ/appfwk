@@ -277,15 +277,6 @@
     <attr name="publish_timeout" type="u32" val="2"/>
   </obj>
 
-  <obj class="ReadoutGroup" id="dummyRog">
-  </obj>
-
-  <obj class="ReadoutMap" id="dummyRoMap">
-    <rel name="groups">
-      <ref class="ReadoutGroup" id="dummyRog"/>
-    </rel>
-  </obj>
-
   <obj class="Segment" id="generated-segment">
     <rel name="applications">
       <ref class="DaqApplication" id="TestApp"/>
@@ -304,7 +295,6 @@
     </rel>
     <rel name="segment" class="Segment" id="generated-segment"/>
     <rel name="detector_configuration" class="DetectorConfig" id="dummy-detector"/>
-    <rel name="readout_map" class="ReadoutMap" id="dummyRoMap"/>
   </obj>
 
   <obj class="Variable" id="CMD_FAC">
