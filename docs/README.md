@@ -28,7 +28,7 @@ In general, in a full blown DAQ system users won't be running `daq_application` 
 When implenting a DAQ module, you'll want to `#include` the [`DAQModule.hpp` header](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp), and derive your DAQ module from the `DAQModule` base class. The most important parts of `DAQModule.hpp` to an implementor of a DAQ module are the following:
 * `DEFINE_DUNE_DAQ_MODULE`: This is a macro which should be "called" at the bottom of your DAQ module's source file with an "argument" of the form `dunedaq::<your_package_name>::<your DAQ module name>`. E.g., `DEFINE_DUNE_DAQ_MODULE(dunedaq::dfmodules::DataWriterModule)` [at the bottom of the dfmodules package's DataWriterModule module's source file](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataWriterModule.cpp) 
 * `register_command`: takes as arguments the name of a command and a function which should execute when the command is received. The function is user defined, and takes an instance of `DAQModule::data_t` as argument. `DAQModule::data_t` is aliased to the `nlohmann::json` type and can thus be thought of as a blob of JSON-structured data. While in principle any arbitary name could be associated with any function of arbitrary behavior to create a command, in practice implementors of DAQ modules define commands associated with the DAQ's state machine: "_conf_", "_start_", "_stop_", "_scrap_". Not all DAQ modules necessarily need to perform an action for each of those transitions; e.g., a module may only be designed to do something during configuration, and not change as the DAQ enters the running state ("_start_") or exits it ("_stop_"). It also supports an optional third argument which lists the states that the application must be in for the command to be valid. [!!!Control People here should make comments and see if this is correct, if it's sitll the plan, etc]
-* `init`: this pure virtual function's implementation is meant to create objects which are persistent for the lifetime of the DAQ module. It also has the unique role of connecting the DAQModel with its own configuration object, see later section [MR update this!!!]. It takes as an argument the type `std::shared_ptr<ModuleConfiguration>`. Typically, `init` will take the generic configuration object (`ModuleConfiguration`), cast it to an object specifically defined for this `DAQModule` and will store the pointer internally to the class for later usage, when the dedicated command comes, usually `conf`. Connection objects are commonly allocated in `init`; they'll be described in more detail later in this document. 
+* `init`: this pure virtual function's implementation is meant to create objects which are persistent for the lifetime of the DAQ module. It also has the unique role of connecting the DAQModel with its own configuration object, see later section [MR update this!!!]. It takes as an argument the type `std::shared_ptr<ModuleConfiguration>`. Typically, `init` will take the generic configuration object (`ModuleConfiguration`), cast it into an object specifically defined for this `DAQModule` and will store the pointer internally to the class for later usage, when the dedicated commands comes, usually `conf`. Connection objects are commonly allocated in `init`; they'll be described in more detail later in this document. 
 
 An conceptual example of what this looks like is the following simplified version of a DAQ module implementation. 
 ```
@@ -46,7 +46,7 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
           register_command("scrap", &MyDAQModule::do_scrap);
      }
      
-     void init(const data_t& init_data) override;
+     void init(std::shared_ptr<ModuleConfiguration>) override;
   
   private:
   
@@ -54,6 +54,8 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
      void do_start(const data_t& start_data);
      void do_stop(const data_t& stop_data);
      void do_scrap(const data_t& scrap_data);
+
+     const MyDAQModuleConf * m_cfg = nullptr;
 };
 ```
 
@@ -71,16 +73,35 @@ A word needs to be said about the concept of a "unique name" here. Looking in [`
 
 ### The `init` function
 
-Already touched upon above, this function takes a `data_t` instance (i.e., JSON) to tell it what objects to make persistent over the DAQ module's lifetime. A very common example of this is the construction of the `iomanager` connections which will pipe data into and out of an instance of the DAQ module. A description of this common use case will illustrate a couple of very important aspects of DAQ module programming. 
+Already touched upon above, this function takes a `std::shared_ptr<ModuleConfiguration>` instance to tell it what objects to make persistent over the DAQ module's lifetime. A very common example of this is the construction of the `iomanager` connections which will pipe data into and out of an instance of the DAQ module. A description of this common use case will illustrate a couple of very important aspects of DAQ module programming. 
 
 When a DAQ module writer wants to communicate with other DAQ modules, they use the [`iomanager`](https://dune-daq-sw.readthedocs.io/en/latest/packages/iomanager/#connectionid-connectionref). The `iomanager` Sender and Receiver objects needed by a DAQ Module get built in the call to `init` based on the JSON configuration `init` receives . A definition of `init`, then, can look like the following:
 ```
-void MyDaqModule::init(const data_t& init_data) {
-    auto ci = appfwk::connection_index(init_data, {"name_of_required_input"});
-    m_required_input_ptr = dunedaq::get_iom_receiver(ci["name_of_required_input"]));
+void MyDaqModule::init(std::shared_ptr<ModuleConfiguration> p) {
+    m_cfg = mcfg->module<MyDAQModuleConf>(get_name());
+    if ( !m_cfg ) {
+      throw appfwk::CommandFailed(ERS_HERE, "init", get_name(), "Unable to retrieve configuration object");
+    }
+    auto inputs = m_cfg->get_inputs();
+    for (auto con : inputs) {
+    if (con->get_data_type() == datatype_to_string <MyType1>()) {
+      m_type1_con = con->UID();
+    }
+     if (con->get_data_type() == datatype_to_string<MyType2>()) {
+      auto iom = iomanager::IOManager::get();
+      m_type2_receiver = iom->get_receiver<MyType2>(con->UID());
+    }
+  }
+
 }
 ```
-In the code above, the call to `connection_index`, defined in [`DAQModuleHelper.cpp`](https://github.com/DUNE-DAQ/appfwk/blob/develop/src/DAQModuleHelper.cpp), returns a map which connects the names of connections with the `ConnectionRef` objects consumed by `IOManager`. It will throw an exception if any provided names don't appear - so in this case, if `name_of_required_input` isn't found in `init_data`, an exception will be thrown. If the name is found, then `m_required_input_ptr`, which here is an `std::shared_ptr_` to a `iomanager::Receiver` of `MyType_t`s, gets pointed to the appropriate `Receiver`. When the DAQ enters the running state, we could have `MyDaqModule` receive `MyType_t` instances from `m_required_input_ptr` for processing.
+In the code above, the configuration object is first, casted and then queried for the possible input connections. 
+The information on the connection is used to decide what to use it for. The input of `MyType1` is simply used to store the name of the connection for later usage, while the inptu of `MyType2` is used to directly obtain the receiver socket from the `IOManager`.
+Similar operations can be done on the outputs, for example see the [`TRBModule`](https://github.com/DUNE-DAQ/dfmodules/blob/2e9fc856e82cf566c2d38d024960a74cee910e75/plugins/TRBModule.cpp#L110). 
+Of course in this case operations can be more complicatd because modules with multiple outputs of the same time might require a bit of more logic to organise where to send data. In that case ad-hoc solutions need to be adopted based on configuration schema object that is defined. 
+
+This code of course raises the question: what _is_ `MyDAQModuleConf`? It's a `struct`, but rather than being manually written the code for it is generated by the DUNE DAQ build system itself, using a `oks` file schema as input. It's in the schema file that the logical contents of the struct are defined; an example of this type of file can be found [here](https://github.com/DUNE-DAQ/listrev/blob/develop/schema/listrev/listrev.schema.xml). This approach allows automatic compile-time checks on the variable (here `MyDAQModuleConf`) retrieved by the module, reducing the workload on the implementor of `do_conf` or other transitions.
+[!!! Here some expert should decide what to do with this comment. Should we keep discussing jsonnet?!?!?]Note also that in fact many functions in a DAQ module, including `init`, can use JSON as input to control their actions, not just `do_conf`. Further details on the generation of code from `jsonnet` files are beyond the scope of appfwk documentation and are instead covered in [this section of the daq-cmake documentation](../daq-cmake/README.md#daq_cmake_schema).
 
 ### The `do_conf` function
 
