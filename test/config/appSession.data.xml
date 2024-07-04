@@ -84,7 +84,7 @@
     <attr name="commandline_parameters" type="string" val="--bind=0.0.0.0:15000 --workers=1 --worker-class=gthread --threads=2 --timeout=0 --pid=connectionservice_15000.pid connection-service.connection-flask:app"/>
     <attr name="port" type="u16" val="15000"/>
     <attr name="threads" type="u16" val="1"/>
-    <rel name="applicationEnvironment">
+    <rel name="application_environment">
       <ref class="VariableSet" id="consvc_ssh"/>
     </rel>
     <rel name="runs_on" class="VirtualHost" id="connectionservice"/>
