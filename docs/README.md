@@ -23,7 +23,7 @@ In general, in a full blown DAQ system users won't be running `daq_application` 
 
 ### Basics of the `DAQModule` interface
 
- <!--**_Be aware that much of the boilerplate code described below can be automatically generated using the [create_dunedaq_package script](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-cmake/#the-create_dunedaq_package-script)_** -->
+ **_Be aware that much of the boilerplate code described below can be automatically generated using the [create_dunedaq_package script](https://dune-daq-sw.readthedocs.io/en/latest/packages/daq-cmake/#the-create_dunedaq_package-script)_** 
 
 When implenting a DAQ module, you'll want to `#include` the [`DAQModule.hpp` header](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp), and derive your DAQ module from the `DAQModule` base class. The most important parts of `DAQModule.hpp` to an implementor of a DAQ module are the following:
 * `DEFINE_DUNE_DAQ_MODULE`: This is a macro which should be "called" at the bottom of your DAQ module's source file with an "argument" of the form `dunedaq::<your_package_name>::<your DAQ module name>`. E.g., `DEFINE_DUNE_DAQ_MODULE(dunedaq::dfmodules::DataWriterModule)` [at the bottom of the dfmodules package's DataWriterModule module's source file](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataWriterModule.cpp) 
