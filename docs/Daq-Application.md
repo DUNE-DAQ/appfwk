@@ -24,4 +24,4 @@ daq_application known arguments (additional arguments will be stored and passed 
 
 # Usage Notes
 
-As of v2.6.0, `daq_application` will seldom have to be called directly, instead the preferred method of starting _dunedaq_ applications will be to use one of the Run Control products, such as `nanorc`.
+As of v2.6.0, `daq_application` will seldom have to be called directly, instead the preferred method of starting _dunedaq_ applications will be to use one of the Run Control products, such as `nanorc` or `drunc`.
