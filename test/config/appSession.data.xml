@@ -66,7 +66,7 @@
   <info name="" type="" num-of-items="51" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231116T105446" last-modified-by="gjc" last-modified-on="thinkpad" last-modification-time="20231117T121356"/>
 
   <include>
-    <file path="schema/coredal/dunedaq.schema.xml"/>
+    <file path="schema/confmodel/dunedaq.schema.xml"/>
     <file path="test/config/appfwk.data.xml"/>
   </include>
 
@@ -84,7 +84,7 @@
     <attr name="commandline_parameters" type="string" val="--bind=0.0.0.0:15000 --workers=1 --worker-class=gthread --threads=2 --timeout=0 --pid=connectionservice_15000.pid connection-service.connection-flask:app"/>
     <attr name="port" type="u16" val="15000"/>
     <attr name="threads" type="u16" val="1"/>
-    <rel name="applicationEnvironment">
+    <rel name="application_environment">
       <ref class="VariableSet" id="consvc_ssh"/>
     </rel>
     <rel name="runs_on" class="VirtualHost" id="connectionservice"/>
@@ -168,7 +168,7 @@
     </rel>
   </obj>
 
-  <obj class="FSMinterface" id="dummy-if">
+  <obj class="FSMaction" id="dummy-if">
     <attr name="name" type="string" val="user-provided-run-number"/>
   </obj>
 
@@ -277,15 +277,6 @@
     <attr name="publish_timeout" type="u32" val="2"/>
   </obj>
 
-  <obj class="ReadoutGroup" id="dummyRog">
-  </obj>
-
-  <obj class="ReadoutMap" id="dummyRoMap">
-    <rel name="groups">
-      <ref class="ReadoutGroup" id="dummyRog"/>
-    </rel>
-  </obj>
-
   <obj class="Segment" id="generated-segment">
     <rel name="applications">
       <ref class="DaqApplication" id="TestApp"/>
@@ -304,7 +295,6 @@
     </rel>
     <rel name="segment" class="Segment" id="generated-segment"/>
     <rel name="detector_configuration" class="DetectorConfig" id="dummy-detector"/>
-    <rel name="readout_map" class="ReadoutMap" id="dummyRoMap"/>
   </obj>
 
   <obj class="Variable" id="CMD_FAC">

@@ -8,15 +8,15 @@
  */
 
 #include "appfwk/ModuleConfiguration.hpp"
-#include "appdal/SmartDaqApplication.hpp"
-#include "coredal/DaqApplication.hpp"
-#include "coredal/DaqModule.hpp"
-#include "coredal/NetworkConnection.hpp"
-#include "coredal/Queue.hpp"
-#include "coredal/ResourceSet.hpp"
-#include "coredal/Service.hpp"
-#include "coredal/Session.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
+#include "appmodel/SmartDaqApplication.hpp"
+#include "confmodel/DaqApplication.hpp"
+#include "confmodel/DaqModule.hpp"
+#include "confmodel/NetworkConnection.hpp"
+#include "confmodel/Queue.hpp"
+#include "confmodel/ResourceSet.hpp"
+#include "confmodel/Service.hpp"
+#include "confmodel/Session.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include <cerrno>
 #include <ifaddrs.h>
@@ -30,13 +30,13 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
 {
   auto session = cfMgr->session();
   auto application = cfMgr->application();
-  std::shared_ptr<oksdbinterfaces::Configuration> confdb = cfMgr->m_confdb;
+  std::shared_ptr<conffwk::Configuration> confdb = cfMgr->m_confdb;
 
   TLOG_DBG(5) << "getting modules";
-  auto smartDaqApp = application->cast<appdal::SmartDaqApplication>();
+  auto smartDaqApp = application->cast<appmodel::SmartDaqApplication>();
   if (smartDaqApp) {
     auto cpos = cfMgr->m_oks_config_spec.find(":") + 1;
-    std::string oksFile = cfMgr->m_oks_config_spec.substr(cpos); // Strip off "oksconfig:"
+    std::string oksFile = cfMgr->m_oks_config_spec.substr(cpos); // Strip off "oksconflibs:"
     m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
 
     for (auto& plan : smartDaqApp->get_action_plans()) {
@@ -44,7 +44,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
       m_action_plans[plan->UID()] = plan;
     }
   } else {
-    auto daqApp = application->cast<coredal::DaqApplication>();
+    auto daqApp = application->cast<confmodel::DaqApplication>();
     if (daqApp) {
       m_modules = daqApp->get_modules();
 
@@ -69,14 +69,14 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
         // Already handled this connection, don't add it again
         continue;
       }
-      auto queue = confdb->cast<coredal::Queue>(con);
+      auto queue = confdb->cast<confmodel::Queue>(con);
       if (queue) {
         TLOG() << "Adding queue " << queue->UID();
         m_queues.emplace_back(iomanager::QueueConfig{ { queue->UID(), queue->get_data_type() },
                                                       iomanager::parse_QueueType(queue->get_queue_type()),
                                                       queue->get_capacity() });
       }
-      auto netCon = confdb->cast<coredal::NetworkConnection>(con);
+      auto netCon = confdb->cast<confmodel::NetworkConnection>(con);
       if (netCon) {
         TLOG() << "Adding network connection " << netCon->UID();
         auto service = netCon->get_associated_service();

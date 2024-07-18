@@ -15,9 +15,9 @@
 
 #include "appfwk/ConfigurationManager.hpp"
 #include "appfwk/ModuleConfiguration.hpp"
-#include "coredal/ActionStep.hpp"
-#include "coredal/DaqModule.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
+#include "confmodel/ActionStep.hpp"
+#include "confmodel/DaqModule.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
@@ -103,7 +103,7 @@ public:
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
-  void init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules);
+  void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules);
 
   void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
   dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);

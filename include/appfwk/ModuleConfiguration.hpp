@@ -12,10 +12,10 @@
 #define APPFWK_INCLUDE_MODULECONFIGURATION_HPP_
 
 #include "appfwk/ConfigurationManager.hpp"
-#include "coredal/ActionPlan.hpp"
-#include "coredal/DaqModule.hpp"
+#include "confmodel/ActionPlan.hpp"
+#include "confmodel/DaqModule.hpp"
 #include "iomanager/IOManager.hpp"
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
 #include <string>
 #include <vector>
@@ -33,7 +33,7 @@ ERS_DECLARE_ISSUE(appfwk,             ///< Namespace
                   ((std::string)app) ///< Message parameters
 )
 
-namespace coredal {
+namespace confmodel {
 class DaqModule;
 class Session;
 class Application;
@@ -43,8 +43,8 @@ namespace appfwk {
 class ModuleConfiguration
 {
   std::shared_ptr<ConfigurationManager> m_config_mgr;
-  std::vector<const dunedaq::coredal::DaqModule*> m_modules;
-  std::unordered_map<std::string, const dunedaq::coredal::ActionPlan*> m_action_plans;
+  std::unordered_map<std::string, const dunedaq::confmodel::ActionPlan*> m_action_plans;
+  std::vector<const dunedaq::confmodel::DaqModule*> m_modules;
   iomanager::Queues_t m_queues;
   iomanager::Connections_t m_networkconnections;
 
@@ -53,7 +53,7 @@ public:
 
   const iomanager::Queues_t& queues() { return m_queues; }
   const iomanager::Connections_t& networkconnections() { return m_networkconnections; }
-  const std::vector<const coredal::DaqModule*>& modules() { return m_modules; }
+  const std::vector<const confmodel::DaqModule*>& modules() { return m_modules; }
 
   const std::unordered_map<std::string, const dunedaq::coredal::ActionPlan*>& action_plans() { return m_action_plans; }
   const dunedaq::coredal::ActionPlan* action_plan(std::string cmd) const;

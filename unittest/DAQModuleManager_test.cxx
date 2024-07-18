@@ -36,7 +36,7 @@ BOOST_TEST_GLOBAL_FIXTURE(EnvFixture);
 std::shared_ptr<dunedaq::appfwk::ConfigurationManager>
 make_config_mgr()
 {
-  std::string oksConfig = "oksconfig:test/config/appSession.data.xml";
+  std::string oksConfig = "oksconflibs:test/config/appSession.data.xml";
   std::string appName = "TestApp";
   std::string sessionName = "test-session";
   return std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName, sessionName);
