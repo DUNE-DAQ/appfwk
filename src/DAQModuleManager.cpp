@@ -16,9 +16,9 @@
 
 #include "appfwk/DAQModule.hpp"
 
-#include "coredal/Action.hpp"
-#include "coredal/ActionStep.hpp"
-#include "coredal/Session.hpp"
+#include "confmodel/Action.hpp"
+#include "confmodel/ActionStep.hpp"
+#include "confmodel/Session.hpp"
 
 #include "iomanager/IOManager.hpp"
 
@@ -72,7 +72,7 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr)
 }
 
 void
-DAQModuleManager::init_modules(const std::vector<const dunedaq::coredal::DaqModule*>& modules)
+DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules)
 {
   for (const auto mod : modules) {
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
@@ -128,7 +128,7 @@ DAQModuleManager::execute_action(const std::string& module_name, const std::stri
 
 void
 DAQModuleManager::execute_action_plan_step(std::string const& cmd,
-                                           const coredal::ActionStep* step,
+                                           const confmodel::ActionStep* step,
                                            const dataobj_t& cmd_data)
 {
   std::string failed_mod_names("");

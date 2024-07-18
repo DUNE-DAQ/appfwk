@@ -120,7 +120,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
   }
 }
 
-const dunedaq::coredal::ActionPlan*
+const dunedaq::confmodel::ActionPlan*
 dunedaq::appfwk::ModuleConfiguration::action_plan(std::string cmd) const
 {
   if (m_action_plans.count(cmd)) {

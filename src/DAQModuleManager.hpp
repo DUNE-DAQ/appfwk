@@ -108,7 +108,7 @@ private:
   void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
   dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);
   bool execute_action(const std::string& mod_name, const std::string& action, const dataobj_t& data_obj);
-  void execute_action_plan_step(const std::string& cmd, const coredal::ActionStep* step, const dataobj_t& cmd_data);
+  void execute_action_plan_step(const std::string& cmd, const confmodel::ActionStep* step, const dataobj_t& cmd_data);
 
   std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id);
   std::shared_ptr<ModuleConfiguration> m_module_configuration;

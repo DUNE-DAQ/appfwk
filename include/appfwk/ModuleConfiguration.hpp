@@ -55,8 +55,8 @@ public:
   const iomanager::Connections_t& networkconnections() { return m_networkconnections; }
   const std::vector<const confmodel::DaqModule*>& modules() { return m_modules; }
 
-  const std::unordered_map<std::string, const dunedaq::coredal::ActionPlan*>& action_plans() { return m_action_plans; }
-  const dunedaq::coredal::ActionPlan* action_plan(std::string cmd) const;
+  const std::unordered_map<std::string, const dunedaq::confmodel::ActionPlan*>& action_plans() { return m_action_plans; }
+  const dunedaq::confmodel::ActionPlan* action_plan(std::string cmd) const;
 
   std::shared_ptr<ConfigurationManager> configuration_manager() { return m_config_mgr; }
 

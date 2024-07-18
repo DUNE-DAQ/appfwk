@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(InvalidActionPlan)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
-  std::string oksConfig = "oksconfig:test/config/appSession.data.xml";
+  std::string oksConfig = "oksconflibs:test/config/appSession.data.xml";
   std::string appName = "MissingModuleApp";
   std::string sessionName = "test-session";
   auto cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName, sessionName);
