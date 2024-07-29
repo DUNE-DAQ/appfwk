@@ -11,7 +11,6 @@
 
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
-#include "opmonlib/InfoCollector.hpp"
 
 #include "appfwk/ConfigurationManager.hpp"
 #include "appfwk/ModuleConfiguration.hpp"
@@ -85,9 +84,6 @@ public:
 
   // Execute a properly structured command
   void execute(const std::string& state, const std::string& cmd, const dataobj_t& cmd_data);
-
-  // Gather statistics from modules
-  void gather_stats(opmonlib::InfoCollector& ic, int level);
 
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name

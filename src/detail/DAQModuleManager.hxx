@@ -224,32 +224,5 @@ DAQModuleManager::execute(const std::string& state, const std::string& cmd, cons
   // dispatch(cmd.id, cmd.data);
 }
 
-void
-DAQModuleManager::gather_stats(opmonlib::InfoCollector& ci, int level)
-{
-
-  iomanager::QueueRegistry::get().gather_stats(ci, level);
-  iomanager::NetworkManager::get().gather_stats(ci, level);
-
-  for (const auto& [mod_name, mod_ptr] : m_module_map) {
-    try {
-      opmonlib::InfoCollector tmp_ci;
-      mod_ptr->get_info(tmp_ci, level);
-      if (!tmp_ci.is_empty()) {
-	ci.add(mod_name, tmp_ci);
-      }
-    }
-    catch( ers::Issue & i ) {
-      ers::warning( FailedInfoGathering(ERS_HERE, mod_name, i) );
-    }
-    catch( std::exception & ex ) {
-      ers::warning( ExceptionWhileInfoGathering(ERS_HERE, mod_name, ex.what()) );
-    }
-    catch( ... ) {
-      ers::warning( FailedInfoGathering(ERS_HERE, mod_name) );
-    }
-  }
-}
-
 } // namespace appfwk
 } // namespace dunedaq

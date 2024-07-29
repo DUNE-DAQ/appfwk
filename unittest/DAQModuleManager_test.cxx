@@ -75,12 +75,6 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
                           [&](DAQModuleManagerNotInitialized) { return true; });
 }
 
-BOOST_AUTO_TEST_CASE(Stats)
-{
-  auto mgr = DAQModuleManager();
-  dunedaq::opmonlib::InfoCollector ic;
-  mgr.gather_stats(ic, 0);
-}
 
 BOOST_AUTO_TEST_CASE(InitializeModules)
 {
@@ -112,8 +106,6 @@ BOOST_AUTO_TEST_CASE(CommandModules)
                           CommandDispatchingFailed,
                           [&](CommandDispatchingFailed) { return true; });
 
-  dunedaq::opmonlib::InfoCollector ic;
-  mgr.gather_stats(ic, 0);
 }
 
 BOOST_AUTO_TEST_CASE(CommandMatchingModules)
