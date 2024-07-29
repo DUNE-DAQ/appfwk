@@ -135,7 +135,7 @@ Application::generate_opmon_data()
   else
     ai.set_host (std::string(hostname));
 
-  publish(std::move(ai));
+  publish(std::move(ai), {}, opmonlib::to_level(opmonlib::EntryOpMonLevel::kTopPriority));
   
   if ( m_run_start_time.time_since_epoch().count() == 0 ) {
     auto now = std::chrono::steady_clock::now();
