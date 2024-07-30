@@ -45,7 +45,7 @@ void
 Application::init()
 {
   m_cmd_fac->set_commanded(*this, get_name());
-  m_mod_mgr.initialize(m_config_mgr);
+  m_mod_mgr.initialize(m_config_mgr, *this);
   set_state("INITIAL");
   m_initialized = true;
 }

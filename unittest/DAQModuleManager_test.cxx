@@ -13,6 +13,7 @@
 #include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 #include "iomanager/connection/Nljs.hpp"
+#include "opmonlib/OpMonManager.hpp"
 
 #include "iomanager/IOManager.hpp"
 
@@ -53,8 +54,9 @@ BOOST_AUTO_TEST_CASE(Initialized)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
+  dunedaq::opmonlib::OpMonManager opmgr(nullptr);
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
@@ -82,8 +84,9 @@ BOOST_AUTO_TEST_CASE(InitializeModules)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
+  dunedaq::opmonlib::OpMonManager opmgr(nullptr);
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
@@ -94,9 +97,9 @@ BOOST_AUTO_TEST_CASE(CommandModules)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
-  
+  dunedaq::opmonlib::OpMonManager opmgr(nullptr);
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
   nlohmann::json cmd_data;
@@ -114,8 +117,9 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
+  dunedaq::opmonlib::OpMonManager opmgr(nullptr);
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 
