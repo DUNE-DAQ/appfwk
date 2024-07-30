@@ -42,7 +42,8 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   get_iomanager()->configure(m_module_configuration->queues(),
                              m_module_configuration->networkconnections(),
                              true,
-                             std::chrono::milliseconds(csInterval));
+                             std::chrono::milliseconds(csInterval),
+			     opm);
   init_modules(m_module_configuration->modules(), opm);
   this->m_initialized = true;
 }
