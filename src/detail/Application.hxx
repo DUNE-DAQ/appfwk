@@ -67,7 +67,8 @@ Application::run(std::atomic<bool>& end_marker)
   s1 >> interval;
   s2 >> level;
 
-  set_opmon_level(level);
+  // MR: we need to set the proper level here
+  set_opmon_level(dunedaq::opmonlib::to_level(dunedaq::opmonlib::SystemOpMonLevel::kAll));
 
   start_monitoring(std::chrono::seconds(interval));
   m_cmd_fac->run(end_marker);
@@ -142,7 +143,6 @@ Application::generate_opmon_data()
     m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count() );
   }
 
-  
   publish( decltype(m_runinfo)(m_runinfo) );
 }
 
