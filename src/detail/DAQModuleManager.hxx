@@ -55,7 +55,7 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
     auto mptr = make_module(mod->class_name(), mod->UID());
     m_module_map.emplace(mod->UID(), mptr);
-    opm.register_child( mod->UID(), mptr);
+    opm.register_node( mod->UID(), mptr);
     mptr->init(m_module_configuration);
   }
 }
