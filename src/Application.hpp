@@ -10,7 +10,7 @@
 #define APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 
 #include "appfwk/cmd/Structs.hpp"
-#include "rcif/RunInfo.pb.h"
+#include "rcif/opmon/run_info.pb.h"
 #include "utilities/NamedObject.hpp"
 
 #include "cmdlib/CommandFacility.hpp"
