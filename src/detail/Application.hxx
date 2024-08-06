@@ -7,7 +7,7 @@
  */
 
 #include "appfwk/Issues.hpp"
-#include "appfwk/AppInfo.pb.h"
+#include "appfwk/opmon/application.pb.h"
 #include "appfwk/cmd/Nljs.hpp"
 #include "rcif/cmd/Nljs.hpp"
 
