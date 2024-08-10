@@ -73,7 +73,6 @@ Application::run(std::atomic<bool>& end_marker)
   start_monitoring(std::chrono::seconds(interval));
   m_cmd_fac->run(end_marker);
 
-  stop_monitoring();
   m_mod_mgr.cleanup();
 }
 
