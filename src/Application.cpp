@@ -115,7 +115,7 @@ Application::execute(const dataobj_t& cmd_data)
   }
 
   try {
-    m_mod_mgr.execute(cmdname, cmd_data);
+    m_mod_mgr.execute(cmdname, rc_cmd.data);
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
       set_state(rc_cmd.exit_state);
