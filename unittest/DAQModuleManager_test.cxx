@@ -98,9 +98,10 @@ BOOST_AUTO_TEST_CASE(NoActionPlan)
   dunedaq::get_iomanager()->reset();
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
-
+  
+  dunedaq::opmonlib::TestOpMonManager opmgr;
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
   nlohmann::json cmd_data;
@@ -119,15 +120,16 @@ BOOST_AUTO_TEST_CASE(InvalidActionPlan)
   std::string oksConfig = "oksconflibs:test/config/appSession.data.xml";
   std::string appName = "MissingModuleApp";
   std::string sessionName = "test-session";
+  dunedaq::opmonlib::TestOpMonManager opmgr;
   auto cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName, sessionName);
   BOOST_REQUIRE_EXCEPTION(
-    mgr.initialize(cfgMgr), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
+    mgr.initialize(cfgMgr, opmgr), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
 
   dunedaq::get_iomanager()->reset();
   appName = "MissingMethodApp";
   cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName, sessionName);
   BOOST_REQUIRE_EXCEPTION(
-    mgr.initialize(cfgMgr), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
+    mgr.initialize(cfgMgr, opmgr), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(CommandModules)

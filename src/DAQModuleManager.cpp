@@ -47,7 +47,7 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   get_iomanager()->configure(m_module_configuration->queues(),
                              m_module_configuration->networkconnections(),
                              true,
-                             std::chrono::milliseconds(csInterval));
+                             std::chrono::milliseconds(csInterval), opm);
   init_modules(m_module_configuration->modules(), opm);
 
   for (auto& plan_pair : m_module_configuration->action_plans()) {
@@ -286,30 +286,6 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
     // We validated the action plans already
     for (auto& step : action_plan->get_steps()) {
       execute_action_plan_step(cmd, step, cmd_data);
-    }
-  }
-}
-
-void
-DAQModuleManager::gather_stats(opmonlib::InfoCollector& ci, int level)
-{
-
-  iomanager::QueueRegistry::get().gather_stats(ci, level);
-  iomanager::NetworkManager::get().gather_stats(ci, level);
-
-  for (const auto& [mod_name, mod_ptr] : m_module_map) {
-    try {
-      opmonlib::InfoCollector tmp_ci;
-      mod_ptr->get_info(tmp_ci, level);
-      if (!tmp_ci.is_empty()) {
-        ci.add(mod_name, tmp_ci);
-      }
-    } catch (ers::Issue& i) {
-      ers::warning(FailedInfoGathering(ERS_HERE, mod_name, i));
-    } catch (std::exception& ex) {
-      ers::warning(ExceptionWhileInfoGathering(ERS_HERE, mod_name, ex.what()));
-    } catch (...) {
-      ers::warning(FailedInfoGathering(ERS_HERE, mod_name));
     }
   }
 }
