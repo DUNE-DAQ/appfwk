@@ -40,7 +40,7 @@ DAQModuleManager::DAQModuleManager()
 }
 
 void
-DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr)
+DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm)
 {
   auto csInterval = cfgMgr->session()->get_connectivity_service_interval_ms();
   m_module_configuration = std::make_shared<ModuleConfiguration>(cfgMgr);
@@ -48,7 +48,7 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr)
                              m_module_configuration->networkconnections(),
                              true,
                              std::chrono::milliseconds(csInterval));
-  init_modules(m_module_configuration->modules());
+  init_modules(m_module_configuration->modules(), opm);
 
   for (auto& plan_pair : m_module_configuration->action_plans()) {
     auto cmd = plan_pair.first;
@@ -72,12 +72,14 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr)
 }
 
 void
-DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules)
+DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules,
+                               opmonlib::OpMonManager& opm)
 {
   for (const auto mod : modules) {
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
     auto mptr = make_module(mod->class_name(), mod->UID());
     m_module_map.emplace(mod->UID(), mptr);
+    opm.register_node(mod->UID(), mptr);
     mptr->init(m_module_configuration);
   }
 }

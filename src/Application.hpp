@@ -10,7 +10,7 @@
 #define APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
 
 #include "appfwk/cmd/Structs.hpp"
-#include "rcif/runinfo/InfoStructs.hpp"
+#include "rcif/opmon/run_info.pb.h"
 #include "utilities/NamedObject.hpp"
 
 #include "cmdlib/CommandFacility.hpp"
@@ -19,8 +19,7 @@
 #include "DAQModuleManager.hpp"
 #include "appfwk/ConfFacility.hpp"
 
-#include "opmonlib/InfoManager.hpp"
-#include "opmonlib/InfoProvider.hpp"
+#include "opmonlib/OpMonManager.hpp"
 
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
@@ -58,14 +57,14 @@ namespace appfwk {
 
 class Application
   : public cmdlib::CommandedObject
-  , public opmonlib::InfoProvider
+  , public opmonlib::OpMonManager
   , public utilities::NamedObject
 {
 public:
   using dataobj_t = nlohmann::json;
 
   Application(std::string app_name,
-              std::string partition_name,
+              std::string session_name,
               std::string cmdlibimpl,
               std::string opmonlibimpl,
               std::string confimpl);
@@ -79,15 +78,13 @@ public:
   // Execute a properly structured command
   void execute(const dataobj_t& cmd_data);
 
-  // Gether the opmon information
-
-  void gather_stats(opmonlib::InfoCollector& ic, int level);
-
   // Check whether the command can be accepted
   bool is_cmd_valid(const dataobj_t& cmd_data);
 
+  // hook for metric generation
+  void generate_opmon_data() override;
+  
   // State synch getter & setter
-
   void set_state(std::string s)
   {
     const std::lock_guard<std::mutex> lock(m_mutex);
@@ -101,15 +98,12 @@ public:
 
 private:
   std::mutex m_mutex;
-  std::string m_partition;
-  opmonlib::InfoManager m_info_mgr;
   std::string m_state;
   std::atomic<bool> m_busy;
   std::atomic<bool> m_error;
   bool m_initialized;
   std::chrono::time_point<std::chrono::steady_clock> m_run_start_time;
-  dunedaq::rcif::runinfo::Info m_runinfo;
-  std::string m_fully_qualified_name;
+  dunedaq::rcif::opmon::RunInfo m_runinfo;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
   std::shared_ptr<ConfigurationManager> m_config_mgr;

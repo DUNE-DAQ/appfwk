@@ -11,7 +11,6 @@
 
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
-#include "opmonlib/InfoCollector.hpp"
 
 #include "appfwk/ConfigurationManager.hpp"
 #include "appfwk/ModuleConfiguration.hpp"
@@ -21,6 +20,7 @@
 
 #include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
+#include "opmonlib/OpMonManager.hpp"
 
 #include <map>
 #include <memory>
@@ -90,20 +90,17 @@ public:
 
   DAQModuleManager();
 
-  void initialize(std::shared_ptr<ConfigurationManager> mgr);
+  void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager & );
   bool initialized() const { return m_initialized; }
   void cleanup();
 
   // Execute a properly structured command
   void execute(const std::string& cmd, const dataobj_t& cmd_data);
 
-  // Gather statistics from modules
-  void gather_stats(opmonlib::InfoCollector& ic, int level);
-
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
-  void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules);
+  void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules, opmonlib::OpMonManager & );
 
   void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
   dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);

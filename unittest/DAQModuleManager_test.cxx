@@ -13,6 +13,7 @@
 #include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 #include "iomanager/connection/Nljs.hpp"
+#include "opmonlib/TestOpMonManager.hpp"
 
 #include "iomanager/IOManager.hpp"
 
@@ -53,8 +54,9 @@ BOOST_AUTO_TEST_CASE(Initialized)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
+  dunedaq::opmonlib::TestOpMonManager opmgr;
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
@@ -75,12 +77,6 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
                           [&](DAQModuleManagerNotInitialized) { return true; });
 }
 
-BOOST_AUTO_TEST_CASE(Stats)
-{
-  auto mgr = DAQModuleManager();
-  dunedaq::opmonlib::InfoCollector ic;
-  mgr.gather_stats(ic, 0);
-}
 
 BOOST_AUTO_TEST_CASE(InitializeModules)
 {
@@ -88,8 +84,9 @@ BOOST_AUTO_TEST_CASE(InitializeModules)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
+  dunedaq::opmonlib::TestOpMonManager opmgr;
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
@@ -139,8 +136,9 @@ BOOST_AUTO_TEST_CASE(CommandModules)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
+  dunedaq::opmonlib::TestOpMonManager opmgr;
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
   nlohmann::json cmd_data;
@@ -149,8 +147,6 @@ BOOST_AUTO_TEST_CASE(CommandModules)
   BOOST_REQUIRE_EXCEPTION(
     mgr.execute("bad_stuff", cmd_data), CommandDispatchingFailed, [&](CommandDispatchingFailed) { return true; });
 
-  dunedaq::opmonlib::InfoCollector ic;
-  mgr.gather_stats(ic, 0);
 }
 
 BOOST_AUTO_TEST_CASE(CommandMatchingModules)
@@ -159,8 +155,9 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
+  dunedaq::opmonlib::TestOpMonManager opmgr;
   auto cfgMgr = make_config_mgr();
-  mgr.initialize(cfgMgr);
+  mgr.initialize(cfgMgr, opmgr);
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 

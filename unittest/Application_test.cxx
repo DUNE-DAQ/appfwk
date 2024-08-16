@@ -226,46 +226,6 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
   dunedaq::iomanager::IOManager::get()->reset();
 }
 
-BOOST_AUTO_TEST_CASE(Stats)
-{
-  dunedaq::get_iomanager()->reset();
-  Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "stdout://flat", "oksconflibs:" + TEST_OKS_DB);
-
-  dunedaq::opmonlib::InfoCollector ic;
-  app.gather_stats(ic, 0);
-  BOOST_REQUIRE(!ic.is_empty());
-
-  app.init();
-  dunedaq::rcif::cmd::RCCommand cmd;
-  nlohmann::json cmd_data;
-
-  dunedaq::appfwk::cmd::CmdObj start;
-  dunedaq::appfwk::cmd::AddressedCmd addr_cmd;
-  dunedaq::rcif::cmd::StartParams start_params;
-  start_params.run = 1010;
-  nlohmann::json start_param_data;
-  to_json(start_param_data, start_params);
-
-  addr_cmd.data = start_param_data;
-  addr_cmd.match = "";
-  start.modules.push_back(addr_cmd);
-  nlohmann::json start_data;
-  to_json(start_data, start);
-
-  cmd.id = "start";
-  cmd.data = start_data;
-  cmd.exit_state = "RUNNING";
-  to_json(cmd_data, cmd);
-
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
-  BOOST_REQUIRE_EQUAL(cmd_valid, true);
-  app.execute(cmd_data);
-
-  app.gather_stats(ic, 999);
-  BOOST_REQUIRE(!ic.is_empty());
-  dunedaq::iomanager::IOManager::get()->reset();
-}
 
 BOOST_AUTO_TEST_CASE(State)
 {

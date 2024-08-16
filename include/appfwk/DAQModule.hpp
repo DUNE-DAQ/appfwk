@@ -22,8 +22,7 @@
 #include "appfwk/ModuleConfiguration.hpp"
 
 #include "utilities/NamedObject.hpp"
-
-#include "opmonlib/InfoCollector.hpp"
+#include "opmonlib/MonitorableObject.hpp"
 
 #include "cetlib/BasicPluginFactory.h"
 #include "cetlib/compiler_macros.h"
@@ -161,7 +160,7 @@ namespace appfwk {
  * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
-class DAQModule : public utilities::NamedObject
+  class DAQModule : public utilities::NamedObject, public opmonlib::MonitorableObject
 {
 public:
   using data_t = nlohmann::json;
@@ -204,8 +203,6 @@ public:
   std::vector<std::string> get_commands() const;
 
   bool has_command(const std::string& name) const;
-
-  virtual void get_info(opmonlib::InfoCollector& /*ci*/, int /*level*/) { return; }
 
 protected:
   /**

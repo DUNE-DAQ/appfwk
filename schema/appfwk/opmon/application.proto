@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package dunedaq.appfwk.opmon;
+
+message AppInfo {
+
+  string state = 1;
+  string host  = 2;
+
+  bool busy = 5;
+  bool error = 6;
+ 
+}

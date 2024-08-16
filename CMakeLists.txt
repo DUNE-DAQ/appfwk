@@ -29,7 +29,7 @@ daq_oks_codegen(appfwk.schema.xml TEST NAMESPACE dunedaq::appfwk::dal
   DALDIR dal DEP_PKGS confmodel)
 
 daq_codegen( app.jsonnet cmd.jsonnet DEP_PKGS iomanager rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
-daq_codegen( appinfo.jsonnet DEP_PKGS opmonlib TEMPLATES opmonlib/InfoStructs.hpp.j2 opmonlib/InfoNljs.hpp.j2 )
+daq_protobuf_codegen( opmon/*.proto )
 
 ##############################################################################
 # Main library
