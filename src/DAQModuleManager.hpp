@@ -113,6 +113,7 @@ private:
   bool m_initialized;
 
   DAQModuleMap_t m_module_map;
+  std::map<std::string, std::vector<std::string>> m_modules_by_type;
 };
 
 } // namespace appfwk

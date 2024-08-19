@@ -47,7 +47,8 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   get_iomanager()->configure(m_module_configuration->queues(),
                              m_module_configuration->networkconnections(),
                              true,
-                             std::chrono::milliseconds(csInterval), opm);
+                             std::chrono::milliseconds(csInterval),
+                             opm);
   init_modules(m_module_configuration->modules(), opm);
 
   for (auto& plan_pair : m_module_configuration->action_plans()) {
@@ -55,12 +56,11 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
 
     for (auto& step : plan_pair.second->get_steps()) {
       for (auto& action : step->get_actions()) {
-        if (action->get_module() == "")
-          continue;
-        if (!m_module_map.count(action->get_module())) {
+        if (!m_modules_by_type.count(action->get_module()) || m_modules_by_type[action->get_module()].size() == 0) {
           throw ActionPlanValidationFailed(ERS_HERE, cmd, action->get_module(), "Module does not exist");
         }
-        if (!m_module_map[action->get_module()]->has_command(action->get_method_name())) {
+        auto module_test = m_module_map[m_modules_by_type[action->get_module()][0]];
+        if (!module_test->has_command(action->get_method_name())) {
           throw ActionPlanValidationFailed(
             ERS_HERE, cmd, action->get_module(), "Module does not have method " + action->get_method_name());
         }
@@ -79,6 +79,12 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
     auto mptr = make_module(mod->class_name(), mod->UID());
     m_module_map.emplace(mod->UID(), mptr);
+
+    if (!m_modules_by_type.count(mod->class_name())) {
+      m_modules_by_type[mod->class_name()] = std::vector<std::string>();
+        }
+    m_modules_by_type[mod->class_name()].emplace_back(mod->UID());
+
     opm.register_node(mod->UID(), mptr);
     mptr->init(m_module_configuration);
   }
@@ -137,25 +143,20 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
   std::unordered_map<std::string, std::future<bool>> futures;
 
   for (auto& action : step->get_actions()) {
-    auto mod_name = action->get_module();
+    auto mod_class = action->get_module();
+    auto modules = m_modules_by_type[mod_class];
+    for (auto& mod_name : modules) {
 
-    if (mod_name == "" || mod_name == "*") {
-      auto mods = get_modnames_by_cmdid(action->get_method_name());
-      for (auto& mod : mods) {
-        TLOG_DEBUG(1) << "Executing action " << action->get_method_name() << " on module " << mod;
-        auto data_obj = get_dataobj_for_module(mod, cmd_data);
-        futures[mod] = std::async(
-          std::launch::async, &DAQModuleManager::execute_action, this, mod, action->get_method_name(), data_obj);
-      }
-    } else {
-      auto data_obj = get_dataobj_for_module(action->get_module(), cmd_data);
-      TLOG_DEBUG(1) << "Executing action " << action->get_method_name() << " on module " << action->get_module();
-      futures[action->get_module()] = std::async(std::launch::async,
-                                                 &DAQModuleManager::execute_action,
-                                                 this,
-                                                 action->get_module(),
-                                                 action->get_method_name(),
-                                                 data_obj);
+      auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
+      TLOG_DEBUG(1) << "Executing action " << action->get_method_name() << " on module " << mod_name
+                    << " (class "
+                    << action->get_module() << ")";
+      futures[mod_name] = std::async(
+        std::launch::async,
+                                        &DAQModuleManager::execute_action,
+                                        this, mod_name,
+                                        action->get_method_name(),
+                                        data_obj);
     }
   }
 

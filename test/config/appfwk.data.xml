@@ -84,17 +84,17 @@
 
 <obj class="Action" id="dummy_module_0_bad_cmd">
  <attr name="method_name" type="string" val="bad_cmd"/>
- <attr name="module" type="string" val="dummy_module_0"/>
+ <attr name="module" type="class" val="DummyModule"/>
 </obj>
 
 <obj class="Action" id="dummy_module_0_bad_stuff">
  <attr name="method_name" type="string" val="bad_stuff"/>
- <attr name="module" type="string" val="dummy_module_0"/>
+ <attr name="module" type="class" val="DummyModule"/>
 </obj>
 
 <obj class="Action" id="dummy_module_0_stuff">
  <attr name="method_name" type="string" val="stuff"/>
- <attr name="module" type="string" val="dummy_module_0"/>
+ <attr name="module" type="class" val="DummyModule"/>
 </obj>
 
 <obj class="ActionPlan" id="bad_action">
