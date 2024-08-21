@@ -16,7 +16,6 @@
 
 #include "appfwk/DAQModule.hpp"
 
-#include "confmodel/Action.hpp"
 #include "confmodel/ActionStep.hpp"
 #include "confmodel/Session.hpp"
 
