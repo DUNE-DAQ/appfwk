@@ -81,6 +81,20 @@
  <comment creation-time="20240327T161636" created-by="eflumerf" created-on="ironvirt9.mshome.net" author="eflumerf" text="Reformat"/>
 </comments>
 
+  <obj class="FSMCommand" id="bad_action">
+    <attr name="cmd" type="string" val="bad_action"/>
+    <attr name="optional" type="bool" val="0"/>
+  </obj>
+
+  <obj class="FSMCommand" id="bad_stuff">
+    <attr name="cmd" type="string" val="bad_stuff"/>
+    <attr name="optional" type="bool" val="0"/>
+  </obj>
+
+  <obj class="FSMCommand" id="stuff">
+    <attr name="cmd" type="string" val="stuff"/>
+    <attr name="optional" type="bool" val="0"/>
+  </obj>
 
 <obj class="Action" id="dummy_module_0_bad_cmd">
  <attr name="method_name" type="string" val="bad_cmd"/>
@@ -98,18 +112,21 @@
 </obj>
 
 <obj class="ActionPlan" id="bad_action">
+  <rel name="fsm" class="FSMCommand" id="bad_action"/>
  <rel name="steps">
   <ref class="ActionStep" id="bad_action_step_1"/>
  </rel>
 </obj>
 
 <obj class="ActionPlan" id="bad_stuff">
+  <rel name="fsm" class="FSMCommand" id="bad_stuff"/>
  <rel name="steps">
   <ref class="ActionStep" id="bad_stuff_step_1"/>
  </rel>
 </obj>
 
 <obj class="ActionPlan" id="stuff">
+  <rel name="fsm" class="FSMCommand" id="stuff"/>
  <rel name="steps">
   <ref class="ActionStep" id="stuff_step_1"/>
  </rel>
