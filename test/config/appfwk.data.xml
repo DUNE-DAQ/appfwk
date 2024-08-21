@@ -96,21 +96,6 @@
     <attr name="optional" type="bool" val="0"/>
   </obj>
 
-<obj class="Action" id="dummy_module_0_bad_cmd">
- <attr name="method_name" type="string" val="bad_cmd"/>
- <attr name="module" type="class" val="DummyModule"/>
-</obj>
-
-<obj class="Action" id="dummy_module_0_bad_stuff">
- <attr name="method_name" type="string" val="bad_stuff"/>
- <attr name="module" type="class" val="DummyModule"/>
-</obj>
-
-<obj class="Action" id="dummy_module_0_stuff">
- <attr name="method_name" type="string" val="stuff"/>
- <attr name="module" type="class" val="DummyModule"/>
-</obj>
-
 <obj class="ActionPlan" id="bad_action">
   <rel name="fsm" class="FSMCommand" id="bad_action"/>
  <rel name="steps">
@@ -133,21 +118,21 @@
 </obj>
 
 <obj class="ActionStep" id="bad_action_step_1">
- <rel name="actions">
-  <ref class="Action" id="dummy_module_0_bad_cmd"/>
- </rel>
+  <attr name="modules" type="class">
+    <data val="DummyModule"/>
+  </attr>
 </obj>
 
 <obj class="ActionStep" id="bad_stuff_step_1">
- <rel name="actions">
-  <ref class="Action" id="dummy_module_0_bad_stuff"/>
- </rel>
+  <attr name="modules" type="class">
+    <data val="DummyModule"/>
+  </attr>
 </obj>
 
 <obj class="ActionStep" id="stuff_step_1">
- <rel name="actions">
-  <ref class="Action" id="dummy_module_0_stuff"/>
- </rel>
+  <attr name="modules" type="class">
+    <data val="DummyModule"/>
+  </attr>
 </obj>
 
 <obj class="DaqApplication" id="MissingMethodApp">

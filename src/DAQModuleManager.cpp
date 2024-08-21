@@ -55,14 +55,13 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
     auto cmd = plan_pair.first;
 
     for (auto& step : plan_pair.second->get_steps()) {
-      for (auto& action : step->get_actions()) {
-        if (!m_modules_by_type.count(action->get_module()) || m_modules_by_type[action->get_module()].size() == 0) {
-          throw ActionPlanValidationFailed(ERS_HERE, cmd, action->get_module(), "Module does not exist");
+      for (auto& mod_type : step->get_modules()) {
+        if (!m_modules_by_type.count(mod_type) || m_modules_by_type[mod_type].size() == 0) {
+          throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_type, "Module does not exist");
         }
-        auto module_test = m_module_map[m_modules_by_type[action->get_module()][0]];
-        if (!module_test->has_command(action->get_method_name())) {
-          throw ActionPlanValidationFailed(
-            ERS_HERE, cmd, action->get_module(), "Module does not have method " + action->get_method_name());
+        auto module_test = m_module_map[m_modules_by_type[mod_type][0]];
+        if (!module_test->has_command(cmd)) {
+          throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_type, "Module does not have method " + cmd);
         }
       }
     }
@@ -82,7 +81,7 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
 
     if (!m_modules_by_type.count(mod->class_name())) {
       m_modules_by_type[mod->class_name()] = std::vector<std::string>();
-        }
+    }
     m_modules_by_type[mod->class_name()].emplace_back(mod->UID());
 
     opm.register_node(mod->UID(), mptr);
@@ -142,21 +141,14 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
   std::string failed_mod_names("");
   std::unordered_map<std::string, std::future<bool>> futures;
 
-  for (auto& action : step->get_actions()) {
-    auto mod_class = action->get_module();
+  for (auto& mod_class : step->get_modules()) {
     auto modules = m_modules_by_type[mod_class];
     for (auto& mod_name : modules) {
 
       auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
-      TLOG_DEBUG(1) << "Executing action " << action->get_method_name() << " on module " << mod_name
-                    << " (class "
-                    << action->get_module() << ")";
-      futures[mod_name] = std::async(
-        std::launch::async,
-                                        &DAQModuleManager::execute_action,
-                                        this, mod_name,
-                                        action->get_method_name(),
-                                        data_obj);
+      TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod_class << ")";
+      futures[mod_name] =
+        std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
     }
   }
 
