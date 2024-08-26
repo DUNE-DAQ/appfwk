@@ -139,7 +139,7 @@ Application::generate_opmon_data()
 
   publish(std::move(ai), {}, opmonlib::to_level(opmonlib::EntryOpMonLevel::kTopPriority));
   
-  if ( m_run_start_time.time_since_epoch().count() == 0 ) {
+  if ( m_run_start_time.time_since_epoch().count() != 0 ) {
     auto now = std::chrono::steady_clock::now();
     m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count() );
   }
