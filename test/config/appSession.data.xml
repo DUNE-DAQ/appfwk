@@ -284,7 +284,7 @@
     <rel name="controller" class="RCApplication" id="my-controller"/>
   </obj>
 
-  <obj class="Session" id="partition_name">
+  <obj class="Session" id="test-session">
     <attr name="use_connectivity_server" type="bool" val="0"/>
     <attr name="connectivity_service_interval_ms" type="u32" val="2000"/>
     <attr name="data_request_timeout_ms" type="u32" val="1000"/>

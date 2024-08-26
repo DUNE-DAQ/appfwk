@@ -6,6 +6,8 @@
  * received with this code.
  */
 
+#include "Application.hpp"
+
 #include "appfwk/Issues.hpp"
 #include "appfwk/opmon/application.pb.h"
 #include "appfwk/cmd/Nljs.hpp"
@@ -109,7 +111,7 @@ Application::execute(const dataobj_t& cmd_data)
   }
   
   try {
-    m_mod_mgr.execute(get_state(), cmdname, rc_cmd.data);
+    m_mod_mgr.execute(cmdname, rc_cmd.data);
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
       set_state(rc_cmd.exit_state);

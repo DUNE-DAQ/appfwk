@@ -39,7 +39,7 @@ make_config_mgr()
 {
   std::string oksConfig = "oksconflibs:test/config/appSession.data.xml";
   std::string appName = "TestApp";
-  std::string sessionName = "partition_name";
+  std::string sessionName = "test-session";
   return std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName, sessionName);
 }
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
   nlohmann::json cmd_data;
   // to_json(cmd_data, cmd);
 
-  BOOST_REQUIRE_EXCEPTION(mgr.execute("CONFIGURED", "start", cmd_data),
+  BOOST_REQUIRE_EXCEPTION(mgr.execute("start", cmd_data),
                           DAQModuleManagerNotInitialized,
                           [&](DAQModuleManagerNotInitialized) { return true; });
 }
@@ -91,6 +91,47 @@ BOOST_AUTO_TEST_CASE(InitializeModules)
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
 }
 
+#if 0
+BOOST_AUTO_TEST_CASE(NoActionPlan)
+{
+
+  dunedaq::get_iomanager()->reset();
+  auto mgr = DAQModuleManager();
+  BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
+  
+  dunedaq::opmonlib::TestOpMonManager opmgr;
+  auto cfgMgr = make_config_mgr();
+  mgr.initialize(cfgMgr, opmgr);
+
+  BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
+  nlohmann::json cmd_data;
+  BOOST_REQUIRE_EXCEPTION(
+    mgr.execute("unknown_cmd", cmd_data), ActionPlanNotFound, [&](ActionPlanNotFound) { return true; });
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(InvalidActionPlan)
+{
+
+  dunedaq::get_iomanager()->reset();
+  auto mgr = DAQModuleManager();
+  BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
+
+  std::string oksConfig = "oksconflibs:test/config/appSession.data.xml";
+  std::string appName = "MissingModuleApp";
+  std::string sessionName = "test-session";
+  dunedaq::opmonlib::TestOpMonManager opmgr;
+  auto cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName, sessionName);
+  BOOST_REQUIRE_EXCEPTION(
+    mgr.initialize(cfgMgr, opmgr), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
+
+  dunedaq::get_iomanager()->reset();
+  appName = "MissingMethodApp";
+  cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName, sessionName);
+  BOOST_REQUIRE_EXCEPTION(
+    mgr.initialize(cfgMgr, opmgr), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
+}
+
 BOOST_AUTO_TEST_CASE(CommandModules)
 {
   dunedaq::get_iomanager()->reset();
@@ -103,11 +144,10 @@ BOOST_AUTO_TEST_CASE(CommandModules)
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);
   nlohmann::json cmd_data;
-  mgr.execute("RUNNING", "stuff", cmd_data);
+  mgr.execute("stuff", cmd_data);
 
-  BOOST_REQUIRE_EXCEPTION(mgr.execute("RUNNING", "bad_stuff", cmd_data),
-                          CommandDispatchingFailed,
-                          [&](CommandDispatchingFailed) { return true; });
+  BOOST_REQUIRE_EXCEPTION(
+    mgr.execute("bad_stuff", cmd_data), CommandDispatchingFailed, [&](CommandDispatchingFailed) { return true; });
 
 }
 
@@ -131,12 +171,12 @@ BOOST_AUTO_TEST_CASE(CommandMatchingModules)
   addr_cmd.match = "foo";
   cmd_obj.modules.push_back(addr_cmd);
   to_json(cmd_obj_data, cmd_obj);
-  mgr.execute("RUNNING", "stuff", cmd_obj_data);
+  mgr.execute("stuff", cmd_obj_data);
 
   addr_cmd.match = ".*module.*";
   cmd_obj.modules.push_back(addr_cmd);
   to_json(cmd_obj_data, cmd_obj);
-  BOOST_REQUIRE_EXCEPTION(mgr.execute("RUNNING", "bad_stuff", cmd_obj_data),
+  BOOST_REQUIRE_EXCEPTION(mgr.execute("bad_stuff", cmd_obj_data),
                           ConflictingCommandMatching,
                           [&](ConflictingCommandMatching) { return true; });
 }

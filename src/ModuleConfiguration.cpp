@@ -9,14 +9,15 @@
 
 #include "appfwk/ModuleConfiguration.hpp"
 #include "appmodel/SmartDaqApplication.hpp"
+#include "conffwk/Configuration.hpp"
 #include "confmodel/DaqApplication.hpp"
 #include "confmodel/DaqModule.hpp"
+#include "confmodel/FSMCommand.hpp"
 #include "confmodel/NetworkConnection.hpp"
 #include "confmodel/Queue.hpp"
 #include "confmodel/ResourceSet.hpp"
 #include "confmodel/Service.hpp"
 #include "confmodel/Session.hpp"
-#include "conffwk/Configuration.hpp"
 
 #include <cerrno>
 #include <ifaddrs.h>
@@ -26,6 +27,7 @@ using namespace dunedaq::appfwk;
 
 ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> cfMgr)
   : m_config_mgr(cfMgr)
+  , m_action_plans()
 {
   auto session = cfMgr->session();
   auto application = cfMgr->application();
@@ -37,14 +39,22 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
     auto cpos = cfMgr->m_oks_config_spec.find(":") + 1;
     std::string oksFile = cfMgr->m_oks_config_spec.substr(cpos); // Strip off "oksconflibs:"
     m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
-  }
-  else {
+
+    for (auto& plan : smartDaqApp->get_action_plans()) {
+      TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << plan->get_fsm()->get_cmd();
+      m_action_plans[plan->get_fsm()->get_cmd()] = plan;
+    }
+  } else {
     auto daqApp = application->cast<confmodel::DaqApplication>();
     if (daqApp) {
       m_modules = daqApp->get_modules();
-    }
-    else {
-      throw (NotADaqApplication(ERS_HERE, application->UID()));
+
+      for (auto& plan : daqApp->get_action_plans()) {
+        TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << plan->get_fsm()->get_cmd();
+        m_action_plans[plan->get_fsm()->get_cmd()] = plan;
+      }
+    } else {
+      throw(NotADaqApplication(ERS_HERE, application->UID()));
     }
   }
 
@@ -109,4 +119,13 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
       }
     }
   }
+}
+
+const dunedaq::confmodel::ActionPlan*
+dunedaq::appfwk::ModuleConfiguration::action_plan(std::string cmd) const
+{
+  if (m_action_plans.count(cmd)) {
+    return m_action_plans.at(cmd);
+  }
+  return nullptr;
 }

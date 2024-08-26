@@ -137,12 +137,13 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
 /**
  * @brief The MissingConnection DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
-                       MissingConnection,                         ///< Type of the Issue
-                       appfwk::GeneralDAQModuleIssue,                  ///< Base class of the Issue
-                       "Required Connection Not Found. Type: " << type << ", direction: " << direction,   ///< Log Message from the issue
-                       ((std::string)name), ///< Base class attributes
-                       ((std::string)type)((std::string)direction)                  ///< Attribute of this class
+ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
+                       MissingConnection,             ///< Type of the Issue
+                       appfwk::GeneralDAQModuleIssue, ///< Base class of the Issue
+                       "Required Connection Not Found. Type: " << type << ", direction: "
+                                                               << direction, ///< Log Message from the issue
+                       ((std::string)name),                                  ///< Base class attributes
+                       ((std::string)type)((std::string)direction)           ///< Attribute of this class
 )
 
 // Re-enable coverage collection LCOV_EXCL_STOP
@@ -197,11 +198,11 @@ public:
    *  Non-accepted commands or failure should return an ERS exception
    * indicating this result.
    */
-  void execute_command(const std::string& name, const std::string& state, const data_t& data = {});
+  void execute_command(const std::string& name, const data_t& data = {});
 
   std::vector<std::string> get_commands() const;
 
-  bool has_command(const std::string& name, const std::string& state) const;
+  bool has_command(const std::string& name) const;
 
 protected:
   /**
@@ -209,9 +210,7 @@ protected:
    * Returns whether the command was inserted (false meaning that command `cmd` already exists)
    */
   template<typename Child>
-  void register_command(const std::string& name,
-                        void (Child::*f)(const data_t&),
-                        const std::set<std::string>& valid_states = std::set<std::string>{ "ANY" });
+  void register_command(const std::string& name, void (Child::*f)(const data_t&));
 
   DAQModule(DAQModule const&) = delete;
   DAQModule(DAQModule&&) = delete;
@@ -219,7 +218,7 @@ protected:
   DAQModule& operator=(DAQModule&&) = delete;
 
 private:
-  using CommandMap_t = std::map<std::string, std::pair<std::set<std::string>, std::function<void(const data_t&)>>>;
+  using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
   CommandMap_t m_commands;
 };
 
