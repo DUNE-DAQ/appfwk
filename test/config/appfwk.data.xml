@@ -96,66 +96,51 @@
     <attr name="optional" type="bool" val="0"/>
   </obj>
 
-  <obj class="Action" id="all_DummyModules_action">
-    <attr name="module_class" type="class" val="DummyModule"/>
-    <attr name="module_id" type="string" val="*"/>
-  </obj>
-
-  <obj class="Action" id="dummyModule_0_action">
-    <attr name="module_class" type="class" val="DummyModule"/>
-    <attr name="module_id" type="string" val="dummy_module_0"/>
-  </obj>
-
-  <obj class="Action" id="dummyModule_1_action">
-    <attr name="module_class" type="class" val="DummyModule"/>
-    <attr name="module_id" type="string" val="dummy_module_1"/>
-  </obj>
-
 <obj class="ActionPlan" id="bad_action">
-  <rel name="fsm" class="FSMCommand" id="bad_action"/>
+  <rel name="command" class="FSMCommand" id="bad_action"/>
  <rel name="steps">
-  <ref class="ActionStep" id="run_on_all_dummymodules_step"/>
+  <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
 </obj>
 
 <obj class="ActionPlan" id="bad_stuff">
-  <rel name="fsm" class="FSMCommand" id="bad_stuff"/>
+  <rel name="command" class="FSMCommand" id="bad_stuff"/>
  <rel name="steps">
-  <ref class="ActionStep" id="run_on_all_dummymodules_step"/>
+  <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
 </obj>
 
   <obj class="ActionPlan" id="bad_stuff_conflict">
-    <rel name="fsm" class="FSMCommand" id="bad_stuff"/>
+    <rel name="command" class="FSMCommand" id="bad_stuff"/>
     <rel name="steps">
-      <ref class="ActionStep" id="run_on_all_dummymodules_step"/>
+      <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
     </rel>
   </obj>
 
-  <obj class="ActionPlan" id="stuff_targeted">
-    <rel name="fsm" class="FSMCommand" id="stuff"/>
+  <obj class="ActionPlan" id="stuff_byid">
+    <rel name="command" class="FSMCommand" id="stuff"/>
     <rel name="steps">
-      <ref class="ActionStep" id="run_on_both_dummymodules_step"/>
+      <ref class="DaqModulesGroupById" id="dummymodules_id_group"/>
     </rel>
   </obj>
   
 <obj class="ActionPlan" id="stuff">
-  <rel name="fsm" class="FSMCommand" id="stuff"/>
+  <rel name="command" class="FSMCommand" id="stuff"/>
  <rel name="steps">
-  <ref class="ActionStep" id="run_on_all_dummymodules_step"/>
+  <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
 </obj>
 
-<obj class="ActionStep" id="run_on_all_dummymodules_step">
-  <rel name="actions">
-    <ref class="Action" id="all_DummyModules_action"/>
-  </rel>
+<obj class="DaqModulesGroupByType" id="dummymodules_type_group">
+  <attr name="modules" type="class">
+    <data val="DummyModule"/>
+  </attr>
 </obj>
 
-<obj class="ActionStep" id="run_on_both_dummymodules_step">
-  <rel name="actions">
-    <ref class="Action" id="dummyModule_0_action"/>
-    <ref class="Action" id="dummyModule_1_action"/>
+<obj class="DaqModulesGroupById" id="dummymodules_id_group">
+  <rel name="modules">
+    <ref class="DummyModule" id="dummy_module_0"/>
+    <ref class="DummyModule" id="dummy_module_1"/>
   </rel>
 </obj>
 
@@ -190,11 +175,11 @@
  </rel>
 </obj>
   
-  <obj class="DaqApplication" id="MissingModuleApp_TargetedAction">
+  <obj class="DaqApplication" id="MissingModuleApp_GroupById">
     <attr name="application_name" type="string" val="daq_application"/>
     <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
     <rel name="action_plans">
-      <ref class="ActionPlan" id="stuff_targeted"/>
+      <ref class="ActionPlan" id="stuff_byid"/>
     </rel>
     <rel name="modules">
       <ref class="DummyModule" id="dummy_module_0"/>
@@ -213,7 +198,7 @@
  </rel>
 </obj>
   
-  <obj class="DaqApplication" id="TestApp_TargetedAction">
+  <obj class="DaqApplication" id="TestApp_ById">
     <attr name="application_name" type="string" val="daq_application"/>
     <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
     <rel name="modules">
@@ -221,7 +206,7 @@
       <ref class="DummyModule" id="dummy_module_1"/>
     </rel>
     <rel name="action_plans">
-      <ref class="ActionPlan" id="stuff_targeted"/>
+      <ref class="ActionPlan" id="stuff_byid"/>
       <ref class="ActionPlan" id="bad_stuff"/>
     </rel>
   </obj>

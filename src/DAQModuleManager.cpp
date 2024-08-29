@@ -16,9 +16,11 @@
 
 #include "appfwk/DAQModule.hpp"
 
-#include "confmodel/ActionStep.hpp"
-#include "confmodel/Action.hpp"
+#include "confmodel/DaqModulesGroup.hpp"
+#include "confmodel/DaqModulesGroupById.hpp"
+#include "confmodel/DaqModulesGroupByType.hpp"
 #include "confmodel/Session.hpp"
+#include "confmodel/SmartActionPlan.hpp"
 
 #include "iomanager/IOManager.hpp"
 
@@ -54,36 +56,61 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   for (auto& plan_pair : m_module_configuration->action_plans()) {
     auto cmd = plan_pair.first;
 
-    for (auto& step : plan_pair.second->get_steps()) {
-      for (auto& action : step->get_actions()) {
-        auto mod_type = action->get_module_class();
-        if (!m_modules_by_type.count(mod_type) || m_modules_by_type[mod_type].size() == 0) {
-          throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_type, "Module does not exist");
+    auto smartplan = plan_pair.second->cast<confmodel::SmartActionPlan>();
+    if (smartplan != nullptr) {
+      // Must be DaqModulesGroupByType
+      for (auto& step : smartplan->get_steps()) {
+        for (auto& mod_type : step->get_modules()) {
+          check_mod_has_cmd(cmd, mod_type);
         }
-
-        auto mod_name = action->get_module_id();
-        if (mod_name != "*") {
-          bool match = false;
-          for (auto& mod_id : m_modules_by_type[mod_type]) {
-            if (mod_id == mod_name) {
-              match = true;
-              break;
-            }
+      }
+    } else {
+      for (auto& step : plan_pair.second->get_steps()) {
+        auto byType = step->cast<confmodel::DaqModulesGroupByType>();
+        auto byMod = step->cast<confmodel::DaqModulesGroupById>();
+        if (byType != nullptr) {
+          for (auto& mod_type : byType->get_modules()) {
+            check_mod_has_cmd(cmd, mod_type);
           }
-          if (!match) {
-            throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_type, "No module with id " + mod_name + " found.");
+        } else if (byMod != nullptr) {
+          for (auto& mod : byMod->get_modules()) {
+            check_mod_has_cmd(cmd, mod->class_name(), mod->UID());
           }
-        }
-
-        auto module_test = m_module_map[m_modules_by_type[mod_type][0]];
-        if (!module_test->has_command(cmd)) {
-          throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_type, "Module does not have method " + cmd);
+        } else {
+          throw ActionPlanValidationFailed(ERS_HERE, cmd, "", "Invalid subclass of DaqModulesGroup encountered!");
         }
       }
     }
   }
-
   this->m_initialized = true;
+}
+
+void
+DAQModuleManager::check_mod_has_cmd(const std::string& cmd, const std::string& mod_class, const std::string& mod_id)
+{
+
+  if (!m_modules_by_type.count(mod_class) || m_modules_by_type[mod_class].size() == 0) {
+    throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist");
+  }
+
+  auto module_test = m_module_map[m_modules_by_type[mod_class][0]];
+  if (mod_id != "") {
+    bool match = false;
+    for (auto& mod_name : m_modules_by_type[mod_class]) {
+      if (mod_id == mod_name) {
+        module_test = m_module_map[mod_name];
+        match = true;
+        break;
+      }
+    }
+    if (!match) {
+      throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No module with id " + mod_id + " found.");
+    }
+  }
+
+  if (!module_test->has_command(cmd)) {
+    throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not have method " + cmd);
+  }
 }
 
 void
@@ -151,23 +178,34 @@ DAQModuleManager::execute_action(const std::string& module_name, const std::stri
 
 void
 DAQModuleManager::execute_action_plan_step(std::string const& cmd,
-                                           const confmodel::ActionStep* step,
+                                           const confmodel::DaqModulesGroup* step,
                                            const dataobj_t& cmd_data)
 {
   std::string failed_mod_names("");
   std::unordered_map<std::string, std::future<bool>> futures;
 
-  for (auto& action : step->get_actions()) {
-    auto mod_class = action->get_module_class();
-    auto modules = m_modules_by_type[mod_class];
-    for (auto& mod_name : modules) {
-      if (mod_name == action->get_module_id() || action->get_module_id() == "*") {
-        auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
-        TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod_class << ")";
-        futures[mod_name] =
-          std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
+  auto byType = step->cast<confmodel::DaqModulesGroupByType>();
+  auto byMod = step->cast<confmodel::DaqModulesGroupById>();
+  if (byType != nullptr) {
+    for (auto& mod_class : byType->get_modules()) {
+      auto modules = m_modules_by_type[mod_class];
+      for (auto& mod_name : modules) {
+          auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
+          TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod_class << ")";
+          futures[mod_name] =
+            std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
       }
     }
+  } else if (byMod != nullptr) {
+    for (auto& mod : byMod->get_modules()) {
+      auto mod_name = mod->UID();
+      auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
+      TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod->class_name() << ")";
+      futures[mod_name] =
+        std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
+    }
+  } else {
+    throw CommandDispatchingFailed(ERS_HERE, cmd, "Could not get DaqModulesGroup!");
   }
 
   for (auto& future : futures) {

@@ -19,6 +19,7 @@
 #include "confmodel/ResourceSet.hpp"
 #include "confmodel/Service.hpp"
 #include "confmodel/Session.hpp"
+#include "confmodel/SmartActionPlan.hpp"
 
 #include <cerrno>
 #include <ifaddrs.h>
@@ -42,11 +43,11 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
     m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
 
     for (auto& plan : smartDaqApp->get_action_plans()) {
-      auto cmd = plan->get_fsm()->get_cmd();
+      auto cmd = plan->get_command()->get_cmd();
       TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
       if (m_action_plans.count(cmd)) {
         throw ActionPlanValidationFailed(
-          ERS_HERE, cmd,"N/A", "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
+          ERS_HERE, cmd, "N/A", "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
       }
       m_action_plans[cmd] = plan;
     }
@@ -56,7 +57,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
       m_modules = daqApp->get_modules();
 
       for (auto& plan : daqApp->get_action_plans()) {
-        auto cmd = plan->get_fsm()->get_cmd();
+        auto cmd = plan->get_command()->get_cmd();
         TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
         if (m_action_plans.count(cmd)) {
           throw ActionPlanValidationFailed(
