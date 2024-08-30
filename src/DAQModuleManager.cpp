@@ -20,7 +20,6 @@
 #include "confmodel/DaqModulesGroupById.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
 #include "confmodel/Session.hpp"
-#include "confmodel/SmartActionPlan.hpp"
 
 #include "iomanager/IOManager.hpp"
 
@@ -56,15 +55,6 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   for (auto& plan_pair : m_module_configuration->action_plans()) {
     auto cmd = plan_pair.first;
 
-    auto smartplan = plan_pair.second->cast<confmodel::SmartActionPlan>();
-    if (smartplan != nullptr) {
-      // Must be DaqModulesGroupByType
-      for (auto& step : smartplan->get_steps()) {
-        for (auto& mod_type : step->get_modules()) {
-          check_mod_has_cmd(cmd, mod_type);
-        }
-      }
-    } else {
       for (auto& step : plan_pair.second->get_steps()) {
         auto byType = step->cast<confmodel::DaqModulesGroupByType>();
         auto byMod = step->cast<confmodel::DaqModulesGroupById>();
@@ -80,7 +70,6 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
           throw ActionPlanValidationFailed(ERS_HERE, cmd, "", "Invalid subclass of DaqModulesGroup encountered!");
         }
       }
-    }
   }
   this->m_initialized = true;
 }
@@ -179,7 +168,7 @@ DAQModuleManager::execute_action(const std::string& module_name, const std::stri
 void
 DAQModuleManager::execute_action_plan_step(std::string const& cmd,
                                            const confmodel::DaqModulesGroup* step,
-                                           const dataobj_t& cmd_data)
+                                           const dataobj_t& cmd_data, bool execution_mode_is_serial)
 {
   std::string failed_mod_names("");
   std::unordered_map<std::string, std::future<bool>> futures;
@@ -194,6 +183,8 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
           TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod_class << ")";
           futures[mod_name] =
             std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
+          if (execution_mode_is_serial)
+            futures[mod_name].wait();
       }
     }
   } else if (byMod != nullptr) {
@@ -203,6 +194,8 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
       TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod->class_name() << ")";
       futures[mod_name] =
         std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
+      if (execution_mode_is_serial)
+        futures[mod_name].wait();
     }
   } else {
     throw CommandDispatchingFailed(ERS_HERE, cmd, "Could not get DaqModulesGroup!");
@@ -332,9 +325,12 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
     }
 #endif
   } else {
+    auto execution_policy = action_plan->get_execution_policy();
+    auto serial_execution = execution_policy == "modules-in-series";
+
     // We validated the action plans already
     for (auto& step : action_plan->get_steps()) {
-      execute_action_plan_step(cmd, step, cmd_data);
+      execute_action_plan_step(cmd, step, cmd_data, serial_execution);
     }
   }
 }

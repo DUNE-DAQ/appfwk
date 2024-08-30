@@ -95,7 +95,7 @@ private:
   void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
   dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);
   bool execute_action(const std::string& mod_name, const std::string& action, const dataobj_t& data_obj);
-  void execute_action_plan_step(const std::string& cmd, const confmodel::DaqModulesGroup* step, const dataobj_t& cmd_data);
+  void execute_action_plan_step(const std::string& cmd, const confmodel::DaqModulesGroup* step, const dataobj_t& cmd_data, bool execution_mode_is_serial);
 
   void check_mod_has_cmd(const std::string& cmd, const std::string& mod_class, const std::string& mod_id = "");
 

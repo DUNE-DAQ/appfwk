@@ -13,13 +13,13 @@
 #include "conffwk/Configuration.hpp"
 #include "confmodel/DaqApplication.hpp"
 #include "confmodel/DaqModule.hpp"
+#include "confmodel/DaqModulesGroupByType.hpp"
 #include "confmodel/FSMCommand.hpp"
 #include "confmodel/NetworkConnection.hpp"
 #include "confmodel/Queue.hpp"
 #include "confmodel/ResourceSet.hpp"
 #include "confmodel/Service.hpp"
 #include "confmodel/Session.hpp"
-#include "confmodel/SmartActionPlan.hpp"
 
 #include <cerrno>
 #include <ifaddrs.h>
@@ -48,6 +48,13 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
       if (m_action_plans.count(cmd)) {
         throw ActionPlanValidationFailed(
           ERS_HERE, cmd, "N/A", "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
+      }
+      for (auto& step : plan->get_steps()) {
+        auto step_byType = step->cast<confmodel::DaqModulesGroupByType>();
+        if (step_byType == nullptr) {
+          throw ActionPlanValidationFailed(
+            ERS_HERE, cmd, "N/A", "ActionPlans for SmartDaqApplications must use DaqModulesGroupByType");
+        }
       }
       m_action_plans[cmd] = plan;
     }
