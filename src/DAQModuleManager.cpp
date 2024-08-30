@@ -79,7 +79,13 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd, const std::string& m
 {
 
   if (!m_modules_by_type.count(mod_class) || m_modules_by_type[mod_class].size() == 0) {
-    throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist");
+    auto issue = ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist");
+    if (mod_id == "") {
+      ers::info(issue);
+      return;
+    } else {
+      throw issue;
+    }
   }
 
   auto module_test = m_module_map[m_modules_by_type[mod_class][0]];

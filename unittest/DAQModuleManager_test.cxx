@@ -122,8 +122,8 @@ BOOST_AUTO_TEST_CASE(InvalidActionPlan)
   std::string sessionName = "test-session";
   dunedaq::opmonlib::TestOpMonManager opmgr;
   auto cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName, sessionName);
-  BOOST_REQUIRE_EXCEPTION(
-    mgr.initialize(cfgMgr, opmgr), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
+  // This succeeds, but prints a message
+  mgr.initialize(cfgMgr, opmgr);
 
   dunedaq::opmonlib::TestOpMonManager opmgr2;
   dunedaq::get_iomanager()->reset();
