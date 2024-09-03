@@ -97,42 +97,51 @@
   </obj>
 
 <obj class="ActionPlan" id="bad_action">
-  <rel name="fsm" class="FSMCommand" id="bad_action"/>
+  <rel name="command" class="FSMCommand" id="bad_action"/>
  <rel name="steps">
-  <ref class="ActionStep" id="bad_action_step_1"/>
+  <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
 </obj>
 
 <obj class="ActionPlan" id="bad_stuff">
-  <rel name="fsm" class="FSMCommand" id="bad_stuff"/>
+  <rel name="command" class="FSMCommand" id="bad_stuff"/>
  <rel name="steps">
-  <ref class="ActionStep" id="bad_stuff_step_1"/>
+  <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
 </obj>
 
+  <obj class="ActionPlan" id="bad_stuff_conflict">
+    <rel name="command" class="FSMCommand" id="bad_stuff"/>
+    <rel name="steps">
+      <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
+    </rel>
+  </obj>
+
+  <obj class="ActionPlan" id="stuff_byid">
+    <rel name="command" class="FSMCommand" id="stuff"/>
+    <rel name="steps">
+      <ref class="DaqModulesGroupById" id="dummymodules_id_group"/>
+    </rel>
+  </obj>
+  
 <obj class="ActionPlan" id="stuff">
-  <rel name="fsm" class="FSMCommand" id="stuff"/>
+  <rel name="command" class="FSMCommand" id="stuff"/>
  <rel name="steps">
-  <ref class="ActionStep" id="stuff_step_1"/>
+  <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
 </obj>
 
-<obj class="ActionStep" id="bad_action_step_1">
+<obj class="DaqModulesGroupByType" id="dummymodules_type_group">
   <attr name="modules" type="class">
     <data val="DummyModule"/>
   </attr>
 </obj>
 
-<obj class="ActionStep" id="bad_stuff_step_1">
-  <attr name="modules" type="class">
-    <data val="DummyModule"/>
-  </attr>
-</obj>
-
-<obj class="ActionStep" id="stuff_step_1">
-  <attr name="modules" type="class">
-    <data val="DummyModule"/>
-  </attr>
+<obj class="DaqModulesGroupById" id="dummymodules_id_group">
+  <rel name="modules">
+    <ref class="DummyModule" id="dummy_module_0"/>
+    <ref class="DummyModule" id="dummy_module_1"/>
+  </rel>
 </obj>
 
 <obj class="DaqApplication" id="MissingMethodApp">
@@ -146,6 +155,18 @@
  </rel>
 </obj>
 
+  <obj class="DaqApplication" id="ConflictingActionPlansApp">
+    <attr name="application_name" type="string" val="daq_application"/>
+    <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+    <rel name="modules">
+      <ref class="DummyModule" id="dummy_module_0"/>
+    </rel>
+    <rel name="action_plans">
+      <ref class="ActionPlan" id="bad_stuff"/>
+      <ref class="ActionPlan" id="bad_stuff_conflict"/>
+    </rel>
+  </obj>
+  
 <obj class="DaqApplication" id="MissingModuleApp">
  <attr name="application_name" type="string" val="daq_application"/>
  <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
@@ -153,6 +174,17 @@
   <ref class="ActionPlan" id="stuff"/>
  </rel>
 </obj>
+  
+  <obj class="DaqApplication" id="MissingModuleApp_GroupById">
+    <attr name="application_name" type="string" val="daq_application"/>
+    <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+    <rel name="action_plans">
+      <ref class="ActionPlan" id="stuff_byid"/>
+    </rel>
+    <rel name="modules">
+      <ref class="DummyModule" id="dummy_module_0"/>
+    </rel>
+  </obj>
 
 <obj class="DaqApplication" id="TestApp">
  <attr name="application_name" type="string" val="daq_application"/>
@@ -165,8 +197,23 @@
   <ref class="ActionPlan" id="bad_stuff"/>
  </rel>
 </obj>
+  
+  <obj class="DaqApplication" id="TestApp_ById">
+    <attr name="application_name" type="string" val="daq_application"/>
+    <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+    <rel name="modules">
+      <ref class="DummyModule" id="dummy_module_0"/>
+      <ref class="DummyModule" id="dummy_module_1"/>
+    </rel>
+    <rel name="action_plans">
+      <ref class="ActionPlan" id="stuff_byid"/>
+      <ref class="ActionPlan" id="bad_stuff"/>
+    </rel>
+  </obj>
 
 <obj class="DummyModule" id="dummy_module_0">
 </obj>
+  <obj class="DummyModule" id="dummy_module_1">
+  </obj>
 
 </oks-data>

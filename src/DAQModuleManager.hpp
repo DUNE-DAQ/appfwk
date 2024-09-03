@@ -14,7 +14,6 @@
 
 #include "appfwk/ConfigurationManager.hpp"
 #include "appfwk/ModuleConfiguration.hpp"
-#include "confmodel/ActionStep.hpp"
 #include "confmodel/DaqModule.hpp"
 #include "conffwk/Configuration.hpp"
 
@@ -68,15 +67,6 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                                  
                        ((std::string)message)                                          ///< This class params
 )
 
-ERS_DECLARE_ISSUE(appfwk,
-                  ActionPlanNotFound,
-                  "No action plan found for command " << cmd << ", taking the following action: " << message,
-                  ((std::string)cmd)((std::string)message))
-
-ERS_DECLARE_ISSUE(appfwk,
-                  ActionPlanValidationFailed,
-                  "Error validating action plan " << cmd << ", module " << module << ": " << message,
-                  ((std::string)cmd)((std::string)module)((std::string)message))
 // Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
@@ -105,7 +95,9 @@ private:
   void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
   dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);
   bool execute_action(const std::string& mod_name, const std::string& action, const dataobj_t& data_obj);
-  void execute_action_plan_step(const std::string& cmd, const confmodel::ActionStep* step, const dataobj_t& cmd_data);
+  void execute_action_plan_step(const std::string& cmd, const confmodel::DaqModulesGroup* step, const dataobj_t& cmd_data, bool execution_mode_is_serial);
+
+  void check_mod_has_cmd(const std::string& cmd, const std::string& mod_class, const std::string& mod_id = "");
 
   std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id);
   std::shared_ptr<ModuleConfiguration> m_module_configuration;

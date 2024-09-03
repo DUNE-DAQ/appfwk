@@ -8,10 +8,12 @@
  */
 
 #include "appfwk/ModuleConfiguration.hpp"
+#include "appfwk/Issues.hpp"
 #include "appmodel/SmartDaqApplication.hpp"
 #include "conffwk/Configuration.hpp"
 #include "confmodel/DaqApplication.hpp"
 #include "confmodel/DaqModule.hpp"
+#include "confmodel/DaqModulesGroupByType.hpp"
 #include "confmodel/FSMCommand.hpp"
 #include "confmodel/NetworkConnection.hpp"
 #include "confmodel/Queue.hpp"
@@ -41,8 +43,20 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
     m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
 
     for (auto& plan : smartDaqApp->get_action_plans()) {
-      TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << plan->get_fsm()->get_cmd();
-      m_action_plans[plan->get_fsm()->get_cmd()] = plan;
+      auto cmd = plan->get_command()->get_cmd();
+      TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
+      if (m_action_plans.count(cmd)) {
+        throw ActionPlanValidationFailed(
+          ERS_HERE, cmd, "N/A", "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
+      }
+      for (auto& step : plan->get_steps()) {
+        auto step_byType = step->cast<confmodel::DaqModulesGroupByType>();
+        if (step_byType == nullptr) {
+          throw ActionPlanValidationFailed(
+            ERS_HERE, cmd, "N/A", "ActionPlans for SmartDaqApplications must use DaqModulesGroupByType");
+        }
+      }
+      m_action_plans[cmd] = plan;
     }
   } else {
     auto daqApp = application->cast<confmodel::DaqApplication>();
@@ -50,8 +64,13 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
       m_modules = daqApp->get_modules();
 
       for (auto& plan : daqApp->get_action_plans()) {
-        TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << plan->get_fsm()->get_cmd();
-        m_action_plans[plan->get_fsm()->get_cmd()] = plan;
+        auto cmd = plan->get_command()->get_cmd();
+        TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
+        if (m_action_plans.count(cmd)) {
+          throw ActionPlanValidationFailed(
+            ERS_HERE, cmd, "N/A", "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
+        }
+        m_action_plans[cmd] = plan;
       }
     } else {
       throw(NotADaqApplication(ERS_HERE, application->UID()));

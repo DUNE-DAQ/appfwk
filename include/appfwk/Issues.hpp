@@ -55,6 +55,16 @@ ERS_DECLARE_ISSUE(appfwk,
 ERS_DECLARE_ISSUE(appfwk, InvalidConfigurationURI, "Cannot get a configuration using URI " << uri, ((std::string)uri))
 
 ERS_DECLARE_ISSUE(appfwk, ConfigurationRetreival, "Failed to retrieve configuration: " << uri, ((std::string)uri))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  ActionPlanNotFound,
+                  "No action plan found for command " << cmd << ", taking the following action: " << message,
+                  ((std::string)cmd)((std::string)message))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  ActionPlanValidationFailed,
+                  "Error validating action plan " << cmd << ", module " << module << ": " << message,
+                  ((std::string)cmd)((std::string)module)((std::string)message))
 // Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 
