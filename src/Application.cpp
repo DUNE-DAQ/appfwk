@@ -42,7 +42,7 @@ Application::Application(std::string appname,
 
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 
-  set_configuration(m_config_mgr->application()->get_opmon_conf());
+  set_opmon_conf(m_config_mgr->application()->get_opmon_conf());
   
   TLOG() << "confimpl=<" << confimpl << ">\n";
 }
