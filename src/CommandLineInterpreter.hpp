@@ -53,7 +53,7 @@ public:
                "passed on)";
     bpo::options_description desc(descstr.str());
     desc.add_options()("name,n", bpo::value<std::string>()->required(), "Application name")(
-      "session,s", bpo::value<std::string>()->default_value("global"), "Sessuion name")(
+      "session,s", bpo::value<std::string>()->default_value("global"), "Session name")(
       "commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")(
       "configurationService,d", bpo::value<std::string>()->required(), "Configuration Service URI")(
       "help,h", "produce help message");
