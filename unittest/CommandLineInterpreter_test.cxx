@@ -40,9 +40,8 @@ BOOST_AUTO_TEST_CASE(AskForHelp)
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, true);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "");
-  BOOST_REQUIRE_EQUAL(parsed.partition_name, "");
+  BOOST_REQUIRE_EQUAL(parsed.session_name, "");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "");
-  BOOST_REQUIRE_EQUAL(parsed.info_service_plugin_name, "");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 0);
 
@@ -85,52 +84,29 @@ BOOST_AUTO_TEST_CASE(ParseNameAndCommandFacility)
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.partition_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
-  BOOST_REQUIRE_EQUAL(parsed.info_service_plugin_name, "stdout://flat");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 0);
 
   delete[] arg_list; // NOLINT
 }
 
-BOOST_AUTO_TEST_CASE(ParseInfoService)
-{
-  char** arg_list = new char* [9] {
-    (char*)("CommandLineInterpreter_test"),     // NOLINT
-      (char*)("-c"), (char*)("stdin://"),       // NOLINT
-      (char*)("-d"), (char*)("file://"),        // NOLINT
-      (char*)("-n"), (char*)("cli_test"),       // NOLINT
-      (char*)("-i"), (char*)("info_service://") // NOLINT
-  };
-  auto parsed = CommandLineInterpreter::parse(9, arg_list);
-
-  BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
-  BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.partition_name, "global");
-  BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
-  BOOST_REQUIRE_EQUAL(parsed.info_service_plugin_name, "info_service://");
-  BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
-  BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 0);
-
-  delete[] arg_list; // NOLINT
-}
-BOOST_AUTO_TEST_CASE(ParsePartition)
+BOOST_AUTO_TEST_CASE(ParseSession)
 {
   char** arg_list = new char* [9] {
     (char*)("CommandLineInterpreter_test"),    // NOLINT
       (char*)("-c"), (char*)("stdin://"),      // NOLINT
       (char*)("-d"), (char*)("file://"),       // NOLINT
       (char*)("-n"), (char*)("cli_test"),      // NOLINT
-      (char*)("-p"), (char*)("test_partition") // NOLINT
+      (char*)("-s"), (char*)("test_session")   // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(9, arg_list);
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.partition_name, "test_partition");
+  BOOST_REQUIRE_EQUAL(parsed.session_name, "test_session");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
-  BOOST_REQUIRE_EQUAL(parsed.info_service_plugin_name, "stdout://flat");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 0);
 
@@ -149,9 +125,8 @@ BOOST_AUTO_TEST_CASE(ParseOtherOption)
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.partition_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
-  BOOST_REQUIRE_EQUAL(parsed.info_service_plugin_name, "stdout://flat");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 1);
   BOOST_REQUIRE_EQUAL(parsed.other_options[0], "--some-other-option");
@@ -173,9 +148,8 @@ BOOST_AUTO_TEST_CASE(ParseMultipleOtherOptions)
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.partition_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
-  BOOST_REQUIRE_EQUAL(parsed.info_service_plugin_name, "stdout://flat");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 4);
   BOOST_REQUIRE_EQUAL(parsed.other_options[0], "--some-other-option");

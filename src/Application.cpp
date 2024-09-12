@@ -29,9 +29,8 @@ namespace appfwk {
 Application::Application(std::string appname,
                          std::string session,
                          std::string cmdlibimpl,
-                         std::string opmonlibimpl,
                          std::string confimpl)
-  : OpMonManager(session, appname, opmonlibimpl)
+  : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, appname, session)->session()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
   , m_busy(false)
@@ -42,7 +41,7 @@ Application::Application(std::string appname,
   m_runinfo.set_running(false);
   m_runinfo.set_run_number(0);
   m_runinfo.set_run_time(0);
-
+  
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 
   set_opmon_conf(m_config_mgr->application()->get_opmon_conf());

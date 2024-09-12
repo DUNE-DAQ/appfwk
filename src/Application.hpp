@@ -66,7 +66,6 @@ public:
   Application(std::string app_name,
               std::string session_name,
               std::string cmdlibimpl,
-              std::string opmonlibimpl,
               std::string confimpl);
 
   // Initialize the application services
