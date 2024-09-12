@@ -1,3 +1,4 @@
+
 /**
  * @file Application.cpp Application implementataion
  *
@@ -18,7 +19,9 @@
 #include <string>
 #include <unistd.h>
 
+#include "confmodel/Session.hpp"
 #include "confmodel/Application.hpp"
+#include "confmodel/OpMonURI.hpp"
 
 namespace dunedaq {
 namespace appfwk {

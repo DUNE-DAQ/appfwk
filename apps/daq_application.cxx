@@ -14,6 +14,12 @@
 
 #include "nlohmann/json.hpp"
 
+#include "confmodel/Session.hpp"
+#include "confmodel/Application.hpp"
+#include "confmodel/OpMonURI.hpp"
+#include "appfwk/ConfigurationManager.hpp"
+
+
 #include <csignal>
 #include <fstream>
 #include <list>
@@ -21,6 +27,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+
+
 
 /**
  * @brief Using namespace for convenience
@@ -80,11 +89,15 @@ main(int argc, char* argv[])
   setenv("DUNEDAQ_APPLICATION_NAME", args.app_name.c_str(), 0);
   setenv("DUNEDAQ_PARTITION", args.partition_name.c_str(), 0);
 
+  auto c_mgr = std::make_unique<dunedaq::appfwk::ConfigurationManager>(args.conf_service_plugin_name, args.app_name, args.partition_name);
+  auto opmon_uri = c_mgr->session()->get_opmon_uri()->get_URI(args.app_name);
+  c_mgr.reset();
+  
   // Create the Application
   appfwk::Application app(args.app_name,
-                          getenv("DUNEDAQ_PARTITION"),
+                          args.partition_name,
                           args.command_facility_plugin_name,
-                          args.info_service_plugin_name,
+                          opmon_uri,
                           args.conf_service_plugin_name);
 
   app.init();
