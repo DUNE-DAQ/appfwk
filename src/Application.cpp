@@ -1,3 +1,4 @@
+
 /**
  * @file Application.cpp Application implementataion
  *
@@ -18,15 +19,18 @@
 #include <string>
 #include <unistd.h>
 
+#include "confmodel/Session.hpp"
+#include "confmodel/Application.hpp"
+#include "confmodel/OpMonURI.hpp"
+
 namespace dunedaq {
 namespace appfwk {
 
 Application::Application(std::string appname,
                          std::string session,
                          std::string cmdlibimpl,
-                         std::string opmonlibimpl,
                          std::string confimpl)
-  : OpMonManager(session, appname, opmonlibimpl)
+  : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, appname, session)->session()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
   , m_busy(false)
@@ -37,9 +41,11 @@ Application::Application(std::string appname,
   m_runinfo.set_running(false);
   m_runinfo.set_run_number(0);
   m_runinfo.set_run_time(0);
-
+  
   m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
 
+  set_opmon_conf(m_config_mgr->application()->get_opmon_conf());
+  
   TLOG() << "confimpl=<" << confimpl << ">\n";
 }
 
@@ -59,20 +65,7 @@ Application::run(std::atomic<bool>& end_marker)
     throw ApplicationNotInitialized(ERS_HERE, get_name());
   }
 
-  setenv("DUNEDAQ_OPMON_INTERVAL", "10", 0);
-  setenv("DUNEDAQ_OPMON_LEVEL", "1", 0);
-
-  std::stringstream s1(getenv("DUNEDAQ_OPMON_INTERVAL"));
-  std::stringstream s2(getenv("DUNEDAQ_OPMON_LEVEL"));
-  uint32_t interval = 0; // NOLINT(build/unsigned)
-  opmonlib::OpMonLevel level  = 0; 
-  s1 >> interval;
-  s2 >> level;
-
-  // MR: we need to set the proper level here
-  set_opmon_level(dunedaq::opmonlib::to_level(dunedaq::opmonlib::SystemOpMonLevel::kAll));
-
-  start_monitoring(std::chrono::seconds(interval));
+  start_monitoring();
   m_cmd_fac->run(end_marker);
 
   m_mod_mgr.cleanup();

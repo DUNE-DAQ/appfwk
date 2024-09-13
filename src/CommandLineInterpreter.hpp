@@ -53,9 +53,8 @@ public:
                "passed on)";
     bpo::options_description desc(descstr.str());
     desc.add_options()("name,n", bpo::value<std::string>()->required(), "Application name")(
-      "partition,p", bpo::value<std::string>()->default_value("global"), "Partition name")(
+      "session,s", bpo::value<std::string>()->default_value("global"), "Session name")(
       "commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")(
-      "informationService,i", bpo::value<std::string>()->default_value("stdout://flat"), "Information Service URI")(
       "configurationService,d", bpo::value<std::string>()->required(), "Configuration Service URI")(
       "help,h", "produce help message");
 
@@ -82,9 +81,8 @@ public:
     }
 
     output.app_name = vm["name"].as<std::string>();
-    output.partition_name = vm["partition"].as<std::string>();
+    output.session_name = vm["session"].as<std::string>();
     output.command_facility_plugin_name = vm["commandFacility"].as<std::string>();
-    output.info_service_plugin_name = vm["informationService"].as<std::string>();
     output.conf_service_plugin_name = vm["configurationService"].as<std::string>();
     return output;
   }
@@ -92,9 +90,8 @@ public:
   bool help_requested{ false }; ///< Did the user just ask for help?
 
   std::string app_name{ "" };
-  std::string partition_name{ "" };
+  std::string session_name{ "" };
   std::string command_facility_plugin_name{ "" }; ///< Name of the CommandFacility plugin to load
-  std::string info_service_plugin_name{ "" };     ///< Name of the InfoService plugin to load
   std::string conf_service_plugin_name{ "" };     ///< Name of the ConfService plugin to load
 
   std::vector<std::string> other_options{}; ///< Any other options which were passed and not recognized
