@@ -79,19 +79,19 @@ main(int argc, char* argv[])
     exit(0);
   }
 
-  // Set/Update the application and partition name in the environment. Used by logging/ers.
-  setenv("DUNEDAQ_APPLICATION_NAME", args.app_name.c_str(), 0);
-  setenv("DUNEDAQ_PARTITION", args.session_name.c_str(), 0);
+  // Get the application and session name from the environment.
+  std::string app_name = getenv("DUNEDAQ_APPLICATION_NAME");
+  std::string session_name = getenv("DUNEDAQ_SESSION");
 
   // Create the Application
-  appfwk::Application app(args.app_name,
-                          args.session_name,
+  appfwk::Application app(app_name,
+                          session_name,
                           args.command_facility_plugin_name,
                           args.conf_service_plugin_name);
 
   app.init();
   app.run(run_marker);
 
-  TLOG() << "Application " << args.app_name << " exiting.";
+  TLOG() << "Application " << app_name << " exiting.";
   return 0;
 }
