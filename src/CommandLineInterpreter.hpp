@@ -52,8 +52,7 @@ public:
             << " known arguments (additional arguments will be stored and "
                "passed on)";
     bpo::options_description desc(descstr.str());
-    desc.add_options()("name,n", bpo::value<std::string>()->required(), "Application name")(
-      "session,s", bpo::value<std::string>()->default_value("global"), "Session name")(
+    desc.add_options()(
       "commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")(
       "configurationService,d", bpo::value<std::string>()->required(), "Configuration Service URI")(
       "help,h", "produce help message");
@@ -80,17 +79,14 @@ public:
       throw CommandLineIssue(ERS_HERE, *argv, e.what());
     }
 
-    output.app_name = vm["name"].as<std::string>();
-    output.session_name = vm["session"].as<std::string>();
     output.command_facility_plugin_name = vm["commandFacility"].as<std::string>();
     output.conf_service_plugin_name = vm["configurationService"].as<std::string>();
+
     return output;
   }
 
   bool help_requested{ false }; ///< Did the user just ask for help?
 
-  std::string app_name{ "" };
-  std::string session_name{ "" };
   std::string command_facility_plugin_name{ "" }; ///< Name of the CommandFacility plugin to load
   std::string conf_service_plugin_name{ "" };     ///< Name of the ConfService plugin to load
 
