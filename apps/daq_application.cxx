@@ -22,9 +22,6 @@
 #include <string>
 #include <vector>
 
-
-
-
 /**
  * @brief Using namespace for convenience
  */
@@ -86,21 +83,18 @@ main(int argc, char* argv[])
   char* app_name_c = getenv("DUNEDAQ_APPLICATION_NAME");
   char* session_name_c = getenv("DUNEDAQ_SESSION");
 
-  bool missing_env_var = !app_name_c || std::string(app_name_c) == "" || !session_name_c || std::string(session_name_c) == "";
+  bool missing_env_var =
+    !app_name_c || std::string(app_name_c) == "" || !session_name_c || std::string(session_name_c) == "";
   if (missing_env_var) {
     ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_APPLICATION_NAME or DUNEDAQ_SESSION"));
     exit(1);
   }
 
-
   app_name = app_name_c;
   session_name = session_name_c;
 
   // Create the Application
-  appfwk::Application app(app_name,
-                          session_name,
-                          args.command_facility_plugin_name,
-                          args.conf_service_plugin_name);
+  appfwk::Application app(app_name, session_name, args.command_facility_plugin_name, args.conf_service_plugin_name);
 
   app.init();
   app.run(run_marker);
