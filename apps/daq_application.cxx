@@ -80,8 +80,23 @@ main(int argc, char* argv[])
   }
 
   // Get the application and session name from the environment.
-  std::string app_name = getenv("DUNEDAQ_APPLICATION_NAME");
-  std::string session_name = getenv("DUNEDAQ_SESSION");
+  std::string app_name = "";
+  std::string session_name = "";
+
+  char* app_name_c = getenv("DUNEDAQ_APPLICATION_NAME");
+  char* session_name_c = getenv("DUNEDAQ_SESSION");
+
+  if (!app_name_c || strcmp(app_name_c, app_name.c_str()) == 0) {
+    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_APPLICATION_NAME"));
+    exit(1);
+  }
+  if (!session_name_c || strcmp(session_name_c, session_name.c_str()) == 0) {
+    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_SESSION"));
+    exit(1);
+  }
+
+  app_name = app_name_c;
+  session_name = session_name_c;
 
   // Create the Application
   appfwk::Application app(app_name,
