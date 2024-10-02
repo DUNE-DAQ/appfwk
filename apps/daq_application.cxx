@@ -86,14 +86,12 @@ main(int argc, char* argv[])
   char* app_name_c = getenv("DUNEDAQ_APPLICATION_NAME");
   char* session_name_c = getenv("DUNEDAQ_SESSION");
 
-  if (!app_name_c || strcmp(app_name_c, app_name.c_str()) == 0) {
-    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_APPLICATION_NAME"));
+  bool missing_env_var = !app_name_c || std::string(app_name_c) == "" || !session_name_c || std::string(session_name_c) == "";
+  if (missing_env_var) {
+    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_APPLICATION_NAME or DUNEDAQ_SESSION"));
     exit(1);
   }
-  if (!session_name_c || strcmp(session_name_c, session_name.c_str()) == 0) {
-    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_SESSION"));
-    exit(1);
-  }
+
 
   app_name = app_name_c;
   session_name = session_name_c;
