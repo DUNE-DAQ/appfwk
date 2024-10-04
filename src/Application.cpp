@@ -44,7 +44,7 @@ Application::Application(std::string appname,
 
   m_cmd_fac = cmdlib::make_command_facility(
     cmdlibimpl,
-    m_config_mgr->session()->get_connectivity_service_interval_ms()
+    m_config_mgr->session()->get_connectivity_service_interval_ms(),
     m_config_mgr->session()->get_use_connectivity_server()
   );
 
