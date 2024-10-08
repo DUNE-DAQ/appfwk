@@ -65,6 +65,11 @@ ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanValidationFailed,
                   "Error validating action plan " << cmd << ", module " << module << ": " << message,
                   ((std::string)cmd)((std::string)module)((std::string)message))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  MismatchedEnvAndCLI,
+                  "The command line argument \"--" << cli_name << "\" and env variable \"" << env_name << "\" must be set to the same value, but are set as \"" << cli_value << "\" and \"" << env_value << "\", respectively",
+                  ((std::string)cli_name)((std::string)env_name)((std::string)cli_value)((std::string)env_value))
 // Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 

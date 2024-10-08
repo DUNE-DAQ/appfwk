@@ -22,9 +22,6 @@
 #include <string>
 #include <vector>
 
-
-
-
 /**
  * @brief Using namespace for convenience
  */
@@ -79,19 +76,35 @@ main(int argc, char* argv[])
     exit(0);
   }
 
-  // Set/Update the application and partition name in the environment. Used by logging/ers.
-  setenv("DUNEDAQ_APPLICATION_NAME", args.app_name.c_str(), 0);
-  setenv("DUNEDAQ_PARTITION", args.session_name.c_str(), 0);
+  // Get the application and session name from the environment.
+  std::string app_name = "";
+  std::string session_name = "";
+
+  char* app_name_c = getenv("DUNEDAQ_APPLICATION_NAME");
+  char* session_name_c = getenv("DUNEDAQ_SESSION");
+
+  bool missing_env_var =
+    !app_name_c || std::string(app_name_c) == "" || !session_name_c || std::string(session_name_c) == "";
+  if (missing_env_var) {
+    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_APPLICATION_NAME or DUNEDAQ_SESSION"));
+    exit(1);
+  }
+
+  app_name = app_name_c;
+  session_name = session_name_c;
+
+  if (args.app_name != app_name || args.session_name != session_name) {
+    ers:error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "name", "DUNEDAQ_APPLICATION_NAME", args.app_name, app_name));
+    ers:error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "session", "DUNEDAQ_SESSION", args.session_name, session_name));
+    exit(1);
+  }
 
   // Create the Application
-  appfwk::Application app(args.app_name,
-                          args.session_name,
-                          args.command_facility_plugin_name,
-                          args.conf_service_plugin_name);
+  appfwk::Application app(app_name, session_name, args.command_facility_plugin_name, args.conf_service_plugin_name);
 
   app.init();
   app.run(run_marker);
 
-  TLOG() << "Application " << args.app_name << " exiting.";
+  TLOG() << "Application " << app_name << " exiting.";
   return 0;
 }
