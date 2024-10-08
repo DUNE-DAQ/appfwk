@@ -93,6 +93,12 @@ main(int argc, char* argv[])
   app_name = app_name_c;
   session_name = session_name_c;
 
+  if (args.app_name != app_name || args.session_name != session_name) {
+    ers::error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "name", "DUNEDAQ_APPLICATION_NAME", args.app_name, app_name));
+    ers::error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "session", "DUNEDAQ_SESSION", args.session_name, session_name));
+    exit(1);
+  }
+
   // Create the Application
   appfwk::Application app(app_name, session_name, args.command_facility_plugin_name, args.conf_service_plugin_name);
 
