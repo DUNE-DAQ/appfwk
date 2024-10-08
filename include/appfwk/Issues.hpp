@@ -65,11 +65,6 @@ ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanValidationFailed,
                   "Error validating action plan " << cmd << ", module " << module << ": " << message,
                   ((std::string)cmd)((std::string)module)((std::string)message))
-
-ERS_DECLARE_ISSUE(appfwk,
-                  EnvironmentVariableNotFound,
-                  "Environment variable " << var << " wasn't found.",
-                  ((std::string)var))
 // Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 

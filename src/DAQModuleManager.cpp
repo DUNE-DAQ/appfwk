@@ -338,12 +338,6 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
     for (auto& step : action_plan->get_steps()) {
       execute_action_plan_step(cmd, step, cmd_data, serial_execution);
     }
-
-  }
-
-  // Shutdown IOManager at scrap
-  if (cmd == "scrap") {
-    get_iomanager()->shutdown();
   }
 }
 
