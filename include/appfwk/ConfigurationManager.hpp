@@ -21,7 +21,7 @@
 namespace dunedaq {
 
 namespace confmodel {
-class Session;
+class System;
 class Application;
 }
 namespace appfwk {
@@ -32,15 +32,15 @@ class ConfigurationManager
 
   std::shared_ptr<conffwk::Configuration> m_confdb;
   std::string m_app_name;
-  std::string m_session_name;
+  std::string m_system_name;
   std::string m_oks_config_spec;
-  const confmodel::Session* m_session;
+  const confmodel::System* m_system;
   const confmodel::Application* m_application;
 
 public:
-  ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& session_name);
+  ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& system_name);
 
-  const confmodel::Session* session() { return m_session; }
+  const confmodel::System* system() { return m_system; }
   const confmodel::Application* application() { return m_application; }
   template<typename T>
   const T* get_dal(const std::string& name)

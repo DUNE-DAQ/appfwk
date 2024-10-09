@@ -26,7 +26,7 @@ using namespace dunedaq::appfwk;
 
 const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json";
 const std::string TEST_JSON_DIR = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/confdata";
-const std::string TEST_OKS_DB = "test/config/appSession.data.xml";
+const std::string TEST_OKS_DB = "test/config/appSystem.data.xml";
 
 struct EnvFixture
 {

@@ -19,7 +19,7 @@
 #include <string>
 #include <unistd.h>
 
-#include "confmodel/Session.hpp"
+#include "confmodel/System.hpp"
 #include "confmodel/Application.hpp"
 #include "confmodel/OpMonURI.hpp"
 
@@ -27,16 +27,16 @@ namespace dunedaq {
 namespace appfwk {
 
 Application::Application(std::string appname,
-                         std::string session,
+                         std::string system,
                          std::string cmdlibimpl,
                          std::string confimpl)
-  : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, appname, session)->session()->get_opmon_uri()->get_URI(appname))
+  : OpMonManager(system, appname, std::make_unique<ConfigurationManager>(confimpl, appname, system)->system()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
   , m_busy(false)
   , m_error(false)
   , m_initialized(false)
-  , m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, appname, session))
+  , m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, appname, system))
 {
   m_runinfo.set_running(false);
   m_runinfo.set_run_number(0);

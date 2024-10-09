@@ -35,7 +35,7 @@ ERS_DECLARE_ISSUE(appfwk,             ///< Namespace
 
 namespace confmodel {
 class DaqModule;
-class Session;
+class System;
 class Application;
 }
 namespace appfwk {

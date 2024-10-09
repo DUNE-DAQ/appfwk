@@ -284,7 +284,7 @@
     <rel name="controller" class="RCApplication" id="my-controller"/>
   </obj>
 
-  <obj class="Session" id="test-session">
+  <obj class="System" id="test-system">
     <attr name="use_connectivity_server" type="bool" val="0"/>
     <attr name="connectivity_service_interval_ms" type="u32" val="2000"/>
     <attr name="data_request_timeout_ms" type="u32" val="1000"/>
@@ -344,7 +344,7 @@
 
   <obj class="Variable" id="DUNEDAQ_PARTITION">
     <attr name="name" type="string" val="DUNEDAQ_PARTITION"/>
-    <attr name="value" type="string" val="lrSession"/>
+    <attr name="value" type="string" val="lrSystem"/>
   </obj>
 
   <obj class="Variable" id="INFO_SVC">
@@ -359,7 +359,7 @@
 
   <obj class="Variable" id="TRACE_FILE">
     <attr name="name" type="string" val="TRACE_FILE"/>
-    <attr name="value" type="string" val="/tmp/trace_buffer_{host}_lrSession"/>
+    <attr name="value" type="string" val="/tmp/trace_buffer_{host}_lrSystem"/>
   </obj>
 
   <obj class="VariableSet" id="common-env">

@@ -19,7 +19,7 @@
 #include "confmodel/DaqModulesGroup.hpp"
 #include "confmodel/DaqModulesGroupById.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
-#include "confmodel/Session.hpp"
+#include "confmodel/System.hpp"
 
 #include "iomanager/IOManager.hpp"
 
@@ -43,11 +43,11 @@ DAQModuleManager::DAQModuleManager()
 void
 DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm)
 {
-  auto csInterval = cfgMgr->session()->get_connectivity_service_interval_ms();
+  auto csInterval = cfgMgr->system()->get_connectivity_service_interval_ms();
   m_module_configuration = std::make_shared<ModuleConfiguration>(cfgMgr);
   get_iomanager()->configure(m_module_configuration->queues(),
                              m_module_configuration->networkconnections(),
-                             cfgMgr->session()->get_use_connectivity_server(),
+                             cfgMgr->system()->get_use_connectivity_server(),
                              std::chrono::milliseconds(csInterval),
                              opm);
   init_modules(m_module_configuration->modules(), opm);
