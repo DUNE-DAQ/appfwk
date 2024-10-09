@@ -17,7 +17,6 @@
 #include "confmodel/DaqModule.hpp"
 #include "conffwk/Configuration.hpp"
 
-#include "appfwk/app/Structs.hpp"
 #include "cmdlib/cmd/Structs.hpp"
 #include "opmonlib/OpMonManager.hpp"
 

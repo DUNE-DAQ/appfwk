@@ -12,10 +12,10 @@
 #define APPFWK_INCLUDE_MODULECONFIGURATION_HPP_
 
 #include "appfwk/ConfigurationManager.hpp"
+#include "conffwk/Configuration.hpp"
 #include "confmodel/ActionPlan.hpp"
 #include "confmodel/DaqModule.hpp"
 #include "iomanager/IOManager.hpp"
-#include "conffwk/Configuration.hpp"
 
 #include <string>
 #include <vector>
@@ -43,20 +43,25 @@ namespace appfwk {
 class ModuleConfiguration
 {
   std::shared_ptr<ConfigurationManager> m_config_mgr;
-  std::unordered_map<std::string, const dunedaq::confmodel::ActionPlan*> m_action_plans;
-  std::vector<const dunedaq::confmodel::DaqModule*> m_modules;
-  iomanager::Queues_t m_queues;
-  iomanager::Connections_t m_networkconnections;
+  std::unordered_map<std::string, const confmodel::ActionPlan*> m_action_plans;
+  std::vector<const confmodel::DaqModule*> m_modules;
+  std::vector<const confmodel::Queue*> m_queues;
+  std::vector<const confmodel::NetworkConnection*> m_networkconnections;
+  const confmodel::ConnectivityService* m_connsvc_config;
 
 public:
   explicit ModuleConfiguration(std::shared_ptr<ConfigurationManager> mgr);
 
-  const iomanager::Queues_t& queues() { return m_queues; }
-  const iomanager::Connections_t& networkconnections() { return m_networkconnections; }
+  const std::vector<const confmodel::Queue*>& queues() { return m_queues; }
+  const std::vector<const confmodel::NetworkConnection*>& networkconnections() { return m_networkconnections; }
   const std::vector<const confmodel::DaqModule*>& modules() { return m_modules; }
+  const confmodel::ConnectivityService* connectivity_service() { return m_connsvc_config; }
 
-  const std::unordered_map<std::string, const dunedaq::confmodel::ActionPlan*>& action_plans() { return m_action_plans; }
-  const dunedaq::confmodel::ActionPlan* action_plan(std::string cmd) const;
+  const std::unordered_map<std::string, const confmodel::ActionPlan*>& action_plans()
+  {
+    return m_action_plans;
+  }
+  const confmodel::ActionPlan* action_plan(std::string cmd) const;
 
   std::shared_ptr<ConfigurationManager> configuration_manager() { return m_config_mgr; }
 
