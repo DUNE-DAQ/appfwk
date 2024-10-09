@@ -26,8 +26,9 @@ BOOST_AUTO_TEST_CASE(ParseNoOptions)
 {
   char** arg_list = new char* [1] { (char*)("CommandLineInterpreter_test") }; // NOLINT
   BOOST_REQUIRE_EXCEPTION(CommandLineInterpreter::parse(1, arg_list),
-                          dunedaq::appfwk::CommandLineIssue,
-                          [&](dunedaq::appfwk::CommandLineIssue) { return true; });
+                          bpo::error,
+			  [&](bpo::error){ return true;} );
+
 
   delete[] arg_list; // NOLINT
 }
@@ -53,8 +54,8 @@ BOOST_AUTO_TEST_CASE(ParseCommandFacility)
   char** arg_list =
     new char* [3] { (char*)("CommandLineInterpreter_test"), (char*)("-c"), (char*)("stdin://") }; // NOLINT
   BOOST_REQUIRE_EXCEPTION(CommandLineInterpreter::parse(3, arg_list),
-                          dunedaq::appfwk::CommandLineIssue,
-                          [&](dunedaq::appfwk::CommandLineIssue) { return true; });
+                          bpo::error,
+			  [&](bpo::error){ return true;} );
 
   delete[] arg_list; // NOLINT
 }
@@ -66,8 +67,8 @@ BOOST_AUTO_TEST_CASE(ParseName)
     (char*)("CommandLineInterpreter_test"), (char*)("-n"), (char*)("cli_test"), (char*)("-d"), (char*)("file://"),
   }; // NOLINT
   BOOST_REQUIRE_EXCEPTION(CommandLineInterpreter::parse(5, arg_list),
-                          dunedaq::appfwk::CommandLineIssue,
-                          [&](dunedaq::appfwk::CommandLineIssue) { return true; });
+                          bpo::error,
+			  [&](bpo::error){ return true;} );
 
   delete[] arg_list; // NOLINT
 }

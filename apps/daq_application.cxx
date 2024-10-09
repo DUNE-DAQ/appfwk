@@ -77,7 +77,7 @@ main(int argc, char* argv[])
 
   // up to here it was not possible to use ERS messages
   
-  dunedaq::logging::Logging().setup( args.session_name, args.application_name );
+  dunedaq::logging::Logging().setup( args.session_name, args.app_name );
 
   // from now on, it's possible to use ERS messages
   
