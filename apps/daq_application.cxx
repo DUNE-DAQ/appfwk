@@ -52,7 +52,6 @@ int
 main(int argc, char* argv[])
 {
 
-  dunedaq::logging::Logging().setup();
 
   // Setup signals
   // std::signal(SIGABRT, signal_handler);
@@ -66,45 +65,30 @@ main(int argc, char* argv[])
   appfwk::CommandLineInterpreter args;
   try {
     args = appfwk::CommandLineInterpreter::parse(argc, argv);
-  } catch (ers::Issue& e) {
+  } catch ( bpo::error const& e ) {
     // Die but do it gracefully gracefully.
-    ers::error(appfwk::BadCliUsage(ERS_HERE, e.message()));
-    exit(-1);
+    std::cerr << "Failed to interpret command line: " << e.what();
+    exit(1);
   }
 
   if (args.help_requested) {
     exit(0);
   }
 
-  // Get the application and session name from the environment.
-  std::string app_name = "";
-  std::string session_name = "";
+  // up to here it was not possible to use ERS messages
+  
+  dunedaq::logging::Logging().setup( args.session_name, args.application_name );
 
-  char* app_name_c = getenv("DUNEDAQ_APPLICATION_NAME");
-  char* session_name_c = getenv("DUNEDAQ_SESSION");
-
-  bool missing_env_var =
-    !app_name_c || std::string(app_name_c) == "" || !session_name_c || std::string(session_name_c) == "";
-  if (missing_env_var) {
-    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_APPLICATION_NAME or DUNEDAQ_SESSION"));
-    exit(1);
-  }
-
-  app_name = app_name_c;
-  session_name = session_name_c;
-
-  if (args.app_name != app_name || args.session_name != session_name) {
-    ers::error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "name", "DUNEDAQ_APPLICATION_NAME", args.app_name, app_name));
-    ers::error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "session", "DUNEDAQ_SESSION", args.session_name, session_name));
-    exit(1);
-  }
-
+  // from now on, it's possible to use ERS messages
+  
   // Create the Application
-  appfwk::Application app(app_name, session_name, args.command_facility_plugin_name, args.conf_service_plugin_name);
+  appfwk::Application app(args.app_name, args.session_name,
+			  args.command_facility_plugin_name,
+			  args.conf_service_plugin_name);
 
   app.init();
   app.run(run_marker);
 
-  TLOG() << "Application " << app_name << " exiting.";
+  TLOG() << "Application " << args.session_name << '.' << args.app_name << " exiting.";
   return 0;
 }
