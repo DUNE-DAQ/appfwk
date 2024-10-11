@@ -41,11 +41,15 @@ Application::Application(std::string appname,
   m_runinfo.set_running(false);
   m_runinfo.set_run_number(0);
   m_runinfo.set_run_time(0);
-  
-  m_cmd_fac = cmdlib::make_command_facility(cmdlibimpl);
+
+  m_cmd_fac = cmdlib::make_command_facility(
+    cmdlibimpl,
+    m_config_mgr->session()->get_connectivity_service_interval_ms(),
+    m_config_mgr->session()->get_use_connectivity_server()
+  );
 
   set_opmon_conf(m_config_mgr->application()->get_opmon_conf());
-  
+
   TLOG() << "confimpl=<" << confimpl << ">\n";
 }
 
@@ -84,14 +88,14 @@ Application::execute(const dataobj_t& cmd_data)
 
   if (cmdname == "start") {
     auto cmd_obj = rc_cmd.data.get<cmd::CmdObj>();
-    
+
     for (const auto& addressed : cmd_obj.modules) {
       dataobj_t startpars = addressed.data;
       auto rc_startpars = startpars.get<rcif::cmd::StartParams>();
       m_runinfo.set_run_number(rc_startpars.run);
       break;
     }
-    
+
     m_run_start_time = std::chrono::steady_clock::now();
     m_runinfo.set_running(true);
     m_runinfo.set_run_time(0);
@@ -102,7 +106,7 @@ Application::execute(const dataobj_t& cmd_data)
     m_runinfo.set_run_number(0);
     m_runinfo.set_run_time(0);
   }
-  
+
   try {
     m_mod_mgr.execute(cmdname, rc_cmd.data);
     m_busy.store(false);
@@ -131,7 +135,7 @@ Application::generate_opmon_data()
     ai.set_host (std::string(hostname));
 
   publish(std::move(ai), {}, opmonlib::to_level(opmonlib::EntryOpMonLevel::kTopPriority));
-  
+
   if ( m_run_start_time.time_since_epoch().count() != 0 ) {
     auto now = std::chrono::steady_clock::now();
     m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count() );
