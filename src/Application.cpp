@@ -44,8 +44,8 @@ Application::Application(std::string appname,
 
   m_cmd_fac = cmdlib::make_command_facility(
     cmdlibimpl,
-    m_config_mgr->session()->get_connectivity_service_interval_ms(),
-    m_config_mgr->session()->get_use_connectivity_server()
+    session,
+    m_config_mgr->session()->get_connectivity_service()
   );
 
   set_opmon_conf(m_config_mgr->application()->get_opmon_conf());
