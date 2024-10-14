@@ -9,26 +9,26 @@
 
 #include "appfwk/ConfigurationManager.hpp"
 #include "confmodel/DaqApplication.hpp"
-#include "confmodel/Session.hpp"
+#include "confmodel/System.hpp"
 #include "conffwk/Configuration.hpp"
 
 using namespace dunedaq::appfwk;
 
-ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& session_name)
+ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& system_name)
 {
-  TLOG() << "configSpec <" << config_spec << "> session name " << session_name << " application name " << app_name;
+  TLOG() << "configSpec <" << config_spec << "> system name " << system_name << " application name " << app_name;
 
   m_oks_config_spec = config_spec;
   m_app_name = app_name;
-  m_session_name = session_name;
+  m_system_name = system_name;
 
   m_confdb.reset(new conffwk::Configuration(config_spec));
 
-  TLOG_DBG(5) << "getting session";
-  m_session = m_confdb->get<confmodel::Session>(session_name);
-  if (m_session == nullptr) {
+  TLOG_DBG(5) << "getting system";
+  m_system = m_confdb->get<confmodel::System>(system_name);
+  if (m_system == nullptr) {
     // Throw an ers Issue here!!
-    TLOG() << "Failed to get session";
+    TLOG() << "Failed to get system";
     exit(0);
   }
 

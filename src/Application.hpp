@@ -64,7 +64,7 @@ public:
   using dataobj_t = nlohmann::json;
 
   Application(std::string app_name,
-              std::string session_name,
+              std::string system_name,
               std::string cmdlibimpl,
               std::string confimpl);
 

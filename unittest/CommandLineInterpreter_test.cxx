@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(AskForHelp)
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, true);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "");
-  BOOST_REQUIRE_EQUAL(parsed.session_name, "");
+  BOOST_REQUIRE_EQUAL(parsed.system_name, "");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 0);
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(ParseNameAndCommandFacility)
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.system_name, "global");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 0);
@@ -92,20 +92,20 @@ BOOST_AUTO_TEST_CASE(ParseNameAndCommandFacility)
   delete[] arg_list; // NOLINT
 }
 
-BOOST_AUTO_TEST_CASE(ParseSession)
+BOOST_AUTO_TEST_CASE(ParseSystem)
 {
   char** arg_list = new char* [9] {
     (char*)("CommandLineInterpreter_test"),    // NOLINT
       (char*)("-c"), (char*)("stdin://"),      // NOLINT
       (char*)("-d"), (char*)("file://"),       // NOLINT
       (char*)("-n"), (char*)("cli_test"),      // NOLINT
-      (char*)("-s"), (char*)("test_session")   // NOLINT
+      (char*)("-s"), (char*)("test_system")   // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(9, arg_list);
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.session_name, "test_session");
+  BOOST_REQUIRE_EQUAL(parsed.system_name, "test_system");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 0);
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(ParseOtherOption)
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.system_name, "global");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 1);
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(ParseMultipleOtherOptions)
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.system_name, "global");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 4);

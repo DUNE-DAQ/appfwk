@@ -76,31 +76,31 @@ main(int argc, char* argv[])
     exit(0);
   }
 
-  // Get the application and session name from the environment.
+  // Get the application and system name from the environment.
   std::string app_name = "";
-  std::string session_name = "";
+  std::string system_name = "";
 
   char* app_name_c = getenv("DUNEDAQ_APPLICATION_NAME");
-  char* session_name_c = getenv("DUNEDAQ_SESSION");
+  char* system_name_c = getenv("DUNEDAQ_SYSTEM");
 
   bool missing_env_var =
-    !app_name_c || std::string(app_name_c) == "" || !session_name_c || std::string(session_name_c) == "";
+    !app_name_c || std::string(app_name_c) == "" || !system_name_c || std::string(system_name_c) == "";
   if (missing_env_var) {
-    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_APPLICATION_NAME or DUNEDAQ_SESSION"));
+    ers::error(appfwk::EnvironmentVariableNotFound(ERS_HERE, "DUNEDAQ_APPLICATION_NAME or DUNEDAQ_SYSTEM"));
     exit(1);
   }
 
   app_name = app_name_c;
-  session_name = session_name_c;
+  system_name = system_name_c;
 
-  if (args.app_name != app_name || args.session_name != session_name) {
+  if (args.app_name != app_name || args.system_name != system_name) {
     ers::error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "name", "DUNEDAQ_APPLICATION_NAME", args.app_name, app_name));
-    ers::error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "session", "DUNEDAQ_SESSION", args.session_name, session_name));
+    ers::error(appfwk::MismatchedEnvAndCLI(ERS_HERE, "system", "DUNEDAQ_SYSTEM", args.system_name, system_name));
     exit(1);
   }
 
   // Create the Application
-  appfwk::Application app(app_name, session_name, args.command_facility_plugin_name, args.conf_service_plugin_name);
+  appfwk::Application app(app_name, system_name, args.command_facility_plugin_name, args.conf_service_plugin_name);
 
   app.init();
   app.run(run_marker);
