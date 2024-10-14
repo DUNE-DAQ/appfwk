@@ -7,7 +7,6 @@
  */
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/app/Nljs.hpp"
 
 #include "logging/Logging.hpp" // NOLINT
 

@@ -13,8 +13,8 @@
 #define APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
 
 #include "boost/program_options.hpp"
-#include "ers/ers.hpp"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -22,17 +22,14 @@ namespace bpo = boost::program_options;
 
 namespace dunedaq {
 
-// Disable coverage collection LCOV_EXCL_START
-ERS_DECLARE_ISSUE(appfwk,                                                             // Namespace
-                  CommandLineIssue,                                                   // Class name
-                  "Command-line processing issue in " << app_name << ": " << message, // Message
-                  ((std::string)app_name)((std::string)message))                      // Args
-
 // Re-enable coverage collection LCOV_EXCL_STOP
 namespace appfwk {
 /**
  * @brief CommandLineInterpreter parses the command-line options given to the
  * application and stores the results as validated data members
+ * 
+ * @details Please note that contrary to the rest of the framework this class is not supposed to use ERS 
+ * because the ERS cannot be instantiated until the command line is parsed
  */
 struct CommandLineInterpreter
 {
@@ -53,20 +50,16 @@ public:
                "passed on)";
     bpo::options_description desc(descstr.str());
     desc.add_options()("name,n", bpo::value<std::string>()->required(), "Application name")(
-      "session,s", bpo::value<std::string>()->default_value("global"), "Session name")(
+      "session,s", bpo::value<std::string>()->required(), "Session name")(
       "commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")(
       "configurationService,d", bpo::value<std::string>()->required(), "Configuration Service URI")(
       "help,h", "produce help message");
 
     bpo::variables_map vm;
-    try {
-      auto parsed = bpo::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
-
-      output.other_options = bpo::collect_unrecognized(parsed.options, bpo::include_positional);
-      bpo::store(parsed, vm);
-    } catch (bpo::error const& e) {
-      throw CommandLineIssue(ERS_HERE, *argv, e.what());
-    }
+    auto parsed = bpo::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
+    
+    output.other_options = bpo::collect_unrecognized(parsed.options, bpo::include_positional);
+    bpo::store(parsed, vm);
 
     if (vm.count("help")) {
       std::cout << desc << std::endl; // NOLINT
@@ -74,12 +67,8 @@ public:
       return output;
     }
 
-    try {
-      bpo::notify(vm);
-    } catch (bpo::error const& e) {
-      throw CommandLineIssue(ERS_HERE, *argv, e.what());
-    }
-
+    bpo::notify(vm);
+    
     output.app_name = vm["name"].as<std::string>();
     output.session_name = vm["session"].as<std::string>();
     output.command_facility_plugin_name = vm["commandFacility"].as<std::string>();

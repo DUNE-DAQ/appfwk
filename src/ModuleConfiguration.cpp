@@ -21,9 +21,6 @@
 #include "confmodel/Service.hpp"
 #include "confmodel/Session.hpp"
 
-#include <cerrno>
-#include <ifaddrs.h>
-#include <netdb.h>
 
 using namespace dunedaq::appfwk;
 
@@ -77,6 +74,8 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
     }
   }
 
+  m_connsvc_config = cfMgr->session()->get_connectivity_service();
+
   std::set<std::string> connectionsAdded;
   for (auto mod : m_modules) {
     TLOG() << "initialising " << mod->class_name() << " module " << mod->UID();
@@ -92,49 +91,11 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
       auto queue = confdb->cast<confmodel::Queue>(con);
       if (queue) {
         TLOG() << "Adding queue " << queue->UID();
-        m_queues.emplace_back(iomanager::QueueConfig{ { queue->UID(), queue->get_data_type() },
-                                                      iomanager::parse_QueueType(queue->get_queue_type()),
-                                                      queue->get_capacity() });
+        m_queues.emplace_back(queue);
       }
       auto netCon = confdb->cast<confmodel::NetworkConnection>(con);
       if (netCon) {
-        TLOG() << "Adding network connection " << netCon->UID();
-        auto service = netCon->get_associated_service();
-        std::string port = "*";
-        if (service->get_port()) {
-          port = std::to_string(service->get_port());
-        }
-        std::string ipaddr = "0.0.0.0";
-        char hostname[256];
-        if (gethostname(&hostname[0], 256) == 0) {
-          ipaddr = std::string(hostname);
-        }
-        auto iface = service->get_eth_device_name();
-        if (iface != "") {
-          // Work out which ip address goes with this device
-          struct ifaddrs* ifaddr;
-          getifaddrs(&ifaddr);
-          for (auto ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-            if (ifa->ifa_addr == NULL) {
-              continue;
-            }
-            if (std::string(ifa->ifa_name) == iface) {
-              char ip[NI_MAXHOST];
-              int status =
-                getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), ip, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-              if (status != 0) {
-                continue;
-              }
-              ipaddr = std::string(ip);
-              break;
-            }
-          }
-        }
-        std::string uri(service->get_protocol() + "://" + ipaddr + ":" + port);
-        m_networkconnections.emplace_back(
-          iomanager::Connection{ { netCon->UID(), con->get_data_type() },
-                                 uri,
-                                 iomanager::parse_ConnectionType(netCon->get_connection_type()) });
+        m_networkconnections.emplace_back(netCon);
       }
     }
   }

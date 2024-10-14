@@ -11,7 +11,6 @@
 #include "cmdlib/cmd/Nljs.hpp"
 
 #include "appfwk/Issues.hpp"
-#include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 
 #include "appfwk/DAQModule.hpp"
@@ -43,33 +42,32 @@ DAQModuleManager::DAQModuleManager()
 void
 DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm)
 {
-  auto csInterval = cfgMgr->session()->get_connectivity_service_interval_ms();
   m_module_configuration = std::make_shared<ModuleConfiguration>(cfgMgr);
-  get_iomanager()->configure(m_module_configuration->queues(),
+  get_iomanager()->configure(cfgMgr->session()->UID(),
+                             m_module_configuration->queues(),
                              m_module_configuration->networkconnections(),
-                             cfgMgr->session()->get_use_connectivity_server(),
-                             std::chrono::milliseconds(csInterval),
+                             m_module_configuration->connectivity_service(),
                              opm);
   init_modules(m_module_configuration->modules(), opm);
 
   for (auto& plan_pair : m_module_configuration->action_plans()) {
     auto cmd = plan_pair.first;
 
-      for (auto& step : plan_pair.second->get_steps()) {
-        auto byType = step->cast<confmodel::DaqModulesGroupByType>();
-        auto byMod = step->cast<confmodel::DaqModulesGroupById>();
-        if (byType != nullptr) {
-          for (auto& mod_type : byType->get_modules()) {
-            check_mod_has_cmd(cmd, mod_type);
-          }
-        } else if (byMod != nullptr) {
-          for (auto& mod : byMod->get_modules()) {
-            check_mod_has_cmd(cmd, mod->class_name(), mod->UID());
-          }
-        } else {
-          throw ActionPlanValidationFailed(ERS_HERE, cmd, "", "Invalid subclass of DaqModulesGroup encountered!");
+    for (auto& step : plan_pair.second->get_steps()) {
+      auto byType = step->cast<confmodel::DaqModulesGroupByType>();
+      auto byMod = step->cast<confmodel::DaqModulesGroupById>();
+      if (byType != nullptr) {
+        for (auto& mod_type : byType->get_modules()) {
+          check_mod_has_cmd(cmd, mod_type);
         }
+      } else if (byMod != nullptr) {
+        for (auto& mod : byMod->get_modules()) {
+          check_mod_has_cmd(cmd, mod->class_name(), mod->UID());
+        }
+      } else {
+        throw ActionPlanValidationFailed(ERS_HERE, cmd, "", "Invalid subclass of DaqModulesGroup encountered!");
       }
+    }
   }
   this->m_initialized = true;
 }
@@ -174,7 +172,8 @@ DAQModuleManager::execute_action(const std::string& module_name, const std::stri
 void
 DAQModuleManager::execute_action_plan_step(std::string const& cmd,
                                            const confmodel::DaqModulesGroup* step,
-                                           const dataobj_t& cmd_data, bool execution_mode_is_serial)
+                                           const dataobj_t& cmd_data,
+                                           bool execution_mode_is_serial)
 {
   std::string failed_mod_names("");
   std::unordered_map<std::string, std::future<bool>> futures;
@@ -185,19 +184,20 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
     for (auto& mod_class : byType->get_modules()) {
       auto modules = m_modules_by_type[mod_class];
       for (auto& mod_name : modules) {
-          auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
-          TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod_class << ")";
-          futures[mod_name] =
-            std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
-          if (execution_mode_is_serial)
-            futures[mod_name].wait();
+        auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
+        TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod_class << ")";
+        futures[mod_name] =
+          std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
+        if (execution_mode_is_serial)
+          futures[mod_name].wait();
       }
     }
   } else if (byMod != nullptr) {
     for (auto& mod : byMod->get_modules()) {
       auto mod_name = mod->UID();
       auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
-      TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod->class_name() << ")";
+      TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod->class_name()
+                    << ")";
       futures[mod_name] =
         std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
       if (execution_mode_is_serial)
@@ -338,7 +338,6 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
     for (auto& step : action_plan->get_steps()) {
       execute_action_plan_step(cmd, step, cmd_data, serial_execution);
     }
-
   }
 
   // Shutdown IOManager at scrap

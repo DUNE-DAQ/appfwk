@@ -26,8 +26,9 @@ BOOST_AUTO_TEST_CASE(ParseNoOptions)
 {
   char** arg_list = new char* [1] { (char*)("CommandLineInterpreter_test") }; // NOLINT
   BOOST_REQUIRE_EXCEPTION(CommandLineInterpreter::parse(1, arg_list),
-                          dunedaq::appfwk::CommandLineIssue,
-                          [&](dunedaq::appfwk::CommandLineIssue) { return true; });
+                          bpo::error,
+			  [&](bpo::error){ return true;} );
+
 
   delete[] arg_list; // NOLINT
 }
@@ -53,8 +54,8 @@ BOOST_AUTO_TEST_CASE(ParseCommandFacility)
   char** arg_list =
     new char* [3] { (char*)("CommandLineInterpreter_test"), (char*)("-c"), (char*)("stdin://") }; // NOLINT
   BOOST_REQUIRE_EXCEPTION(CommandLineInterpreter::parse(3, arg_list),
-                          dunedaq::appfwk::CommandLineIssue,
-                          [&](dunedaq::appfwk::CommandLineIssue) { return true; });
+                          bpo::error,
+			  [&](bpo::error){ return true;} );
 
   delete[] arg_list; // NOLINT
 }
@@ -66,25 +67,26 @@ BOOST_AUTO_TEST_CASE(ParseName)
     (char*)("CommandLineInterpreter_test"), (char*)("-n"), (char*)("cli_test"), (char*)("-d"), (char*)("file://"),
   }; // NOLINT
   BOOST_REQUIRE_EXCEPTION(CommandLineInterpreter::parse(5, arg_list),
-                          dunedaq::appfwk::CommandLineIssue,
-                          [&](dunedaq::appfwk::CommandLineIssue) { return true; });
+                          bpo::error,
+			  [&](bpo::error){ return true;} );
 
   delete[] arg_list; // NOLINT
 }
 
 BOOST_AUTO_TEST_CASE(ParseNameAndCommandFacility)
 {
-  char** arg_list = new char* [7] {
-    (char*)("CommandLineInterpreter_test"), // NOLINT
-      (char*)("-c"), (char*)("stdin://"),   // NOLINT
-      (char*)("-d"), (char*)("file://"),    // NOLINT
-      (char*)("-n"), (char*)("cli_test")    // NOLINT
+  char** arg_list = new char* [9] {
+    (char*)("CommandLineInterpreter_test"),   // NOLINT
+      (char*)("-c"), (char*)("stdin://"),     // NOLINT
+      (char*)("-d"), (char*)("file://"),      // NOLINT
+      (char*)("-s"), (char*)("test_session"), // NOLINT
+      (char*)("-n"), (char*)("cli_test")      // NOLINT
   };
-  auto parsed = CommandLineInterpreter::parse(7, arg_list);
+  auto parsed = CommandLineInterpreter::parse(9, arg_list);
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.session_name, "test_session");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 0);
@@ -114,18 +116,19 @@ BOOST_AUTO_TEST_CASE(ParseSession)
 }
 BOOST_AUTO_TEST_CASE(ParseOtherOption)
 {
-  char** arg_list = new char* [8] {
-    (char*)("CommandLineInterpreter_test"), // NOLINT
-      (char*)("-c"), (char*)("stdin://"),   // NOLINT
-      (char*)("-d"), (char*)("file://"),    // NOLINT
-      (char*)("-n"), (char*)("cli_test"),   // NOLINT
-      (char*)("--some-other-option")        // NOLINT
+  char** arg_list = new char* [10] {
+    (char*)("CommandLineInterpreter_test"),   // NOLINT
+      (char*)("-c"), (char*)("stdin://"),     // NOLINT
+      (char*)("-d"), (char*)("file://"),      // NOLINT
+      (char*)("-n"), (char*)("cli_test"),     // NOLINT
+      (char*)("-s"), (char*)("test_session"), // NOLINT
+      (char*)("--some-other-option")          // NOLINT
   };
-  auto parsed = CommandLineInterpreter::parse(8, arg_list);
+  auto parsed = CommandLineInterpreter::parse(10, arg_list);
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.session_name, "test_session");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 1);
@@ -135,20 +138,21 @@ BOOST_AUTO_TEST_CASE(ParseOtherOption)
 }
 BOOST_AUTO_TEST_CASE(ParseMultipleOtherOptions)
 {
-  char** arg_list = new char* [11] {
-    (char*)("CommandLineInterpreter_test"), // NOLINT
-      (char*)("-c"), (char*)("stdin://"),   // NOLINT
-      (char*)("-d"), (char*)("file://"),    // NOLINT
-      (char*)("-n"), (char*)("cli_test"),   // NOLINT
-      (char*)("--some-other-option"),       // NOLINT
-      (char*)("--yet-another-option=4"),    // NOLINT
-      (char*)("-u"), (char*)("me")          // NOLINT
+  char** arg_list = new char* [13] {
+    (char*)("CommandLineInterpreter_test"),   // NOLINT
+      (char*)("-c"), (char*)("stdin://"),     // NOLINT
+      (char*)("-d"), (char*)("file://"),      // NOLINT
+      (char*)("-n"), (char*)("cli_test"),     // NOLINT
+      (char*)("-s"), (char*)("test_session"), // NOLINT
+      (char*)("--some-other-option"),         // NOLINT
+      (char*)("--yet-another-option=4"),      // NOLINT
+      (char*)("-u"), (char*)("me")            // NOLINT
   };
-  auto parsed = CommandLineInterpreter::parse(11, arg_list);
+  auto parsed = CommandLineInterpreter::parse(13, arg_list);
 
   BOOST_REQUIRE_EQUAL(parsed.help_requested, false);
   BOOST_REQUIRE_EQUAL(parsed.app_name, "cli_test");
-  BOOST_REQUIRE_EQUAL(parsed.session_name, "global");
+  BOOST_REQUIRE_EQUAL(parsed.session_name, "test_session");
   BOOST_REQUIRE_EQUAL(parsed.command_facility_plugin_name, "stdin://");
   BOOST_REQUIRE_EQUAL(parsed.conf_service_plugin_name, "file://");
   BOOST_REQUIRE_EQUAL(parsed.other_options.size(), 4);

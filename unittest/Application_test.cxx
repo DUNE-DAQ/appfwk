@@ -9,7 +9,6 @@
 #include "rcif/cmd/Nljs.hpp"
 
 #include "Application.hpp"
-#include "appfwk/app/Nljs.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 #include "iomanager/IOManager.hpp"
 
@@ -25,7 +24,6 @@ BOOST_AUTO_TEST_SUITE(Application_test)
 using namespace dunedaq::appfwk;
 
 const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json";
-const std::string TEST_JSON_DIR = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/confdata";
 const std::string TEST_OKS_DB = "test/config/appSession.data.xml";
 
 struct EnvFixture
