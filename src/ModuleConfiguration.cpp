@@ -14,7 +14,7 @@
 #include "confmodel/DaqApplication.hpp"
 #include "confmodel/DaqModule.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
-#include "confmodel/FSMCommand.hpp"
+#include "confmodel/FSMtransition.hpp"
 #include "confmodel/NetworkConnection.hpp"
 #include "confmodel/Queue.hpp"
 #include "confmodel/ResourceSet.hpp"
@@ -40,7 +40,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
     m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
 
     for (auto& plan : smartDaqApp->get_action_plans()) {
-      auto cmd = plan->get_command()->get_cmd();
+      auto cmd = plan->get_command()->UID();
       TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
       if (m_action_plans.count(cmd)) {
         throw ActionPlanValidationFailed(
@@ -61,7 +61,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
       m_modules = daqApp->get_modules();
 
       for (auto& plan : daqApp->get_action_plans()) {
-        auto cmd = plan->get_command()->get_cmd();
+        auto cmd = plan->get_command()->UID();
         TLOG_DBG(6) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
         if (m_action_plans.count(cmd)) {
           throw ActionPlanValidationFailed(
