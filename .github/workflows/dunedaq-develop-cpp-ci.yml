@@ -72,19 +72,19 @@ jobs:
           dbt-build # --unittest # --lint
 
     - name: upload build log file
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build_log_${{ matrix.os_name }}
         path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/build*.log
 
     # - name: upload linter output file
-    #   uses: actions/upload-artifact@v3
+    #   uses: actions/upload-artifact@v4
     #   with:
     #     name: linting_log_${{ matrix.os_name }}
     #     path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/linting*
 
     # - name: upload unittest output file
-    #   uses: actions/upload-artifact@v3
+    #   uses: actions/upload-artifact@v4
     #   with:
     #     name: unit_tests_log_${{ matrix.os_name }}
     #     path: ${{ github.workspace }}/dev-${{ matrix.os_name }}/log/unit_tests*
