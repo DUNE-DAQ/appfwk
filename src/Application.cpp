@@ -19,7 +19,7 @@
 #include <string>
 #include <unistd.h>
 
-#include "confmodel/Session.hpp"
+#include "confmodel/System.hpp"
 #include "confmodel/Application.hpp"
 #include "confmodel/OpMonURI.hpp"
 
@@ -30,13 +30,13 @@ Application::Application(std::string appname,
                          std::string session,
                          std::string cmdlibimpl,
                          std::string confimpl)
-  : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, appname, session)->session()->get_opmon_uri()->get_URI(appname))
+  : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, appname)->system()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
   , m_busy(false)
   , m_error(false)
   , m_initialized(false)
-  , m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, appname, session))
+  , m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, appname))
 {
   m_runinfo.set_running(false);
   m_runinfo.set_run_number(0);
@@ -45,7 +45,7 @@ Application::Application(std::string appname,
   m_cmd_fac = cmdlib::make_command_facility(
     cmdlibimpl,
     session,
-    m_config_mgr->session()->get_connectivity_service()
+    m_config_mgr->system()->get_connectivity_service()
   );
 
   set_opmon_conf(m_config_mgr->application()->get_opmon_conf());

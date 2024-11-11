@@ -19,7 +19,7 @@
 #include "confmodel/Queue.hpp"
 #include "confmodel/ResourceSet.hpp"
 #include "confmodel/Service.hpp"
-#include "confmodel/Session.hpp"
+#include "confmodel/System.hpp"
 
 
 using namespace dunedaq::appfwk;
@@ -28,7 +28,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
   : m_config_mgr(cfMgr)
   , m_action_plans()
 {
-  auto session = cfMgr->session();
+  auto system = cfMgr->system();
   auto application = cfMgr->application();
   std::shared_ptr<conffwk::Configuration> confdb = cfMgr->m_confdb;
 
@@ -37,7 +37,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
   if (smartDaqApp) {
     auto cpos = cfMgr->m_oks_config_spec.find(":") + 1;
     std::string oksFile = cfMgr->m_oks_config_spec.substr(cpos); // Strip off "oksconflibs:"
-    m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, session);
+    m_modules = smartDaqApp->generate_modules(confdb.get(), oksFile, system);
 
     for (auto& plan : smartDaqApp->get_action_plans()) {
       auto cmd = plan->get_command()->get_cmd();
@@ -74,7 +74,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
     }
   }
 
-  m_connsvc_config = cfMgr->session()->get_connectivity_service();
+  m_connsvc_config = cfMgr->system()->get_connectivity_service();
 
   std::set<std::string> connectionsAdded;
   for (auto mod : m_modules) {

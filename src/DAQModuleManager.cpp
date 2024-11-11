@@ -18,7 +18,7 @@
 #include "confmodel/DaqModulesGroup.hpp"
 #include "confmodel/DaqModulesGroupById.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
-#include "confmodel/Session.hpp"
+#include "confmodel/System.hpp"
 
 #include "iomanager/IOManager.hpp"
 
@@ -43,7 +43,7 @@ void
 DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm)
 {
   m_module_configuration = std::make_shared<ModuleConfiguration>(cfgMgr);
-  get_iomanager()->configure(cfgMgr->session()->UID(),
+  get_iomanager()->configure(cfgMgr->system()->UID(),
                              m_module_configuration->queues(),
                              m_module_configuration->networkconnections(),
                              m_module_configuration->connectivity_service(),

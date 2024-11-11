@@ -299,7 +299,7 @@
  <attr name="port" type="u16" val="0"/>
 </obj>
 
-<obj class="Session" id="test-session">
+<obj class="System" id="test-system">
  <attr name="data_request_timeout_ms" type="u32" val="1000"/>
  <attr name="data_rate_slowdown_factor" type="u32" val="1"/>
  <attr name="rte_script" type="string" val="/home/gjc/DUNE/fddaq-v4.2.0-a9/install/daq_app_rte.sh"/>
