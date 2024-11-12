@@ -28,7 +28,6 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
   TLOG_DBG(5) << "getting session";
   m_session = m_confdb->get<confmodel::Session>(session_name);
   if (m_session == nullptr) {
-    // Throw an ers Issue here!!
     TLOG() << "Failed to get session";
     throw MissingComponent(ERS_HERE, "Session " + session_name);
   }
@@ -36,7 +35,6 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
   TLOG_DBG(5) << "getting app";
   m_application = m_confdb->get<confmodel::Application>(app_name);
   if (m_application == nullptr) {
-    // Throw an ers Issue here!!
     TLOG() << "Failed to get app";
     throw MissingComponent(ERS_HERE, "Application " + app_name);
   }
