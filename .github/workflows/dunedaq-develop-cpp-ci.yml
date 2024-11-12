@@ -40,7 +40,7 @@ jobs:
     # Runs a single command using the runners shell
     
     - name: Checkout daq-release
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: DUNE-DAQ/daq-release
         path: daq-release
@@ -57,7 +57,7 @@ jobs:
           dbt-create -n $release_name dev-${{ matrix.os_name }}
 
     - name: checkout package for CI
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: ${{ github.repository }}
     
@@ -65,11 +65,10 @@ jobs:
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           cd $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}
-          source env.sh || true
-          test $REPO == "dbe" && spack load dbe || true
-          spack unload $REPO || true
+          source env.sh
+          test $REPO == "dbe" && spack load dbe
           cp -pr $GITHUB_WORKSPACE/DUNE-DAQ/$REPO $GITHUB_WORKSPACE/dev-${{ matrix.os_name }}/sourcecode
-          dbt-build # --unittest # --lint
+          dbt-build  # --unittest done elsewhere; --lint unavailable due to llvm being too large for images
 
     - name: upload build log file
       uses: actions/upload-artifact@v4
