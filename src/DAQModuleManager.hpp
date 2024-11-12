@@ -79,7 +79,7 @@ public:
 
   DAQModuleManager();
 
-  void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager & );
+  void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager &, std::string session);
   bool initialized() const { return m_initialized; }
   void cleanup();
 

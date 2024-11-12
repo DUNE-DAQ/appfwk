@@ -82,7 +82,7 @@ public:
 
   // hook for metric generation
   void generate_opmon_data() override;
-  
+
   // State synch getter & setter
   void set_state(std::string s)
   {
@@ -98,6 +98,7 @@ public:
 private:
   std::mutex m_mutex;
   std::string m_state;
+  std::string m_session;
   std::atomic<bool> m_busy;
   std::atomic<bool> m_error;
   bool m_initialized;

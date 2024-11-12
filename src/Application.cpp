@@ -33,6 +33,7 @@ Application::Application(std::string appname,
   : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, appname)->system()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
+  , m_session(session)
   , m_busy(false)
   , m_error(false)
   , m_initialized(false)
@@ -57,7 +58,7 @@ void
 Application::init()
 {
   m_cmd_fac->set_commanded(*this, get_name());
-  m_mod_mgr.initialize(m_config_mgr, *this);
+  m_mod_mgr.initialize(m_config_mgr, *this, m_session);
   set_state("INITIAL");
   m_initialized = true;
 }

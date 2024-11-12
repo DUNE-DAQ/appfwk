@@ -40,10 +40,10 @@ DAQModuleManager::DAQModuleManager()
 }
 
 void
-DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm)
+DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm, std::string session)
 {
   m_module_configuration = std::make_shared<ModuleConfiguration>(cfgMgr);
-  get_iomanager()->configure(cfgMgr->system()->UID(),
+  get_iomanager()->configure(session,
                              m_module_configuration->queues(),
                              m_module_configuration->networkconnections(),
                              m_module_configuration->connectivity_service(),
