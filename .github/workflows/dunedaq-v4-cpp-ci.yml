@@ -40,7 +40,7 @@ jobs:
     # Runs a single command using the runners shell
     
     - name: Checkout daq-release
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: DUNE-DAQ/daq-release
         path: daq-release
@@ -55,7 +55,7 @@ jobs:
           dbt-create -n $release_name dev-${{ matrix.os_name }}
 
     - name: checkout package for CI
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: ${{ github.repository }}
     
