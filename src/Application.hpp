@@ -66,7 +66,8 @@ public:
   Application(std::string app_name,
               std::string session_name,
               std::string cmdlibimpl,
-              std::string confimpl);
+              std::string confimpl,
+              std::string system_name);
 
   // Initialize the application services
   void init();
@@ -99,6 +100,7 @@ private:
   std::mutex m_mutex;
   std::string m_state;
   std::string m_session;
+  std::string m_system;
   std::atomic<bool> m_busy;
   std::atomic<bool> m_error;
   bool m_initialized;

@@ -29,15 +29,17 @@ namespace appfwk {
 Application::Application(std::string appname,
                          std::string session,
                          std::string cmdlibimpl,
-                         std::string confimpl)
-  : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, appname)->system()->get_opmon_uri()->get_URI(appname))
+                         std::string confimpl,
+                         std::string system_name)
+  : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, system_name, appname)->system()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
   , m_session(session)
+  , m_system(system_name)
   , m_busy(false)
   , m_error(false)
   , m_initialized(false)
-  , m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, appname))
+  , m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, system_name, appname))
 {
   m_runinfo.set_running(false);
   m_runinfo.set_run_number(0);

@@ -35,9 +35,10 @@ BOOST_TEST_GLOBAL_FIXTURE(EnvFixture);
 std::shared_ptr<dunedaq::appfwk::ConfigurationManager>
 make_config_mgr()
 {
-  std::string oksConfig = "oksconflibs:test/config/appSystem.data.xml:test-system";
+  std::string oksConfig = "oksconflibs:test/config/appSystem.data.xml";
+  std::string oksSystem = "test-system";
   std::string appName = "TestApp";
-  return std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName);
+  return std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, oksSystem, appName);
 }
 
 BOOST_AUTO_TEST_CASE(Construct)
@@ -114,31 +115,32 @@ BOOST_AUTO_TEST_CASE(InvalidActionPlan)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
-  std::string oksConfig = "oksconflibs:test/config/appSystem.data.xml:test-system";
+  std::string oksConfig = "oksconflibs:test/config/appSystem.data.xml";
+  std::string oksSystem = "test-system";
   std::string appName = "MissingModuleApp";
   dunedaq::opmonlib::TestOpMonManager opmgr;
-  auto cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName);
+  auto cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, oksSystem, appName);
   // This succeeds, but prints a message
   mgr.initialize(cfgMgr, opmgr, "unit-test");
 
   dunedaq::opmonlib::TestOpMonManager opmgr2;
   dunedaq::get_iomanager()->reset();
   appName = "MissingMethodApp";
-  cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName);
+  cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, oksSystem, appName);
   BOOST_REQUIRE_EXCEPTION(
     mgr.initialize(cfgMgr, opmgr2, "unit-test"), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
 
   dunedaq::opmonlib::TestOpMonManager opmgr3;
   dunedaq::get_iomanager()->reset();
   appName = "ConflictingActionPlansApp";
-  cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName);
+  cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, oksSystem, appName);
   BOOST_REQUIRE_EXCEPTION(
     mgr.initialize(cfgMgr, opmgr3, "unit-test"), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
 
   dunedaq::opmonlib::TestOpMonManager opmgr4;
   dunedaq::get_iomanager()->reset();
   appName = "MissingModuleApp_GroupById";
-  cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName);
+  cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, oksSystem, appName);
   BOOST_REQUIRE_EXCEPTION(
     mgr.initialize(cfgMgr, opmgr4, "unit-test"), ActionPlanValidationFailed, [&](ActionPlanValidationFailed) { return true; });
 }
@@ -168,11 +170,12 @@ BOOST_AUTO_TEST_CASE(CommandModules_ById)
   auto mgr = DAQModuleManager();
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
-  std::string oksConfig = "oksconflibs:test/config/appSystem.data.xml:test-system";
+  std::string oksConfig = "oksconflibs:test/config/appSystem.data.xml";
+  std::string oksSystem = "test-system";
   std::string appName = "TestApp_ById";
 
   dunedaq::opmonlib::TestOpMonManager opmgr;
-  auto cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, appName);
+  auto cfgMgr = std::make_shared<dunedaq::appfwk::ConfigurationManager>(oksConfig, oksSystem, appName);
   mgr.initialize(cfgMgr, opmgr, "unit-test");
 
   BOOST_REQUIRE_EQUAL(mgr.initialized(), true);

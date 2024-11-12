@@ -38,7 +38,7 @@ class ConfigurationManager
   const confmodel::Application* m_application;
 
 public:
-  ConfigurationManager(const std::string& config_spec, const std::string& app_name);
+  ConfigurationManager(const std::string& config_spec, const std::string& system_name, const std::string& app_name);
 
   const confmodel::System* system() { return m_system; }
   const confmodel::Application* application() { return m_application; }

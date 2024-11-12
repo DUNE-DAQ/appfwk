@@ -25,24 +25,31 @@ using namespace dunedaq::appfwk;
 
 const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json";
 const std::string TEST_OKS_DB = "test/config/appSession.data.xml";
-
-struct EnvFixture
-{
-  EnvFixture() { setenv("DUNEDAQ_PARTITION", "Application_test", 0); }
-};
-BOOST_TEST_GLOBAL_FIXTURE(EnvFixture);
+const std::string TEST_OKS_SYSTEM = "test-system";
+const std::string SESSION_NAME = "test-session";
 
 BOOST_AUTO_TEST_CASE(Constructor)
 {
   Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
 }
 
 BOOST_AUTO_TEST_CASE(Init)
 {
   dunedaq::get_iomanager()->reset();
   Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
+
   app.init();
 
   dunedaq::iomanager::IOManager::get()->reset();
@@ -53,8 +60,13 @@ BOOST_AUTO_TEST_CASE(Run)
   std::atomic<bool> end_marker = false;
 
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+    Application app(
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
 
   BOOST_REQUIRE_EXCEPTION(
     app.run(end_marker), ApplicationNotInitialized, [&](ApplicationNotInitialized) { return true; });
@@ -68,8 +80,13 @@ BOOST_AUTO_TEST_CASE(Run)
 BOOST_AUTO_TEST_CASE(Start)
 {
   dunedaq::get_iomanager()->reset();
-  Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+   Application app(
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
   app.init();
 
   dunedaq::appfwk::cmd::CmdObj start;
@@ -100,7 +117,12 @@ BOOST_AUTO_TEST_CASE(Stop)
 {
   dunedaq::get_iomanager()->reset();
   Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
   app.init();
 
   dunedaq::rcif::cmd::StartParams start_params;
@@ -147,7 +169,13 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
 {
   dunedaq::get_iomanager()->reset();
   Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
+
   dunedaq::rcif::cmd::RCCommand cmd;
   nlohmann::json cmd_data;
 
@@ -175,7 +203,12 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 
   dunedaq::get_iomanager()->reset();
   Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
   app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
@@ -198,7 +231,13 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
 {
   dunedaq::get_iomanager()->reset();
   Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
+
   app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
@@ -229,7 +268,12 @@ BOOST_AUTO_TEST_CASE(State)
 {
   dunedaq::get_iomanager()->reset();
   Application app(
-    "TestApp", "partition_name", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB);
+    "TestApp",
+    SESSION_NAME,
+    "stdin://" + TEST_JSON_FILE,
+    "oksconflibs:" + TEST_OKS_DB,
+    TEST_OKS_SYSTEM
+  );
 
   std::string state_in = "state";
   app.set_state(state_in);
