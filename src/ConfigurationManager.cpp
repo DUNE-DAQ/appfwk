@@ -8,9 +8,10 @@
  */
 
 #include "appfwk/ConfigurationManager.hpp"
+#include "appfwk/Issues.hpp"
+#include "conffwk/Configuration.hpp"
 #include "confmodel/DaqApplication.hpp"
 #include "confmodel/Session.hpp"
-#include "conffwk/Configuration.hpp"
 
 using namespace dunedaq::appfwk;
 
@@ -27,16 +28,14 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
   TLOG_DBG(5) << "getting session";
   m_session = m_confdb->get<confmodel::Session>(session_name);
   if (m_session == nullptr) {
-    // Throw an ers Issue here!!
     TLOG() << "Failed to get session";
-    exit(0);
+    throw MissingComponent(ERS_HERE, "Session " + session_name);
   }
 
   TLOG_DBG(5) << "getting app";
   m_application = m_confdb->get<confmodel::Application>(app_name);
   if (m_application == nullptr) {
-    // Throw an ers Issue here!!
     TLOG() << "Failed to get app";
-    exit(0);
+    throw MissingComponent(ERS_HERE, "Application " + app_name);
   }
 }
