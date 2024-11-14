@@ -8,9 +8,10 @@
  */
 
 #include "appfwk/ConfigurationManager.hpp"
+#include "appfwk/Issues.hpp"
+#include "conffwk/Configuration.hpp"
 #include "confmodel/DaqApplication.hpp"
 #include "confmodel/System.hpp"
-#include "conffwk/Configuration.hpp"
 
 using namespace dunedaq::appfwk;
 
@@ -29,16 +30,14 @@ ConfigurationManager::ConfigurationManager(const std::string& config_spec, const
   TLOG_DBG(5) << "getting system";
   m_system = m_confdb->get<confmodel::System>(m_system_name);
   if (m_system == nullptr) {
-    // Throw an ers Issue here!!
-    TLOG() << "Failed to get the system";
-    exit(0);
+    TLOG() << "Failed to get system";
+    throw MissingComponent(ERS_HERE, "System " + m_system_name);
   }
 
   TLOG_DBG(5) << "getting app";
   m_application = m_confdb->get<confmodel::Application>(app_name);
   if (m_application == nullptr) {
-    // Throw an ers Issue here!!
     TLOG() << "Failed to get app";
-    exit(0);
+    throw MissingComponent(ERS_HERE, "Application " + app_name);
   }
 }

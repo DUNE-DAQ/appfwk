@@ -39,9 +39,23 @@ BOOST_AUTO_TEST_CASE(Constructor)
   );
 }
 
+BOOST_AUTO_TEST_CASE(ConstructorFailures)
+{
+  std::shared_ptr<Application> app_ptr;
+  BOOST_REQUIRE_EXCEPTION(app_ptr = std::make_shared<Application>(
+								  "TestApp", "bad-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, TEST_OKS_SYSTEM),
+                          MissingComponent,
+                          [&](MissingComponent) { return true; });
+  BOOST_REQUIRE_EXCEPTION(app_ptr = std::make_shared<Application>(
+								  "BADApp", SESSION_NAME, "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, TEST_OKS_SYSTEM),
+                          MissingComponent,
+                          [&](MissingComponent) { return true; });
+}
+
 BOOST_AUTO_TEST_CASE(Init)
 {
   dunedaq::get_iomanager()->reset();
+
   Application app(
     "TestApp",
     SESSION_NAME,
@@ -60,6 +74,7 @@ BOOST_AUTO_TEST_CASE(Run)
   std::atomic<bool> end_marker = false;
 
   dunedaq::get_iomanager()->reset();
+
     Application app(
     "TestApp",
     SESSION_NAME,
@@ -74,12 +89,15 @@ BOOST_AUTO_TEST_CASE(Run)
   app.init();
 
   app.run(end_marker);
+
+  BOOST_REQUIRE(app.get_state() == "INITIAL");
   dunedaq::iomanager::IOManager::get()->reset();
 }
 
 BOOST_AUTO_TEST_CASE(Start)
 {
   dunedaq::get_iomanager()->reset();
+
    Application app(
     "TestApp",
     SESSION_NAME,
@@ -116,6 +134,7 @@ BOOST_AUTO_TEST_CASE(Start)
 BOOST_AUTO_TEST_CASE(Stop)
 {
   dunedaq::get_iomanager()->reset();
+
   Application app(
     "TestApp",
     SESSION_NAME,
@@ -168,6 +187,7 @@ BOOST_AUTO_TEST_CASE(Stop)
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
   dunedaq::get_iomanager()->reset();
+
   Application app(
     "TestApp",
     SESSION_NAME,
@@ -202,6 +222,7 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 {
 
   dunedaq::get_iomanager()->reset();
+
   Application app(
     "TestApp",
     SESSION_NAME,
@@ -230,6 +251,7 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 BOOST_AUTO_TEST_CASE(CommandThrowsException)
 {
   dunedaq::get_iomanager()->reset();
+
   Application app(
     "TestApp",
     SESSION_NAME,
@@ -237,7 +259,6 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
     "oksconflibs:" + TEST_OKS_DB,
     TEST_OKS_SYSTEM
   );
-
   app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
@@ -263,10 +284,10 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
   dunedaq::iomanager::IOManager::get()->reset();
 }
 
-
 BOOST_AUTO_TEST_CASE(State)
 {
   dunedaq::get_iomanager()->reset();
+
   Application app(
     "TestApp",
     SESSION_NAME,
