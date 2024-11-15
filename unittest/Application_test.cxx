@@ -36,14 +36,13 @@ BOOST_AUTO_TEST_CASE(Constructor)
 BOOST_AUTO_TEST_CASE(ConstructorFailures)
 {
   BOOST_REQUIRE_EXCEPTION(
-    app_ptr = std::make_shared<Application>(
+    std::make_shared<Application>(
       "TestApp", SESSION_NAME, "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "bad-system"),
     MissingComponent,
     [&](MissingComponent) { return true; });
 
-  std::shared_ptr<Application> app_ptr;
   BOOST_REQUIRE_EXCEPTION(
-    app_ptr = std::make_shared<Application>(
+    std::make_shared<Application>(
       "BADApp", SESSION_NAME, "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, TEST_OKS_SYSTEM),
     MissingComponent,
     [&](MissingComponent) { return true; });
