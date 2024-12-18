@@ -68,6 +68,12 @@ public:
   const std::unordered_map<std::string, const confmodel::ActionPlan*>& action_plans() { return m_action_plans; }
   const confmodel::ActionPlan* action_plan(std::string cmd) const;
 
+  template<typename T>
+  const T* get_dal(const std::string& name)
+  {
+    return m_confdb->get<T>(name);
+  }
+
   bool disabled(const confmodel::ResourceBase* resource) { return resource->disabled(*m_session); }
 };
 

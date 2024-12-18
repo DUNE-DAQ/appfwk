@@ -121,7 +121,7 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
     m_modules_by_type[mod->class_name()].emplace_back(mod->UID());
 
     opm.register_node(mod->UID(), mptr);
-    mptr->init(m_module_configuration);
+    mptr->init(m_configuration_mgr);
   }
 }
 
