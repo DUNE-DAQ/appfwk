@@ -1,5 +1,5 @@
 /**
- * @file ModuleConfiguration.hpp ModuleConfiguration class definition
+ * @file ConfigurationManager.hpp ConfigurationManager class definition
  *
  *
  *
@@ -11,42 +11,64 @@
 #ifndef APPFWK_INCLUDE_CONFIGURATIONMANAGER_HPP_
 #define APPFWK_INCLUDE_CONFIGURATIONMANAGER_HPP_
 
-#include "confmodel/DaqModule.hpp"
-#include "iomanager/IOManager.hpp"
 #include "conffwk/Configuration.hpp"
+#include "confmodel/ActionPlan.hpp"
+#include "confmodel/DaqModule.hpp"
+#include "confmodel/ResourceBase.hpp"
+#include "iomanager/IOManager.hpp"
 
 #include <string>
 #include <vector>
 
 namespace dunedaq {
 
+ERS_DECLARE_ISSUE(appfwk,                                                                  ///< Namespace
+                  NotADaqModule,                                                           ///< Issue class name
+                  "Application contains a resource " << res << " that is not a DaqModule", ///< Message
+                  ((std::string)res)                                                       ///< Message parameters
+)
+ERS_DECLARE_ISSUE(appfwk,             ///< Namespace
+                  NotADaqApplication, ///< Issue class name
+                  "Application " << app << " is neither a DaqApplication nor a SmartDaqApplication ", ///< Message
+                  ((std::string)app) ///< Message parameters
+)
 namespace confmodel {
 class Session;
 class Application;
+class DaqModule;
 }
 namespace appfwk {
 
 class ConfigurationManager
 {
-  friend class ModuleConfiguration;
-
   std::shared_ptr<conffwk::Configuration> m_confdb;
   std::string m_app_name;
   std::string m_session_name;
   std::string m_oks_config_spec;
   const confmodel::Session* m_session;
   const confmodel::Application* m_application;
+  std::unordered_map<std::string, const confmodel::ActionPlan*> m_action_plans;
+  std::vector<const confmodel::DaqModule*> m_modules;
+  std::vector<const confmodel::Queue*> m_queues;
+  std::vector<const confmodel::NetworkConnection*> m_networkconnections;
+  const confmodel::ConnectivityService* m_connsvc_config;
 
 public:
+
   ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& session_name);
 
   const confmodel::Session* session() { return m_session; }
   const confmodel::Application* application() { return m_application; }
-  template<typename T>
-  const T* get_dal(const std::string& name)
-  {
-    return m_confdb->get<T>(name);
-  }
+
+  const std::vector<const confmodel::Queue*>& queues() { return m_queues; }
+  const std::vector<const confmodel::NetworkConnection*>& networkconnections() { return m_networkconnections; }
+  const std::vector<const confmodel::DaqModule*>& modules() { return m_modules; }
+  const confmodel::ConnectivityService* connectivity_service() { return m_connsvc_config; }
+
+  const std::unordered_map<std::string, const confmodel::ActionPlan*>& action_plans() { return m_action_plans; }
+  const confmodel::ActionPlan* action_plan(std::string cmd) const;
+
+  bool disabled(const confmodel::ResourceBase* resource) { return resource->disabled(*m_session); }
 };
 
 } // namespace appfwk
