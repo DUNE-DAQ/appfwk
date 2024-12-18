@@ -43,6 +43,7 @@ void
 DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm)
 {
   m_configuration_mgr = cfgMgr; // Make a copy
+  cfgMgr->initialize();
   get_iomanager()->configure(m_configuration_mgr->session()->UID(),
                              m_configuration_mgr->queues(),
                              m_configuration_mgr->networkconnections(),

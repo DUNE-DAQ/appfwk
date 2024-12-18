@@ -52,20 +52,49 @@ class ConfigurationManager
   std::vector<const confmodel::Queue*> m_queues;
   std::vector<const confmodel::NetworkConnection*> m_networkconnections;
   const confmodel::ConnectivityService* m_connsvc_config;
+  bool initialized{ false };
 
 public:
 
   ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& session_name);
+  void initialize();
 
-  const confmodel::Session* session() { return m_session; }
-  const confmodel::Application* application() { return m_application; }
+  const confmodel::Session* session()
+  {
+    return m_session;
+  }
+  const confmodel::Application* application()
+  {
+    initialize();
+    return m_application;
+  }
 
-  const std::vector<const confmodel::Queue*>& queues() { return m_queues; }
-  const std::vector<const confmodel::NetworkConnection*>& networkconnections() { return m_networkconnections; }
-  const std::vector<const confmodel::DaqModule*>& modules() { return m_modules; }
-  const confmodel::ConnectivityService* connectivity_service() { return m_connsvc_config; }
+  const std::vector<const confmodel::Queue*>& queues()
+  {
+    initialize();
+    return m_queues;
+  }
+  const std::vector<const confmodel::NetworkConnection*>& networkconnections()
+  {
+    initialize();
+    return m_networkconnections;
+  }
+  const std::vector<const confmodel::DaqModule*>& modules()
+  {
+    initialize();
+    return m_modules;
+  }
+  const confmodel::ConnectivityService* connectivity_service()
+  {
+    initialize();
+    return m_connsvc_config;
+  }
 
-  const std::unordered_map<std::string, const confmodel::ActionPlan*>& action_plans() { return m_action_plans; }
+  const std::unordered_map<std::string, const confmodel::ActionPlan*>& action_plans()
+  {
+    initialize();
+    return m_action_plans;
+  }
   const confmodel::ActionPlan* action_plan(std::string cmd) const;
 
   template<typename T>
@@ -73,8 +102,6 @@ public:
   {
     return m_confdb->get<T>(name);
   }
-
-  bool disabled(const confmodel::ResourceBase* resource) { return resource->disabled(*m_session); }
 };
 
 } // namespace appfwk

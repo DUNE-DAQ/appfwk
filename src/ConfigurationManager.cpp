@@ -39,12 +39,19 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
     TLOG() << "Failed to get session";
     throw MissingComponent(ERS_HERE, "Session " + session_name);
   }
+}
 
+void
+ConfigurationManager::initialize()
+{
+  if (initialized) {
+    return;
+  }
   TLOG_DBG(5) << "getting app";
-  m_application = m_confdb->get<confmodel::Application>(app_name);
+  m_application = m_confdb->get<confmodel::Application>(m_app_name);
   if (m_application == nullptr) {
     TLOG() << "Failed to get app";
-    throw MissingComponent(ERS_HERE, "Application " + app_name);
+    throw MissingComponent(ERS_HERE, "Application " + m_app_name);
   }
 
   TLOG_DBG(5) << "getting modules";
@@ -114,6 +121,8 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
       }
     }
   }
+
+  initialized = true;
 }
 
 const dunedaq::confmodel::ActionPlan*
