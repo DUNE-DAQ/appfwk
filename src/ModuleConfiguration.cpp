@@ -9,7 +9,7 @@
 
 #include "appfwk/ModuleConfiguration.hpp"
 #include "appfwk/Issues.hpp"
-#include "appmodel/SmartDaqApplication.hpp"
+#include "confmodel/SmartDaqApplication.hpp"
 #include "conffwk/Configuration.hpp"
 #include "confmodel/DaqApplication.hpp"
 #include "confmodel/DaqModule.hpp"
@@ -33,7 +33,7 @@ ModuleConfiguration::ModuleConfiguration(std::shared_ptr<ConfigurationManager> c
   std::shared_ptr<conffwk::Configuration> confdb = cfMgr->m_confdb;
 
   TLOG_DBG(5) << "getting modules";
-  auto smartDaqApp = application->cast<appmodel::SmartDaqApplication>();
+  auto smartDaqApp = application->cast<confmodel::SmartDaqApplication>();
   if (smartDaqApp) {
     auto cpos = cfMgr->m_oks_config_spec.find(":") + 1;
     std::string oksFile = cfMgr->m_oks_config_spec.substr(cpos); // Strip off "oksconflibs:"
