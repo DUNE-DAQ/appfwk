@@ -40,7 +40,7 @@ public:
     register_command("stuff", &DummyParentModule::do_stuff);
   }
 
-  void init(std::shared_ptr<ModuleConfiguration>) final {}
+  void init(std::shared_ptr<ConfigurationManager>) final {}
 
   virtual void do_stuff(const data_t& /*data*/) = 0;
 };
