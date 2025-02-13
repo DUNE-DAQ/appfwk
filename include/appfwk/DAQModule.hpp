@@ -19,7 +19,7 @@
 #ifndef APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 #define APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
 
-#include "appfwk/ModuleConfiguration.hpp"
+#include "appfwk/ConfigurationManager.hpp"
 
 #include "utilities/NamedObject.hpp"
 #include "opmonlib/MonitorableObject.hpp"
@@ -185,7 +185,7 @@ public:
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
-  virtual void init(std::shared_ptr<ModuleConfiguration> /*mcfg*/) = 0;
+  virtual void init(std::shared_ptr<ConfigurationManager> /*mcfg*/) = 0;
 
   /**
    * @brief Execute a command in this DAQModule

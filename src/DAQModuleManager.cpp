@@ -42,15 +42,16 @@ DAQModuleManager::DAQModuleManager()
 void
 DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm)
 {
-  m_module_configuration = std::make_shared<ModuleConfiguration>(cfgMgr);
-  get_iomanager()->configure(cfgMgr->session()->UID(),
-                             m_module_configuration->queues(),
-                             m_module_configuration->networkconnections(),
-                             m_module_configuration->connectivity_service(),
+  m_configuration_mgr = cfgMgr; // Make a copy
+  cfgMgr->initialize();
+  get_iomanager()->configure(m_configuration_mgr->session()->UID(),
+                             m_configuration_mgr->queues(),
+                             m_configuration_mgr->networkconnections(),
+                             m_configuration_mgr->connectivity_service(),
                              opm);
-  init_modules(m_module_configuration->modules(), opm);
+  init_modules(m_configuration_mgr->modules(), opm);
 
-  for (auto& plan_pair : m_module_configuration->action_plans()) {
+  for (auto& plan_pair : m_configuration_mgr->action_plans()) {
     auto cmd = plan_pair.first;
 
     for (auto& step : plan_pair.second->get_steps()) {
@@ -121,7 +122,7 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
     m_modules_by_type[mod->class_name()].emplace_back(mod->UID());
 
     opm.register_node(mod->UID(), mptr);
-    mptr->init(m_module_configuration);
+    mptr->init(m_configuration_mgr);
   }
 }
 
@@ -297,7 +298,7 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
 
   check_cmd_data(cmd, cmd_data);
 
-  auto action_plan = m_module_configuration->action_plan(cmd);
+  auto action_plan = m_configuration_mgr->action_plan(cmd);
   if (action_plan == nullptr) {
 #if 0
     throw ActionPlanNotFound(ERS_HERE, cmd, "Throwing exception");
