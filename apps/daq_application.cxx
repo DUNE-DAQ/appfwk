@@ -80,15 +80,20 @@ main(int argc, char* argv[])
   dunedaq::logging::Logging().setup( args.session_name, args.app_name );
 
   // from now on, it's possible to use ERS messages
-  
-  // Create the Application
-  appfwk::Application app(args.app_name, args.session_name,
-			  args.command_facility_plugin_name,
-			  args.conf_service_plugin_name);
 
-  app.init();
-  app.run(run_marker);
+  try {
+    // Create the Application
+    appfwk::Application app(args.app_name, args.session_name,
+			    args.command_facility_plugin_name,
+			    args.conf_service_plugin_name);
+    
+    app.init();
+    app.run(run_marker);
+  } catch ( const ers::Issue & e ) {
+    ers::fatal(appfwk::ApplicationFailure(ERS_HERE, args.session_name, args.app_name, e));
+  }
 
+				 
   TLOG() << "Application " << args.session_name << '.' << args.app_name << " exiting.";
   return 0;
 }

@@ -77,6 +77,12 @@ ERS_DECLARE_ISSUE(appfwk,
                   "The command line argument \"--" << cli_name << "\" and env variable \"" << env_name << "\" must be set to the same value, but are set as \"" << cli_value << "\" and \"" << env_value << "\", respectively",
                   ((std::string)cli_name)((std::string)env_name)((std::string)cli_value)((std::string)env_value))
 
+
+ERS_DECLARE_ISSUE(appfwk,
+		  ApplicationFailure,
+		  "Application " << application << " in session " << session << " failed",
+		  ((std::string)session)((std::string)application))
+
 // Re-enable coverage collection LCOV_EXCL_STOP
 } // namespace dunedaq
 
