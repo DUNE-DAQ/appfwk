@@ -10,7 +10,7 @@
 #include "appfwk/Issues.hpp"
 
 #include <cetlib/BasicPluginFactory.h>
-#include <logging/Logging.hpp>
+#include "logging/Logging.hpp"
 
 #include <pistache/client.h>
 #include <pistache/http.h>

@@ -18,6 +18,7 @@
 
 #include "cmdlib/cmd/Structs.hpp"
 #include "opmonlib/OpMonManager.hpp"
+#include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
 
 #include <map>
 #include <memory>
