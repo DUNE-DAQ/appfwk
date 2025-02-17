@@ -101,9 +101,7 @@ ConfigurationManager::initialize()
   std::set<std::string> connectionsAdded;
   for (auto mod : m_modules) {
     TLOG() << "initialising " << mod->class_name() << " module " << mod->UID();
-    auto connections = mod->get_inputs();
-    auto outputs = mod->get_outputs();
-    connections.insert(connections.end(), outputs.begin(), outputs.end());
+    auto connections = mod->get_connections();
     for (auto con : connections) {
       auto [c, inserted] = connectionsAdded.insert(con->UID());
       if (!inserted) {
