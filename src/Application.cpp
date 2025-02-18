@@ -30,13 +30,13 @@ Application::Application(std::string appname,
                          std::string session,
                          std::string cmdlibimpl,
                          std::string confimpl)
-  : OpMonManager(session, appname, std::make_unique<ConfigurationManager>(confimpl, appname, session)->session()->get_opmon_uri()->get_URI(appname))
+  : Configurable(confimpl, appname, session) 
+  , OpMonManager(session, appname, m_config_mgr->session()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
   , m_busy(false)
   , m_error(false)
   , m_initialized(false)
-  , m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, appname, session))
 {
   m_runinfo.set_running(false);
   m_runinfo.set_run_number(0);

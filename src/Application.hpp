@@ -56,8 +56,26 @@ ERS_DECLARE_ISSUE(appfwk,         ///< Namespace
 // Re-enable coverage collection LCOV_EXCL_STOP
 namespace appfwk {
 
+    class Configurable
+    {
+    public:
+      Configurable(std::string confimpl, std::string app_name, std::string session_name)
+        : m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, app_name, session_name))
+      {
+      }
+
+      Configurable(std::shared_ptr<ConfigurationManager> mgr)
+        : m_config_mgr(mgr)
+      {
+      }
+
+    protected:
+      std::shared_ptr<ConfigurationManager> m_config_mgr;
+    };
+
 class Application
-  : public cmdlib::CommandedObject
+  : public Configurable
+  , public cmdlib::CommandedObject
   , public opmonlib::OpMonManager
   , public utilities::NamedObject
 {
@@ -106,7 +124,6 @@ private:
   dunedaq::rcif::opmon::RunInfo m_runinfo;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
-  std::shared_ptr<ConfigurationManager> m_config_mgr;
 };
 
 } // namespace appfwk
