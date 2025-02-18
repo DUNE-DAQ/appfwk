@@ -31,7 +31,7 @@ Application::Application(std::string appname,
                          std::string cmdlibimpl,
                          std::string confimpl)
   : Configurable(confimpl, appname, session) 
-  , OpMonManager(session, appname, m_config_mgr->session()->get_opmon_uri()->get_URI(appname))
+  , OpMonManager(session, appname, get_config_manager()->session()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
   , m_busy(false)
@@ -43,12 +43,10 @@ Application::Application(std::string appname,
   m_runinfo.set_run_time(0);
 
   m_cmd_fac = cmdlib::make_command_facility(
-    cmdlibimpl,
-    session,
-    m_config_mgr->session()->get_connectivity_service()
+    cmdlibimpl, session, get_config_manager()->session()->get_connectivity_service()
   );
 
-  set_opmon_conf(m_config_mgr->application()->get_opmon_conf());
+  set_opmon_conf(get_config_manager()->application()->get_opmon_conf());
 
   TLOG() << "confimpl=<" << confimpl << ">\n";
 }
@@ -57,7 +55,7 @@ void
 Application::init()
 {
   m_cmd_fac->set_commanded(*this, get_name());
-  m_mod_mgr.initialize(m_config_mgr, *this);
+  m_mod_mgr.initialize(get_config_manager(), *this);
   set_state("INITIAL");
   m_initialized = true;
 }

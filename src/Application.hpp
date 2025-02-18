@@ -16,6 +16,7 @@
 #include "cmdlib/CommandFacility.hpp"
 #include "cmdlib/CommandedObject.hpp"
 
+#include "Configurable.hpp"
 #include "DAQModuleManager.hpp"
 #include "appfwk/ConfFacility.hpp"
 
@@ -54,24 +55,8 @@ ERS_DECLARE_ISSUE(appfwk,         ///< Namespace
 )
 
 // Re-enable coverage collection LCOV_EXCL_STOP
+
 namespace appfwk {
-
-    class Configurable
-    {
-    public:
-      Configurable(std::string confimpl, std::string app_name, std::string session_name)
-        : m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, app_name, session_name))
-      {
-      }
-
-      Configurable(std::shared_ptr<ConfigurationManager> mgr)
-        : m_config_mgr(mgr)
-      {
-      }
-
-    protected:
-      std::shared_ptr<ConfigurationManager> m_config_mgr;
-    };
 
 class Application
   : public Configurable
