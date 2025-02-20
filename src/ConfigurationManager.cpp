@@ -39,6 +39,7 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
     TLOG() << "Failed to get session";
     throw MissingComponent(ERS_HERE, "Session " + session_name);
   }
+  m_helper = std::make_shared<appmodel::ConfigurationHelper>(m_session);
 }
 
 void
@@ -59,7 +60,7 @@ ConfigurationManager::initialize()
   if (smartDaqApp) {
     auto cpos = m_oks_config_spec.find(":") + 1;
     std::string oksFile = m_oks_config_spec.substr(cpos); // Strip off "oksconflibs:"
-    m_modules = smartDaqApp->generate_modules(m_confdb.get(), oksFile, m_session);
+    m_modules = smartDaqApp->generate_modules(m_confdb.get(), oksFile, m_helper);
 
     for (auto& plan : smartDaqApp->get_action_plans()) {
       auto cmd = plan->get_command()->get_cmd();

@@ -11,6 +11,7 @@
 #ifndef APPFWK_INCLUDE_CONFIGURATIONMANAGER_HPP_
 #define APPFWK_INCLUDE_CONFIGURATIONMANAGER_HPP_
 
+#include "appmodel/ConfigurationHelper.hpp"
 #include "conffwk/Configuration.hpp"
 #include "confmodel/ActionPlan.hpp"
 #include "confmodel/DaqModule.hpp"
@@ -43,6 +44,7 @@ namespace appfwk {
 class ConfigurationManager
 {
   std::shared_ptr<conffwk::Configuration> m_confdb;
+  std::shared_ptr<appmodel::ConfigurationHelper> m_helper;
   std::string m_app_name;
   std::string m_session_name;
   std::string m_oks_config_spec;
