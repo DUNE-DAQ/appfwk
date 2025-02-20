@@ -1,13 +1,13 @@
 /**
- * @file Configurable.hpp Instantiates and owns a ConfigurationManager
+ * @file ConfigurationManagerOwner.hpp Instantiates and owns a ConfigurationManager
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef APPFWK_INCLUDE_APPFWK_CONFIGURABLE_HPP_
-#define APPFWK_INCLUDE_APPFWK_CONFIGURABLE_HPP_
+#ifndef APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_
+#define APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_
 
 #include "appfwk/ConfigurationManager.hpp"
 
@@ -17,10 +17,10 @@
 namespace dunedaq {
 namespace appfwk {
 
-class Configurable
+class ConfigurationManagerOwner
 {
 public:
-  Configurable(std::string confimpl, std::string app_name, std::string session_name)
+  ConfigurationManagerOwner(std::string confimpl, std::string app_name, std::string session_name)
     : m_config_mgr(std::make_shared<ConfigurationManager>(confimpl, app_name, session_name))
   {
   }
@@ -34,4 +34,4 @@ private:
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APPFWK_INCLUDE_APPFWK_CONFIGURABLE_HPP_
+#endif // APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_

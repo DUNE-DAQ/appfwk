@@ -30,7 +30,7 @@ Application::Application(std::string appname,
                          std::string session,
                          std::string cmdlibimpl,
                          std::string confimpl)
-  : Configurable(confimpl, appname, session) 
+  : ConfigurationManagerOwner(confimpl, appname, session) 
   , OpMonManager(session, appname, get_config_manager()->session()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
