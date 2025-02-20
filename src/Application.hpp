@@ -16,6 +16,7 @@
 #include "cmdlib/CommandFacility.hpp"
 #include "cmdlib/CommandedObject.hpp"
 
+#include "ConfigurationManagerOwner.hpp"
 #include "DAQModuleManager.hpp"
 #include "appfwk/ConfFacility.hpp"
 
@@ -54,10 +55,12 @@ ERS_DECLARE_ISSUE(appfwk,         ///< Namespace
 )
 
 // Re-enable coverage collection LCOV_EXCL_STOP
+
 namespace appfwk {
 
 class Application
-  : public cmdlib::CommandedObject
+  : public ConfigurationManagerOwner
+  , public cmdlib::CommandedObject
   , public opmonlib::OpMonManager
   , public utilities::NamedObject
 {
@@ -106,7 +109,6 @@ private:
   dunedaq::rcif::opmon::RunInfo m_runinfo;
   DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
-  std::shared_ptr<ConfigurationManager> m_config_mgr;
 };
 
 } // namespace appfwk
