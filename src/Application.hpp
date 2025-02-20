@@ -16,7 +16,7 @@
 #include "cmdlib/CommandFacility.hpp"
 #include "cmdlib/CommandedObject.hpp"
 
-#include "Configurable.hpp"
+#include "ConfigurationManagerOwner.hpp"
 #include "DAQModuleManager.hpp"
 #include "appfwk/ConfFacility.hpp"
 
@@ -59,7 +59,7 @@ ERS_DECLARE_ISSUE(appfwk,         ///< Namespace
 namespace appfwk {
 
 class Application
-  : public Configurable
+  : public ConfigurationManagerOwner
   , public cmdlib::CommandedObject
   , public opmonlib::OpMonManager
   , public utilities::NamedObject
