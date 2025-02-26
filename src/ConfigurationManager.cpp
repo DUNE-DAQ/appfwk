@@ -39,7 +39,7 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
     TLOG() << "Failed to get session";
     throw MissingComponent(ERS_HERE, "Session " + session_name);
   }
-  m_helper = std::make_shared<appmodel::ConfigurationHelper>(m_session);
+  m_helper = std::make_shared<appmodel::ConfigurationHelper>(m_session, m_app_name);
 }
 
 void
