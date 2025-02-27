@@ -21,9 +21,9 @@
 
 #include "appfwk/ConfigurationManager.hpp"
 
-#include "utilities/NamedObject.hpp"
-#include "opmonlib/MonitorableObject.hpp"
 #include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
+#include "opmonlib/MonitorableObject.hpp"
+#include "utilities/NamedObject.hpp"
 
 #include "cetlib/BasicPluginFactory.h"
 #include "cetlib/compiler_macros.h"
@@ -78,6 +78,17 @@ ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
                   GeneralDAQModuleIssue,  ///< Issue class name
                   " DAQModule: " << name, ///< Message
                   ((std::string)name)     ///< Message parameters
+)
+
+/**
+ * @brief Initialization failed ERS Issue (used by DAQModuleManager)
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
+                       DAQModuleInitFailed,           ///< Type of the issue
+                       appfwk::GeneralDAQModuleIssue, ///< Base class of the issue
+                       " init failed.",               ///< Log message from the issue
+                       ((std::string)name),           ///< Base class attributes
+                       ERS_EMPTY                      ///< Attribute of this class
 )
 
 /**
@@ -161,7 +172,9 @@ namespace appfwk {
  * This header also contains the definitions of the Issues that can be
  * thrown by the DAQModule.
  */
-  class DAQModule : public utilities::NamedObject, public opmonlib::MonitorableObject
+class DAQModule
+  : public utilities::NamedObject
+  , public opmonlib::MonitorableObject
 {
 public:
   using data_t = nlohmann::json;
