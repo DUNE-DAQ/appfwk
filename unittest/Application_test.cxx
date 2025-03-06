@@ -9,6 +9,7 @@
 #include "rcif/cmd/Nljs.hpp"
 
 #include "Application.hpp"
+#include "appfwk/Issues.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 #include "iomanager/IOManager.hpp"
 
