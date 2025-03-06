@@ -29,8 +29,9 @@ namespace appfwk {
 Application::Application(std::string appname,
                          std::string session,
                          std::string cmdlibimpl,
-                         std::string confimpl)
-  : ConfigurationManagerOwner(confimpl, appname, session) 
+                         std::string confimpl,
+                         std::string configuration_id)
+  : ConfigurationManagerOwner(confimpl, appname, configuration_id)
   , OpMonManager(session, appname, get_config_manager()->session()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")

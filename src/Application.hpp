@@ -70,7 +70,8 @@ public:
   Application(std::string app_name,
               std::string session_name,
               std::string cmdlibimpl,
-              std::string confimpl);
+              std::string confimpl,
+              std::string configuration_id);
 
   // Initialize the application services
   void init();
@@ -86,7 +87,7 @@ public:
 
   // hook for metric generation
   void generate_opmon_data() override;
-  
+
   // State synch getter & setter
   void set_state(std::string s)
   {
