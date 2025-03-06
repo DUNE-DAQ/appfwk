@@ -14,14 +14,13 @@ find_package(rcif REQUIRED)
 find_package(iomanager REQUIRED)
 find_package(opmonlib REQUIRED)
 find_package(nlohmann_json REQUIRED )
-find_package(Pistache REQUIRED)
 find_package(okssystem REQUIRED)
 find_package(conffwk REQUIRED)
 find_package(confmodel REQUIRED)
 find_package(appmodel REQUIRED)
 
 
-set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json pistache_shared
+set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmdlib::cmdlib rcif::rcif iomanager::iomanager opmonlib::opmonlib nlohmann_json::nlohmann_json 
   confmodel::confmodel appmodel::appmodel conffwk::conffwk okssystem::okssystem)
 
 find_package(oksdalgen REQUIRED)
@@ -35,11 +34,6 @@ daq_protobuf_codegen( opmon/*.proto )
 # Main library
 daq_add_library(Application.cpp DAQModule.cpp DAQModuleManager.cpp ConfigurationManager.cpp
   LINK_LIBRARIES ${APPFWK_DEPENDENCIES})
-
-##############################################################################
-# Plugins
-daq_add_plugin(fileConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json)
-daq_add_plugin(dbConfFacility duneConfFacility LINK_LIBRARIES ers::ers logging::logging nlohmann_json::nlohmann_json pistache_shared)
 
 # ##############################################################################
 # Applications
@@ -58,7 +52,6 @@ daq_add_application( dummy_module_test dummy_module_test.cxx TEST LINK_LIBRARIES
 daq_add_unit_test(Application_test            LINK_LIBRARIES appfwk )
 daq_add_unit_test(CommandLineInterpreter_test LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQModuleManager_test       LINK_LIBRARIES appfwk )
-daq_add_unit_test(Interruptible_test          LINK_LIBRARIES appfwk )
 
 ##############################################################################
 
