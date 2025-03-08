@@ -43,13 +43,13 @@ make_config_mgr()
 
 BOOST_AUTO_TEST_CASE(Construct)
 {
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
 }
 
 BOOST_AUTO_TEST_CASE(Initialized)
 {
   dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::opmonlib::TestOpMonManager opmgr;
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(Initialized)
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
   dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   // dunedaq::cmdlib::cmd::Command cmd;
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
 BOOST_AUTO_TEST_CASE(InitializeModules)
 {
   dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::opmonlib::TestOpMonManager opmgr;
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(NoActionPlan)
 {
 
   dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
   
   dunedaq::opmonlib::TestOpMonManager opmgr;
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(InvalidActionPlan)
 {
 
   dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   std::string oksConfig = "oksconflibs:test/config/appSession.data.xml";
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(InvalidActionPlan)
 BOOST_AUTO_TEST_CASE(CommandModules)
 {
   dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::opmonlib::TestOpMonManager opmgr;
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(CommandModules_ById)
 {
 
   dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   std::string oksConfig = "oksconflibs:test/config/appSession.data.xml";
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(CommandModules_ById)
 BOOST_AUTO_TEST_CASE(CommandMatchingModules)
 {
   dunedaq::get_iomanager()->reset();
-  auto mgr = DAQModuleManager();
+  auto mgr = DAQModuleManager("utest_session");
   BOOST_REQUIRE_EQUAL(mgr.initialized(), false);
 
   dunedaq::opmonlib::TestOpMonManager opmgr;

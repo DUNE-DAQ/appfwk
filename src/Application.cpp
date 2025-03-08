@@ -26,14 +26,15 @@
 namespace dunedaq {
 namespace appfwk {
 
-Application::Application(std::string appname,
-                         std::string session,
+Application::Application(std::string app_name,
+                         std::string session_name,
                          std::string cmdlibimpl,
                          std::string confimpl,
                          std::string configuration_id)
-  : ConfigurationManagerOwner(confimpl, appname, configuration_id)
-  , OpMonManager(session, appname, get_config_manager()->session()->get_opmon_uri()->get_URI(appname))
-  , NamedObject(appname)
+  : ConfigurationManagerOwner(confimpl, app_name, configuration_id)
+  , OpMonManager(session_name, app_name, get_config_manager()->session()->get_opmon_uri()->get_URI(app_name))
+  , NamedObject(app_name)
+  , m_mod_mgr(session_name)
   , m_state("NONE")
   , m_busy(false)
   , m_error(false)
@@ -44,7 +45,7 @@ Application::Application(std::string appname,
   m_runinfo.set_run_time(0);
 
   m_cmd_fac = cmdlib::make_command_facility(
-    cmdlibimpl, session, get_config_manager()->session()->get_connectivity_service()
+    cmdlibimpl, session_name, get_config_manager()->session()->get_connectivity_service()
   );
 
   set_opmon_conf(get_config_manager()->application()->get_opmon_conf());

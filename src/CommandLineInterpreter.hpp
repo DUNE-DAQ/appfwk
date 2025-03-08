@@ -50,8 +50,8 @@ public:
                "passed on)";
     bpo::options_description desc(descstr.str());
     desc.add_options()("name,n", bpo::value<std::string>()->required(), "Application name")(
-      "session-name,s", bpo::value<std::string>()->required(), "Session name")(
-      "configuration-id,ci", bpo::value<std::string>()->required(), "Configuration id")(
+      "sessionName,s", bpo::value<std::string>()->required(), "Session name")(
+      "configurationId,k", bpo::value<std::string>()->required(), "Configuration id")(
       "commandFacility,c", bpo::value<std::string>()->required(), "CommandFacility URI")(
       "configurationService,d", bpo::value<std::string>()->required(), "Configuration Service URI")(
       "help,h", "produce help message");
@@ -71,8 +71,8 @@ public:
     bpo::notify(vm);
 
     output.app_name = vm["name"].as<std::string>();
-    output.session_name = vm["session-name"].as<std::string>();
-    output.configuration_id = vm["configuration-id"].as<std::string>();
+    output.session_name = vm["sessionName"].as<std::string>();
+    output.configuration_id = vm["configurationId"].as<std::string>();
     output.command_facility_plugin_name = vm["commandFacility"].as<std::string>();
     output.conf_service_plugin_name = vm["configurationService"].as<std::string>();
     return output;
