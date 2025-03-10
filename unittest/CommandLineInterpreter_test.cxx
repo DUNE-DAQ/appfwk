@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_CASE(ParseNameAndCommandFacility)
     (char*)("CommandLineInterpreter_test"),    // NOLINT
     (char*)("-c"), (char*)("stdin://"),        // NOLINT
     (char*)("-d"), (char*)("file://"),         // NOLINT
-    (char*)("-s"), (char*)("test_session"),    // NOLINT
-    (char*)("-k"), (char*)("my_test_session"), // NOLINT
+    (char*)("-s"), (char*)("my_test_session"), // NOLINT
+    (char*)("-k"), (char*)("test_session"),    // NOLINT
     (char*)("-n"), (char*)("cli_test")         // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(11, arg_list);
@@ -124,9 +124,10 @@ BOOST_AUTO_TEST_CASE(ParseOtherOption)
     (char*)("CommandLineInterpreter_test"),    // NOLINT
     (char*)("-c"), (char*)("stdin://"),        // NOLINT
     (char*)("-d"), (char*)("file://"),         // NOLINT
-    (char*)("-s"), (char*)("my_test_session"),    // NOLINT
-    (char*)("-k"), (char*)("test_session"), // NOLINT
-    (char*)("-n"), (char*)("cli_test")         // NOLINT
+    (char*)("-s"), (char*)("my_test_session"), // NOLINT
+    (char*)("-k"), (char*)("test_session"),    // NOLINT
+    (char*)("-n"), (char*)("cli_test"),        // NOLINT
+    (char*)("--some-other-option")             // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(12, arg_list);
 
