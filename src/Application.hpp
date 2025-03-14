@@ -70,7 +70,8 @@ public:
   Application(std::string app_name,
               std::string session_name,
               std::string cmdlibimpl,
-              std::string confimpl);
+              std::string confimpl,
+              std::string configuration_id);
 
   // Initialize the application services
   void init();
@@ -86,7 +87,7 @@ public:
 
   // hook for metric generation
   void generate_opmon_data() override;
-  
+
   // State synch getter & setter
   void set_state(std::string s)
   {
@@ -100,6 +101,7 @@ public:
   }
 
 private:
+  DAQModuleManager m_mod_mgr;
   std::mutex m_mutex;
   std::string m_state;
   std::atomic<bool> m_busy;
@@ -107,7 +109,6 @@ private:
   bool m_initialized;
   std::chrono::time_point<std::chrono::steady_clock> m_run_start_time;
   dunedaq::rcif::opmon::RunInfo m_runinfo;
-  DAQModuleManager m_mod_mgr;
   std::shared_ptr<cmdlib::CommandFacility> m_cmd_fac;
 };
 

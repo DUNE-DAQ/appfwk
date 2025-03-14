@@ -34,8 +34,8 @@
 namespace dunedaq {
 namespace appfwk {
 
-DAQModuleManager::DAQModuleManager()
-  : m_initialized(false)
+DAQModuleManager::DAQModuleManager(const std::string& session_name)
+  : m_session_name(session_name), m_initialized(false)
 {
 }
 
@@ -44,7 +44,7 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
 {
   m_configuration_mgr = cfgMgr; // Make a copy
   cfgMgr->initialize();
-  get_iomanager()->configure(m_configuration_mgr->session()->UID(),
+  get_iomanager()->configure(m_session_name,
                              m_configuration_mgr->queues(),
                              m_configuration_mgr->networkconnections(),
                              m_configuration_mgr->connectivity_service(),
