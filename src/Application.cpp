@@ -10,8 +10,8 @@
 #include "Application.hpp"
 
 #include "appfwk/Issues.hpp"
-#include "appfwk/opmon/application.pb.h"
 #include "appfwk/cmd/Nljs.hpp"
+#include "appfwk/opmon/application.pb.h"
 #include "rcif/cmd/Nljs.hpp"
 
 #include "logging/Logging.hpp"
@@ -19,18 +19,15 @@
 #include <string>
 #include <unistd.h>
 
-#include "confmodel/Session.hpp"
 #include "confmodel/Application.hpp"
 #include "confmodel/OpMonURI.hpp"
+#include "confmodel/Session.hpp"
 
 namespace dunedaq {
 namespace appfwk {
 
-Application::Application(std::string appname,
-                         std::string session,
-                         std::string cmdlibimpl,
-                         std::string confimpl)
-  : ConfigurationManagerOwner(confimpl, appname, session) 
+Application::Application(std::string appname, std::string session, std::string cmdlibimpl, std::string confimpl)
+  : ConfigurationManagerOwner(confimpl, appname, session)
   , OpMonManager(session, appname, get_config_manager()->session()->get_opmon_uri()->get_URI(appname))
   , NamedObject(appname)
   , m_state("NONE")
@@ -42,9 +39,8 @@ Application::Application(std::string appname,
   m_runinfo.set_run_number(0);
   m_runinfo.set_run_time(0);
 
-  m_cmd_fac = cmdlib::make_command_facility(
-    cmdlibimpl, session, get_config_manager()->session()->get_connectivity_service()
-  );
+  m_cmd_fac =
+    cmdlib::make_command_facility(cmdlibimpl, session, get_config_manager()->session()->get_connectivity_service());
 
   set_opmon_conf(get_config_manager()->application()->get_opmon_conf());
 
@@ -97,8 +93,7 @@ Application::execute(const dataobj_t& cmd_data)
     m_run_start_time = std::chrono::steady_clock::now();
     m_runinfo.set_running(true);
     m_runinfo.set_run_time(0);
-  }
-  else if (cmdname == "stop") {
+  } else if (cmdname == "stop") {
     m_run_start_time = std::chrono::steady_clock::time_point();
     m_runinfo.set_running(false);
     m_runinfo.set_run_number(0);
@@ -130,16 +125,16 @@ Application::generate_opmon_data()
   if (res < 0)
     ai.set_host("Unknown");
   else
-    ai.set_host (std::string(hostname));
+    ai.set_host(std::string(hostname));
 
   publish(std::move(ai), {}, opmonlib::to_level(opmonlib::EntryOpMonLevel::kTopPriority));
 
-  if ( m_run_start_time.time_since_epoch().count() != 0 ) {
+  if (m_run_start_time.time_since_epoch().count() != 0) {
     auto now = std::chrono::steady_clock::now();
-    m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count() );
+    m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count());
   }
 
-  publish( decltype(m_runinfo)(m_runinfo) );
+  publish(decltype(m_runinfo)(m_runinfo));
 }
 
 bool

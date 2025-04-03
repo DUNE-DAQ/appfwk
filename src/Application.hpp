@@ -19,8 +19,8 @@
 #include "ConfigurationManagerOwner.hpp"
 #include "DAQModuleManager.hpp"
 
-#include "opmonlib/OpMonManager.hpp"
 #include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
+#include "opmonlib/OpMonManager.hpp"
 
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
@@ -66,10 +66,7 @@ class Application
 public:
   using dataobj_t = nlohmann::json;
 
-  Application(std::string app_name,
-              std::string session_name,
-              std::string cmdlibimpl,
-              std::string confimpl);
+  Application(std::string app_name, std::string session_name, std::string cmdlibimpl, std::string confimpl);
 
   // Initialize the application services
   void init();
@@ -85,7 +82,7 @@ public:
 
   // hook for metric generation
   void generate_opmon_data() override;
-  
+
   // State synch getter & setter
   void set_state(std::string s)
   {

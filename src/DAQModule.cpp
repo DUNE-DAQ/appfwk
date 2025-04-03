@@ -18,8 +18,8 @@ void
 DAQModule::execute_command(const std::string& cmd_name, const data_t& data)
 {
   if (auto cmd = m_commands.find(cmd_name); cmd != m_commands.end()) {
-      std::invoke(cmd->second, data);
-      return;
+    std::invoke(cmd->second, data);
+    return;
   }
   throw UnknownCommand(ERS_HERE, get_name(), cmd_name);
 }
@@ -37,7 +37,7 @@ bool
 DAQModule::has_command(const std::string& cmd_name) const
 {
   if (auto cmd = m_commands.find(cmd_name); cmd != m_commands.end()) {
-      return true;
+    return true;
   }
   return false;
 }

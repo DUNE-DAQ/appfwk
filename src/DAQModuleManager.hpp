@@ -13,12 +13,12 @@
 #include "nlohmann/json.hpp"
 
 #include "appfwk/ConfigurationManager.hpp"
-#include "confmodel/DaqModule.hpp"
 #include "conffwk/Configuration.hpp"
+#include "confmodel/DaqModule.hpp"
 
 #include "cmdlib/cmd/Structs.hpp"
-#include "opmonlib/OpMonManager.hpp"
 #include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
+#include "opmonlib/OpMonManager.hpp"
 
 #include <map>
 #include <memory>
@@ -79,7 +79,7 @@ public:
 
   DAQModuleManager();
 
-  void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager & );
+  void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager&);
   bool initialized() const { return m_initialized; }
   void cleanup();
 
@@ -89,12 +89,15 @@ public:
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
-  void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules, opmonlib::OpMonManager & );
+  void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules, opmonlib::OpMonManager&);
 
   void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
   dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);
   bool execute_action(const std::string& mod_name, const std::string& action, const dataobj_t& data_obj);
-  void execute_action_plan_step(const std::string& cmd, const confmodel::DaqModulesGroup* step, const dataobj_t& cmd_data, bool execution_mode_is_serial);
+  void execute_action_plan_step(const std::string& cmd,
+                                const confmodel::DaqModulesGroup* step,
+                                const dataobj_t& cmd_data,
+                                bool execution_mode_is_serial);
 
   void check_mod_has_cmd(const std::string& cmd, const std::string& mod_class, const std::string& mod_id = "");
 

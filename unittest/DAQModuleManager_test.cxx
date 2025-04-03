@@ -75,7 +75,6 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
                           [&](DAQModuleManagerNotInitialized) { return true; });
 }
 
-
 BOOST_AUTO_TEST_CASE(InitializeModules)
 {
   dunedaq::get_iomanager()->reset();

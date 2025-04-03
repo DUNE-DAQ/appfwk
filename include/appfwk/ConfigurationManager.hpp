@@ -56,14 +56,10 @@ class ConfigurationManager
   bool initialized{ false };
 
 public:
-
   ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& session_name);
   void initialize();
 
-  const confmodel::Session* session()
-  {
-    return m_session;
-  }
+  const confmodel::Session* session() { return m_session; }
   const confmodel::Application* application()
   {
     initialize();
