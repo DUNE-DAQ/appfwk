@@ -77,7 +77,7 @@ class DAQModuleManager
 public:
   using dataobj_t = nlohmann::json;
 
-  DAQModuleManager();
+  DAQModuleManager(const std::string& session_name);
 
   void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager&);
   bool initialized() const { return m_initialized; }
@@ -104,6 +104,7 @@ private:
   std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id);
   std::shared_ptr<ConfigurationManager> m_configuration_mgr;
 
+  std::string m_session_name;
   bool m_initialized;
 
   DAQModuleMap_t m_module_map;

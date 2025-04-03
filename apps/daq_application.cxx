@@ -81,8 +81,11 @@ main(int argc, char* argv[])
   // from now on, it's possible to use ERS messages
 
   // Create the Application
-  appfwk::Application app(
-    args.app_name, args.session_name, args.command_facility_plugin_name, args.conf_service_plugin_name);
+  appfwk::Application app(args.app_name,
+                          args.session_name,
+                          args.command_facility_plugin_name,
+                          args.conf_service_plugin_name,
+                          args.configuration_id);
 
   try {
 
