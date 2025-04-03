@@ -17,7 +17,8 @@ namespace dunedaq::appfwk {
 void
 DAQModule::execute_command(const std::string& cmd_name, const data_t& data)
 {
-  if (auto cmd = m_commands.find(cmd_name); cmd != m_commands.end()) {
+  auto cmd = m_commands.find(cmd_name);
+  if (cmd != m_commands.end()) {
     std::invoke(cmd->second, data);
     return;
   }
@@ -36,10 +37,7 @@ DAQModule::get_commands() const
 bool
 DAQModule::has_command(const std::string& cmd_name) const
 {
-  if (auto cmd = m_commands.find(cmd_name); cmd != m_commands.end()) {
-    return true;
-  }
-  return false;
+  return m_commands.find(cmd_name) != m_commands.end();
 }
 
 } // namespace dunedaq::appfwk

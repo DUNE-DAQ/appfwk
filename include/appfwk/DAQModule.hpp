@@ -122,17 +122,6 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
 )
 
 /**
- * @brief The InvalidCommand DAQModule ERS Issue
- */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                    ///< Namespace
-                       InvalidState,                              ///< Issue class name
-                       appfwk::CommandIssue,                      ///< Base class of the issue
-                       "Command is not valid in state " << state, ///< Log Message from the issue
-                       ((std::string)cmd)((std::string)name),     ///< Base class attributes
-                       ((std::string)state)                       ///< Attribute of this class
-)
-
-/**
  * @brief The CommandFailed DAQModule ERS Issue
  */
 ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
@@ -196,8 +185,8 @@ public:
    * @param name The command from CCM
    * @param data Arguments for the command from CCM
    *
-   * execute_command is the single entry point for DAQModuleManager to pass CCM commands to DAQModules. Failure should
-   * throw an ERS exception indicating this result.
+   * execute_command is the single entry point for DAQModuleManager to pass CCM commands to DAQModules. If the given
+   * command has not been registered, it will throw an UnknownCommand ERS exception.
    */
   void execute_command(const std::string& name, const data_t& data = {});
 
@@ -226,26 +215,6 @@ private:
   CommandMap_t m_commands;
 };
 
-/**
- * @brief Load a DAQModule plugin and return a shared_ptr to the contained DAQModule class
- * @param plugin_name Name of the plugin, e.g. DebugLoggingDAQModule
- * @param instance_name Name of the returned DAQModule instance, e.g. DebugLogger1
- * @return shared_ptr to created DAQModule instance
- */
-inline std::shared_ptr<DAQModule>
-make_module(std::string const& plugin_name, std::string const& instance_name)
-{
-  static cet::BasicPluginFactory bpf("duneDAQModule", "make");
-
-  std::shared_ptr<DAQModule> mod_ptr;
-  try {
-    mod_ptr = bpf.makePlugin<std::shared_ptr<DAQModule>>(plugin_name, instance_name);
-  } catch (const cet::exception& cexpt) {
-    throw DAQModuleCreationFailed(ERS_HERE, plugin_name, instance_name, cexpt);
-  }
-  return mod_ptr;
-}
-
 } // namespace appfwk
 
 } // namespace dunedaq
@@ -253,7 +222,3 @@ make_module(std::string const& plugin_name, std::string const& instance_name)
 #include "detail/DAQModule.hxx"
 
 #endif // APPFWK_INCLUDE_APPFWK_DAQMODULE_HPP_
-
-// Local Variables:
-// c-basic-offset: 2
-// End:

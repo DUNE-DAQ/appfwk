@@ -17,6 +17,12 @@
 namespace dunedaq {
 namespace appfwk {
 
+/**
+ * This class exists to be a base class of Application, so that the ConfigurationManager can be initialized once and
+ * used to initialize the OpMonManager (which is also a base class of Application).
+ *
+ * @todo ELF April 3, 2025: Determine how the ConfigurationManager should be exposed by this class to those using it
+ */
 class ConfigurationManagerOwner
 {
 public:
