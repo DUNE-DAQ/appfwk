@@ -29,26 +29,30 @@ const std::string TEST_OKS_DB = "test/config/appSession.data.xml";
 
 BOOST_AUTO_TEST_CASE(Constructor)
 {
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
 }
 
 BOOST_AUTO_TEST_CASE(ConstructorFailures)
 {
   std::shared_ptr<Application> app_ptr;
-  BOOST_REQUIRE_EXCEPTION(app_ptr = std::make_shared<Application>(
-                            "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "bad-session"),
-                          MissingComponent,
-                          [&](MissingComponent) { return true; });
-  BOOST_REQUIRE_EXCEPTION(app_ptr = std::make_shared<Application>(
-                            "BADApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session"),
-                          MissingComponent,
-                          [&](MissingComponent) { return true; });
+  BOOST_REQUIRE_EXCEPTION(
+    app_ptr = std::make_shared<Application>(
+      "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "bad-session"),
+    MissingComponent,
+    [&](MissingComponent) { return true; });
+  BOOST_REQUIRE_EXCEPTION(
+    app_ptr = std::make_shared<Application>(
+      "BADApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session"),
+    MissingComponent,
+    [&](MissingComponent) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(Init)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
   app.init();
 
   dunedaq::iomanager::IOManager::get()->reset();
@@ -59,7 +63,8 @@ BOOST_AUTO_TEST_CASE(Run)
   std::atomic<bool> end_marker = false;
 
   dunedaq::get_iomanager()->reset();
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
 
   BOOST_REQUIRE_EXCEPTION(
     app.run(end_marker), ApplicationNotInitialized, [&](ApplicationNotInitialized) { return true; });
@@ -75,7 +80,8 @@ BOOST_AUTO_TEST_CASE(Run)
 BOOST_AUTO_TEST_CASE(Start)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
   app.init();
 
   dunedaq::appfwk::cmd::CmdObj start;
@@ -105,7 +111,8 @@ BOOST_AUTO_TEST_CASE(Start)
 BOOST_AUTO_TEST_CASE(Stop)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
   app.init();
 
   dunedaq::rcif::cmd::StartParams start_params;
@@ -151,7 +158,8 @@ BOOST_AUTO_TEST_CASE(Stop)
 BOOST_AUTO_TEST_CASE(NotInitialized)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
   dunedaq::rcif::cmd::RCCommand cmd;
   nlohmann::json cmd_data;
 
@@ -178,7 +186,8 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 {
 
   dunedaq::get_iomanager()->reset();
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
   app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
@@ -200,7 +209,8 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
 BOOST_AUTO_TEST_CASE(CommandThrowsException)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
   app.init();
 
   dunedaq::rcif::cmd::RCCommand cmd;
@@ -229,7 +239,8 @@ BOOST_AUTO_TEST_CASE(CommandThrowsException)
 BOOST_AUTO_TEST_CASE(State)
 {
   dunedaq::get_iomanager()->reset();
-  Application app("TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
+  Application app(
+    "TestApp", "the-test-session", "stdin://" + TEST_JSON_FILE, "oksconflibs:" + TEST_OKS_DB, "test-session");
 
   std::string state_in = "state";
   app.set_state(state_in);

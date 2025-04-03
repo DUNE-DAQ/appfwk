@@ -56,8 +56,7 @@ Application::Application(std::string app_name,
     cmdlib::make_command_facility(cmdlibimpl, session, get_config_manager()->session()->get_connectivity_service());
 =======
   m_cmd_fac = cmdlib::make_command_facility(
-    cmdlibimpl, session_name, get_config_manager()->session()->get_connectivity_service()
-  );
+    cmdlibimpl, session_name, get_config_manager()->session()->get_connectivity_service());
 >>>>>>> develop
 
   set_opmon_conf(get_config_manager()->application()->get_opmon_conf());

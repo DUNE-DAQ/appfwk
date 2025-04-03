@@ -35,7 +35,8 @@ namespace dunedaq {
 namespace appfwk {
 
 DAQModuleManager::DAQModuleManager(const std::string& session_name)
-  : m_session_name(session_name), m_initialized(false)
+  : m_session_name(session_name)
+  , m_initialized(false)
 {
 }
 
