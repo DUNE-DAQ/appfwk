@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_SUITE(Application_test)
 
 using namespace dunedaq::appfwk;
 
-const std::string TEST_JSON_FILE =
+const std::string TEST_JSON_FILE =                                                    // NOLINT
   std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json"; // NOLINT
 const std::string TEST_OKS_DB = "test/config/appSession.data.xml";                    // NOLINT
 

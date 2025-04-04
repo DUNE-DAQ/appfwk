@@ -52,7 +52,7 @@ main(int argc, char* argv[])
     args = appfwk::CommandLineInterpreter::parse(argc, argv);
   } catch (bpo::error const& e) {
     // Die but do it gracefully gracefully.
-    std::cerr << "Failed to interpret command line: " << e.what();
+    std::cerr << "Failed to interpret command line: " << e.what(); // NOLINT
     exit(1);
   }
 

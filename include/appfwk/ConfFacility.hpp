@@ -11,9 +11,12 @@
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
 #include <nlohmann/json.hpp>
+
+#include <memory>
 #include <string>
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
+// NOLINTNEXTLINE
 #define EXTERN_C_FUNC_DECLARE_START                                                                                    \
   extern "C"                                                                                                           \
   {
@@ -23,6 +26,7 @@
  * @brief Declare the function that will be called by the plugin loader
  * @param klass Class to be defined as a DUNE Configuration Facility
  */
+// NOLINTNEXTLINE
 #define DEFINE_DUNE_CONFIGURATION_FACILITY(klass)                                                                      \
   EXTERN_C_FUNC_DECLARE_START                                                                                          \
   std::unique_ptr<dunedaq::appfwk::ConfFacility> make()                                                                \

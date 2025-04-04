@@ -20,9 +20,9 @@
 
 #include <string>
 #include <unistd.h>
+#include <utility>
 
-namespace dunedaq {
-namespace appfwk {
+namespace dunedaq::appfwk {
 
 Application::Application(std::string app_name,
                          std::string session_name,
@@ -123,7 +123,7 @@ Application::generate_opmon_data()
   ai.set_busy(m_busy.load());
   ai.set_error(m_error.load());
 
-  char hostname[256];
+  char hostname[256]; // NOLINT
   auto res = gethostname(hostname, 256);
   if (res < 0)
     ai.set_host("Unknown");
@@ -153,5 +153,4 @@ Application::check_state_for_cmd(const dataobj_t& cmd_data) const
   return false;
 }
 
-} // namespace appfwk
-} // namespace dunedaq
+} // namespace dunedaq::appfwk

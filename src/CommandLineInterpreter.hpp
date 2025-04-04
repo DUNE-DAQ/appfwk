@@ -20,10 +20,7 @@
 
 namespace bpo = boost::program_options;
 
-namespace dunedaq {
-
-// Re-enable coverage collection LCOV_EXCL_STOP
-namespace appfwk {
+namespace dunedaq::appfwk {
 /**
  * @brief CommandLineInterpreter parses the command-line options given to the
  * application and stores the results as validated data members
@@ -88,7 +85,6 @@ public:
 
   std::vector<std::string> other_options{}; ///< Any other options which were passed and not recognized
 };
-} // namespace appfwk
-} // namespace dunedaq
+} // namespace dunedaq::appfwk
 
 #endif // APPFWK_SRC_COMMANDLINEINTERPRETER_HPP_
