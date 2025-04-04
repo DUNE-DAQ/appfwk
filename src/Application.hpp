@@ -44,7 +44,7 @@ ERS_DECLARE_ISSUE(appfwk,                                                     //
                   ((std::string)name)                                         ///< Message parameters
 )
 
-ERS_DECLARE_ISSUE(appfwk,         ///< Namespace
+ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
                   InvalidStateForCommand, ///< Issue class name
                   "Command " << cmdid << " not allowed at this time. state: " << state << ", error: " << err
                              << ", busy: " << busy, ///< Message

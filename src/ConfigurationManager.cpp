@@ -33,7 +33,7 @@ ConfigurationManager::ConfigurationManager(std::string& config_spec, std::string
   , m_oks_config_spec(config_spec)
 {
   TLOG() << "configSpec <" << config_spec << "> session name " << session_name << " application name " << app_name;
-    
+
   TLOG_DBG(5) << "getting session " << session_name;
   m_session = m_confdb->get<confmodel::Session>(session_name);
   if (m_session == nullptr) {
