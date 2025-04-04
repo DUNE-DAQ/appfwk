@@ -33,6 +33,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,
 
 namespace appfwk {
 
+/// Showcase DAQModule inheritance, including overriding command implementations in child classes
 class DummyParentModule : public DAQModule
 {
 public:

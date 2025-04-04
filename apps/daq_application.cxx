@@ -23,11 +23,6 @@
 #include <vector>
 
 /**
- * @brief Using namespace for convenience
- */
-using json = nlohmann::json;
-
-/**
  * @brief Global atomic for process lifetime
  */
 std::atomic<bool> run_marker{ true };
@@ -42,22 +37,13 @@ signal_handler(int signal)
   run_marker.store(false);
 }
 
-/**
- * @brief Entry point for daq_application
- * @param argc Number of arguments
- * @param argv Arguments
- * @return Status Code
- */
 int
 main(int argc, char* argv[])
 {
 
   // Setup signals
-  // std::signal(SIGABRT, signal_handler);
-  // std::signal(SIGTERM, signal_handler);
   std::signal(SIGINT, signal_handler);
   std::signal(SIGQUIT, signal_handler);
-  // std::signal(SIGHUP, signal_handler);
 
   using namespace dunedaq;
 
@@ -74,11 +60,8 @@ main(int argc, char* argv[])
     exit(0);
   }
 
-  // up to here it was not possible to use ERS messages
-
+  // Enable DUNE-DAQ logging, including TLOG and ERS messages
   dunedaq::logging::Logging().setup(args.session_name, args.app_name);
-
-  // from now on, it's possible to use ERS messages
 
   // Create the Application
   appfwk::Application app(args.app_name,
