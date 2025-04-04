@@ -8,7 +8,7 @@
  */
 
 #include "appfwk/ConfigurationManager.hpp"
-#include "appfwk/Issues.hpp"
+
 #include "appmodel/SmartDaqApplication.hpp"
 #include "conffwk/Configuration.hpp"
 #include "confmodel/DaqApplication.hpp"

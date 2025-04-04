@@ -54,6 +54,11 @@ ERS_DECLARE_ISSUE(appfwk,         ///< Namespace
                   ((bool)busy)                      ///< Message parameters // NOLINT
 )
 
+ERS_DECLARE_ISSUE(appfwk,
+                  ApplicationFailure,
+                  "Application " << application << " in session " << session << " failed",
+                  ((std::string)session)((std::string)application))
+
 // Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {

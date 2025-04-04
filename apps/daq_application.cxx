@@ -9,7 +9,7 @@
 
 #include "Application.hpp"
 #include "CommandLineInterpreter.hpp"
-#include "appfwk/Issues.hpp"
+
 #include "logging/Logging.hpp"
 
 #include "nlohmann/json.hpp"

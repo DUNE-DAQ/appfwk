@@ -6,22 +6,21 @@
  * received with this code.
  */
 
-#include "cmdlib/cmd/Nljs.hpp"
-
 #include "DAQModuleManager.hpp"
-#include "appfwk/Issues.hpp"
-#include "appfwk/cmd/Nljs.hpp"
-#include "opmonlib/TestOpMonManager.hpp"
 
+#include "appfwk/cmd/Nljs.hpp"
+
+#include "cmdlib/cmd/Nljs.hpp"
 #include "iomanager/IOManager.hpp"
+#include "opmonlib/TestOpMonManager.hpp"
 
 #define BOOST_TEST_MODULE DAQModuleManager_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 
+#include <memory>
 #include <string>
 #include <type_traits>
-#include <memory>
 
 BOOST_AUTO_TEST_SUITE(DAQModuleManager_test)
 

@@ -6,27 +6,28 @@
  * received with this code.
  */
 
-#include "rcif/cmd/Nljs.hpp"
-
 #include "Application.hpp"
-#include "appfwk/Issues.hpp"
+
 #include "appfwk/cmd/Nljs.hpp"
+
 #include "iomanager/IOManager.hpp"
+#include "rcif/cmd/Nljs.hpp"
 
 #define BOOST_TEST_MODULE Application_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 
-#include <string>
 #include <memory>
+#include <string>
 #include <type_traits>
 
 BOOST_AUTO_TEST_SUITE(Application_test)
 
 using namespace dunedaq::appfwk;
 
-const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json"; // NOLINT
-const std::string TEST_OKS_DB = "test/config/appSession.data.xml"; // NOLINT
+const std::string TEST_JSON_FILE =
+  std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json"; // NOLINT
+const std::string TEST_OKS_DB = "test/config/appSession.data.xml";                    // NOLINT
 
 BOOST_AUTO_TEST_CASE(Constructor)
 {

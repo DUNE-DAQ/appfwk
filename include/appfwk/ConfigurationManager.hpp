@@ -32,6 +32,13 @@ ERS_DECLARE_ISSUE(appfwk,             ///< Namespace
                   ((std::string)app) ///< Message parameters
 )
 
+ERS_DECLARE_ISSUE(appfwk, MissingComponent, "No such component: " << what, ((std::string)what))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  ActionPlanValidationFailed,
+                  "Error validating action plan " << cmd << ", module " << module << ": " << message,
+                  ((std::string)cmd)((std::string)module)((std::string)message))
+
 namespace appfwk {
 
 class ConfigurationManager

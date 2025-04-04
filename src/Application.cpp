@@ -9,19 +9,17 @@
 
 #include "Application.hpp"
 
-#include "appfwk/Issues.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 #include "appfwk/opmon/application.pb.h"
-#include "rcif/cmd/Nljs.hpp"
-
-#include "logging/Logging.hpp"
-
-#include <string>
-#include <unistd.h>
 
 #include "confmodel/Application.hpp"
 #include "confmodel/OpMonURI.hpp"
 #include "confmodel/Session.hpp"
+#include "logging/Logging.hpp"
+#include "rcif/cmd/Nljs.hpp"
+
+#include <string>
+#include <unistd.h>
 
 namespace dunedaq {
 namespace appfwk {

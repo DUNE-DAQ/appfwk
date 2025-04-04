@@ -7,7 +7,6 @@
  */
 
 #include "appfwk/DAQModule.hpp"
-#include "appfwk/Issues.hpp"
 
 #define BOOST_TEST_MODULE DAQModule_test // NOLINT
 

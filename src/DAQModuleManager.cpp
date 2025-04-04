@@ -8,20 +8,15 @@
 
 #include "DAQModuleManager.hpp"
 
-#include "cmdlib/cmd/Nljs.hpp"
-
-#include "appfwk/Issues.hpp"
+#include "appfwk/DAQModule.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 
-#include "appfwk/DAQModule.hpp"
-
+#include "cmdlib/cmd/Nljs.hpp"
 #include "confmodel/DaqModulesGroup.hpp"
 #include "confmodel/DaqModulesGroupById.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
 #include "confmodel/Session.hpp"
-
 #include "iomanager/IOManager.hpp"
-
 #include "logging/Logging.hpp"
 
 #include <future>

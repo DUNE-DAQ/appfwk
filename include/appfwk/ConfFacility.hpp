@@ -8,8 +8,6 @@
 #ifndef APPFWK_INCLUDE_APPFWK_CONFFACILITY_HPP_
 #define APPFWK_INCLUDE_APPFWK_CONFFACILITY_HPP_
 
-#include "Issues.hpp"
-
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
 #include <nlohmann/json.hpp>

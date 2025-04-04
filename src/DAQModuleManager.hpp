@@ -66,6 +66,11 @@ ERS_DECLARE_ISSUE_BASE(appfwk,                                                  
                        ((std::string)message)                                          ///< This class params
 )
 
+ERS_DECLARE_ISSUE(appfwk,
+                  ActionPlanNotFound,
+                  "No action plan found for command " << cmd << ", taking the following action: " << message,
+                  ((std::string)cmd)((std::string)message))
+
 // Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
