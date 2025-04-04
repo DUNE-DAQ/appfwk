@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#ifndef APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
-#define APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
+#ifndef APPFWK_SRC_DAQMODULEMANAGER_HPP_
+#define APPFWK_SRC_DAQMODULEMANAGER_HPP_
 
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
@@ -77,7 +77,7 @@ class DAQModuleManager
 public:
   using dataobj_t = nlohmann::json;
 
-  DAQModuleManager(const std::string& session_name);
+  explicit DAQModuleManager(const std::string& session_name);
 
   void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager&);
   bool initialized() const { return m_initialized; }
@@ -114,4 +114,4 @@ private:
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
+#endif // APPFWK_SRC_DAQMODULEMANAGER_HPP_

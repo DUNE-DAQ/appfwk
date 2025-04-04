@@ -18,14 +18,15 @@
 #include "boost/test/unit_test.hpp"
 
 #include <string>
+#include <memory>
 #include <type_traits>
 
 BOOST_AUTO_TEST_SUITE(Application_test)
 
 using namespace dunedaq::appfwk;
 
-const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json";
-const std::string TEST_OKS_DB = "test/config/appSession.data.xml";
+const std::string TEST_JSON_FILE = std::string(getenv("DBT_AREA_ROOT")) + "/sourcecode/appfwk/test/scripts/test.json"; // NOLINT
+const std::string TEST_OKS_DB = "test/config/appSession.data.xml"; // NOLINT
 
 BOOST_AUTO_TEST_CASE(Constructor)
 {
@@ -103,7 +104,7 @@ BOOST_AUTO_TEST_CASE(Start)
   cmd.exit_state = "RUNNING";
   to_json(cmd_data, cmd);
 
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
+  bool cmd_valid = app.check_state_for_cmd(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
   app.execute(cmd_data);
   dunedaq::iomanager::IOManager::get()->reset();
@@ -137,7 +138,7 @@ BOOST_AUTO_TEST_CASE(Stop)
   cmd.exit_state = "RUNNING";
   to_json(cmd_data, cmd);
 
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
+  bool cmd_valid = app.check_state_for_cmd(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
   app.execute(cmd_data);
 
@@ -149,7 +150,7 @@ BOOST_AUTO_TEST_CASE(Stop)
   cmd.exit_state = "CONFIGURED";
   to_json(cmd_data, cmd);
 
-  cmd_valid = app.is_cmd_valid(cmd_data);
+  cmd_valid = app.check_state_for_cmd(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
   app.execute(cmd_data);
   dunedaq::iomanager::IOManager::get()->reset();
@@ -171,18 +172,18 @@ BOOST_AUTO_TEST_CASE(NotInitialized)
   cmd.exit_state = "RUNNING";
   to_json(cmd_data, cmd);
 
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
+  bool cmd_valid = app.check_state_for_cmd(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, true);
 
   BOOST_REQUIRE_EXCEPTION(
     app.execute(cmd_data), DAQModuleManagerNotInitialized, [&](DAQModuleManagerNotInitialized) { return true; });
 
-  cmd_valid = app.is_cmd_valid(cmd_data);
+  cmd_valid = app.check_state_for_cmd(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, false);
   dunedaq::iomanager::IOManager::get()->reset();
 }
 
-BOOST_AUTO_TEST_CASE(InvalidCommandTest)
+BOOST_AUTO_TEST_CASE(CommandStateTest)
 {
 
   dunedaq::get_iomanager()->reset();
@@ -196,12 +197,12 @@ BOOST_AUTO_TEST_CASE(InvalidCommandTest)
   nlohmann::json cmd_data;
   to_json(cmd_data, cmd);
 
-  bool cmd_valid = app.is_cmd_valid(cmd_data);
+  bool cmd_valid = app.check_state_for_cmd(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, false);
 
-  BOOST_REQUIRE_EXCEPTION(app.execute(cmd_data), InvalidCommand, [&](InvalidCommand) { return true; });
+  BOOST_REQUIRE_EXCEPTION(app.execute(cmd_data), InvalidStateForCommand, [&](InvalidStateForCommand) { return true; });
 
-  cmd_valid = app.is_cmd_valid(cmd_data);
+  cmd_valid = app.check_state_for_cmd(cmd_data);
   BOOST_REQUIRE_EQUAL(cmd_valid, false);
   dunedaq::iomanager::IOManager::get()->reset();
 }

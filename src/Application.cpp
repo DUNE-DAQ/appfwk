@@ -79,8 +79,8 @@ Application::execute(const dataobj_t& cmd_data)
 {
   auto rc_cmd = cmd_data.get<rcif::cmd::RCCommand>();
   std::string cmdname = rc_cmd.id;
-  if (!is_cmd_valid(cmd_data)) {
-    throw InvalidCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
+  if (!check_state_for_cmd(cmd_data)) {
+    throw InvalidStateForCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
   }
 
   m_busy.store(true);
@@ -143,14 +143,13 @@ Application::generate_opmon_data()
 }
 
 bool
-Application::is_cmd_valid(const dataobj_t& cmd_data)
+Application::check_state_for_cmd(const dataobj_t& cmd_data) const
 {
   if (m_busy.load() || m_error.load())
     return false;
 
-  std::string state = get_state();
   std::string entry_state = cmd_data.get<rcif::cmd::RCCommand>().entry_state;
-  if (entry_state == "ANY" || state == entry_state)
+  if (entry_state == "ANY" || get_state() == entry_state)
     return true;
 
   return false;

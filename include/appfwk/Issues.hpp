@@ -22,35 +22,35 @@ namespace dunedaq {
 // Disable coverage collection LCOV_EXCL_START
 // Throw if a CLI receives unexpected usage.  The "what" arg
 // should explain the nature of the error.
-ERS_DECLARE_ISSUE(appfwk, BadCliUsage, what, ((std::string)what))
+//ERS_DECLARE_ISSUE(appfwk, BadCliUsage, what, ((std::string)what))
 
 // Throw if an operation driven by a schema fails due to data not
 // following the schema.  This can be considered a special case of
 // a corrupt stream.  Describe the error in the "what" arg.
-ERS_DECLARE_ISSUE(appfwk, InvalidSchema, "Schema error: " << what, ((std::string)what))
+//ERS_DECLARE_ISSUE(appfwk, InvalidSchema, "Schema error: " << what, ((std::string)what))
 
 // Throw if a lookup of a component fails.
 ERS_DECLARE_ISSUE(appfwk, MissingComponent, "No such component: " << what, ((std::string)what))
 
 // Throw if a command is received for which there is no handler
 // implemented.
-ERS_DECLARE_ISSUE(appfwk,
-                  UnexpectedCommand,
-                  "Unexpected command: " << cmd << " received by " << who,
-                  ((std::string)cmd)((std::string)who))
+//ERS_DECLARE_ISSUE(appfwk,
+//                  UnexpectedCommand,
+//                  "Unexpected command: " << cmd << " received by " << who,
+//                  ((std::string)cmd)((std::string)who))
 
-ERS_DECLARE_ISSUE(appfwk,
-                  CommandContractViolation,
-                  "Contract " << who << " violation with command: " << cmd << ": " << what,
-                  ((std::string)what)((std::string)cmd)((std::string)who))
+//ERS_DECLARE_ISSUE(appfwk,
+//                  CommandContractViolation,
+//                  "Contract " << who << " violation with command: " << cmd << ": " << what,
+//                  ((std::string)what)((std::string)cmd)((std::string)who))
 
 ERS_DECLARE_ISSUE(appfwk, BadFile, "Can not open file: " << filename, ((std::string)filename))
 
-ERS_DECLARE_ISSUE(appfwk, CannotParseData, "Can not parse data: " << reason, ((std::string)reason))
+//ERS_DECLARE_ISSUE(appfwk, CannotParseData, "Can not parse data: " << reason, ((std::string)reason))
 
-ERS_DECLARE_ISSUE(appfwk, InvalidConfigurationURI, "Cannot get a configuration using URI " << uri, ((std::string)uri))
+//ERS_DECLARE_ISSUE(appfwk, InvalidConfigurationURI, "Cannot get a configuration using URI " << uri, ((std::string)uri))
 
-ERS_DECLARE_ISSUE(appfwk, ConfigurationRetreival, "Failed to retrieve configuration: " << uri, ((std::string)uri))
+//ERS_DECLARE_ISSUE(appfwk, ConfigurationRetreival, "Failed to retrieve configuration: " << uri, ((std::string)uri))
 
 ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanNotFound,
@@ -62,17 +62,17 @@ ERS_DECLARE_ISSUE(appfwk,
                   "Error validating action plan " << cmd << ", module " << module << ": " << message,
                   ((std::string)cmd)((std::string)module)((std::string)message))
 
-ERS_DECLARE_ISSUE(appfwk,
-                  EnvironmentVariableNotFound,
-                  "Environment variable " << var << " wasn't found.",
-                  ((std::string)var))
+//ERS_DECLARE_ISSUE(appfwk,
+//                  EnvironmentVariableNotFound,
+//                  "Environment variable " << var << " wasn't found.",
+//                  ((std::string)var))
 
-ERS_DECLARE_ISSUE(appfwk,
-                  MismatchedEnvAndCLI,
-                  "The command line argument \"--" << cli_name << "\" and env variable \"" << env_name
-                                                   << "\" must be set to the same value, but are set as \"" << cli_value
-                                                   << "\" and \"" << env_value << "\", respectively",
-                  ((std::string)cli_name)((std::string)env_name)((std::string)cli_value)((std::string)env_value))
+//ERS_DECLARE_ISSUE(appfwk,
+//                  MismatchedEnvAndCLI,
+//                  "The command line argument \"--" << cli_name << "\" and env variable \"" << env_name
+//                                                   << "\" must be set to the same value, but are set as \"" << cli_value
+//                                                   << "\" and \"" << env_value << "\", respectively",
+//                  ((std::string)cli_name)((std::string)env_name)((std::string)cli_value)((std::string)env_value))
 
 ERS_DECLARE_ISSUE(appfwk,
                   ApplicationFailure,

@@ -21,6 +21,7 @@
 
 #include <string>
 #include <type_traits>
+#include <memory>
 
 BOOST_AUTO_TEST_SUITE(DAQModuleManager_test)
 

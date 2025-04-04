@@ -5,8 +5,8 @@
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
-#ifndef APPFWK_SRC_CONFFACILITY
-#define APPFWK_SRC_CONFFACILITY
+#ifndef APPFWK_INCLUDE_APPFWK_CONFFACILITY_HPP_
+#define APPFWK_INCLUDE_APPFWK_CONFFACILITY_HPP_
 
 #include "Issues.hpp"
 
@@ -85,4 +85,4 @@ make_conf_facility(std::string const& uri)
 
 } // namespace dunedaq::appfwk
 
-#endif // APPFWK_SRC_CONFFACILITY
+#endif // APPFWK_INCLUDE_APPFWK_CONFFACILITY_HPP_

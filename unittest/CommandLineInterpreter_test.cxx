@@ -20,7 +20,8 @@ using namespace dunedaq::appfwk;
 // n.b. Because CommandLineInterpreter requires a non-const char**,
 // some coding guidelines need to be bent for the sake of simplicity
 
-// clang-format off Turning off clang-format to preserve formatting of commandline array declarations
+// Turning off clang-format to preserve formatting of commandline array declarations
+// clang-format off
 
 BOOST_AUTO_TEST_SUITE(CommandLineInterpreter_test)
 
@@ -61,8 +62,10 @@ BOOST_AUTO_TEST_CASE(ParseName)
 {
 
   char** arg_list = new char*[5]{
-    (char*)("CommandLineInterpreter_test"), (char*)("-n"), (char*)("cli_test"), (char*)("-d"), (char*)("file://"),
-  }; // NOLINT
+    (char*)("CommandLineInterpreter_test"), // NOLINT
+    (char*)("-n"), (char*)("cli_test"),     // NOLINT
+    (char*)("-d"), (char*)("file://"),      // NOLINT
+  };
   BOOST_REQUIRE_EXCEPTION(CommandLineInterpreter::parse(5, arg_list), bpo::error, [&](bpo::error) { return true; });
 
   delete[] arg_list; // NOLINT
@@ -70,18 +73,13 @@ BOOST_AUTO_TEST_CASE(ParseName)
 
 BOOST_AUTO_TEST_CASE(ParseNameAndCommandFacility)
 {
-  char** arg_list = new char*[11]{
-    (char*)("CommandLineInterpreter_test"), // NOLINT
-    (char*)("-c"),
-    (char*)("stdin://"), // NOLINT
-    (char*)("-d"),
-    (char*)("file://"), // NOLINT
-    (char*)("-s"),
-    (char*)("my_test_session"), // NOLINT
-    (char*)("-k"),
-    (char*)("test_session"), // NOLINT
-    (char*)("-n"),
-    (char*)("cli_test") // NOLINT
+  char** arg_list = new char* [11] {
+    (char*)("CommandLineInterpreter_test"),    // NOLINT
+    (char*)("-c"), (char*)("stdin://"),        // NOLINT
+    (char*)("-d"), (char*)("file://"),         // NOLINT
+    (char*)("-s"), (char*)("my_test_session"), // NOLINT
+    (char*)("-k"), (char*)("test_session"),    // NOLINT
+    (char*)("-n"), (char*)("cli_test")         // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(11, arg_list);
 
@@ -98,18 +96,13 @@ BOOST_AUTO_TEST_CASE(ParseNameAndCommandFacility)
 
 BOOST_AUTO_TEST_CASE(ParseSession)
 {
-  char** arg_list = new char*[11]{
-    (char*)("CommandLineInterpreter_test"), // NOLINT
-    (char*)("-c"),
-    (char*)("stdin://"), // NOLINT
-    (char*)("-d"),
-    (char*)("file://"), // NOLINT
-    (char*)("-s"),
-    (char*)("my_test_session"), // NOLINT
-    (char*)("-k"),
-    (char*)("test_session"), // NOLINT
-    (char*)("-n"),
-    (char*)("cli_test") // NOLINT
+  char** arg_list = new char* [11] {
+    (char*)("CommandLineInterpreter_test"),    // NOLINT
+    (char*)("-c"), (char*)("stdin://"),        // NOLINT
+    (char*)("-d"), (char*)("file://"),         // NOLINT
+    (char*)("-s"), (char*)("my_test_session"), // NOLINT
+    (char*)("-k"), (char*)("test_session"),    // NOLINT
+    (char*)("-n"), (char*)("cli_test")         // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(11, arg_list);
 
@@ -125,19 +118,14 @@ BOOST_AUTO_TEST_CASE(ParseSession)
 }
 BOOST_AUTO_TEST_CASE(ParseOtherOption)
 {
-  char** arg_list = new char*[12]{
-    (char*)("CommandLineInterpreter_test"), // NOLINT
-    (char*)("-c"),
-    (char*)("stdin://"), // NOLINT
-    (char*)("-d"),
-    (char*)("file://"), // NOLINT
-    (char*)("-s"),
-    (char*)("my_test_session"), // NOLINT
-    (char*)("-k"),
-    (char*)("test_session"), // NOLINT
-    (char*)("-n"),
-    (char*)("cli_test"),           // NOLINT
-    (char*)("--some-other-option") // NOLINT
+  char** arg_list = new char* [12] {
+    (char*)("CommandLineInterpreter_test"),    // NOLINT
+    (char*)("-c"), (char*)("stdin://"),        // NOLINT
+    (char*)("-d"), (char*)("file://"),         // NOLINT
+    (char*)("-s"), (char*)("my_test_session"), // NOLINT
+    (char*)("-k"), (char*)("test_session"),    // NOLINT
+    (char*)("-n"), (char*)("cli_test"),        // NOLINT
+    (char*)("--some-other-option")             // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(12, arg_list);
 
@@ -154,22 +142,16 @@ BOOST_AUTO_TEST_CASE(ParseOtherOption)
 }
 BOOST_AUTO_TEST_CASE(ParseMultipleOtherOptions)
 {
-  char** arg_list = new char*[15]{
-    (char*)("CommandLineInterpreter_test"), // NOLINT
-    (char*)("-c"),
-    (char*)("stdin://"), // NOLINT
-    (char*)("-d"),
-    (char*)("file://"), // NOLINT
-    (char*)("-n"),
-    (char*)("cli_test"), // NOLINT
-    (char*)("-s"),
-    (char*)("my_test_session"), // NOLINT
-    (char*)("-k"),
-    (char*)("test_session"),           // NOLINT
-    (char*)("--some-other-option"),    // NOLINT
-    (char*)("--yet-another-option=4"), // NOLINT
-    (char*)("-u"),
-    (char*)("me") // NOLINT
+  char** arg_list = new char* [15] {
+    (char*)("CommandLineInterpreter_test"),      // NOLINT
+      (char*)("-c"), (char*)("stdin://"),        // NOLINT
+      (char*)("-d"), (char*)("file://"),         // NOLINT
+      (char*)("-n"), (char*)("cli_test"),        // NOLINT
+      (char*)("-s"), (char*)("my_test_session"), // NOLINT
+      (char*)("-k"), (char*)("test_session"),    // NOLINT
+      (char*)("--some-other-option"),            // NOLINT
+      (char*)("--yet-another-option=4"),         // NOLINT
+      (char*)("-u"), (char*)("me")               // NOLINT
   };
   auto parsed = CommandLineInterpreter::parse(15, arg_list);
 

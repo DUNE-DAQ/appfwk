@@ -6,16 +6,15 @@
  * received with this code.
  */
 
-#ifndef APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_
-#define APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_
+#ifndef APPFWK_SRC_CONFIGURATIONMANAGEROWNER_HPP_
+#define APPFWK_SRC_CONFIGURATIONMANAGEROWNER_HPP_
 
 #include "appfwk/ConfigurationManager.hpp"
 
 #include <memory>
 #include <string>
 
-namespace dunedaq {
-namespace appfwk {
+namespace dunedaq::appfwk {
 
 /**
  * This class exists to be a base class of Application, so that the ConfigurationManager can be initialized once and
@@ -37,7 +36,6 @@ private:
   std::shared_ptr<ConfigurationManager> m_config_mgr;
 };
 
-} // namespace appfwk
-} // namespace dunedaq
+} // namespace dunedaq::appfwk
 
-#endif // APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_
+#endif // APPFWK_SRC_CONFIGURATIONMANAGEROWNER_HPP_
