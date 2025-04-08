@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
-#define APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
+#ifndef APPFWK_SRC_COMMANDLINEINTERPRETER_HPP_
+#define APPFWK_SRC_COMMANDLINEINTERPRETER_HPP_
 
 #include "boost/program_options.hpp"
 
@@ -20,10 +20,7 @@
 
 namespace bpo = boost::program_options;
 
-namespace dunedaq {
-
-// Re-enable coverage collection LCOV_EXCL_STOP
-namespace appfwk {
+namespace dunedaq::appfwk {
 /**
  * @brief CommandLineInterpreter parses the command-line options given to the
  * application and stores the results as validated data members
@@ -78,17 +75,16 @@ public:
     return output;
   }
 
-  bool help_requested{ false }; ///< Did the user just ask for help?
+  bool help_requested{ false };
 
   std::string app_name{ "" };
   std::string session_name{ "" };
   std::string configuration_id{ "" };
-  std::string command_facility_plugin_name{ "" }; ///< Name of the CommandFacility plugin to load
-  std::string conf_service_plugin_name{ "" };     ///< Name of the ConfService plugin to load
+  std::string command_facility_plugin_name{ "" };
+  std::string conf_service_plugin_name{ "" };
 
   std::vector<std::string> other_options{}; ///< Any other options which were passed and not recognized
 };
-} // namespace appfwk
-} // namespace dunedaq
+} // namespace dunedaq::appfwk
 
-#endif // APPFWK_INCLUDE_APPFWK_COMMANDLINEINTERPRETER_HPP_
+#endif // APPFWK_SRC_COMMANDLINEINTERPRETER_HPP_

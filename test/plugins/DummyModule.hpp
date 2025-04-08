@@ -16,6 +16,7 @@
 #include "ers/ers.hpp"
 #include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -32,6 +33,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,
 
 namespace appfwk {
 
+/// Showcase DAQModule inheritance, including overriding command implementations in child classes
 class DummyParentModule : public DAQModule
 {
 public:

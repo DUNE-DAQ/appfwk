@@ -6,19 +6,19 @@
  * received with this code.
  */
 
-#ifndef APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
-#define APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
+#ifndef APPFWK_SRC_DAQMODULEMANAGER_HPP_
+#define APPFWK_SRC_DAQMODULEMANAGER_HPP_
 
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 
 #include "appfwk/ConfigurationManager.hpp"
-#include "confmodel/DaqModule.hpp"
 #include "conffwk/Configuration.hpp"
+#include "confmodel/DaqModule.hpp"
 
 #include "cmdlib/cmd/Structs.hpp"
-#include "opmonlib/OpMonManager.hpp"
 #include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
+#include "opmonlib/OpMonManager.hpp"
 
 #include <map>
 #include <memory>
@@ -28,43 +28,39 @@
 namespace dunedaq {
 
 // Disable coverage collection LCOV_EXCL_START
-ERS_DECLARE_ISSUE(appfwk,                                                   ///< Namespace
-                  DAQModuleManagerNotInitialized,                           ///< Issue class name
-                  "Command " << cmdid << " received before initialization", ///< Message
-                  ((std::string)cmdid)                                      ///< Message parameters
-)
-ERS_DECLARE_ISSUE(appfwk,                             ///< Namespace
-                  DAQModuleManagerAlreadyInitialized, ///< Issue class name
+ERS_DECLARE_ISSUE(appfwk,
+                  DAQModuleManagerNotInitialized,
+                  "Command " << cmdid << " received before initialization",
+                  ((std::string)cmdid))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  DAQModuleManagerAlreadyInitialized,
                   "\"init\" Command received when already initialized",
-                  ERS_EMPTY) ///< Message
+                  ERS_EMPTY)
 
-ERS_DECLARE_ISSUE(appfwk,                                                               ///< Namespace
-                  CommandDispatchingFailed,                                             ///< Issue class name
-                  "Command " << cmdid << " was not executed correctly by: " << modules, ///< Message
-                  ((std::string)cmdid)                                                  ///< Message parameters
-                  ((std::string)modules)                                                ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk,
+                  CommandDispatchingFailed,
+                  "Command " << cmdid << " was not executed correctly by: " << modules,
+                  ((std::string)cmdid)((std::string)modules))
 
-ERS_DECLARE_ISSUE(appfwk,                                                                ///< Namespace
-                  ConflictingCommandMatching,                                            ///< Issue class name
-                  "Command " << cmdid << " matches multiple times modules: " << modules, ///< Message
-                  ((std::string)cmdid)                                                   ///< Message parameters
-                  ((std::string)modules)                                                 ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk,
+                  ConflictingCommandMatching,
+                  "Command " << cmdid << " matches multiple times modules: " << modules,
+                  ((std::string)cmdid)((std::string)modules))
 
-ERS_DECLARE_ISSUE(appfwk,                                         ///< Namespace
-                  FailedInfoGathering,                            ///< Issue class name
-                  "Info gathering failed for module: " << module, ///< Message
-                  ((std::string)module)                           ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk, FailedInfoGathering, "Info gathering failed for module: " << module, ((std::string)module))
 
-ERS_DECLARE_ISSUE_BASE(appfwk,                                                         ///< Namespace
-                       ExceptionWhileInfoGathering,                                    ///< Issue class name
-                       FailedInfoGathering,                                            ///< Base Issue class name
-                       module << " threw exception while info gathering: " << message, ///< Message
-                       ((std::string)module),                                          ///< Base Issue params
-                       ((std::string)message)                                          ///< This class params
-)
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       ExceptionWhileInfoGathering,
+                       FailedInfoGathering,
+                       module << " threw exception while info gathering: " << message,
+                       ((std::string)module),
+                       ((std::string)message))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  ActionPlanNotFound,
+                  "No action plan found for command " << cmd << ", taking the following action: " << message,
+                  ((std::string)cmd)((std::string)message))
 
 // Re-enable coverage collection LCOV_EXCL_STOP
 
@@ -77,9 +73,9 @@ class DAQModuleManager
 public:
   using dataobj_t = nlohmann::json;
 
-  DAQModuleManager(const std::string& session_name);
+  explicit DAQModuleManager(const std::string& session_name);
 
-  void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager & );
+  void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager&);
   bool initialized() const { return m_initialized; }
   void cleanup();
 
@@ -89,12 +85,15 @@ public:
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
-  void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules, opmonlib::OpMonManager & );
+  void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules, opmonlib::OpMonManager&);
 
   void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
   dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);
   bool execute_action(const std::string& mod_name, const std::string& action, const dataobj_t& data_obj);
-  void execute_action_plan_step(const std::string& cmd, const confmodel::DaqModulesGroup* step, const dataobj_t& cmd_data, bool execution_mode_is_serial);
+  void execute_action_plan_step(const std::string& cmd,
+                                const confmodel::DaqModulesGroup* step,
+                                const dataobj_t& cmd_data,
+                                bool execution_mode_is_serial);
 
   void check_mod_has_cmd(const std::string& cmd, const std::string& mod_class, const std::string& mod_id = "");
 
@@ -111,4 +110,4 @@ private:
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APPFWK_INCLUDE_APPFWK_DAQMODULEMANAGER_HPP_
+#endif // APPFWK_SRC_DAQMODULEMANAGER_HPP_

@@ -6,26 +6,26 @@
  * received with this code.
  */
 
-#ifndef APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
-#define APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
+#ifndef APPFWK_SRC_APPLICATION_HPP_
+#define APPFWK_SRC_APPLICATION_HPP_
 
+// appfwk Includes
+#include "ConfigurationManagerOwner.hpp"
+#include "DAQModuleManager.hpp"
 #include "appfwk/cmd/Structs.hpp"
+
+// DUNE-DAQ includes
+#include "cmdlib/CommandFacility.hpp"
+#include "cmdlib/CommandedObject.hpp"
+#include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
+#include "opmonlib/OpMonManager.hpp"
 #include "rcif/opmon/run_info.pb.h"
 #include "utilities/NamedObject.hpp"
 
-#include "cmdlib/CommandFacility.hpp"
-#include "cmdlib/CommandedObject.hpp"
-
-#include "ConfigurationManagerOwner.hpp"
-#include "DAQModuleManager.hpp"
-#include "appfwk/ConfFacility.hpp"
-
-#include "opmonlib/OpMonManager.hpp"
-#include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
-
-#include "ers/Issue.hpp"
+// External libraries
 #include "nlohmann/json.hpp"
 
+// C++ includes
 #include <atomic>
 #include <chrono>
 #include <memory>
@@ -35,24 +35,22 @@
 namespace dunedaq {
 
 // Disable coverage collection LCOV_EXCL_START
-/**
- * @brief A generic Application ERS Issue
- */
-ERS_DECLARE_ISSUE(appfwk,                                                     ///< Namespace
-                  ApplicationNotInitialized,                                  ///< Issue class name
-                  "Application " << name << " has not been initialized yet.", ///< Message
-                  ((std::string)name)                                         ///< Message parameters
-)
 
-ERS_DECLARE_ISSUE(appfwk,         ///< Namespace
-                  InvalidCommand, ///< Issue class name
-                  "Command " << cmdid << " not allowed. state: " << state << ", error: " << err
-                             << ", busy: " << busy, ///< Message
-                  ((std::string)cmdid)              ///< Message parameters
-                  ((std::string)state)              ///< Message parameters
-                  ((bool)err)                       ///< Message parameters // NOLINT
-                  ((bool)busy)                      ///< Message parameters // NOLINT
-)
+ERS_DECLARE_ISSUE(appfwk,
+                  ApplicationNotInitialized,
+                  "Application " << name << " has not been initialized yet.",
+                  ((std::string)name))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  InvalidStateForCommand,
+                  "Command " << cmdid << " not allowed at this time. state: " << state << ", error: " << err
+                             << ", busy: " << busy,
+                  ((std::string)cmdid)((std::string)state)((bool)err)((bool)busy)) // NOLINT
+
+ERS_DECLARE_ISSUE(appfwk,
+                  ApplicationFailure,
+                  "Application " << application << " in session " << session << " failed",
+                  ((std::string)session)((std::string)application))
 
 // Re-enable coverage collection LCOV_EXCL_STOP
 
@@ -73,28 +71,22 @@ public:
               std::string confimpl,
               std::string configuration_id);
 
-  // Initialize the application services
   void init();
 
-  // Start the main run loop
   void run(std::atomic<bool>& end_marker);
 
-  // Execute a properly structured command
-  void execute(const dataobj_t& cmd_data);
+  void execute(const dataobj_t& cmd_data) override;
 
-  // Check whether the command can be accepted
-  bool is_cmd_valid(const dataobj_t& cmd_data);
+  bool check_state_for_cmd(const dataobj_t& cmd_data) const;
 
-  // hook for metric generation
   void generate_opmon_data() override;
 
-  // State synch getter & setter
   void set_state(std::string s)
   {
     const std::lock_guard<std::mutex> lock(m_mutex);
     m_state = s;
   }
-  std::string get_state()
+  std::string get_state() const
   {
     const std::lock_guard<std::mutex> lock(m_mutex);
     return m_state;
@@ -102,7 +94,7 @@ public:
 
 private:
   DAQModuleManager m_mod_mgr;
-  std::mutex m_mutex;
+  mutable std::mutex m_mutex;
   std::string m_state;
   std::atomic<bool> m_busy;
   std::atomic<bool> m_error;
@@ -115,4 +107,4 @@ private:
 } // namespace appfwk
 } // namespace dunedaq
 
-#endif // APPFWK_INCLUDE_APPFWK_APPLICATION_HPP_
+#endif // APPFWK_SRC_APPLICATION_HPP_

@@ -6,17 +6,22 @@
  * received with this code.
  */
 
-#ifndef APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_
-#define APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_
+#ifndef APPFWK_SRC_CONFIGURATIONMANAGEROWNER_HPP_
+#define APPFWK_SRC_CONFIGURATIONMANAGEROWNER_HPP_
 
 #include "appfwk/ConfigurationManager.hpp"
 
 #include <memory>
 #include <string>
 
-namespace dunedaq {
-namespace appfwk {
+namespace dunedaq::appfwk {
 
+/**
+ * This class exists to be a base class of Application, so that the ConfigurationManager can be initialized once and
+ * used to initialize the OpMonManager (which is also a base class of Application).
+ *
+ * @todo ELF April 3, 2025: Determine how the ConfigurationManager should be exposed by this class to those using it
+ */
 class ConfigurationManagerOwner
 {
 public:
@@ -31,7 +36,6 @@ private:
   std::shared_ptr<ConfigurationManager> m_config_mgr;
 };
 
-} // namespace appfwk
-} // namespace dunedaq
+} // namespace dunedaq::appfwk
 
-#endif // APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGEROWNER_HPP_
+#endif // APPFWK_SRC_CONFIGURATIONMANAGEROWNER_HPP_

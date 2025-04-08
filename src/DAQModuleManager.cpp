@@ -8,34 +8,31 @@
 
 #include "DAQModuleManager.hpp"
 
-#include "cmdlib/cmd/Nljs.hpp"
-
-#include "appfwk/Issues.hpp"
+#include "appfwk/DAQModule.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 
-#include "appfwk/DAQModule.hpp"
-
+#include "cmdlib/cmd/Nljs.hpp"
 #include "confmodel/DaqModulesGroup.hpp"
 #include "confmodel/DaqModulesGroupById.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
 #include "confmodel/Session.hpp"
-
 #include "iomanager/IOManager.hpp"
-
 #include "logging/Logging.hpp"
 
 #include <future>
 #include <map>
+#include <memory>
 #include <regex>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
-namespace dunedaq {
-namespace appfwk {
+namespace dunedaq::appfwk {
 
 DAQModuleManager::DAQModuleManager(const std::string& session_name)
-  : m_session_name(session_name), m_initialized(false)
+  : m_session_name(session_name)
+  , m_initialized(false)
 {
 }
 
@@ -78,12 +75,11 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd, const std::string& m
 {
 
   if (!m_modules_by_type.count(mod_class) || m_modules_by_type[mod_class].size() == 0) {
-    auto issue = ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist");
     if (mod_id == "") {
-      ers::info(issue);
+      ers::info(ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist"));
       return;
     } else {
-      throw issue;
+      throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist");
     }
   }
 
@@ -352,5 +348,4 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
   }
 }
 
-} // namespace appfwk
-} // namespace dunedaq
+} // namespace dunedaq::appfwk

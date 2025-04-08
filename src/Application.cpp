@@ -9,22 +9,20 @@
 
 #include "Application.hpp"
 
-#include "appfwk/Issues.hpp"
-#include "appfwk/opmon/application.pb.h"
 #include "appfwk/cmd/Nljs.hpp"
-#include "rcif/cmd/Nljs.hpp"
+#include "appfwk/opmon/application.pb.h"
 
+#include "confmodel/Application.hpp"
+#include "confmodel/OpMonURI.hpp"
+#include "confmodel/Session.hpp"
 #include "logging/Logging.hpp"
+#include "rcif/cmd/Nljs.hpp"
 
 #include <string>
 #include <unistd.h>
+#include <utility>
 
-#include "confmodel/Session.hpp"
-#include "confmodel/Application.hpp"
-#include "confmodel/OpMonURI.hpp"
-
-namespace dunedaq {
-namespace appfwk {
+namespace dunedaq::appfwk {
 
 Application::Application(std::string app_name,
                          std::string session_name,
@@ -45,8 +43,7 @@ Application::Application(std::string app_name,
   m_runinfo.set_run_time(0);
 
   m_cmd_fac = cmdlib::make_command_facility(
-    cmdlibimpl, session_name, get_config_manager()->session()->get_connectivity_service()
-  );
+    cmdlibimpl, session_name, get_config_manager()->session()->get_connectivity_service());
 
   set_opmon_conf(get_config_manager()->application()->get_opmon_conf());
 
@@ -80,8 +77,8 @@ Application::execute(const dataobj_t& cmd_data)
 {
   auto rc_cmd = cmd_data.get<rcif::cmd::RCCommand>();
   std::string cmdname = rc_cmd.id;
-  if (!is_cmd_valid(cmd_data)) {
-    throw InvalidCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
+  if (!check_state_for_cmd(cmd_data)) {
+    throw InvalidStateForCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
   }
 
   m_busy.store(true);
@@ -99,8 +96,7 @@ Application::execute(const dataobj_t& cmd_data)
     m_run_start_time = std::chrono::steady_clock::now();
     m_runinfo.set_running(true);
     m_runinfo.set_run_time(0);
-  }
-  else if (cmdname == "stop") {
+  } else if (cmdname == "stop") {
     m_run_start_time = std::chrono::steady_clock::time_point();
     m_runinfo.set_running(false);
     m_runinfo.set_run_number(0);
@@ -127,36 +123,34 @@ Application::generate_opmon_data()
   ai.set_busy(m_busy.load());
   ai.set_error(m_error.load());
 
-  char hostname[256];
+  char hostname[256]; // NOLINT
   auto res = gethostname(hostname, 256);
   if (res < 0)
     ai.set_host("Unknown");
   else
-    ai.set_host (std::string(hostname));
+    ai.set_host(std::string(hostname));
 
   publish(std::move(ai), {}, opmonlib::to_level(opmonlib::EntryOpMonLevel::kTopPriority));
 
-  if ( m_run_start_time.time_since_epoch().count() != 0 ) {
+  if (m_run_start_time.time_since_epoch().count() != 0) {
     auto now = std::chrono::steady_clock::now();
-    m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count() );
+    m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count());
   }
 
-  publish( decltype(m_runinfo)(m_runinfo) );
+  publish(decltype(m_runinfo)(m_runinfo));
 }
 
 bool
-Application::is_cmd_valid(const dataobj_t& cmd_data)
+Application::check_state_for_cmd(const dataobj_t& cmd_data) const
 {
   if (m_busy.load() || m_error.load())
     return false;
 
-  std::string state = get_state();
   std::string entry_state = cmd_data.get<rcif::cmd::RCCommand>().entry_state;
-  if (entry_state == "ANY" || state == entry_state)
+  if (entry_state == "ANY" || get_state() == entry_state)
     return true;
 
   return false;
 }
 
-} // namespace appfwk
-} // namespace dunedaq
+} // namespace dunedaq::appfwk
