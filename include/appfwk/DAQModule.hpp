@@ -61,88 +61,75 @@ namespace dunedaq {
 /**
  * @brief A ERS Issue for DAQModule creation failure
  */
-ERS_DECLARE_ISSUE(appfwk,                  ///< Namespace
-                  DAQModuleCreationFailed, ///< Type of the Issue
-                  "Failed to create DAQModule " << instance_name << " of type "
-                                                << plugin_name,          ///< Log Message from the issue
-                  ((std::string)plugin_name)((std::string)instance_name) ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk,
+                  DAQModuleCreationFailed,
+                  "Failed to create DAQModule " << instance_name << " of type " << plugin_name,
+                  ((std::string)plugin_name)((std::string)instance_name))
 
 /**
  * @brief A generic DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
-                  GeneralDAQModuleIssue,  ///< Issue class name
-                  " DAQModule: " << name, ///< Message
-                  ((std::string)name)     ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk, GeneralDAQModuleIssue, " DAQModule: " << name, ((std::string)name))
 
 /**
  * @brief Initialization failed ERS Issue (used by DAQModuleManager)
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
-                       DAQModuleInitFailed,           ///< Type of the issue
-                       appfwk::GeneralDAQModuleIssue, ///< Base class of the issue
-                       " init failed.",               ///< Log message from the issue
-                       ((std::string)name),           ///< Base class attributes
-                       ERS_EMPTY                      ///< Attribute of this class
-)
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       DAQModuleInitFailed,
+                       appfwk::GeneralDAQModuleIssue,
+                       " init failed.",
+                       ((std::string)name),
+                       ERS_EMPTY)
 
 /**
  * @brief Generic command ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
-                       CommandIssue,                  ///< Type of the issue
-                       appfwk::GeneralDAQModuleIssue, ///< Base class of the issue
-                       " Command " << cmd,            ///< Log Message from the issue
-                       ((std::string)name),           ///< Base class attributes
-                       ((std::string)cmd)             ///< Attribute of this class
-)
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       CommandIssue,
+                       appfwk::GeneralDAQModuleIssue,
+                       " Command " << cmd,
+                       ((std::string)name),
+                       ((std::string)cmd))
 
 /**
  * @brief The CommandFailed DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
-                       CommandRegistrationFailed,             ///< Type of the Issue
-                       appfwk::CommandIssue,                  ///< Base class of the Issue
-                       "Command registration failed.",        ///< Log Message from the issue
-                       ((std::string)cmd)((std::string)name), ///< Base class attributes
-                       ERS_EMPTY                              ///< Attribute of this class
-)
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       CommandRegistrationFailed,
+                       appfwk::CommandIssue,
+                       "Command registration failed.",
+                       ((std::string)cmd)((std::string)name),
+                       ERS_EMPTY)
 
 /**
  * @brief The UnknownCommand DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
-                       UnknownCommand,                        ///< Issue class name
-                       appfwk::CommandIssue,                  ///< Base class of the issue
-                       "Command is not recognised",           ///< Log Message from the issue
-                       ((std::string)cmd)((std::string)name), ///< Base class attributes
-                       ERS_EMPTY                              ///< Attribute of this class
-)
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       UnknownCommand,
+                       appfwk::CommandIssue,
+                       "Command is not recognised",
+                       ((std::string)cmd)((std::string)name),
+                       ERS_EMPTY)
 
 /**
  * @brief The CommandFailed DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                                ///< Namespace
-                       CommandFailed,                         ///< Type of the Issue
-                       appfwk::CommandIssue,                  ///< Base class of the Issue
-                       "Command Failed. Reason " << reason,   ///< Log Message from the issue
-                       ((std::string)cmd)((std::string)name), ///< Base class attributes
-                       ((std::string)reason)                  ///< Attribute of this class
-)
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       CommandFailed,
+                       appfwk::CommandIssue,
+                       "Command Failed. Reason " << reason,
+                       ((std::string)cmd)((std::string)name),
+                       ((std::string)reason))
 
 /**
  * @brief The MissingConnection DAQModule ERS Issue
  */
-ERS_DECLARE_ISSUE_BASE(appfwk,                        ///< Namespace
-                       MissingConnection,             ///< Type of the Issue
-                       appfwk::GeneralDAQModuleIssue, ///< Base class of the Issue
-                       "Required Connection Not Found. Type: " << type << ", direction: "
-                                                               << direction, ///< Log Message from the issue
-                       ((std::string)name),                                  ///< Base class attributes
-                       ((std::string)type)((std::string)direction)           ///< Attribute of this class
-)
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       MissingConnection,
+                       appfwk::GeneralDAQModuleIssue,
+                       "Required Connection Not Found. Type: " << type << ", direction: " << direction,
+                       ((std::string)name),
+                       ((std::string)type)((std::string)direction))
 
 // Re-enable coverage collection LCOV_EXCL_STOP
 namespace appfwk {
@@ -214,6 +201,9 @@ private:
   using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
   CommandMap_t m_commands;
 };
+
+std::shared_ptr<DAQModule>
+make_module(std::string const& plugin_name, std::string const& instance_name);
 
 } // namespace appfwk
 

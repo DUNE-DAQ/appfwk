@@ -28,43 +28,34 @@
 namespace dunedaq {
 
 // Disable coverage collection LCOV_EXCL_START
-ERS_DECLARE_ISSUE(appfwk,                                                   ///< Namespace
-                  DAQModuleManagerNotInitialized,                           ///< Issue class name
-                  "Command " << cmdid << " received before initialization", ///< Message
-                  ((std::string)cmdid)                                      ///< Message parameters
-)
-ERS_DECLARE_ISSUE(appfwk,                             ///< Namespace
-                  DAQModuleManagerAlreadyInitialized, ///< Issue class name
+ERS_DECLARE_ISSUE(appfwk,
+                  DAQModuleManagerNotInitialized,
+                  "Command " << cmdid << " received before initialization",
+                  ((std::string)cmdid))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  DAQModuleManagerAlreadyInitialized,
                   "\"init\" Command received when already initialized",
-                  ERS_EMPTY) ///< Message
+                  ERS_EMPTY)
 
-ERS_DECLARE_ISSUE(appfwk,                                                               ///< Namespace
-                  CommandDispatchingFailed,                                             ///< Issue class name
-                  "Command " << cmdid << " was not executed correctly by: " << modules, ///< Message
-                  ((std::string)cmdid)                                                  ///< Message parameters
-                  ((std::string)modules)                                                ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk,
+                  CommandDispatchingFailed,
+                  "Command " << cmdid << " was not executed correctly by: " << modules,
+                  ((std::string)cmdid)((std::string)modules))
 
-ERS_DECLARE_ISSUE(appfwk,                                                                ///< Namespace
-                  ConflictingCommandMatching,                                            ///< Issue class name
-                  "Command " << cmdid << " matches multiple times modules: " << modules, ///< Message
-                  ((std::string)cmdid)                                                   ///< Message parameters
-                  ((std::string)modules)                                                 ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk,
+                  ConflictingCommandMatching,
+                  "Command " << cmdid << " matches multiple times modules: " << modules,
+                  ((std::string)cmdid)((std::string)modules))
 
-ERS_DECLARE_ISSUE(appfwk,                                         ///< Namespace
-                  FailedInfoGathering,                            ///< Issue class name
-                  "Info gathering failed for module: " << module, ///< Message
-                  ((std::string)module)                           ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk, FailedInfoGathering, "Info gathering failed for module: " << module, ((std::string)module))
 
-ERS_DECLARE_ISSUE_BASE(appfwk,                                                         ///< Namespace
-                       ExceptionWhileInfoGathering,                                    ///< Issue class name
-                       FailedInfoGathering,                                            ///< Base Issue class name
-                       module << " threw exception while info gathering: " << message, ///< Message
-                       ((std::string)module),                                          ///< Base Issue params
-                       ((std::string)message)                                          ///< This class params
-)
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       ExceptionWhileInfoGathering,
+                       FailedInfoGathering,
+                       module << " threw exception while info gathering: " << message,
+                       ((std::string)module),
+                       ((std::string)message))
 
 ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanNotFound,

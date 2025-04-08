@@ -35,24 +35,17 @@
 namespace dunedaq {
 
 // Disable coverage collection LCOV_EXCL_START
-/**
- * @brief A generic Application ERS Issue
- */
-ERS_DECLARE_ISSUE(appfwk,                                                     ///< Namespace
-                  ApplicationNotInitialized,                                  ///< Issue class name
-                  "Application " << name << " has not been initialized yet.", ///< Message
-                  ((std::string)name)                                         ///< Message parameters
-)
 
-ERS_DECLARE_ISSUE(appfwk,                 ///< Namespace
-                  InvalidStateForCommand, ///< Issue class name
+ERS_DECLARE_ISSUE(appfwk,
+                  ApplicationNotInitialized,
+                  "Application " << name << " has not been initialized yet.",
+                  ((std::string)name))
+
+ERS_DECLARE_ISSUE(appfwk,
+                  InvalidStateForCommand,
                   "Command " << cmdid << " not allowed at this time. state: " << state << ", error: " << err
-                             << ", busy: " << busy, ///< Message
-                  ((std::string)cmdid)              ///< Message parameters
-                  ((std::string)state)              ///< Message parameters
-                  ((bool)err)                       ///< Message parameters // NOLINT
-                  ((bool)busy)                      ///< Message parameters // NOLINT
-)
+                             << ", busy: " << busy,
+                  ((std::string)cmdid)((std::string)state)((bool)err)((bool)busy)) // NOLINT
 
 ERS_DECLARE_ISSUE(appfwk,
                   ApplicationFailure,

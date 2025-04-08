@@ -28,11 +28,10 @@
 
 namespace dunedaq {
 
-ERS_DECLARE_ISSUE(appfwk,             ///< Namespace
-                  NotADaqApplication, ///< Issue class name
-                  "Application " << app << " is neither a DaqApplication nor a SmartDaqApplication ", ///< Message
-                  ((std::string)app) ///< Message parameters
-)
+ERS_DECLARE_ISSUE(appfwk,
+                  NotADaqApplication,
+                  "Application " << app << " is neither a DaqApplication nor a SmartDaqApplication ",
+                  ((std::string)app))
 
 ERS_DECLARE_ISSUE(appfwk, MissingComponent, "No such component: " << what, ((std::string)what))
 

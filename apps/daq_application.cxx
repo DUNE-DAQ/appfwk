@@ -12,8 +12,6 @@
 
 #include "logging/Logging.hpp"
 
-#include "nlohmann/json.hpp"
-
 #include <csignal>
 #include <fstream>
 #include <list>
