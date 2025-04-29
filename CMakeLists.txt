@@ -24,7 +24,7 @@ set(APPFWK_DEPENDENCIES ${CETLIB} ${CETLIB_EXCEPT} ers::ers logging::logging cmd
   confmodel::confmodel appmodel::appmodel conffwk::conffwk okssystem::okssystem)
 
 find_package(oksdalgen REQUIRED)
-add_dal_library(appfwk.schema.xml TEST NAMESPACE dunedaq::appfwk::dal
+daq_add_dal_library(appfwk.schema.xml TEST NAMESPACE dunedaq::appfwk::dal
   DALDIR dal DEP_PKGS confmodel)
 
 daq_codegen( cmd.jsonnet DEP_PKGS rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
