@@ -3,38 +3,10 @@ on:
   pull_request:
     types:
       - opened
-jobs:
-  track_issue:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get project data
-        env:
-          GITHUB_TOKEN: ${{ secrets.BOT_CI_ISSUES }}
-          ORGANIZATION: DUNE-DAQ
-          PROJECT_NUMBER: 5
-        run: |
-          gh api graphql -f query='
-            query($org: String!, $number: Int!) {
-              organization(login: $org){
-                projectV2(number: $number) {
-                  id
-                }
-              }
-            }' -f org=$ORGANIZATION -F number=$PROJECT_NUMBER > project_data.json
 
-          echo 'PROJECT_ID='$(jq '.data.organization.projectV2.id' project_data.json) >> $GITHUB_ENV
-                    
-      - name: Add issue to project
-        env:
-          GITHUB_TOKEN: ${{ secrets.BOT_CI_ISSUES }}
-        run: |
-            PR_NUMBER=${{ github.event.pull_request.number }}
-            node_id=`curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER} | jq '.node_id'`
-            item_id="$( gh api graphql -f query='
-            mutation($project:ID!, $issue:ID!) {
-              addProjectV2ItemById(input: {projectId: $project, contentId: $issue}) {
-                item {
-                  id
-                }
-              }
-            }' -f project=$PROJECT_ID -f issue=$node_id --jq '.data.addProjectV2ItemById.item.id')"    
+jobs:
+  track_prs_dispatch:
+    name: Add new pull request to project
+    uses: DUNE-DAQ/.github/.github/workflows/track_new_prs.yml@develop
+    secrets:
+      BOT_CI_ISSUES: ${{ secrets.BOT_CI_ISSUES }}
