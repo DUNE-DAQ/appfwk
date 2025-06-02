@@ -60,7 +60,7 @@ ConfigurationManager::initialize()
   if (smart_daq_app) {
     auto cpos = m_oks_config_spec.find(":") + 1;
     std::string oksFile = m_oks_config_spec.substr(cpos); // Strip off "oksconflibs:"
-    m_modules = smart_daq_app->generate_modules(m_confdb.get(), oksFile, m_session);
+    m_modules = smart_daq_app->generate_modules(m_session);
 
     for (auto& plan : smart_daq_app->get_action_plans()) {
       auto cmd = plan->get_command()->get_cmd();
