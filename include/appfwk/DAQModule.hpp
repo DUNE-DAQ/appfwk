@@ -150,8 +150,6 @@ class DAQModule
   , public opmonlib::MonitorableObject
 {
 public:
-  using data_t = nlohmann::json;
-
   explicit DAQModule(std::string name)
     : utilities::NamedObject(name)
   {
@@ -175,7 +173,7 @@ public:
    * execute_command is the single entry point for DAQModuleManager to pass CCM commands to DAQModules. If the given
    * command has not been registered, it will throw an UnknownCommand ERS exception.
    */
-  void execute_command(const std::string& name, const data_t& data = {});
+  void execute_command(const std::string& name, const nlohmann::json& data = {});
 
   std::vector<std::string> get_commands() const;
 
@@ -190,7 +188,7 @@ protected:
    * This method will throw a CommandRegistrationFailed ERS exception if the command could not be added
    */
   template<typename Child>
-  void register_command(const std::string& name, void (Child::*f)(const data_t&));
+  void register_command(const std::string& name, void (Child::*f)(const nlohmann::json&));
 
   DAQModule(DAQModule const&) = delete;
   DAQModule(DAQModule&&) = delete;
@@ -198,7 +196,7 @@ protected:
   DAQModule& operator=(DAQModule&&) = delete;
 
 private:
-  using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
+  using CommandMap_t = std::map<std::string, std::function<void(const nlohmann::json&)>>;
   CommandMap_t m_commands;
 };
 
