@@ -27,7 +27,7 @@ In general, in a full blown DAQ system users won't be running `daq_application` 
 
 When implenting a DAQ module, you'll want to `#include` the [`DAQModule.hpp` header](https://github.com/DUNE-DAQ/appfwk/blob/develop/include/appfwk/DAQModule.hpp), and derive your DAQ module from the `DAQModule` base class. The most important parts of `DAQModule.hpp` to an implementor of a DAQ module are the following:
 * `DEFINE_DUNE_DAQ_MODULE`: This is a macro which should be "called" at the bottom of your DAQ module's source file with an "argument" of the form `dunedaq::<your_package_name>::<your DAQ module name>`. E.g., `DEFINE_DUNE_DAQ_MODULE(dunedaq::dfmodules::DataWriterModule)` [at the bottom of the dfmodules package's DataWriterModule module's source file](https://github.com/DUNE-DAQ/dfmodules/blob/develop/plugins/DataWriterModule.cpp) 
-* `register_command`: takes as arguments the name of a command and a function which should execute when the command is received. The function is user defined, and takes an instance of `DAQModule::data_t` as argument. `DAQModule::data_t` is aliased to the `nlohmann::json` type and can thus be thought of as a blob of JSON-structured data. While in principle any arbitary name could be associated with any function of arbitrary behavior to create a command, in practice implementors of DAQ modules define commands associated with the DAQ's state machine: "_conf_", "_start_", "_stop_", "_scrap_". Not all DAQ modules necessarily need to perform an action for each of those transitions; e.g., a module may only be designed to do something during configuration, and not change as the DAQ enters the running state ("_start_") or exits it ("_stop_"). It also supports an optional third argument which lists the states that the application must be in for the command to be valid. [!!!Control People here should make comments and see if this is correct, if it's sitll the plan, etc]
+* `register_command`: takes as arguments the name of a command and a function which should execute when the command is received. The function is user defined, and takes an instance of `nlohmann::json` as argument. While in principle any arbitary name could be associated with any function of arbitrary behavior to create a command, in practice implementors of DAQ modules define commands associated with the DAQ's state machine: "_conf_", "_start_", "_stop_", "_scrap_". Not all DAQ modules necessarily need to perform an action for each of those transitions; e.g., a module may only be designed to do something during configuration, and not change as the DAQ enters the running state ("_start_") or exits it ("_stop_"). It also supports an optional third argument which lists the states that the application must be in for the command to be valid. [!!!Control People here should make comments and see if this is correct, if it's sitll the plan, etc]
 * `init`: this pure virtual function's implementation is meant to create objects which are persistent for the lifetime of the DAQ module. It also has the unique role of connecting the DAQModel with its own configuration object, see later the init section for more details. It takes as an argument the type `std::shared_ptr<ConfigurationManager>`. Typically, `init` will query the `ConfigurationManager`, extract the configuration object specifically defined for this `DAQModule` and will store the pointer internally to the class for later usage, when the dedicated commands comes, usually `conf`. Connection, as they are persistent objects, are commonly allocated in `init`; they'll be described in more detail later in this document. 
 
 An conceptual example of what this looks like is the following simplified version of a DAQ module implementation. 
@@ -50,10 +50,10 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
   
   private:
   
-     void do_conf(const data_t& conf_data);
-     void do_start(const data_t& start_data);
-     void do_stop(const data_t& stop_data);
-     void do_scrap(const data_t& scrap_data);
+     void do_conf(const nlohmann::json& conf_data);
+     void do_start(const nlohmann::json& start_data);
+     void do_stop(const nlohmann::json& stop_data);
+     void do_scrap(const nlohmann::json& scrap_data);
 
      const MyDAQModuleConf * m_cfg = nullptr;
 };
@@ -108,7 +108,7 @@ This code of course raises the question: what _is_ `MyDAQModuleConf`? It's a `cl
 
 As one might expect, there are many values which a DAQ module may rely on to perform its calculations when in the running state that ideally should be settable during the `conf` transition. The typical technique is to have some member data which in the DAQ module constructor intentionally gets initialized either to zero or to implausible values (e.g. `m_calibration_scale_factor(-1)`, `m_num_total_warnings(0)`) and then to set them properly during the `config` transition. You'll see in the code below that the information is extracted from the previously set pointer to our schema generated object and is used to set the member(s). 
 ```C++
-void MyDaqModule::do_conf(const data_t&)
+void MyDaqModule::do_conf(const nlohmann::json&)
 {
   m_calibration_scale_factor = m_cfg->get_calibration_scale_factor();
   // ...and then set the other members which take per-configuration values...
@@ -121,7 +121,7 @@ Most DAQ modules are designed to loop over some sort of repeated action when the
 
 While it's of course possible to accomplish this using the existing concurrency facilities provided by the C++ Standard Library, the `utilities` package provides a class, `WorkerThread`, which makes this easier. `WorkerThread` is covered in detail [here](https://dune-daq-sw.readthedocs.io/en/latest/packages/utilities/WorkerThread-Usage-Notes/); when in use the `do_start` function can be as simple as follows:
 ```C++
-void MyDaqModule::do_start(const data_t& /*args*/) {
+void MyDaqModule::do_start(const nlohmann::json& /*args*/) {
     m_thread.start_working_thread();  // m_thread is an `utilities::WorkerThread` member of MyDaqModule
 }
 ```
@@ -131,7 +131,7 @@ Note that `start_working_thread` takes an optional argument which gives the `Wor
 
 Quite simple, basically the reverse of `do_start`:
 ```C++
-void MyDaqModule::do_stop(const data_t& /*args*/) {
+void MyDaqModule::do_stop(const nlohmann::json& /*args*/) {
     m_thread.stop_working_thread();  // m_thread is an `utilities::WorkerThread` member of MyDaqModule
 }
 ```
@@ -176,10 +176,10 @@ class MyDaqModule : public dunedaq::appfwk::DAQModule {
   
   private:
   
-     void do_conf(const data_t& conf_data);
-     void do_start(const data_t& start_data);
-     void do_stop(const data_t& stop_data);
-     void do_scrap(const data_t& scrap_data);
+     void do_conf(const nlohmann::json& conf_data);
+     void do_start(const nlohmann::json& start_data);
+     void do_stop(const nlohmann::json& stop_data);
+     void do_scrap(const nlohmann::json& scrap_data);
      
      void do_work(std::atomic<bool>&);
      dunedaq::utilities::WorkerThread m_thread; 
@@ -211,7 +211,7 @@ void MyDaqModule::init(std::shared_ptr<ConfigurationManager>) {
     }
 }
 
-void MyDaqModule::do_conf(const data_t& conf_data)
+void MyDaqModule::do_conf(const nlohmann::json& conf_data)
 {
   auto data = conf_data.get<mydaqmodule::Conf>();
 
@@ -219,15 +219,15 @@ void MyDaqModule::do_conf(const data_t& conf_data)
   // ...and then set the other members which take per-configuration values...
 }
 
-void MyDaqModule::do_start(const data_t& /*args*/) {
+void MyDaqModule::do_start(const nlohmann::json& /*args*/) {
     m_thread.start_working_thread();  // m_thread is an `utilities::WorkerThread` member of MyDaqModule
 }
 
-void MyDaqModule::do_stop(const data_t& /*args*/) {
+void MyDaqModule::do_stop(const nlohmann::json& /*args*/) {
     m_thread.stop_working_thread();  
 }
 
-void MyDaqModule::do_scrap(const data_t& /*args*/) {
+void MyDaqModule::do_scrap(const nlohmann::json& /*args*/) {
     m_calibration_scale_factor = -1;
 }
 

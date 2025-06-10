@@ -37,8 +37,8 @@ public:
 
   void init(const nlohmann::json&) final {}
 
-  void do_stuff(const data_t& /*data*/) {}
-  void do_other_stuff(const data_t& /*data*/) {}
+  void do_stuff(const nlohmann::json& /*data*/) {}
+  void do_other_stuff(const nlohmann::json& /*data*/) {}
 };
 
 class GoodDAQModule : public DAQModule
@@ -52,7 +52,7 @@ public:
 
   void init(const nlohmann::json&) final {}
 
-  void do_stuff(const data_t& /*data*/) {}
+  void do_stuff(const nlohmann::json& /*data*/) {}
 };
 
 class AnyDAQModule : public DAQModule
@@ -68,7 +68,7 @@ public:
 
   void init(const nlohmann::json&) final {}
 
-  void do_stuff(const data_t& /*data*/) {}
+  void do_stuff(const nlohmann::json& /*data*/) {}
 };
 } // namespace daqmoduletest
 
