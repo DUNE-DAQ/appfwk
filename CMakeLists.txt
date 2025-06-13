@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(appfwk VERSION 4.2.0)
+project(appfwk VERSION 4.2.1)
 
 find_package(daq-cmake REQUIRED )
 
