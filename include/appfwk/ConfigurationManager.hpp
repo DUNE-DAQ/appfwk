@@ -37,7 +37,7 @@ ERS_DECLARE_ISSUE(appfwk, MissingComponent, "No such component: " << what, ((std
 
 ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanValidationFailed,
-                  "Error validating action plan " << cmd << ", module " << module << ": " << message,
+                  "Action plan validation failed: " << cmd << ", module " << module << ": " << message,
                   ((std::string)cmd)((std::string)module)((std::string)message))
 
 namespace appfwk {
