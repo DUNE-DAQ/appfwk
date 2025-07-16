@@ -85,3 +85,38 @@ The ActionPlans are associated with the Application instance as follows:
 
 * DAQModules register their action methods in the same way as before, however the specification of valid states for an action has been removed
 * ActionPlans refer to FSMCommand objects as defined by the CCM. New FSMCommands may be added, but should be integrated into the state machine in consultation with CCM experts.
+* For each step of an ActionPlan, whether executing in series or in parallel, the modules will be called in the order in which they are declared to the Application. In series mode, the future has `wait()` called for each module in the step, and in parallel mode, the futures are all started and the results are collected by a loop which calls `wait()` on each individually.
+
+## Further Examples
+
+### https://github.com/DUNE-DAQ/daqsystemtest/blob/develop/config/daqsystemtest/moduleconfs.data.xml#L134
+
+```XML
+<obj class="ActionPlan" id="readout-start">
+ <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
+ <rel name="command" class="FSMCommand" id="start"/>
+ <rel name="steps">
+  <ref class="DaqModulesGroupByType" id="aggregator-step"/>
+  <ref class="DaqModulesGroupByType" id="tp-handler-step"/>
+  <ref class="DaqModulesGroupByType" id="dlh-step"/>
+  <ref class="DaqModulesGroupByType" id="data-source-step"/>
+ </rel>
+</obj>
+```
+
+This ActionPlan consists of four steps, with each step being executed in parallel. Therefore, the FragmentAggregator will run first (there is only one FA per app), when it is complete, all of the TP Handlers will receive "start" in parallel, once they are all complete, then the DataLinkHandlers, and finally the FDFakeReaderModules.
+
+### https://github.com/DUNE-DAQ/daqsystemtest/blob/develop/config/daqsystemtest/moduleconfs.data.xml#L199
+
+```XML
+<obj class="ActionPlan" id="tc-maker-start">
+ <attr name="execution_policy" type="enum" val="modules-in-series"/>
+ <rel name="command" class="FSMCommand" id="start"/>
+ <rel name="steps">
+  <ref class="DaqModulesGroupByType" id="ta-handler-step"/>
+  <ref class="DaqModulesGroupByType" id="subscriber-step"/>
+ </rel>
+</obj>
+```
+
+This ActionPlan, by contrast, uses the modules-in-series execution policy, so for an application with "ta-handler-01", "ta-handler-02", and "ta-subscriber-01", the ActionPlan will result in "ta-handler-01" executing "start", then once that is complete, "ta-handler-02" will execute "start", and finally "ta-subscriber-01" will receive "start".
