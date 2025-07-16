@@ -1,5 +1,5 @@
 /**
- * @file DummyModule.cpp DummyModule class implementation. Contains only macro call needed to create C entry point for
+ * @file ExtraModule.cpp ExtraModule class implementation. Contains only macro call needed to create C entry point for
  * dynamic loading.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -9,4 +9,4 @@
 
 #include "DummyModule.hpp"
 
-DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::DummyModule)
+DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::ExtraModule)

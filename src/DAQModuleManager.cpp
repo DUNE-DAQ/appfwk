@@ -23,6 +23,7 @@
 #include <map>
 #include <memory>
 #include <regex>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -50,6 +51,12 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
 
   for (auto& plan_pair : m_configuration_mgr->action_plans()) {
     auto cmd = plan_pair.first;
+    std::map<std::string, std::set<std::string>> modules_with_cmd;
+    for (const auto& [mod_type, module_list] : m_modules_by_type) {
+      if (module_list.size() > 0 && m_module_map[module_list[0]]->has_command(cmd)) {
+        modules_with_cmd[mod_type] = std::set<std::string>(module_list.begin(), module_list.end());
+      }
+    }
 
     for (auto& step : plan_pair.second->get_steps()) {
       auto byType = step->cast<confmodel::DaqModulesGroupByType>();
@@ -57,13 +64,22 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
       if (byType != nullptr) {
         for (auto& mod_type : byType->get_modules()) {
           check_mod_has_cmd(cmd, mod_type);
+          modules_with_cmd.erase(mod_type);
         }
       } else if (byMod != nullptr) {
         for (auto& mod : byMod->get_modules()) {
           check_mod_has_cmd(cmd, mod->class_name(), mod->UID());
+          modules_with_cmd[mod->class_name()].erase(mod->UID());
         }
       } else {
         throw ActionPlanValidationFailed(ERS_HERE, cmd, "", "Invalid subclass of DaqModulesGroup encountered!");
+      }
+    }
+
+    for (const auto& [mod_type, module_list] : modules_with_cmd) {
+      for (auto& mod : module_list) {
+        ers::error(ActionPlanValidationFailed(
+          ERS_HERE, cmd, mod, "ActionPlan is defined, module has command, but module is not in any steps"));
       }
     }
   }
@@ -301,37 +317,37 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
 
   auto action_plan = m_configuration_mgr->action_plan(cmd);
   if (action_plan == nullptr) {
-#if 0
-    throw ActionPlanNotFound(ERS_HERE, cmd, "Throwing exception");
-#elif 0
-    ers::warning(ActionPlanNotFound(ERS_HERE, cmd, "Returning without executing actions"));
-    return;
-#else
-    // Emulate old behavior
-    TLOG_DEBUG(1) << ActionPlanNotFound(ERS_HERE, cmd, "Executing action on all modules in parallel");
-    std::string failed_mod_names("");
-    std::unordered_map<std::string, std::future<bool>> futures;
+    if (ACTION_PLANS_REQUIRED) {
+      throw ActionPlanNotFound(ERS_HERE, cmd, "Throwing exception");
+    } else if (ACTION_PLANS_REQUIRED_WARNING) {
+      ers::warning(ActionPlanNotFound(ERS_HERE, cmd, "Returning without executing actions"));
+      return;
+    } else {
+      // Emulate old behavior
+      TLOG_DEBUG(1) << ActionPlanNotFound(ERS_HERE, cmd, "Executing action on all modules in parallel");
+      std::string failed_mod_names("");
+      std::unordered_map<std::string, std::future<bool>> futures;
 
-    auto mods = get_modnames_by_cmdid(cmd);
-    for (auto& mod : mods) {
-      TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod;
-      auto data_obj = get_dataobj_for_module(mod, cmd_data);
-      futures[mod] = std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod, cmd, data_obj);
-    }
+      auto mods = get_modnames_by_cmdid(cmd);
+      for (auto& mod : mods) {
+        TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod;
+        auto data_obj = get_dataobj_for_module(mod, cmd_data);
+        futures[mod] = std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod, cmd, data_obj);
+      }
 
-    for (auto& future : futures) {
-      future.second.wait();
-      auto ret = future.second.get();
-      if (!ret) {
-        failed_mod_names.append(future.first);
-        failed_mod_names.append(", ");
+      for (auto& future : futures) {
+        future.second.wait();
+        auto ret = future.second.get();
+        if (!ret) {
+          failed_mod_names.append(future.first);
+          failed_mod_names.append(", ");
+        }
+      }
+      // Throw if any dispatching failed
+      if (!failed_mod_names.empty()) {
+        throw CommandDispatchingFailed(ERS_HERE, cmd, failed_mod_names);
       }
     }
-    // Throw if any dispatching failed
-    if (!failed_mod_names.empty()) {
-      throw CommandDispatchingFailed(ERS_HERE, cmd, failed_mod_names);
-    }
-#endif
   } else {
     auto execution_policy = action_plan->get_execution_policy();
     auto serial_execution = execution_policy == "modules-in-series";

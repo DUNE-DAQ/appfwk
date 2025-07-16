@@ -66,6 +66,9 @@ ERS_DECLARE_ISSUE(appfwk,
 
 namespace appfwk {
 
+constexpr int ACTION_PLANS_REQUIRED = 0;
+constexpr int ACTION_PLANS_REQUIRED_WARNING = 0;
+
 class DAQModule;
 
 class DAQModuleManager
