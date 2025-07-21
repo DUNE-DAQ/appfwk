@@ -69,13 +69,6 @@ ConfigurationManager::initialize()
         throw ActionPlanValidationFailed(
           ERS_HERE, cmd, "N/A", "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
       }
-      for (auto& step : plan->get_steps()) {
-        auto step_by_type = step->cast<confmodel::DaqModulesGroupByType>();
-        if (step_by_type == nullptr) {
-          throw ActionPlanValidationFailed(
-            ERS_HERE, cmd, "N/A", "ActionPlans for SmartDaqApplications must use DaqModulesGroupByType");
-        }
-      }
       m_action_plans[cmd] = plan;
     }
   } else {
