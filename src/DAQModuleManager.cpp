@@ -218,6 +218,11 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
     for (auto& mod : byMod->get_modules()) {
       auto mod_name = mod->UID();
       auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
+
+      if (byMod->get_optional() && !m_module_map.count(mod_name)) {
+        continue;
+      }
+
       TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod->class_name()
                     << ")";
       futures[mod_name] =
