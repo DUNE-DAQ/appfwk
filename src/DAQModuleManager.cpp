@@ -63,12 +63,12 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
       auto byMod = step->cast<confmodel::DaqModulesGroupById>();
       if (byType != nullptr) {
         for (auto& mod_type : byType->get_modules()) {
-          check_mod_has_cmd(cmd, mod_type);
+          check_mod_has_cmd(cmd, mod_type, byType->get_optional());
           modules_with_cmd.erase(mod_type);
         }
       } else if (byMod != nullptr) {
         for (auto& mod : byMod->get_modules()) {
-          check_mod_has_cmd(cmd, mod->class_name(), mod->UID());
+          check_mod_has_cmd(cmd, mod->class_name(), byMod->get_optional(), mod->UID());
           modules_with_cmd[mod->class_name()].erase(mod->UID());
         }
       } else {
@@ -87,10 +87,14 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
 }
 
 void
-DAQModuleManager::check_mod_has_cmd(const std::string& cmd, const std::string& mod_class, const std::string& mod_id)
+DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
+                                    const std::string& mod_class,
+                                    bool is_optional,
+                                    const std::string& mod_id)
 {
-
   if (!m_modules_by_type.count(mod_class) || m_modules_by_type[mod_class].size() == 0) {
+    if (is_optional)
+      return;
     if (mod_id == "") {
       ers::warning(ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist"));
       return;
@@ -109,7 +113,7 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd, const std::string& m
         break;
       }
     }
-    if (!match) {
+    if (!match && !is_optional) {
       throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No module with id " + mod_id + " found.");
     }
   }
