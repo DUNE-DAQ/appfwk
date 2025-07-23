@@ -25,7 +25,7 @@ DAQModule::register_command(const std::string& cmd_name, void (Child::*f)(const 
     m_commands.emplace(cmd_name, std::bind(f, dynamic_cast<Child*>(this), _1)).second; // NOLINT(modernize-avoid-bind)
   if (!done) {
     // Throw here
-    throw CommandRegistrationFailedMessage(ERS_HERE, get_name(), cmd_name, "Emplacing command in command map failed");
+    throw CommandRegistrationFailedMessage(ERS_HERE, get_name(), cmd_name, "Emplacing command in command map failed, possible duplicate registration");
   }
 }
 
