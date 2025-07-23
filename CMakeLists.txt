@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(appfwk VERSION 4.2.1)
+project(appfwk VERSION 4.2.2)
 
 find_package(daq-cmake REQUIRED )
 
@@ -51,7 +51,7 @@ daq_add_application( dummy_module_test dummy_module_test.cxx TEST LINK_LIBRARIES
 
 daq_add_unit_test(Application_test            LINK_LIBRARIES appfwk )
 daq_add_unit_test(CommandLineInterpreter_test LINK_LIBRARIES appfwk )
-#daq_add_unit_test(DAQModule_test              LINK_LIBRARIES appfwk )
+daq_add_unit_test(DAQModule_test              LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQModuleManager_test       LINK_LIBRARIES appfwk )
 
 ##############################################################################
