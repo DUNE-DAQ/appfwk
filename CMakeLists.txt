@@ -53,7 +53,7 @@ daq_add_application( check_action_plans check_action_plans.cxx TEST LINK_LIBRARI
 
 daq_add_unit_test(Application_test            LINK_LIBRARIES appfwk )
 daq_add_unit_test(CommandLineInterpreter_test LINK_LIBRARIES appfwk )
-#daq_add_unit_test(DAQModule_test              LINK_LIBRARIES appfwk )
+daq_add_unit_test(DAQModule_test              LINK_LIBRARIES appfwk )
 daq_add_unit_test(DAQModuleManager_test       LINK_LIBRARIES appfwk )
 
 ##############################################################################
