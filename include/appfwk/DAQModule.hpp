@@ -97,7 +97,7 @@ ERS_DECLARE_ISSUE_BASE(appfwk,
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        CommandRegistrationFailed,
                        appfwk::CommandIssue,
-                       "Command registration. ",
+                       "Command registration failed. ",
                        ((std::string)cmd)((std::string)name),
                        ERS_EMPTY)
 
