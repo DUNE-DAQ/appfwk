@@ -19,7 +19,7 @@ echo
 
 daq_application
 ret=$?
-if [ $ret -ne 255 ]; then
+if [ $ret -ne 1 ]; then
   echo
   echo "WARNING: Unexpected return code $ret from daq_application without options"
   echo
@@ -29,7 +29,7 @@ echo
 echo "INFO: Testing daq_application with stdin command facility"
 echo
 
-echo "status"|daq_application --name "TestApp" -c "stdin://${SCRIPT_DIR}/test.json" -d "file://${SCRIPT_DIR}/confdata"
+echo "status"|daq_application --name "TestApp" -c "stdin://${SCRIPT_DIR}/test.json" -d "oksconflibs:test/config/appSession.data.xml" --configurationId "test-session" --sessionName "daq_application_test"
 ret=$?
 
 if [ $ret -ne 0 ]; then
@@ -43,16 +43,13 @@ echo "INFO: Testing daq_application signal handling"
 echo
 
 mkfifo input && trap "rm input" EXIT
-tail -f input|daq_application --name "TestApp" -c "stdin://${SCRIPT_DIR}/test.json"  -d "file://${SCRIPT_DIR}/confdata" & PID=$!
+tail -f input|daq_application --name "TestApp" -c "stdin://${SCRIPT_DIR}/test.json"  -d "oksconflibs:test/config/appSession.data.xml" --configurationId "test-session" --sessionName "daq_application_test" & PID=$!
 
-echo "init" >input
+echo "conf" >input
 sleep 1
 
 echo "Sending SIGQUIT"
 kill -SIGQUIT $PID
-sleep 1
-
-echo "conf" >input
 sleep 1
 
 echo "start" >input # This should not execute!
