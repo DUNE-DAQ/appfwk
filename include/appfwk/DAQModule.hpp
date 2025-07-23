@@ -92,10 +92,20 @@ ERS_DECLARE_ISSUE_BASE(appfwk,
                        ((std::string)cmd))
 
 /**
- * @brief The CommandFailed DAQModule ERS Issue
+ * @brief The CommandRegistrationFailed DAQModule ERS Issue
  */
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        CommandRegistrationFailed,
+                       appfwk::CommandIssue,
+                       "Command registration. ",
+                       ((std::string)cmd)((std::string)name),
+                       ERS_EMPTY)
+
+/**
+ * @brief The CommandRegistrationFailedMessage DAQModule ERS Issue
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       CommandRegistrationFailedMessage,
                        appfwk::CommandIssue,
                        "Command registration failed: " << message,
                        ((std::string)cmd)((std::string)name),
