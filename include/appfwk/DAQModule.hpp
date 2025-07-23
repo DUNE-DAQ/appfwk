@@ -97,9 +97,9 @@ ERS_DECLARE_ISSUE_BASE(appfwk,
 ERS_DECLARE_ISSUE_BASE(appfwk,
                        CommandRegistrationFailed,
                        appfwk::CommandIssue,
-                       "Command registration failed.",
+                       "Command registration failed: " << message,
                        ((std::string)cmd)((std::string)name),
-                       ERS_EMPTY)
+                       ((std::string)message))
 
 /**
  * @brief The UnknownCommand DAQModule ERS Issue
@@ -181,6 +181,8 @@ public:
 
   bool has_command(const std::string& name) const;
 
+  void set_command_registration_allowed(bool allowed) { m_command_registration_allowed = allowed; }
+
 protected:
   /**
    * @brief Registers a mdoule command under the name `name`.
@@ -200,6 +202,7 @@ protected:
 private:
   using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
   CommandMap_t m_commands;
+  std::atomic<bool> m_command_registration_allowed{ true };
 };
 
 std::shared_ptr<DAQModule>

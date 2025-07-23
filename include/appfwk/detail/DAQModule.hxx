@@ -15,13 +15,16 @@ template<typename Child>
 void
 DAQModule::register_command(const std::string& cmd_name, void (Child::*f)(const data_t&))
 {
+  if (!m_command_registration_allowed) {
+    throw CommandRegistrationFailed(ERS_HERE, get_name(), cmd_name, "Registering commands is not allowed at this time");
+  }
   using namespace std::placeholders;
 
   bool done =
     m_commands.emplace(cmd_name, std::bind(f, dynamic_cast<Child*>(this), _1)).second; // NOLINT(modernize-avoid-bind)
   if (!done) {
     // Throw here
-    throw CommandRegistrationFailed(ERS_HERE, get_name(), cmd_name);
+    throw CommandRegistrationFailed(ERS_HERE, get_name(), cmd_name, "Emplacing command in command map failed");
   }
 }
 

@@ -95,7 +95,7 @@ main(int argc, char* argv[])
     return 0;
   }
 
-  auto apps = session->get_enabled_applications();
+  auto apps = session->enabled_applications();
 
   for (auto& app : apps) {
     module_map.clear();

@@ -130,6 +130,8 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
   for (const auto mod : modules) {
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
     auto mptr = make_module(mod->class_name(), mod->UID());
+    // Once constructed, DAQModules should not try to regsiter any more commands
+    mptr->set_command_registration_allowed(false);
     m_module_map.emplace(mod->UID(), mptr);
 
     if (!m_modules_by_type.count(mod->class_name())) {
