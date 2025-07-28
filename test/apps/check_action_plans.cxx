@@ -248,10 +248,10 @@ main(int argc, char* argv[])
   std::cout << std::endl << std::endl << "Summary:" << std::endl;
 
   if (validation_errors.size() > 0) {
-    size_t longest_app = 11;     // Application heading
-    size_t longest_command = 7;  // Command heading
-    size_t longest_module = 6;   // Module heading
-    size_t longest_severity = 8; // Severity heading
+    size_t longest_app = 15;     // Application heading
+    size_t longest_command = 15;  // Command heading
+    size_t longest_module = 15;   // Module heading
+    size_t longest_severity = 15; // Severity heading
 
     for (auto& report : validation_errors) {
       if (report.app.size() > longest_app)
@@ -262,11 +262,12 @@ main(int argc, char* argv[])
         longest_module = report.module.size();
     }
 
-    std::string app_heading_space(longest_app - 10, ' ');
-    std::string command_heading_space(longest_command - 6, ' ');
-    std::string module_heading_space(longest_module - 5, ' ');
+    std::string app_heading_space(longest_app - 11 + 1, ' ');
+    std::string command_heading_space(longest_command - 7 + 1, ' ');
+    std::string module_heading_space(longest_module - 6 + 1, ' ');
+    std::string severity_heading_space(longest_severity - 8 + 1, ' ');
     std::cout << "Application" << app_heading_space << "Command" << command_heading_space << "Module"
-              << module_heading_space << "Severity " << "Message" << std::endl;
+              << module_heading_space << "Severity" << severity_heading_space << "Message" << std::endl;
 
     for (auto& report : validation_errors) {
 
