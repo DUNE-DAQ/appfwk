@@ -28,20 +28,86 @@ using namespace dunedaq;
 
 std::map<std::string, std::shared_ptr<appfwk::DAQModule>> module_map;
 std::map<std::string, std::vector<std::string>> modules_by_type;
+
+std::string red = "";
+std::string green = "";
+std::string yellow = "";
+std::string blue = "";
+std::string clear = "";
+
+struct ErrorReport
+{
+  enum Severity
+  {
+    Error,
+    Warning,
+    Info,
+    Ignored
+  };
+  Severity severity;
+  std::string app;
+  std::string module;
+  std::string command;
+  std::string message;
+
+  std::string severity_color()
+  {
+    switch (severity) {
+      case ErrorReport::Severity::Error:
+        return red;
+      case ErrorReport::Severity::Warning:
+        return yellow;
+      case ErrorReport::Severity::Info:
+        return blue;
+      case ErrorReport::Severity::Ignored:
+        return green;
+    }
+    return clear;
+  }
+  std::string severity_string()
+  {
+    switch (severity) {
+      case ErrorReport::Severity::Error:
+        return "Error";
+      case ErrorReport::Severity::Warning:
+        return "Warning";
+      case ErrorReport::Severity::Info:
+        return "Info";
+      case ErrorReport::Severity::Ignored:
+        return "Debug";
+    }
+    return "UNKNOWN";
+  }
+};
+std::vector<ErrorReport> validation_errors;
+
 void
-check_mod_has_cmd(const std::string& cmd,
+check_mod_has_cmd(const std::string& app,
+                  const std::string& cmd,
                   const std::string& mod_class,
                   bool is_optional,
                   const std::string& mod_id = "")
 {
   if (!modules_by_type.count(mod_class) || modules_by_type[mod_class].size() == 0) {
-    if (is_optional)
+    if (is_optional) {
+      validation_errors.emplace_back(ErrorReport::Severity::Ignored,
+                                     app,
+                                     mod_class,
+                                     cmd,
+                                     "No modules of class " + mod_class + " in application (optional step)");
       return;
+    }
     if (mod_id == "") {
-      ers::warning(appfwk::ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist"));
+      validation_errors.emplace_back(
+        ErrorReport::Severity::Warning, app, mod_class, cmd, "No modules of class " + mod_class + " in application!");
+      ers::warning(appfwk::ActionPlanValidationFailed(
+        ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!"));
       return;
     } else {
-      ers::error(appfwk::ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist"));
+      validation_errors.emplace_back(
+        ErrorReport::Severity::Error, app, mod_class, cmd, "No modules of class " + mod_class + " in application!");
+      ers::error(appfwk::ActionPlanValidationFailed(
+        ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!"));
     }
   }
 
@@ -56,25 +122,39 @@ check_mod_has_cmd(const std::string& cmd,
       }
     }
     if (!match && !is_optional) {
+      validation_errors.emplace_back(
+        ErrorReport::Severity::Error, app, mod_class, cmd, "No module with id " + mod_id + " found.");
       ers::error(
         appfwk::ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No module with id " + mod_id + " found."));
     }
   }
 
   if (!module_test->has_command(cmd)) {
-    ers::error(appfwk::ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not have method " + cmd));
+    validation_errors.emplace_back(
+      ErrorReport::Severity::Error, app, mod_class, cmd, "Module does not have command " + cmd + " registered.");
+    ers::error(appfwk::ActionPlanValidationFailed(
+      ERS_HERE, cmd, mod_class, "Module does not have command " + cmd + " registered."));
   }
 }
 int
 main(int argc, char* argv[])
 {
   if (argc < 3) {
-    std::cout << "Usage: " << argv[0] << " <session> <database-file>\n";
+    std::cout << "Usage: " << argv[0] << " <session> <database-file> [nocolor]\n";
     return 0;
   }
 
   std::string sessionName(argv[1]);
   std::string dbfile(argv[2]);
+
+  if (argc < 4) {
+    red = "\033[31m";
+    green = "\033[32m";
+    yellow = "\033[33m";
+    blue = "\033[36m";
+    clear = "\033[0m";
+  }
+
   if (dbfile.find(":") == std::string::npos) {
     dbfile = "oksconflibs:" + dbfile;
   }
@@ -134,15 +214,17 @@ main(int argc, char* argv[])
         auto byMod = step->cast<confmodel::DaqModulesGroupById>();
         if (byType != nullptr) {
           for (auto& mod_type : byType->get_modules()) {
-            check_mod_has_cmd(cmd, mod_type, byType->get_optional());
+            check_mod_has_cmd(app->UID(), cmd, mod_type, byType->get_optional());
             modules_with_cmd.erase(mod_type);
           }
         } else if (byMod != nullptr) {
           for (auto& mod : byMod->get_modules()) {
-            check_mod_has_cmd(cmd, mod->class_name(), byMod->get_optional(), mod->UID());
+            check_mod_has_cmd(app->UID(), cmd, mod->class_name(), byMod->get_optional(), mod->UID());
             modules_with_cmd[mod->class_name()].erase(mod->UID());
           }
         } else {
+          validation_errors.emplace_back(
+            ErrorReport::Severity::Error, app->UID(), "N/A", cmd, "Invalid subclass of DaqModulesGroup encountered!");
           ers::error(
             appfwk::ActionPlanValidationFailed(ERS_HERE, cmd, "", "Invalid subclass of DaqModulesGroup encountered!"));
         }
@@ -150,10 +232,56 @@ main(int argc, char* argv[])
 
       for (const auto& [mod_type, module_list] : modules_with_cmd) {
         for (auto& mod : module_list) {
+          validation_errors.emplace_back(ErrorReport::Severity::Error,
+                                         app->UID(),
+                                         mod_type,
+                                         cmd,
+                                         "ActionPlan is defined, module has command, but module " + mod +
+                                           " is not in any steps");
           ers::error(appfwk::ActionPlanValidationFailed(
             ERS_HERE, cmd, mod, "ActionPlan is defined, module has command, but module is not in any steps"));
         }
       }
     }
+  }
+
+  std::cout << std::endl << std::endl << "Summary:" << std::endl;
+
+  if (validation_errors.size() > 0) {
+    size_t longest_app = 11;     // Application heading
+    size_t longest_command = 7;  // Command heading
+    size_t longest_module = 6;   // Module heading
+    size_t longest_severity = 8; // Severity heading
+
+    for (auto& report : validation_errors) {
+      if (report.app.size() > longest_app)
+        longest_app = report.app.size();
+      if (report.command.size() > longest_command)
+        longest_command = report.command.size();
+      if (report.module.size() > longest_module)
+        longest_module = report.module.size();
+    }
+
+    std::string app_heading_space(longest_app - 10, ' ');
+    std::string command_heading_space(longest_command - 6, ' ');
+    std::string module_heading_space(longest_module - 5, ' ');
+    std::cout << "Application" << app_heading_space << "Command" << command_heading_space << "Module"
+              << module_heading_space << "Severity " << "Message" << std::endl;
+
+    for (auto& report : validation_errors) {
+
+      std::cout << report.severity_color();
+      std::string app_space(longest_app - report.app.size() + 1, ' ');
+      std::cout << report.app << app_space;
+      std::string command_space(longest_command - report.command.size() + 1, ' ');
+      std::cout << report.command << command_space;
+      std::string module_space(longest_module - report.module.size() + 1, ' ');
+      std::cout << report.module << module_space;
+      std::string severity_space(longest_severity - report.severity_string().size() + 1, ' ');
+      std::cout << report.severity_string() << severity_space;
+      std::cout << report.message << clear << std::endl;
+    }
+  } else {
+    std::cout << "No validation errors encountered!" << std::endl;
   }
 }
