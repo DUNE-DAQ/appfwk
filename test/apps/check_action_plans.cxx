@@ -22,18 +22,22 @@
 #include "opmonlib/TestOpMonManager.hpp"
 
 #include <iostream>
+#include <map>
+#include <memory>
+#include <set>
 #include <string>
+#include <vector>
 
 using namespace dunedaq;
 
 std::map<std::string, std::shared_ptr<appfwk::DAQModule>> module_map;
 std::map<std::string, std::vector<std::string>> modules_by_type;
 
-std::string red = "";
-std::string green = "";
-std::string yellow = "";
-std::string blue = "";
-std::string clear = "";
+std::string red = "";    // NOLINT
+std::string green = "";  // NOLINT
+std::string yellow = ""; // NOLINT
+std::string blue = "";   // NOLINT
+std::string clear = "";  // NOLINT
 
 struct ErrorReport
 {
@@ -140,14 +144,24 @@ int
 main(int argc, char* argv[])
 {
   if (argc < 3) {
-    std::cout << "Usage: " << argv[0] << " <session> <database-file> [nocolor]\n";
+    std::cout << "Usage: " << argv[0] << " <session> <database-file> [spacing=2] [nocolor]\n"; // NOLINT
     return 0;
   }
 
-  std::string sessionName(argv[1]);
-  std::string dbfile(argv[2]);
+  std::string sessionName(argv[1]); // NOLINT
+  std::string dbfile(argv[2]);      // NOLINT
+  size_t minimum_space = 2;         // Minimum space between columns (must be >= 1)
+  if (argc >= 4) {
+    minimum_space = std::atoi(argv[3]); // NOLINT
+    if (minimum_space < 1) {
+      minimum_space = 1;
+    }
+    if (minimum_space > 10) {
+      minimum_space = 10;
+    }
+  }
 
-  if (argc < 4) {
+  if (argc < 5) {
     red = "\033[31m";
     green = "\033[32m";
     yellow = "\033[33m";
@@ -161,17 +175,17 @@ main(int argc, char* argv[])
 
   logging::Logging::setup("test", "validate_plans");
 
-  conffwk::Configuration* confdb;
+  conffwk::Configuration* confdb = nullptr;
   try {
     confdb = new conffwk::Configuration(dbfile);
   } catch (conffwk::Generic& exc) {
-    std::cout << "Failed to load OKS database: " << exc << std::endl;
+    std::cout << "Failed to load OKS database: " << exc << std::endl; // NOLINT
     return 0;
   }
 
   auto session = confdb->get<confmodel::Session>(sessionName);
   if (session == nullptr) {
-    std::cout << "Failed to get Session " << sessionName << " from database\n";
+    std::cout << "Failed to get Session " << sessionName << " from database\n"; // NOLINT
     return 0;
   }
 
@@ -245,13 +259,13 @@ main(int argc, char* argv[])
     }
   }
 
-  std::cout << std::endl << std::endl << "Summary:" << std::endl;
+  std::cout << std::endl << std::endl << "Summary:" << std::endl; // NOLINT
 
   if (validation_errors.size() > 0) {
-    size_t longest_app = 15;     // Application heading
-    size_t longest_command = 15;  // Command heading
-    size_t longest_module = 15;   // Module heading
-    size_t longest_severity = 15; // Severity heading
+    size_t longest_app = 11;     // Application heading
+    size_t longest_command = 7;  // Command heading
+    size_t longest_module = 6;   // Module heading
+    size_t longest_severity = 8; // Severity heading
 
     for (auto& report : validation_errors) {
       if (report.app.size() > longest_app)
@@ -262,27 +276,28 @@ main(int argc, char* argv[])
         longest_module = report.module.size();
     }
 
-    std::string app_heading_space(longest_app - 11 + 1, ' ');
-    std::string command_heading_space(longest_command - 7 + 1, ' ');
-    std::string module_heading_space(longest_module - 6 + 1, ' ');
-    std::string severity_heading_space(longest_severity - 8 + 1, ' ');
+    std::string app_heading_space(longest_app - 11 + minimum_space, ' ');
+    std::string command_heading_space(longest_command - 7 + minimum_space, ' ');
+    std::string module_heading_space(longest_module - 6 + minimum_space, ' ');
+    std::string severity_heading_space(longest_severity - 8 + minimum_space, ' ');
+    // NOLINTNEXTLINE
     std::cout << "Application" << app_heading_space << "Command" << command_heading_space << "Module"
               << module_heading_space << "Severity" << severity_heading_space << "Message" << std::endl;
 
     for (auto& report : validation_errors) {
 
-      std::cout << report.severity_color();
-      std::string app_space(longest_app - report.app.size() + 1, ' ');
-      std::cout << report.app << app_space;
-      std::string command_space(longest_command - report.command.size() + 1, ' ');
-      std::cout << report.command << command_space;
-      std::string module_space(longest_module - report.module.size() + 1, ' ');
-      std::cout << report.module << module_space;
-      std::string severity_space(longest_severity - report.severity_string().size() + 1, ' ');
-      std::cout << report.severity_string() << severity_space;
-      std::cout << report.message << clear << std::endl;
+      std::cout << report.severity_color(); // NOLINT
+      std::string app_space(longest_app - report.app.size() + minimum_space, ' ');
+      std::cout << report.app << app_space; // NOLINT
+      std::string command_space(longest_command - report.command.size() + minimum_space, ' ');
+      std::cout << report.command << command_space; // NOLINT
+      std::string module_space(longest_module - report.module.size() + minimum_space, ' ');
+      std::cout << report.module << module_space; // NOLINT
+      std::string severity_space(longest_severity - report.severity_string().size() + minimum_space, ' ');
+      std::cout << report.severity_string() << severity_space; // NOLINT
+      std::cout << report.message << clear << std::endl;       // NOLINT
     }
   } else {
-    std::cout << "No validation errors encountered!" << std::endl;
+    std::cout << "No validation errors encountered!" << std::endl; // NOLINT
   }
-}
+} // NOLINT

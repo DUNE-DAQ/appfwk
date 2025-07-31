@@ -96,7 +96,8 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
     if (is_optional)
       return;
     if (mod_id == "") {
-      ers::warning(ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No modules of class "+ mod_class + " in application!"));
+      ers::warning(
+        ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!"));
       return;
     } else {
       throw ActionPlanValidationFailed(
