@@ -96,10 +96,12 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
     if (is_optional)
       return;
     if (mod_id == "") {
-      ers::warning(ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist"));
+      ers::warning(
+        ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!"));
       return;
     } else {
-      throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not exist");
+      throw ActionPlanValidationFailed(
+        ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!");
     }
   }
 
@@ -119,7 +121,7 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
   }
 
   if (!module_test->has_command(cmd)) {
-    throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not have method " + cmd);
+    throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not have command " + cmd + " registered.");
   }
 }
 
@@ -130,6 +132,8 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
   for (const auto mod : modules) {
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
     auto mptr = make_module(mod->class_name(), mod->UID());
+    // Once constructed, DAQModules should not try to regsiter any more commands
+    mptr->set_command_registration_allowed(false);
     m_module_map.emplace(mod->UID(), mptr);
 
     if (!m_modules_by_type.count(mod->class_name())) {
