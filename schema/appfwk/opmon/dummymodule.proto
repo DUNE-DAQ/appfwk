@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package dunedaq.appfwk.opmon;
+
+message DummyModuleInfo {
+
+  uint64 stuff_calls = 1;
+ 
+}

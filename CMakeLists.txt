@@ -42,9 +42,11 @@ daq_add_application( daq_application daq_application.cxx LINK_LIBRARIES appfwk )
 # ##############################################################################
 # Test plugins
 daq_add_plugin( DummyModule		  duneDAQModule TEST LINK_LIBRARIES appfwk )
+daq_add_plugin( ExtraModule		  duneDAQModule TEST LINK_LIBRARIES appfwk )
 
 # Test applications
 daq_add_application( dummy_module_test dummy_module_test.cxx TEST LINK_LIBRARIES appfwk )
+daq_add_application( check_action_plans check_action_plans.cxx TEST LINK_LIBRARIES appfwk )
 
 # ##############################################################################
 # Unit tests

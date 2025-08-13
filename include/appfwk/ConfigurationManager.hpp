@@ -36,7 +36,7 @@ ERS_DECLARE_ISSUE(appfwk, MissingComponent, "No such component: " << what, ((std
 
 ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanValidationFailed,
-                  "Error validating action plan " << cmd << ", module " << module << ": " << message,
+                  "Action plan validation failed: " << cmd << ", module " << module << ": " << message,
                   ((std::string)cmd)((std::string)module)((std::string)message))
 
 namespace appfwk {
@@ -44,7 +44,7 @@ namespace appfwk {
 class ConfigurationManager
 {
 public:
-  ConfigurationManager(std::string& config_spec, std::string& app_name, std::string& session_name);
+  ConfigurationManager(std::string const& config_spec, std::string const& app_name, std::string const& session_name);
   void initialize();
 
   const confmodel::Session* session() const { return m_session; }

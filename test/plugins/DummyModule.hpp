@@ -12,6 +12,7 @@
 #define APPFWK_TEST_PLUGINS_DUMMYMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
+#include "appfwk/opmon/dummymodule.pb.h"
 
 #include "ers/ers.hpp"
 #include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
@@ -62,7 +63,46 @@ public:
   void do_stuff(const data_t& /*data*/) override
   {
     ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "DummyModule do_stuff"));
+    m_stuff_calls++;
   };
+
+protected:
+  void generate_opmon_data() override
+  {
+    opmon::DummyModuleInfo dmi;
+    dmi.set_stuff_calls(m_stuff_calls.exchange(0));
+
+    publish(std::move(dmi));
+  }
+
+private:
+  std::atomic<uint64_t> m_stuff_calls{ 0 }; // NOLINT(build/unsigned)
+};
+
+class ExtraModule : public DummyParentModule
+{
+public:
+  explicit ExtraModule(const std::string& name)
+    : DummyParentModule(name)
+  {
+  }
+  void do_stuff(const data_t& /*data*/) override
+  {
+    ers::info(DummyModuleUpdate(ERS_HERE, get_name(), "ExtraModule do_stuff"));
+    m_stuff_calls++;
+  }
+
+protected:
+  void generate_opmon_data() override
+  {
+    opmon::DummyModuleInfo dmi;
+    dmi.set_stuff_calls(m_stuff_calls.exchange(0));
+
+    publish(std::move(dmi));
+  }
+
+private:
+  std::atomic<uint64_t> m_stuff_calls{ 0 }; // NOLINT(build/unsigned)
 };
 
 } // namespace appfwk

@@ -53,3 +53,6 @@ test/src/appfwk/fakedataproducerdaqmodule/Structs.hpp
 test/src/appfwk/fakedataconsumerdaqmodule/Nljs.hpp
 test/src/appfwk/fakedataconsumerdaqmodule/Structs.hpp
 .DS_Store
+
+# dbt-clang-format temporary files
+.clang-format

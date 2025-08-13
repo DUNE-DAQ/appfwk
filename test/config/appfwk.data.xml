@@ -63,7 +63,7 @@
 
 <oks-data>
 
-<info name="" type="" num-of-items="22" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231110T143339" last-modified-by="eflumerf" last-modified-on="ironvirt9.IRONDOMAIN.local" last-modification-time="20241023T204135"/>
+<info name="" type="" num-of-items="32" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231110T143339" last-modified-by="eflumerf" last-modified-on="ironvirt9.mshome.net" last-modification-time="20250722T162554"/>
 
 <include>
  <file path="schema/confmodel/dunedaq.schema.xml"/>
@@ -122,6 +122,22 @@
  </rel>
 </obj>
 
+<obj class="ActionPlan" id="stuff_byid_optional">
+ <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
+ <rel name="command" class="FSMCommand" id="stuff"/>
+ <rel name="steps">
+  <ref class="DaqModulesGroupById" id="dummymodules_id_group_optional"/>
+ </rel>
+</obj>
+
+<obj class="ActionPlan" id="stuff_optional">
+ <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
+ <rel name="command" class="FSMCommand" id="stuff"/>
+ <rel name="steps">
+  <ref class="DaqModulesGroupByType" id="dummymodules_type_group_optional"/>
+ </rel>
+</obj>
+
 <obj class="DaqApplication" id="ConflictingActionPlansApp">
  <attr name="application_name" type="string" val="daq_application"/>
  <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
@@ -132,6 +148,34 @@
  <rel name="action_plans">
   <ref class="ActionPlan" id="bad_stuff"/>
   <ref class="ActionPlan" id="bad_stuff_conflict"/>
+ </rel>
+</obj>
+
+<obj class="DaqApplication" id="ExtraModuleApp">
+ <attr name="application_name" type="string" val="daq_application"/>
+ <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+ <rel name="opmon_conf" class="OpMonConf" id="slow-all-monitoring"/>
+ <rel name="modules">
+  <ref class="DummyModule" id="dummy_module_0"/>
+  <ref class="DummyModule" id="dummy_module_1"/>
+  <ref class="ExtraModule" id="extra_module_0"/>
+ </rel>
+ <rel name="action_plans">
+  <ref class="ActionPlan" id="stuff"/>
+ </rel>
+</obj>
+
+<obj class="DaqApplication" id="ExtraModuleApp_GroupById">
+ <attr name="application_name" type="string" val="daq_application"/>
+ <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+ <rel name="opmon_conf" class="OpMonConf" id="slow-all-monitoring"/>
+ <rel name="modules">
+  <ref class="DummyModule" id="dummy_module_0"/>
+  <ref class="DummyModule" id="dummy_module_1"/>
+  <ref class="DummyModule" id="dummy_module_2"/>
+ </rel>
+ <rel name="action_plans">
+  <ref class="ActionPlan" id="stuff_byid"/>
  </rel>
 </obj>
 
@@ -168,6 +212,27 @@
  </rel>
 </obj>
 
+<obj class="DaqApplication" id="MissingModuleApp_GroupById_Optional">
+ <attr name="application_name" type="string" val="daq_application"/>
+ <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+ <rel name="opmon_conf" class="OpMonConf" id="slow-all-monitoring"/>
+ <rel name="modules">
+  <ref class="DummyModule" id="dummy_module_0"/>
+ </rel>
+ <rel name="action_plans">
+  <ref class="ActionPlan" id="stuff_byid_optional"/>
+ </rel>
+</obj>
+
+<obj class="DaqApplication" id="MissingModuleApp_Optional">
+ <attr name="application_name" type="string" val="daq_application"/>
+ <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
+ <rel name="opmon_conf" class="OpMonConf" id="slow-all-monitoring"/>
+ <rel name="action_plans">
+  <ref class="ActionPlan" id="stuff_optional"/>
+ </rel>
+</obj>
+
 <obj class="DaqApplication" id="TestApp">
  <attr name="application_name" type="string" val="daq_application"/>
  <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
@@ -196,6 +261,15 @@
 </obj>
 
 <obj class="DaqModulesGroupById" id="dummymodules_id_group">
+ <attr name="optional" type="bool" val="0"/>
+ <rel name="modules">
+  <ref class="DummyModule" id="dummy_module_0"/>
+  <ref class="DummyModule" id="dummy_module_1"/>
+ </rel>
+</obj>
+
+<obj class="DaqModulesGroupById" id="dummymodules_id_group_optional">
+ <attr name="optional" type="bool" val="1"/>
  <rel name="modules">
   <ref class="DummyModule" id="dummy_module_0"/>
   <ref class="DummyModule" id="dummy_module_1"/>
@@ -203,6 +277,14 @@
 </obj>
 
 <obj class="DaqModulesGroupByType" id="dummymodules_type_group">
+ <attr name="optional" type="bool" val="0"/>
+ <attr name="modules" type="class">
+  <data val="DummyModule"/>
+ </attr>
+</obj>
+
+<obj class="DaqModulesGroupByType" id="dummymodules_type_group_optional">
+ <attr name="optional" type="bool" val="1"/>
  <attr name="modules" type="class">
   <data val="DummyModule"/>
  </attr>
@@ -212,6 +294,12 @@
 </obj>
 
 <obj class="DummyModule" id="dummy_module_1">
+</obj>
+
+<obj class="DummyModule" id="dummy_module_2">
+</obj>
+
+<obj class="ExtraModule" id="extra_module_0">
 </obj>
 
 <obj class="FSMCommand" id="bad_action">
