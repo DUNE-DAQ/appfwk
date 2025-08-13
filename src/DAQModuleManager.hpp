@@ -98,7 +98,10 @@ private:
                                 const dataobj_t& cmd_data,
                                 bool execution_mode_is_serial);
 
-  void check_mod_has_cmd(const std::string& cmd, const std::string& mod_class, const std::string& mod_id = "");
+  void check_mod_has_cmd(const std::string& cmd,
+                         const std::string& mod_class,
+                         bool is_optional,
+                         const std::string& mod_id = "");
 
   std::vector<std::string> get_modnames_by_cmdid(cmdlib::cmd::CmdId id);
   std::shared_ptr<ConfigurationManager> m_configuration_mgr;

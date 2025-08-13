@@ -6,8 +6,8 @@
  * received with this code.
  */
 
-#include "appfwk/DAQModule.hpp"
 #include "appfwk/ConfigurationManager.hpp"
+#include "appfwk/DAQModule.hpp"
 
 #define BOOST_TEST_MODULE DAQModule_test // NOLINT
 
@@ -40,6 +40,22 @@ public:
 
   void do_stuff(const data_t& /*data*/) {}
   void do_other_stuff(const data_t& /*data*/) {}
+};
+
+class RegisterCommandDAQModule : public DAQModule
+{
+public:
+  explicit RegisterCommandDAQModule(std::string const& name)
+    : DAQModule(name)
+  {
+    register_command("stuff", &RegisterCommandDAQModule::do_stuff);
+  }
+
+  void init(std::shared_ptr<ConfigurationManager>) final {}
+
+  void try_register(std::string cmd) { register_command(cmd, &RegisterCommandDAQModule::do_stuff); }
+
+  void do_stuff(const data_t& /*data*/) {}
 };
 
 class GoodDAQModule : public DAQModule
@@ -76,7 +92,7 @@ public:
 BOOST_AUTO_TEST_CASE(Construct)
 {
   daqmoduletest::GoodDAQModule gdm("construct_test_good");
-  BOOST_REQUIRE_THROW(daqmoduletest::BadDAQModule bdm("construct_test_bad"), CommandRegistrationFailed);
+  BOOST_REQUIRE_THROW(daqmoduletest::BadDAQModule bdm("construct_test_bad"), CommandRegistrationFailedMessage);
 }
 
 BOOST_AUTO_TEST_CASE(Commands)
@@ -111,6 +127,21 @@ BOOST_AUTO_TEST_CASE(MakeModule)
   BOOST_REQUIRE_EXCEPTION(make_module("not_a_real_plugin_name", "error_test"),
                           DAQModuleCreationFailed,
                           [&](DAQModuleCreationFailed) { return true; });
+}
+
+BOOST_AUTO_TEST_CASE(RegisterCommand)
+{
+  daqmoduletest::RegisterCommandDAQModule rdm("register_command_test");
+
+  // This is allowed
+  rdm.try_register("before_inhibit");
+  rdm.set_command_registration_allowed(false);
+  BOOST_REQUIRE_EXCEPTION(rdm.try_register("after_inhibit"),
+                          CommandRegistrationFailedMessage,
+                          [&](CommandRegistrationFailedMessage) { return true; });
+  BOOST_REQUIRE(rdm.has_command("stuff"));
+  BOOST_REQUIRE(rdm.has_command("before_inhibit"));
+  BOOST_REQUIRE(!rdm.has_command("after_inhibit"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
