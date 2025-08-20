@@ -200,7 +200,7 @@ main(int argc, char* argv[])
     cfgMgr->initialize();
 
     // Check module matching
-    auto modules = cfgMgr->modules();
+    auto modules = cfgMgr->get_modules();
 
     for (const auto mod : modules) {
       TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
@@ -213,7 +213,7 @@ main(int argc, char* argv[])
       modules_by_type[mod->class_name()].emplace_back(mod->UID());
     }
 
-    for (auto& plan_pair : cfgMgr->action_plans()) {
+    for (auto& plan_pair : cfgMgr->get_action_plans()) {
       auto cmd = plan_pair.first;
       TLOG() << app->UID() << ": Checking action plan " << cmd;
       std::map<std::string, std::set<std::string>> modules_with_cmd;

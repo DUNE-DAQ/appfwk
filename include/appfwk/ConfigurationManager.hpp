@@ -47,40 +47,40 @@ public:
   ConfigurationManager(std::string const& config_spec, std::string const& app_name, std::string const& session_name);
   void initialize();
 
-  const confmodel::Session* session() const { return m_session; }
-  const confmodel::Application* application()
+  const confmodel::Session* get_session() const { return m_session; }
+  const confmodel::Application* get_application()
   {
     initialize();
     return m_application;
   }
 
-  const std::vector<const confmodel::Queue*>& queues()
+  const std::vector<const confmodel::Queue*>& get_queues()
   {
     initialize();
     return m_queues;
   }
-  const std::vector<const confmodel::NetworkConnection*>& networkconnections()
+  const std::vector<const confmodel::NetworkConnection*>& get_networkconnections()
   {
     initialize();
     return m_networkconnections;
   }
-  const std::vector<const confmodel::DaqModule*>& modules()
+  const std::vector<const confmodel::DaqModule*>& get_modules()
   {
     initialize();
     return m_modules;
   }
-  const confmodel::ConnectivityService* connectivity_service()
+  const confmodel::ConnectivityService* get_connectivity_service()
   {
     initialize();
     return m_connsvc_config;
   }
 
-  const std::unordered_map<std::string, const confmodel::ActionPlan*>& action_plans()
+  const std::unordered_map<std::string, const confmodel::ActionPlan*>& get_action_plans()
   {
     initialize();
     return m_action_plans;
   }
-  const confmodel::ActionPlan* action_plan(std::string cmd) const;
+  const confmodel::ActionPlan* get_action_plan(std::string cmd) const;
 
   template<typename T>
   const T* get_dal(const std::string& name)

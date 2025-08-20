@@ -38,8 +38,8 @@ public:
 
   void init(std::shared_ptr<ConfigurationManager>) final {}
 
-  void do_stuff(const data_t& /*data*/) {}
-  void do_other_stuff(const data_t& /*data*/) {}
+  void do_stuff(const CommandData_t& /*data*/) {}
+  void do_other_stuff(const CommandData_t& /*data*/) {}
 };
 
 class RegisterCommandDAQModule : public DAQModule
@@ -55,7 +55,7 @@ public:
 
   void try_register(std::string cmd) { register_command(cmd, &RegisterCommandDAQModule::do_stuff); }
 
-  void do_stuff(const data_t& /*data*/) {}
+  void do_stuff(const CommandData_t& /*data*/) {}
 };
 
 class GoodDAQModule : public DAQModule
@@ -69,7 +69,7 @@ public:
 
   void init(std::shared_ptr<ConfigurationManager>) final {}
 
-  void do_stuff(const data_t& /*data*/) {}
+  void do_stuff(const CommandData_t& /*data*/) {}
 };
 
 class AnyDAQModule : public DAQModule
@@ -85,7 +85,7 @@ public:
 
   void init(std::shared_ptr<ConfigurationManager>) final {}
 
-  void do_stuff(const data_t& /*data*/) {}
+  void do_stuff(const CommandData_t& /*data*/) {}
 };
 } // namespace daqmoduletest
 

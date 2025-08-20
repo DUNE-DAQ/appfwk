@@ -43,13 +43,13 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   m_configuration_mgr = cfgMgr; // Make a copy
   cfgMgr->initialize();
   get_iomanager()->configure(m_session_name,
-                             m_configuration_mgr->queues(),
-                             m_configuration_mgr->networkconnections(),
-                             m_configuration_mgr->connectivity_service(),
+                             m_configuration_mgr->get_queues(),
+                             m_configuration_mgr->get_networkconnections(),
+                             m_configuration_mgr->get_connectivity_service(),
                              opm);
-  init_modules(m_configuration_mgr->modules(), opm);
+  init_modules(m_configuration_mgr->get_modules(), opm);
 
-  for (auto& plan_pair : m_configuration_mgr->action_plans()) {
+  for (auto& plan_pair : m_configuration_mgr->get_action_plans()) {
     auto cmd = plan_pair.first;
     std::map<std::string, std::set<std::string>> modules_with_cmd;
     for (const auto& [mod_type, module_list] : m_modules_by_type) {
@@ -158,22 +158,22 @@ DAQModuleManager::cleanup()
   this->m_initialized = false;
 }
 
-DAQModuleManager::dataobj_t
-DAQModuleManager::get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data)
+DAQModule::CommandData_t
+DAQModuleManager::get_command_data_for_module(const std::string& mod_name, const DAQModule::CommandData_t& cmd_data)
 {
   auto cmd_obj = cmd_data.get<cmd::CmdObj>();
-  const dataobj_t dummy{};
+  const DAQModule::CommandData_t dummy{};
 
   if (!cmd_obj.modules.empty()) {
     for (const auto& addressed : cmd_obj.modules) {
 
       // First exception: empty = `all`
       if (addressed.match.empty()) {
-        return addressed.data;
+        return static_cast<DAQModule::CommandData_t>(addressed.data);
       } else {
         // match module name with regex
         if (std::regex_match(mod_name, std::regex(addressed.match))) {
-          return addressed.data;
+          return static_cast<DAQModule::CommandData_t>(addressed.data);
         }
       }
     }
@@ -183,11 +183,11 @@ DAQModuleManager::get_dataobj_for_module(const std::string& mod_name, const data
 }
 
 bool
-DAQModuleManager::execute_action(const std::string& module_name, const std::string& action, const dataobj_t& data_obj)
+DAQModuleManager::execute_action(const std::string& module_name, const std::string& action, const DAQModule::CommandData_t& command_data)
 {
   try {
     TLOG_DEBUG(2) << "Executing " << module_name << " -> " << action;
-    m_module_map[module_name]->execute_command(action, data_obj);
+    m_module_map[module_name]->execute_command(action, command_data);
   } catch (ers::Issue& ex) {
     ers::error(ex);
     return false;
@@ -198,7 +198,7 @@ DAQModuleManager::execute_action(const std::string& module_name, const std::stri
 void
 DAQModuleManager::execute_action_plan_step(std::string const& cmd,
                                            const confmodel::DaqModulesGroup* step,
-                                           const dataobj_t& cmd_data,
+                                           const DAQModule::CommandData_t& cmd_data,
                                            bool execution_mode_is_serial)
 {
   std::string failed_mod_names("");
@@ -210,10 +210,10 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
     for (auto& mod_class : byType->get_modules()) {
       auto modules = m_modules_by_type[mod_class];
       for (auto& mod_name : modules) {
-        auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
+        auto command_data = get_command_data_for_module(mod_name, cmd_data);
         TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod_class << ")";
         futures[mod_name] =
-          std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
+          std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, command_data);
         if (execution_mode_is_serial)
           futures[mod_name].wait();
       }
@@ -221,7 +221,7 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
   } else if (byMod != nullptr) {
     for (auto& mod : byMod->get_modules()) {
       auto mod_name = mod->UID();
-      auto data_obj = get_dataobj_for_module(mod_name, cmd_data);
+      auto command_data = get_command_data_for_module(mod_name, cmd_data);
 
       if (byMod->get_optional() && !m_module_map.count(mod_name)) {
         continue;
@@ -230,7 +230,7 @@ DAQModuleManager::execute_action_plan_step(std::string const& cmd,
       TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod_name << " (class " << mod->class_name()
                     << ")";
       futures[mod_name] =
-        std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, data_obj);
+        std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod_name, cmd, command_data);
       if (execution_mode_is_serial)
         futures[mod_name].wait();
     }
@@ -266,7 +266,7 @@ DAQModuleManager::get_modnames_by_cmdid(cmdlib::cmd::CmdId id)
 }
 
 void
-DAQModuleManager::check_cmd_data(const std::string& id, const dataobj_t& cmd_data)
+DAQModuleManager::check_command_data(const std::string& id, const DAQModule::CommandData_t& cmd_data)
 {
   // This method ensures that each module is only matched once per command.
   // If multiple matches are found, an ers::Issue is thrown
@@ -275,7 +275,7 @@ DAQModuleManager::check_cmd_data(const std::string& id, const dataobj_t& cmd_dat
   // vastly improved, in style if not in performance.
 
   auto cmd_obj = cmd_data.get<cmd::CmdObj>();
-  const dataobj_t dummy{};
+  const DAQModule::CommandData_t dummy{};
 
   // Make a convenience array with module names that have the requested command
   std::vector<std::string> cmd_mod_names = get_modnames_by_cmdid(id);
@@ -317,7 +317,7 @@ DAQModuleManager::check_cmd_data(const std::string& id, const dataobj_t& cmd_dat
 }
 
 void
-DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
+DAQModuleManager::execute(const std::string& cmd, const DAQModule::CommandData_t& cmd_data)
 {
 
   TLOG_DEBUG(1) << "Command id:" << cmd;
@@ -326,9 +326,9 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
     throw DAQModuleManagerNotInitialized(ERS_HERE, cmd);
   }
 
-  check_cmd_data(cmd, cmd_data);
+  check_command_data(cmd, cmd_data);
 
-  auto action_plan = m_configuration_mgr->action_plan(cmd);
+  auto action_plan = m_configuration_mgr->get_action_plan(cmd);
   if (action_plan == nullptr) {
     if (ACTION_PLANS_REQUIRED) {
       throw ActionPlanNotFound(ERS_HERE, cmd, "Throwing exception");
@@ -344,8 +344,8 @@ DAQModuleManager::execute(const std::string& cmd, const dataobj_t& cmd_data)
       auto mods = get_modnames_by_cmdid(cmd);
       for (auto& mod : mods) {
         TLOG_DEBUG(1) << "Executing action " << cmd << " on module " << mod;
-        auto data_obj = get_dataobj_for_module(mod, cmd_data);
-        futures[mod] = std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod, cmd, data_obj);
+        auto command_data = get_command_data_for_module(mod, cmd_data);
+        futures[mod] = std::async(std::launch::async, &DAQModuleManager::execute_action, this, mod, cmd, command_data);
       }
 
       for (auto& future : futures) {
