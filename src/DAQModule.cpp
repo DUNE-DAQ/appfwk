@@ -15,7 +15,7 @@
 namespace dunedaq::appfwk {
 
 void
-DAQModule::execute_command(const std::string& cmd_name, const data_t& data)
+DAQModule::execute_command(const std::string& cmd_name, const CommandData_t& data)
 {
   auto cmd = m_commands.find(cmd_name);
   if (cmd != m_commands.end()) {

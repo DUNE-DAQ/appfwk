@@ -13,7 +13,7 @@ namespace dunedaq::appfwk {
 
 template<typename Child>
 void
-DAQModule::register_command(const std::string& cmd_name, void (Child::*f)(const data_t&))
+DAQModule::register_command(const std::string& cmd_name, void (Child::*f)(const CommandData_t&))
 {
   if (!m_command_registration_allowed) {
     throw CommandRegistrationFailedMessage(
