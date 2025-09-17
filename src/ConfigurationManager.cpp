@@ -114,7 +114,7 @@ ConfigurationManager::initialize()
 }
 
 const dunedaq::confmodel::ActionPlan*
-ConfigurationManager::action_plan(std::string cmd) const
+ConfigurationManager::get_action_plan(std::string cmd) const
 {
   if (m_action_plans.count(cmd)) {
     return m_action_plans.at(cmd);

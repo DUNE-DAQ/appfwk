@@ -12,6 +12,7 @@
 #include "ers/Issue.hpp"
 #include "nlohmann/json.hpp"
 
+#include "appfwk/DAQModule.hpp"
 #include "appfwk/ConfigurationManager.hpp"
 #include "conffwk/Configuration.hpp"
 #include "confmodel/DaqModule.hpp"
@@ -69,13 +70,9 @@ namespace appfwk {
 constexpr int ACTION_PLANS_REQUIRED = 0;
 constexpr int ACTION_PLANS_REQUIRED_WARNING = 0;
 
-class DAQModule;
-
 class DAQModuleManager
 {
 public:
-  using dataobj_t = nlohmann::json;
-
   explicit DAQModuleManager(const std::string& session_name);
 
   void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager&);
@@ -83,19 +80,20 @@ public:
   void cleanup();
 
   // Execute a properly structured command
-  void execute(const std::string& cmd, const dataobj_t& cmd_data);
+  void execute(const std::string& cmd, const DAQModule::CommandData_t& cmd_data);
 
 private:
   typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
 
   void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules, opmonlib::OpMonManager&);
 
-  void check_cmd_data(const std::string& id, const dataobj_t& cmd_data);
-  dataobj_t get_dataobj_for_module(const std::string& mod_name, const dataobj_t& cmd_data);
-  bool execute_action(const std::string& mod_name, const std::string& action, const dataobj_t& data_obj);
+  void check_command_data(const std::string& id, const DAQModule::CommandData_t& cmd_data);
+  DAQModule::CommandData_t get_command_data_for_module(const std::string& mod_name,
+                                                  const DAQModule::CommandData_t& cmd_data);
+  bool execute_action(const std::string& mod_name, const std::string& action, const DAQModule::CommandData_t& data_obj);
   void execute_action_plan_step(const std::string& cmd,
                                 const confmodel::DaqModulesGroup* step,
-                                const dataobj_t& cmd_data,
+                                const DAQModule::CommandData_t& cmd_data,
                                 bool execution_mode_is_serial);
 
   void check_mod_has_cmd(const std::string& cmd,

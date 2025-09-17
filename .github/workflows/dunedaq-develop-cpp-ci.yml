@@ -12,7 +12,11 @@ on:
       - 'docs/**'
       - '.github/**'
   pull_request:
-    branches: [ develop ]
+    branches:
+      - develop
+      - patch/*
+      - prep-release/*
+
   schedule:
     - cron: "0 9 * * *"
 

@@ -30,7 +30,7 @@ Application::Application(std::string app_name,
                          std::string confimpl,
                          std::string configuration_id)
   : ConfigurationManagerOwner(confimpl, app_name, configuration_id)
-  , OpMonManager(session_name, app_name, get_config_manager()->session()->get_opmon_uri()->get_URI(app_name))
+  , OpMonManager(session_name, app_name, get_config_manager()->get_session()->get_opmon_uri()->get_URI(app_name))
   , NamedObject(app_name)
   , m_mod_mgr(session_name)
   , m_state("NONE")
@@ -43,9 +43,9 @@ Application::Application(std::string app_name,
   m_runinfo.set_run_time(0);
 
   m_cmd_fac = cmdlib::make_command_facility(
-    cmdlibimpl, session_name, get_config_manager()->session()->get_connectivity_service());
+    cmdlibimpl, session_name, get_config_manager()->get_session()->get_connectivity_service());
 
-  set_opmon_conf(get_config_manager()->application()->get_opmon_conf());
+  set_opmon_conf(get_config_manager()->get_application()->get_opmon_conf());
 
   TLOG() << "confimpl=<" << confimpl << ">\n";
 }
@@ -104,7 +104,7 @@ Application::execute(const dataobj_t& cmd_data)
   }
 
   try {
-    m_mod_mgr.execute(cmdname, rc_cmd.data);
+    m_mod_mgr.execute(cmdname, static_cast<DAQModule::CommandData_t>(rc_cmd.data));
     m_busy.store(false);
     if (rc_cmd.exit_state != "ANY")
       set_state(rc_cmd.exit_state);

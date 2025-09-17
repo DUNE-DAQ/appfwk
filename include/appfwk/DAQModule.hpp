@@ -160,7 +160,12 @@ class DAQModule
   , public opmonlib::MonitorableObject
 {
 public:
-  using data_t = nlohmann::json;
+  /**
+   * @brief CommandData_t is used to pass parameters to commands
+   * 
+   *  CommandData_t is defined as a class to enforce API usage (in case we change implementation in the future)
+   */
+  class CommandData_t : public nlohmann::json {};
 
   explicit DAQModule(std::string name)
     : utilities::NamedObject(name)
@@ -185,7 +190,7 @@ public:
    * execute_command is the single entry point for DAQModuleManager to pass CCM commands to DAQModules. If the given
    * command has not been registered, it will throw an UnknownCommand ERS exception.
    */
-  void execute_command(const std::string& name, const data_t& data = {});
+  void execute_command(const std::string& name, const CommandData_t& data = {});
 
   std::vector<std::string> get_commands() const;
 
@@ -202,7 +207,7 @@ protected:
    * This method will throw a CommandRegistrationFailed ERS exception if the command could not be added
    */
   template<typename Child>
-  void register_command(const std::string& name, void (Child::*f)(const data_t&));
+  void register_command(const std::string& name, void (Child::*f)(const CommandData_t&));
 
   DAQModule(DAQModule const&) = delete;
   DAQModule(DAQModule&&) = delete;
@@ -210,7 +215,7 @@ protected:
   DAQModule& operator=(DAQModule&&) = delete;
 
 private:
-  using CommandMap_t = std::map<std::string, std::function<void(const data_t&)>>;
+  using CommandMap_t = std::map<std::string, std::function<void(const CommandData_t&)>>;
   CommandMap_t m_commands;
   std::atomic<bool> m_command_registration_allowed{ true };
 };
