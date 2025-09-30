@@ -54,11 +54,12 @@ ConfigurationManager::ConfigurationManager(std::string const& config_spec,
   }
 }
 
-void
-ConfigurationManager::initialize()
+std::vector<ValidationReport>
+ConfigurationManager::initialize(bool throw_on_fatal)
 {
+  std::vector<ValidationReport> reports;
   if (m_initialized) {
-    return;
+    return reports;
   }
   TLOG_DBG(TLVL_APP) << "getting app " << m_app_name;
   m_application = m_confdb->get<confmodel::Application>(m_app_name);
@@ -69,6 +70,8 @@ ConfigurationManager::initialize()
 
   TLOG_DBG(TLVL_APP) << "getting modules for app " << m_app_name;
   auto smart_daq_app = m_application->cast<appmodel::SmartDaqApplication>();
+  auto daq_app = m_application->cast<confmodel::DaqApplication>();
+
   if (smart_daq_app) {
     auto cpos = m_oks_config_spec.find(":") + 1;
     std::string oksFile = m_oks_config_spec.substr(cpos); // Strip off "oksconflibs:"
@@ -78,28 +81,43 @@ ConfigurationManager::initialize()
       auto cmd = plan->get_command()->get_cmd();
       TLOG_DBG(TLVL_ACTION_PLAN) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
       if (m_action_plans.count(cmd)) {
-        throw ActionPlanValidationFailed(
-          ERS_HERE, cmd, "N/A", "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
+        reports.emplace_back(ValidationReport::Severity::Fatal,
+                             m_app_name,
+                             "N/A",
+                             cmd,
+                             "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
+        if (throw_on_fatal)
+          throw ActionPlanValidationFailed(
+            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message());
+        else
+          ers::error(ActionPlanValidationFailed(
+            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message()));
+      }
+      m_action_plans[cmd] = plan;
+    }
+  } else if (daq_app) {
+    m_modules = daq_app->get_modules();
+
+    for (auto& plan : daq_app->get_action_plans()) {
+      auto cmd = plan->get_command()->get_cmd();
+      TLOG_DBG(TLVL_ACTION_PLAN) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
+      if (m_action_plans.count(cmd)) {
+        reports.emplace_back(ValidationReport::Severity::Fatal,
+                             m_app_name,
+                             "N/A",
+                             cmd,
+                             "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
+        if (throw_on_fatal)
+          throw ActionPlanValidationFailed(
+            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message());
+        else
+          ers::error(ActionPlanValidationFailed(
+            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message()));
       }
       m_action_plans[cmd] = plan;
     }
   } else {
-    auto daq_app = m_application->cast<confmodel::DaqApplication>();
-    if (daq_app) {
-      m_modules = daq_app->get_modules();
-
-      for (auto& plan : daq_app->get_action_plans()) {
-        auto cmd = plan->get_command()->get_cmd();
-        TLOG_DBG(TLVL_ACTION_PLAN) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
-        if (m_action_plans.count(cmd)) {
-          throw ActionPlanValidationFailed(
-            ERS_HERE, cmd, "N/A", "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
-        }
-        m_action_plans[cmd] = plan;
-      }
-    } else {
-      throw(NotADaqApplication(ERS_HERE, m_application->UID()));
-    }
+    throw(NotADaqApplication(ERS_HERE, m_application->UID()));
   }
 
   m_connsvc_config = m_session->get_connectivity_service();
@@ -129,6 +147,7 @@ ConfigurationManager::initialize()
   }
 
   m_initialized = true;
+  return reports;
 }
 
 const dunedaq::confmodel::ActionPlan*
