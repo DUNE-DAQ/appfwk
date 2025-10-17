@@ -83,7 +83,7 @@
  <attr name="commandline_parameters" type="string">
   <data val="Process PID $$;"/>
   <data val="trap &apos;pkill -INT -P $$&apos; EXIT;"/>
-  <data val="gunicorn -b 0.0.0.0:5000 --workers=1 --worker-class=gthread --threads=2 --timeout 5000000000 --log-level=debug connection-service.connection-flask:app"/>
+  <data val="gunicorn -b 0.0.0.0:5000 --workers=1 --worker-class=gthread --threads=2 --timeout 5000000000 --log-level=debug connectivityservice.connection-flask:app"/>
  </attr>
  <attr name="threads" type="u16" val="1"/>
  <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
