@@ -78,27 +78,6 @@
 </comments>
 
 
-<obj class="ConnectionService" id="local-connection-server">
- <attr name="application_name" type="string" val="echo"/>
- <attr name="commandline_parameters" type="string">
-  <data val="Process PID $$;"/>
-  <data val="trap &apos;pkill -INT -P $$&apos; EXIT;"/>
-  <data val="gunicorn -b 0.0.0.0:5000 --workers=1 --worker-class=gthread --threads=2 --timeout 5000000000 --log-level=debug connection-service.connection-flask:app"/>
- </attr>
- <attr name="threads" type="u16" val="1"/>
- <rel name="runs_on" class="VirtualHost" id="vlocalhost"/>
- <rel name="exposes_service">
-  <ref class="Service" id="local-connectivity-service"/>
- </rel>
- <rel name="opmon_conf" class="OpMonConf" id="slow-all-monitoring"/>
-</obj>
-
-<obj class="ConnectivityService" id="local-connectivity-service-config">
- <attr name="interval_ms" type="u32" val="2000"/>
- <attr name="host" type="string" val="localhost"/>
- <rel name="service" class="Service" id="local-connectivity-service"/>
-</obj>
-
 <obj class="DetectorConfig" id="dummy-detector">
  <attr name="tpg_channel_map" type="string" val="PD2HDChannelMap"/>
  <attr name="clock_speed_hz" type="u32" val="62500000"/>
@@ -289,11 +268,6 @@
  <rel name="controller" class="RCApplication" id="my-controller"/>
 </obj>
 
-<obj class="Service" id="local-connectivity-service">
- <attr name="protocol" type="string" val="http"/>
- <attr name="port" type="u16" val="5000"/>
-</obj>
-
 <obj class="Service" id="my-controller_control">
  <attr name="protocol" type="string" val="grpc"/>
  <attr name="port" type="u16" val="0"/>
@@ -310,11 +284,6 @@
  <rel name="segment" class="Segment" id="generated-segment"/>
  <rel name="detector_configuration" class="DetectorConfig" id="dummy-detector"/>
  <rel name="opmon_uri" class="OpMonURI" id="local-opmon-uri"/>
-</obj>
-
-<obj class="Variable" id="CONNECTION_FLASK_DEBUG">
- <attr name="name" type="string" val="CONNECTION_FLASK_DEBUG"/>
- <attr name="value" type="string" val="2"/>
 </obj>
 
 <obj class="Variable" id="DETCHANNELMAPS_SHARE">
@@ -365,19 +334,6 @@
   <ref class="Variable" id="DUNEDAQ_ERS_VERBOSITY_LEVEL"/>
   <ref class="Variable" id="DUNEDAQ_ERS_WARNING"/>
  </rel>
-</obj>
-
-<obj class="VariableSet" id="consvc_ssh">
- <rel name="contains">
-  <ref class="Variable" id="CONNECTION_FLASK_DEBUG"/>
- </rel>
-</obj>
-
-<obj class="VirtualHost" id="connectionservice">
- <rel name="uses">
-  <ref class="ProcessingResource" id="cpus"/>
- </rel>
- <rel name="runs_on" class="PhysicalHost" id="localhost"/>
 </obj>
 
 <obj class="VirtualHost" id="controller">
