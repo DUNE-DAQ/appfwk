@@ -14,7 +14,7 @@
 
 #include "conffwk/Configuration.hpp"
 #include "confmodel/ActionPlan.hpp"
-#include "confmodel/Application.hpp"
+#include "confmodel/DaqApplication.hpp"
 #include "confmodel/DaqModule.hpp"
 #include "confmodel/Session.hpp"
 #include "iomanager/IOManager.hpp"
@@ -92,10 +92,9 @@ private:
   std::shared_ptr<conffwk::Configuration> m_confdb;
   std::string m_app_name;
   std::string m_session_name;
-  std::string m_oks_config_spec;
 
   const confmodel::Session* m_session;
-  const confmodel::Application* m_application;
+  const confmodel::DaqApplication* m_application;
   std::unordered_map<std::string, const confmodel::ActionPlan*> m_action_plans;
   std::vector<const confmodel::DaqModule*> m_modules;
   std::vector<const confmodel::Queue*> m_queues;
