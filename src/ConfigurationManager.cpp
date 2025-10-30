@@ -42,7 +42,6 @@ ConfigurationManager::ConfigurationManager(std::string const& config_spec,
   : m_confdb(new conffwk::Configuration(config_spec))
   , m_app_name(app_name)
   , m_session_name(session_name)
-  , m_oks_config_spec(config_spec)
 {
   TLOG() << "configSpec <" << config_spec << "> session name " << session_name << " application name " << app_name;
 
@@ -62,7 +61,7 @@ ConfigurationManager::initialize(bool throw_on_fatal)
     return reports;
   }
   TLOG_DBG(TLVL_APP) << "getting app " << m_app_name;
-  m_application = m_confdb->get<confmodel::Application>(m_app_name);
+  m_application = m_confdb->get<confmodel::DaqApplication>(m_app_name);
   if (m_application == nullptr) {
     TLOG() << "Failed to get app " << m_app_name;
     throw MissingComponent(ERS_HERE, "Application " + m_app_name);
@@ -71,53 +70,33 @@ ConfigurationManager::initialize(bool throw_on_fatal)
   TLOG_DBG(TLVL_APP) << "getting modules for app " << m_app_name;
   auto smart_daq_app = m_application->cast<appmodel::SmartDaqApplication>();
   auto daq_app = m_application->cast<confmodel::DaqApplication>();
+  if(!daq_app && !smart_daq_app) {
+    throw(NotADaqApplication(ERS_HERE, m_application->UID()));    
+  }
 
   if (smart_daq_app) {
-    auto cpos = m_oks_config_spec.find(":") + 1;
-    std::string oksFile = m_oks_config_spec.substr(cpos); // Strip off "oksconflibs:"
-    m_modules = smart_daq_app->generate_modules(m_session);
-
-    for (auto& plan : smart_daq_app->get_action_plans()) {
-      auto cmd = plan->get_command()->get_cmd();
-      TLOG_DBG(TLVL_ACTION_PLAN) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
-      if (m_action_plans.count(cmd)) {
-        reports.emplace_back(ValidationReport::Severity::Fatal,
-                             m_app_name,
-                             "N/A",
-                             cmd,
-                             "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
-        if (throw_on_fatal)
-          throw ActionPlanValidationFailed(
-            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message());
-        else
-          ers::error(ActionPlanValidationFailed(
-            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message()));
-      }
-      m_action_plans[cmd] = plan;
+    smart_daq_app->generate_modules(m_session);
+  }
+ 
+  m_modules = m_application->get_modules();
+   
+  for (auto& plan : m_application->get_action_plans()) {
+    auto cmd = plan->get_command()->get_cmd();
+    TLOG_DBG(TLVL_ACTION_PLAN) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
+    if (m_action_plans.count(cmd)) {
+      reports.emplace_back(ValidationReport::Severity::Fatal,
+                           m_app_name,
+                           "N/A",
+                           cmd,
+                           "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
+      if (throw_on_fatal)
+        throw ActionPlanValidationFailed(
+          ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message());
+      else
+        ers::error(ActionPlanValidationFailed(
+          ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message()));
     }
-  } else if (daq_app) {
-    m_modules = daq_app->get_modules();
-
-    for (auto& plan : daq_app->get_action_plans()) {
-      auto cmd = plan->get_command()->get_cmd();
-      TLOG_DBG(TLVL_ACTION_PLAN) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
-      if (m_action_plans.count(cmd)) {
-        reports.emplace_back(ValidationReport::Severity::Fatal,
-                             m_app_name,
-                             "N/A",
-                             cmd,
-                             "Multiple ActionPlans registered for cmd, conflicting plan is " + plan->UID());
-        if (throw_on_fatal)
-          throw ActionPlanValidationFailed(
-            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message());
-        else
-          ers::error(ActionPlanValidationFailed(
-            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message()));
-      }
-      m_action_plans[cmd] = plan;
-    }
-  } else {
-    throw(NotADaqApplication(ERS_HERE, m_application->UID()));
+    m_action_plans[cmd] = plan;
   }
 
   m_connsvc_config = m_session->get_connectivity_service();

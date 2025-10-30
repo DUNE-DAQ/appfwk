@@ -1,0 +1,32 @@
+name: Documentation
+description: Suggest updates or additions to the documentation that don't include changes in functionality.
+title: "[Doc]: "
+labels: ["documentation"]
+projects: ["DUNE-DAQ/5"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe what part of the documentation needs updating
+      placeholder: "XYZ is not described well in the README..."
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested changes
+      description: Give some suggested changes for the documentation
+      placeholder: "Add detail on class ABC..."
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that may add to the desired documentation
+
+        Tip: You can attach images or files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false        
+  

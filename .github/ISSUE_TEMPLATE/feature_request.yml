@@ -1,0 +1,68 @@
+name: New Feature or Enhancement Request
+description: Suggest a new feature or enhancement of existing functionality
+title: "[Feature]: "
+labels: ["enhancement"]
+projects: ["DUNE-DAQ/5"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe what new feature or enhancement you would like to see.
+      placeholder: "Description here..."
+    validations:
+      required: true
+  - type: dropdown
+    id: impact-radius
+    attributes:
+      label: Potential impact radius
+      description: |
+        What do you expect the "impact radius" for implementing this new feature/enhancement to be?
+        
+          - _Zero_: No real changes in functionality (e.g. code refactoring)
+          - _Small/Isolated_: Changes in one repo/one subsystem; unlikely to need significant developer coordination
+          - _Medium_: Changes in multiple repos or multiple functionalities within one subsystem; will benefit from coordination between developers
+          - _Large_: Changes software or user interfaces, underlying system behavior, and/or the way that users run the system; requires coordination across developers
+            
+        If "Medium" or "Large", consider filing a "Medium/Large Change Request/Summary".
+      options:
+        - Zero
+        - Small/Isolated
+        - Medium
+        - Large
+        - ???
+      default: 1
+    validations:
+       required: true
+  - type: textarea
+    id: justification
+    attributes:
+      label: Reason for change
+      description: Explain why you think this feature/enhancement is needed.
+      placeholder: "Explanation here..."
+    validations:
+      required: false
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested implementations
+      description: Give some suggested ideas on how the new feature or enhancement could be done
+      placeholder: "Suggestions here..."
+    validations:
+      required: false
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing suggestions
+      description: What tests or use cases would demonstrate this new feature or enhancement?
+      placeholder: "Testing ideas here..."      
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that may add to the description for the new feature or enhancement
+
+        Tip: You can attach images or files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false        
+  
