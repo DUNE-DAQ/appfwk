@@ -12,6 +12,8 @@
 #ifndef APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGER_HPP_
 #define APPFWK_INCLUDE_APPFWK_CONFIGURATIONMANAGER_HPP_
 
+#include "appfwk/ValidationReport.hpp"
+
 #include "conffwk/Configuration.hpp"
 #include "confmodel/ActionPlan.hpp"
 #include "confmodel/DaqApplication.hpp"
@@ -27,6 +29,7 @@
 
 namespace dunedaq {
 
+// Disable coverage collection LCOV_EXCL_START
 ERS_DECLARE_ISSUE(appfwk,
                   NotADaqApplication,
                   "Application " << app << " is neither a DaqApplication nor a SmartDaqApplication ",
@@ -38,6 +41,7 @@ ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanValidationFailed,
                   "Action plan validation failed: " << cmd << ", module " << module << ": " << message,
                   ((std::string)cmd)((std::string)module)((std::string)message))
+// Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
 
@@ -45,7 +49,7 @@ class ConfigurationManager
 {
 public:
   ConfigurationManager(std::string const& config_spec, std::string const& app_name, std::string const& session_name);
-  void initialize();
+  std::vector<ValidationReport> initialize(bool throw_on_fatal = true);
 
   const confmodel::Session* get_session() const { return m_session; }
   const confmodel::Application* get_application()
@@ -87,6 +91,8 @@ public:
   {
     return m_confdb->get<T>(name);
   }
+
+  std::string get_app_name() const { return m_app_name; }
 
 private:
   std::shared_ptr<conffwk::Configuration> m_confdb;

@@ -13,6 +13,7 @@
 #include "DAQModuleManager.hpp"
 #include "appfwk/ConfigurationManager.hpp"
 #include "appfwk/DAQModule.hpp"
+#include "appfwk/ValidationReport.hpp"
 
 #include "conffwk/Configuration.hpp"
 #include "confmodel/DaqModulesGroup.hpp"
@@ -30,116 +31,30 @@
 
 using namespace dunedaq;
 
-std::map<std::string, std::shared_ptr<appfwk::DAQModule>> module_map;
-std::map<std::string, std::vector<std::string>> modules_by_type;
-
 std::string red = "";    // NOLINT
 std::string green = "";  // NOLINT
 std::string yellow = ""; // NOLINT
 std::string blue = "";   // NOLINT
 std::string clear = "";  // NOLINT
 
-struct ErrorReport
+std::string
+severity_color(appfwk::ValidationReport report)
 {
-  enum Severity
-  {
-    Error,
-    Warning,
-    Info,
-    Ignored
-  };
-  Severity severity;
-  std::string app;
-  std::string module;
-  std::string command;
-  std::string message;
-
-  std::string severity_color()
-  {
-    switch (severity) {
-      case ErrorReport::Severity::Error:
-        return red;
-      case ErrorReport::Severity::Warning:
-        return yellow;
-      case ErrorReport::Severity::Info:
-        return blue;
-      case ErrorReport::Severity::Ignored:
-        return green;
-    }
-    return clear;
+  switch (report.get_severity()) {
+    case appfwk::ValidationReport::Severity::Fatal:
+      return red;
+    case appfwk::ValidationReport::Severity::Error:
+      return red;
+    case appfwk::ValidationReport::Severity::Warning:
+      return yellow;
+    case appfwk::ValidationReport::Severity::Info:
+      return blue;
+    case appfwk::ValidationReport::Severity::Ignored:
+      return green;
   }
-  std::string severity_string()
-  {
-    switch (severity) {
-      case ErrorReport::Severity::Error:
-        return "Error";
-      case ErrorReport::Severity::Warning:
-        return "Warning";
-      case ErrorReport::Severity::Info:
-        return "Info";
-      case ErrorReport::Severity::Ignored:
-        return "Debug";
-    }
-    return "UNKNOWN";
-  }
-};
-std::vector<ErrorReport> validation_errors;
-
-void
-check_mod_has_cmd(const std::string& app,
-                  const std::string& cmd,
-                  const std::string& mod_class,
-                  bool is_optional,
-                  const std::string& mod_id = "")
-{
-  if (!modules_by_type.count(mod_class) || modules_by_type[mod_class].size() == 0) {
-    if (is_optional) {
-      validation_errors.emplace_back(ErrorReport::Severity::Ignored,
-                                     app,
-                                     mod_class,
-                                     cmd,
-                                     "No modules of class " + mod_class + " in application (optional step)");
-      return;
-    }
-    if (mod_id == "") {
-      validation_errors.emplace_back(
-        ErrorReport::Severity::Warning, app, mod_class, cmd, "No modules of class " + mod_class + " in application!");
-      ers::warning(appfwk::ActionPlanValidationFailed(
-        ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!"));
-      return;
-    } else {
-      validation_errors.emplace_back(
-        ErrorReport::Severity::Error, app, mod_class, cmd, "No modules of class " + mod_class + " in application!");
-      ers::error(appfwk::ActionPlanValidationFailed(
-        ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!"));
-    }
-  }
-
-  auto module_test = module_map[modules_by_type[mod_class][0]];
-  if (mod_id != "") {
-    bool match = false;
-    for (auto& mod_name : modules_by_type[mod_class]) {
-      if (mod_id == mod_name) {
-        module_test = module_map[mod_name];
-        match = true;
-        break;
-      }
-    }
-    if (!match && !is_optional) {
-      validation_errors.emplace_back(
-        ErrorReport::Severity::Error, app, mod_class, cmd, "No module with id " + mod_id + " found.");
-      ers::error(
-        appfwk::ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No module with id " + mod_id + " found."));
-    }
-  }
-
-  if (!module_test->has_command(cmd)) {
-    validation_errors.emplace_back(
-      ErrorReport::Severity::Error, app, mod_class, cmd, "Module does not have command " + cmd + " registered.");
-    ers::error(appfwk::ActionPlanValidationFailed(
-      ERS_HERE, cmd, mod_class, "Module does not have command " + cmd + " registered."));
-  }
+  return clear;
 }
+
 int
 main(int argc, char* argv[])
 {
@@ -191,72 +106,29 @@ main(int argc, char* argv[])
 
   auto apps = session->enabled_applications();
 
+  std::vector<appfwk::ValidationReport> validation_errors;
+
   for (auto& app : apps) {
-    module_map.clear();
-    modules_by_type.clear();
 
     TLOG() << app->UID() << ": Initializing ConfigurationManager to check for duplicate ActionPlans";
     auto cfgMgr = std::make_shared<appfwk::ConfigurationManager>(dbfile, app->UID(), sessionName);
-    cfgMgr->initialize();
+    auto cfgMgr_reports = cfgMgr->initialize(false);
+    validation_errors.insert(validation_errors.end(),
+                             std::make_move_iterator(cfgMgr_reports.begin()),
+                             std::make_move_iterator(cfgMgr_reports.end()));
 
     // Check module matching
+    TLOG() << app->UID() << ": Constructing modules so they can register their commands";
     auto modules = cfgMgr->get_modules();
+    appfwk::DAQModuleManager mmgr(sessionName);
+    mmgr.set_config_mgr(cfgMgr);
+    mmgr.construct_modules(modules);
 
-    for (const auto mod : modules) {
-      TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
-      auto mptr = appfwk::make_module(mod->class_name(), mod->UID());
-      module_map.emplace(mod->UID(), mptr);
-
-      if (!modules_by_type.count(mod->class_name())) {
-        modules_by_type[mod->class_name()] = std::vector<std::string>();
-      }
-      modules_by_type[mod->class_name()].emplace_back(mod->UID());
-    }
-
-    for (auto& plan_pair : cfgMgr->get_action_plans()) {
-      auto cmd = plan_pair.first;
-      TLOG() << app->UID() << ": Checking action plan " << cmd;
-      std::map<std::string, std::set<std::string>> modules_with_cmd;
-      for (const auto& [mod_type, module_list] : modules_by_type) {
-        if (module_list.size() > 0 && module_map[module_list[0]]->has_command(cmd)) {
-          modules_with_cmd[mod_type] = std::set<std::string>(module_list.begin(), module_list.end());
-        }
-      }
-
-      for (auto& step : plan_pair.second->get_steps()) {
-        auto byType = step->cast<confmodel::DaqModulesGroupByType>();
-        auto byMod = step->cast<confmodel::DaqModulesGroupById>();
-        if (byType != nullptr) {
-          for (auto& mod_type : byType->get_modules()) {
-            check_mod_has_cmd(app->UID(), cmd, mod_type, byType->get_optional());
-            modules_with_cmd.erase(mod_type);
-          }
-        } else if (byMod != nullptr) {
-          for (auto& mod : byMod->get_modules()) {
-            check_mod_has_cmd(app->UID(), cmd, mod->class_name(), byMod->get_optional(), mod->UID());
-            modules_with_cmd[mod->class_name()].erase(mod->UID());
-          }
-        } else {
-          validation_errors.emplace_back(
-            ErrorReport::Severity::Error, app->UID(), "N/A", cmd, "Invalid subclass of DaqModulesGroup encountered!");
-          ers::error(
-            appfwk::ActionPlanValidationFailed(ERS_HERE, cmd, "", "Invalid subclass of DaqModulesGroup encountered!"));
-        }
-      }
-
-      for (const auto& [mod_type, module_list] : modules_with_cmd) {
-        for (auto& mod : module_list) {
-          validation_errors.emplace_back(ErrorReport::Severity::Error,
-                                         app->UID(),
-                                         mod_type,
-                                         cmd,
-                                         "ActionPlan is defined, module has command, but module " + mod +
-                                           " is not in any steps");
-          ers::error(appfwk::ActionPlanValidationFailed(
-            ERS_HERE, cmd, mod, "ActionPlan is defined, module has command, but module is not in any steps"));
-        }
-      }
-    }
+    
+    TLOG() << app->UID() << ": Validating Action Plans";
+    auto ap_reports = mmgr.validate_action_plans(false);
+    validation_errors.insert(validation_errors.end(),
+                             std::make_move_iterator(ap_reports.begin()), std::make_move_iterator(ap_reports.end()));
   }
 
   std::cout << std::endl << std::endl << "Summary:" << std::endl; // NOLINT
@@ -268,12 +140,12 @@ main(int argc, char* argv[])
     size_t longest_severity = 8; // Severity heading
 
     for (auto& report : validation_errors) {
-      if (report.app.size() > longest_app)
-        longest_app = report.app.size();
-      if (report.command.size() > longest_command)
-        longest_command = report.command.size();
-      if (report.module.size() > longest_module)
-        longest_module = report.module.size();
+      if (report.get_app().size() > longest_app)
+        longest_app = report.get_app().size();
+      if (report.get_command().size() > longest_command)
+        longest_command = report.get_command().size();
+      if (report.get_module().size() > longest_module)
+        longest_module = report.get_module().size();
     }
 
     std::string app_heading_space(longest_app - 11 + minimum_space, ' ');
@@ -286,16 +158,16 @@ main(int argc, char* argv[])
 
     for (auto& report : validation_errors) {
 
-      std::cout << report.severity_color(); // NOLINT
-      std::string app_space(longest_app - report.app.size() + minimum_space, ' ');
-      std::cout << report.app << app_space; // NOLINT
-      std::string command_space(longest_command - report.command.size() + minimum_space, ' ');
-      std::cout << report.command << command_space; // NOLINT
-      std::string module_space(longest_module - report.module.size() + minimum_space, ' ');
-      std::cout << report.module << module_space; // NOLINT
+      std::cout << severity_color(report); // NOLINT
+      std::string app_space(longest_app - report.get_app().size() + minimum_space, ' ');
+      std::cout << report.get_app() << app_space; // NOLINT
+      std::string command_space(longest_command - report.get_command().size() + minimum_space, ' ');
+      std::cout << report.get_command() << command_space; // NOLINT
+      std::string module_space(longest_module - report.get_module().size() + minimum_space, ' ');
+      std::cout << report.get_module() << module_space; // NOLINT
       std::string severity_space(longest_severity - report.severity_string().size() + minimum_space, ' ');
       std::cout << report.severity_string() << severity_space; // NOLINT
-      std::cout << report.message << clear << std::endl;       // NOLINT
+      std::cout << report.get_message() << clear << std::endl;       // NOLINT
     }
   } else {
     std::cout << "No validation errors encountered!" << std::endl; // NOLINT

@@ -40,7 +40,7 @@ DAQModuleManager::DAQModuleManager(const std::string& session_name)
 void
 DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmonlib::OpMonManager& opm)
 {
-  m_configuration_mgr = cfgMgr; // Make a copy
+  set_config_mgr(cfgMgr);
   cfgMgr->initialize();
   get_iomanager()->configure(m_session_name,
                              m_configuration_mgr->get_queues(),
@@ -49,59 +49,51 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
                              opm);
   init_modules(m_configuration_mgr->get_modules(), opm);
 
-  for (auto& plan_pair : m_configuration_mgr->get_action_plans()) {
-    auto cmd = plan_pair.first;
-    std::map<std::string, std::set<std::string>> modules_with_cmd;
-    for (const auto& [mod_type, module_list] : m_modules_by_type) {
-      if (module_list.size() > 0 && m_module_map[module_list[0]]->has_command(cmd)) {
-        modules_with_cmd[mod_type] = std::set<std::string>(module_list.begin(), module_list.end());
-      }
-    }
+  validate_action_plans();
 
-    for (auto& step : plan_pair.second->get_steps()) {
-      auto byType = step->cast<confmodel::DaqModulesGroupByType>();
-      auto byMod = step->cast<confmodel::DaqModulesGroupById>();
-      if (byType != nullptr) {
-        for (auto& mod_type : byType->get_modules()) {
-          check_mod_has_cmd(cmd, mod_type, byType->get_optional());
-          modules_with_cmd.erase(mod_type);
-        }
-      } else if (byMod != nullptr) {
-        for (auto& mod : byMod->get_modules()) {
-          check_mod_has_cmd(cmd, mod->class_name(), byMod->get_optional(), mod->UID());
-          modules_with_cmd[mod->class_name()].erase(mod->UID());
-        }
-      } else {
-        throw ActionPlanValidationFailed(ERS_HERE, cmd, "", "Invalid subclass of DaqModulesGroup encountered!");
-      }
-    }
-
-    for (const auto& [mod_type, module_list] : modules_with_cmd) {
-      for (auto& mod : module_list) {
-        ers::error(ActionPlanValidationFailed(
-          ERS_HERE, cmd, mod, "ActionPlan is defined, module has command, but module is not in any steps"));
-      }
-    }
-  }
   this->m_initialized = true;
 }
 
-void
+std::optional<ValidationReport>
 DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
                                     const std::string& mod_class,
                                     bool is_optional,
-                                    const std::string& mod_id)
+                                    const std::string& mod_id,
+                                    bool throw_on_fatal)
 {
+  std::string app = m_configuration_mgr->get_app_name();
+
   if (!m_modules_by_type.count(mod_class) || m_modules_by_type[mod_class].size() == 0) {
-    if (is_optional)
-      return;
+    if (is_optional) {
+      ValidationReport report(ValidationReport::Severity::Ignored,
+                           app,
+                           mod_class,
+                           cmd,
+                           "No modules of class " + mod_class + " in application (optional step)");
+
+      return report;
+    }
     if (mod_id == "") {
-      ers::warning(
-        ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!"));
-      return;
+      ValidationReport report(ValidationReport::Severity::Warning,
+                           app,
+                           mod_class,
+                           cmd,
+                           "No modules of class " + mod_class + " in application!");
+      ers::warning(ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
+      return report;
     } else {
-      throw ActionPlanValidationFailed(
-        ERS_HERE, cmd, mod_class, "No modules of class " + mod_class + " in application!");
+      ValidationReport report(ValidationReport::Severity::Fatal,
+                           app,
+                           mod_class,
+                           cmd,
+                           "No modules of class " + mod_class + " in application!");
+      if (throw_on_fatal)
+        throw ActionPlanValidationFailed(
+          ERS_HERE, report.get_command(), report.get_module(), report.get_message());
+      else
+        ers::error(ActionPlanValidationFailed(
+          ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
+      return report;
     }
   }
 
@@ -116,18 +108,33 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
       }
     }
     if (!match && !is_optional) {
-      throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "No module with id " + mod_id + " found.");
+      ValidationReport report(
+        ValidationReport::Severity::Fatal, app, mod_class, cmd, "No module with id " + mod_id + " found.");
+
+      if (throw_on_fatal)
+        throw ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message());
+      else
+        ers::error(
+          ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
+      return report;
     }
   }
 
   if (!module_test->has_command(cmd)) {
-    throw ActionPlanValidationFailed(ERS_HERE, cmd, mod_class, "Module does not have command " + cmd + " registered.");
+    ValidationReport report(
+      ValidationReport::Severity::Fatal, app, mod_class, cmd, "Module does not have command " + cmd + " registered.");
+
+    if (throw_on_fatal)
+      throw ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message());
+    else
+      ers::error(ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
+    return report;
   }
+  return {};
 }
 
 void
-DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules,
-                               opmonlib::OpMonManager& opm)
+DAQModuleManager::construct_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules)
 {
   for (const auto mod : modules) {
     TLOG_DEBUG(0) << "construct: " << mod->class_name() << " : " << mod->UID();
@@ -140,7 +147,17 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
       m_modules_by_type[mod->class_name()] = std::vector<std::string>();
     }
     m_modules_by_type[mod->class_name()].emplace_back(mod->UID());
+  }
+}
 
+void
+DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules,
+                               opmonlib::OpMonManager& opm)
+{
+  construct_modules(modules);
+
+  for (const auto mod : modules) {
+    auto mptr = m_module_map[mod->UID()];
     opm.register_node(mod->UID(), mptr);
 
     try {
@@ -149,6 +166,67 @@ DAQModuleManager::init_modules(const std::vector<const dunedaq::confmodel::DaqMo
       throw DAQModuleInitFailed(ERS_HERE, mod->UID(), ex);
     }
   }
+}
+
+std::vector<ValidationReport>
+DAQModuleManager::validate_action_plans(bool throw_on_fatal)
+{
+  std::vector<ValidationReport> reports;
+  std::string app = m_configuration_mgr->get_app_name();
+
+  for (auto& plan_pair : m_configuration_mgr->get_action_plans()) {
+    auto cmd = plan_pair.first;
+    TLOG_DEBUG(0) << app << ": Checking action plan " << cmd;
+    std::map<std::string, std::set<std::string>> modules_with_cmd;
+    for (const auto& [mod_type, module_list] : m_modules_by_type) {
+      if (module_list.size() > 0 && m_module_map[module_list[0]]->has_command(cmd)) {
+        modules_with_cmd[mod_type] = std::set<std::string>(module_list.begin(), module_list.end());
+      }
+    }
+
+    for (auto& step : plan_pair.second->get_steps()) {
+      auto byType = step->cast<confmodel::DaqModulesGroupByType>();
+      auto byMod = step->cast<confmodel::DaqModulesGroupById>();
+      if (byType != nullptr) {
+        for (auto& mod_type : byType->get_modules()) {
+          auto report = check_mod_has_cmd(cmd, mod_type, byType->get_optional(), "", throw_on_fatal);
+          if (report)
+            reports.push_back(report.value());
+          modules_with_cmd.erase(mod_type);
+        }
+      } else if (byMod != nullptr) {
+        for (auto& mod : byMod->get_modules()) {
+          auto report = check_mod_has_cmd(cmd, mod->class_name(), byMod->get_optional(), mod->UID(), throw_on_fatal);
+          if (report)
+            reports.push_back(report.value());
+          modules_with_cmd[mod->class_name()].erase(mod->UID());
+        }
+      } else {
+        reports.emplace_back(
+          ValidationReport::Severity::Fatal, app, "N/A", cmd, "Invalid subclass of DaqModulesGroup encountered!");
+        if (throw_on_fatal)
+          throw ActionPlanValidationFailed(
+            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message());
+        else
+          ers::error(ActionPlanValidationFailed(
+            ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message()));
+      }
+    }
+
+    for (const auto& [mod_type, module_list] : modules_with_cmd) {
+      for (auto& mod : module_list) {
+        reports.emplace_back(ValidationReport::Severity::Error,
+                             app,
+                             mod_type,
+                             cmd,
+                             "ActionPlan is defined, module has command, but module " + mod + " is not in any steps");
+        ers::error(ActionPlanValidationFailed(
+          ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message()));
+      }
+    }
+  }
+
+  return reports;
 }
 
 void
@@ -183,7 +261,9 @@ DAQModuleManager::get_command_data_for_module(const std::string& mod_name, const
 }
 
 bool
-DAQModuleManager::execute_action(const std::string& module_name, const std::string& action, const DAQModule::CommandData_t& command_data)
+DAQModuleManager::execute_action(const std::string& module_name,
+                                 const std::string& action,
+                                 const DAQModule::CommandData_t& command_data)
 {
   try {
     TLOG_DEBUG(2) << "Executing " << module_name << " -> " << action;
