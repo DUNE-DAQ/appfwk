@@ -113,31 +113,14 @@ Application::execute(const dataobj_t& cmd_data)
     m_error.store(true);
     throw;
   }
+
+  publish_app_info();
 }
 
 void
 Application::generate_opmon_data()
 {
-  opmon::AppInfo ai;
-  ai.set_state(get_state());
-  ai.set_busy(m_busy.load());
-  ai.set_error(m_error.load());
-
-  char hostname[256]; // NOLINT
-  auto res = gethostname(hostname, 256);
-  if (res < 0)
-    ai.set_host("Unknown");
-  else
-    ai.set_host(std::string(hostname));
-
-  publish(std::move(ai), {}, opmonlib::to_level(opmonlib::EntryOpMonLevel::kTopPriority));
-
-  if (m_run_start_time.time_since_epoch().count() != 0) {
-    auto now = std::chrono::steady_clock::now();
-    m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count());
-  }
-
-  publish(decltype(m_runinfo)(m_runinfo));
+  publish_app_info();
 }
 
 bool
@@ -153,4 +136,31 @@ Application::check_state_for_cmd(const dataobj_t& cmd_data) const
   return false;
 }
 
+void
+Application::publish_app_info() {
+  
+  opmon::AppInfo ai;
+  ai.set_state(get_state());
+  ai.set_busy(m_busy.load());
+  ai.set_error(m_error.load());
+  
+  char hostname[256]; // NOLINT
+  auto res = gethostname(hostname, 256);
+  if (res < 0)
+    ai.set_host("Unknown");
+  else
+    ai.set_host(std::string(hostname));
+
+  publish(std::move(ai), {}, opmonlib::to_level(opmonlib::EntryOpMonLevel::kTopPriority));
+
+  if (m_run_start_time.time_since_epoch().count() != 0) {
+    auto now = std::chrono::steady_clock::now();
+    m_runinfo.set_run_time(std::chrono::duration_cast<std::chrono::seconds>(now - m_run_start_time).count());
+  }
+
+  publish(decltype(m_runinfo)(m_runinfo));
+
+}
+
+  
 } // namespace dunedaq::appfwk

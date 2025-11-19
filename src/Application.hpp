@@ -92,6 +92,9 @@ public:
     return m_state;
   }
 
+protected:
+  void publish_app_info();
+  
 private:
   DAQModuleManager m_mod_mgr;
   mutable std::mutex m_mutex;
