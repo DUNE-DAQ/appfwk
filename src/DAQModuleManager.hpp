@@ -89,7 +89,7 @@ public:
   std::vector<ValidationReport> validate_action_plans(bool throw_on_fatal = true);
 
 private:
-  typedef std::map<std::string, std::shared_ptr<DAQModule>> DAQModuleMap_t; ///< DAQModules indexed by name
+  using DAQModuleMap_t = std::map<std::string, std::shared_ptr<DAQModule>>; ///< DAQModules indexed by name
 
   void init_modules(const std::vector<const dunedaq::confmodel::DaqModule*>& modules, opmonlib::OpMonManager&);
 

@@ -2,7 +2,7 @@
  * @file ConfigurationManager.hpp ConfigurationManager class declaration
  *
  * The ConfigurationManager loads objects from an OKS database and makes them available to other parts of the
- * application. It also provides some convinience methods for accessing frequently-used objects.
+ * application. It also provides some convenience methods for accessing frequently-used objects.
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have

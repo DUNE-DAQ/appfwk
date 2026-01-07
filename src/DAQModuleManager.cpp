@@ -1,5 +1,5 @@
 /**
- * @file DAQModuleManager.cpp DAQModuleManager implementataion
+ * @file DAQModuleManager.cpp DAQModuleManager implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have

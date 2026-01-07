@@ -200,7 +200,7 @@ public:
 
 protected:
   /**
-   * @brief Registers a mdoule command under the name `name`.
+   * @brief Registers a module command under the name `name`.
    * @param name Name of the command to add to the commands list executable by execute_command
    * @param f Callback function that executes the command logic within the DAQModule
    *
