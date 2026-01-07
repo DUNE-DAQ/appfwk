@@ -19,13 +19,13 @@ namespace appfwk {
 class ValidationReport
 {
 public:
-  enum Severity
+  enum class Severity
   {
-    Fatal,
-    Error,
-    Warning,
-    Info,
-    Ignored
+    kFatal,
+    kError,
+    kWarning,
+    kInfo,
+    kIgnored
   };
 
   ValidationReport(Severity sev, std::string app, std::string module, std::string command, std::string message)
@@ -40,15 +40,15 @@ public:
   std::string severity_string()
   {
     switch (m_severity) {
-      case Severity::Fatal:
+      case Severity::kFatal:
         return "Fatal";
-      case Severity::Error:
+      case Severity::kError:
         return "Error";
-      case Severity::Warning:
+      case Severity::kWarning:
         return "Warning";
-      case Severity::Info:
+      case Severity::kInfo:
         return "Info";
-      case Severity::Ignored:
+      case Severity::kIgnored:
         return "Debug";
     }
     return "UNKNOWN";

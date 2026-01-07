@@ -65,7 +65,7 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
 
   if (!m_modules_by_type.count(mod_class) || m_modules_by_type[mod_class].size() == 0) {
     if (is_optional) {
-      ValidationReport report(ValidationReport::Severity::Ignored,
+      ValidationReport report(ValidationReport::Severity::kIgnored,
                            app,
                            mod_class,
                            cmd,
@@ -74,7 +74,7 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
       return report;
     }
     if (mod_id == "") {
-      ValidationReport report(ValidationReport::Severity::Warning,
+      ValidationReport report(ValidationReport::Severity::kWarning,
                            app,
                            mod_class,
                            cmd,
@@ -82,7 +82,7 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
       ers::warning(ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
       return report;
     } else {
-      ValidationReport report(ValidationReport::Severity::Fatal,
+      ValidationReport report(ValidationReport::Severity::kFatal,
                            app,
                            mod_class,
                            cmd,
@@ -109,7 +109,7 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
     }
     if (!match && !is_optional) {
       ValidationReport report(
-        ValidationReport::Severity::Fatal, app, mod_class, cmd, "No module with id " + mod_id + " found.");
+        ValidationReport::Severity::kFatal, app, mod_class, cmd, "No module with id " + mod_id + " found.");
 
       if (throw_on_fatal)
         throw ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message());
@@ -122,7 +122,7 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
 
   if (!module_test->has_command(cmd)) {
     ValidationReport report(
-      ValidationReport::Severity::Fatal, app, mod_class, cmd, "Module does not have command " + cmd + " registered.");
+      ValidationReport::Severity::kFatal, app, mod_class, cmd, "Module does not have command " + cmd + " registered.");
 
     if (throw_on_fatal)
       throw ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message());
@@ -203,7 +203,7 @@ DAQModuleManager::validate_action_plans(bool throw_on_fatal)
         }
       } else {
         reports.emplace_back(
-          ValidationReport::Severity::Fatal, app, "N/A", cmd, "Invalid subclass of DaqModulesGroup encountered!");
+          ValidationReport::Severity::kFatal, app, "N/A", cmd, "Invalid subclass of DaqModulesGroup encountered!");
         if (throw_on_fatal)
           throw ActionPlanValidationFailed(
             ERS_HERE, reports.back().get_command(), reports.back().get_module(), reports.back().get_message());
@@ -215,7 +215,7 @@ DAQModuleManager::validate_action_plans(bool throw_on_fatal)
 
     for (const auto& [mod_type, module_list] : modules_with_cmd) {
       for (auto& mod : module_list) {
-        reports.emplace_back(ValidationReport::Severity::Error,
+        reports.emplace_back(ValidationReport::Severity::kError,
                              app,
                              mod_type,
                              cmd,

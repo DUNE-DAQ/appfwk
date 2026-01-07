@@ -28,11 +28,11 @@ using namespace dunedaq::appfwk;
 
 enum
 {
-  TLVL_SESSION = 5,
-  TLVL_APP = 6,
-  TLVL_MODULE = 7,
-  TLVL_QUEUE = 8,
-  TLVL_ACTION_PLAN = 9,
+  kTlvlSession = 5,
+  kTlvlApp = 6,
+  kTlvlModule = 7,
+  kTlvlQueue = 8,
+  kTlvlActionPlan = 9,
 
 };
 
@@ -45,7 +45,7 @@ ConfigurationManager::ConfigurationManager(std::string const& config_spec,
 {
   TLOG() << "configSpec <" << config_spec << "> session name " << session_name << " application name " << app_name;
 
-  TLOG_DBG(TLVL_SESSION) << "getting session " << session_name;
+  TLOG_DBG(kTlvlSession) << "getting session " << session_name;
   m_session = m_confdb->get<confmodel::Session>(session_name);
   if (m_session == nullptr) {
     TLOG() << "Failed to get session " << session_name;
@@ -60,14 +60,14 @@ ConfigurationManager::initialize(bool throw_on_fatal)
   if (m_initialized) {
     return reports;
   }
-  TLOG_DBG(TLVL_APP) << "getting app " << m_app_name;
+  TLOG_DBG(kTlvlApp) << "getting app " << m_app_name;
   m_application = m_confdb->get<confmodel::DaqApplication>(m_app_name);
   if (m_application == nullptr) {
     TLOG() << "Failed to get app " << m_app_name;
     throw MissingComponent(ERS_HERE, "Application " + m_app_name);
   }
 
-  TLOG_DBG(TLVL_APP) << "getting modules for app " << m_app_name;
+  TLOG_DBG(kTlvlApp) << "getting modules for app " << m_app_name;
   auto smart_daq_app = m_application->cast<appmodel::SmartDaqApplication>();
   auto daq_app = m_application->cast<confmodel::DaqApplication>();
   if(!daq_app && !smart_daq_app) {
@@ -82,9 +82,9 @@ ConfigurationManager::initialize(bool throw_on_fatal)
    
   for (auto& plan : m_application->get_action_plans()) {
     auto cmd = plan->get_command()->get_cmd();
-    TLOG_DBG(TLVL_ACTION_PLAN) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
+    TLOG_DBG(kTlvlActionPlan) << "Registering action plan " << plan->UID() << " for cmd " << cmd;
     if (m_action_plans.count(cmd)) {
-      reports.emplace_back(ValidationReport::Severity::Fatal,
+      reports.emplace_back(ValidationReport::Severity::kFatal,
                            m_app_name,
                            "N/A",
                            cmd,
@@ -103,7 +103,7 @@ ConfigurationManager::initialize(bool throw_on_fatal)
 
   std::set<std::string> connectionsAdded;
   for (auto mod : m_modules) {
-    TLOG_DBG(TLVL_MODULE) << "initialising " << mod->class_name() << " module " << mod->UID();
+    TLOG_DBG(kTlvlModule) << "initialising " << mod->class_name() << " module " << mod->UID();
     auto connections = mod->get_inputs();
     auto outputs = mod->get_outputs();
     connections.insert(connections.end(), outputs.begin(), outputs.end());
@@ -115,7 +115,7 @@ ConfigurationManager::initialize(bool throw_on_fatal)
       }
       auto queue = m_confdb->cast<confmodel::Queue>(con);
       if (queue) {
-        TLOG_DBG(TLVL_QUEUE) << "Adding queue " << queue->UID();
+        TLOG_DBG(kTlvlQueue) << "Adding queue " << queue->UID();
         m_queues.emplace_back(queue);
       }
       auto net_con = m_confdb->cast<confmodel::NetworkConnection>(con);

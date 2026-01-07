@@ -41,15 +41,15 @@ std::string
 severity_color(appfwk::ValidationReport report)
 {
   switch (report.get_severity()) {
-    case appfwk::ValidationReport::Severity::Fatal:
+    case appfwk::ValidationReport::Severity::kFatal:
       return red;
-    case appfwk::ValidationReport::Severity::Error:
+    case appfwk::ValidationReport::Severity::kError:
       return red;
-    case appfwk::ValidationReport::Severity::Warning:
+    case appfwk::ValidationReport::Severity::kWarning:
       return yellow;
-    case appfwk::ValidationReport::Severity::Info:
+    case appfwk::ValidationReport::Severity::kInfo:
       return blue;
-    case appfwk::ValidationReport::Severity::Ignored:
+    case appfwk::ValidationReport::Severity::kIgnored:
       return green;
   }
   return clear;
