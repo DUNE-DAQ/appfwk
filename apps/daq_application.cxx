@@ -9,10 +9,8 @@
 
 #include "Application.hpp"
 #include "CommandLineInterpreter.hpp"
-#include "appfwk/Issues.hpp"
-#include "logging/Logging.hpp"
 
-#include "nlohmann/json.hpp"
+#include "logging/Logging.hpp"
 
 #include <csignal>
 #include <fstream>
@@ -21,11 +19,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-/**
- * @brief Using namespace for convenience
- */
-using json = nlohmann::json;
 
 /**
  * @brief Global atomic for process lifetime
@@ -42,32 +35,22 @@ signal_handler(int signal)
   run_marker.store(false);
 }
 
-/**
- * @brief Entry point for daq_application
- * @param argc Number of arguments
- * @param argv Arguments
- * @return Status Code
- */
 int
 main(int argc, char* argv[])
 {
 
-
   // Setup signals
-  // std::signal(SIGABRT, signal_handler);
-  // std::signal(SIGTERM, signal_handler);
   std::signal(SIGINT, signal_handler);
   std::signal(SIGQUIT, signal_handler);
-  // std::signal(SIGHUP, signal_handler);
 
   using namespace dunedaq;
 
   appfwk::CommandLineInterpreter args;
   try {
     args = appfwk::CommandLineInterpreter::parse(argc, argv);
-  } catch ( bpo::error const& e ) {
+  } catch (bpo::error const& e) {
     // Die but do it gracefully gracefully.
-    std::cerr << "Failed to interpret command line: " << e.what();
+    std::cerr << "Failed to interpret command line: " << e.what(); // NOLINT
     exit(1);
   }
 
@@ -75,25 +58,24 @@ main(int argc, char* argv[])
     exit(0);
   }
 
-  // up to here it was not possible to use ERS messages
-  
-  dunedaq::logging::Logging().setup( args.session_name, args.app_name );
+  // Enable DUNE-DAQ logging, including TLOG and ERS messages
+  dunedaq::logging::Logging().setup(args.session_name, args.app_name);
 
-  // from now on, it's possible to use ERS messages
+  // Create the Application
+  appfwk::Application app(args.app_name,
+                          args.session_name,
+                          args.command_facility_plugin_name,
+                          args.conf_service_plugin_name,
+                          args.configuration_id);
 
   try {
-    // Create the Application
-    appfwk::Application app(args.app_name, args.session_name,
-			    args.command_facility_plugin_name,
-			    args.conf_service_plugin_name);
-    
+
     app.init();
     app.run(run_marker);
-  } catch ( const ers::Issue & e ) {
+  } catch (ers::Issue& e) {
     ers::fatal(appfwk::ApplicationFailure(ERS_HERE, args.session_name, args.app_name, e));
   }
 
-				 
   TLOG() << "Application " << args.session_name << '.' << args.app_name << " exiting.";
   return 0;
 }

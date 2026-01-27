@@ -1,0 +1,87 @@
+name: Medium/Large Change Request/Summary
+description: Describe or request modifications that affect multiple repositories, include multiple Issues or PRs (even in the same repository), and/or that requires developer coordination
+title: "[Medium/Large Impact Change]: "
+projects: ["DUNE-DAQ/5"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: | 
+        Describe what is changing and why. Reference descriptions in other issues, presentations, etc. as appropriate.
+
+        (You can attach images or files by clicking this area to highlight it and then dragging files in.)
+      placeholder: "Description here..."
+    validations:
+      required: true
+  - type: textarea
+    id: related-issues-and-prs
+    attributes:
+      label: Related issues and PRs
+      description: |
+        If multiple Issues or PRs are part of this change, list them here. If none, say none.
+        
+        The sub-issue functionality in GitHub can also be used.
+      placeholder: |
+        - [A related issue](https://github.com/DUNE-DAQ/hdf5libs/issues/60)
+
+      render: markdown
+    validations:
+      required: true
+  - type: dropdown
+    id: impact-radius
+    attributes:
+      label: Impact radius
+      description: |
+        What is the "impact radius" for implementing this change?
+        
+          - _Zero_: No real changes in functionality or interfaces (e.g. code cleanup / simple refactoring)
+          - _Small/Isolated_: Changes in one repo/one subsystem; unlikely to need significant developer coordination
+          - _Medium_: Changes in multiple repos or multiple functionalities within one subsystem; will benefit from coordination between developers
+          - _Large_: Changes software or user interfaces, underlying system behavior, and/or the way that users run the system; requires coordination across developers
+            
+      options:
+        - Zero
+        - Small/Isolated
+        - Medium
+        - Large
+        - ???
+      default: 3
+    validations:
+       required: true
+  - type: textarea
+    id: impact-description
+    attributes:
+      label: Impact on developers and users
+      description: Describe the impact on developers and users, including changes in system behavior
+      placeholder: (e.g. API changes, new run control commands, changes in how data is drained from the system when a run is stopped, etc.)
+    validations:
+      required: true
+  - type: textarea
+    id: coordination
+    attributes:
+      label: Useful coordination
+      description: |
+        List whatever coordination between developers or groups will be useful.
+        This may include the timing of merges or updating of documentation or updating of configurations.
+      placeholder: "e.g. No special coordination will be needed for merging these changes to develop branches beyond announcing the merges on the appropriate Slack channel."
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing suggestions and/or changes needed in testing
+      description: Describe what tests would be done to see this change in action, and/or needed changes to existing tests.
+      placeholder: "Testing description here..."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that may add to the description for aid in coordination for this change.
+
+        Tip: You can attach images or files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false        
+  
