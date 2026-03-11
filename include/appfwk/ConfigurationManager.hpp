@@ -14,6 +14,7 @@
 
 #include "appfwk/ValidationReport.hpp"
 
+#include "appmodel/ConfigurationHelper.hpp"
 #include "conffwk/Configuration.hpp"
 #include "confmodel/ActionPlan.hpp"
 #include "confmodel/DaqApplication.hpp"
@@ -96,6 +97,7 @@ public:
 
 private:
   std::shared_ptr<conffwk::Configuration> m_confdb;
+  std::shared_ptr<appmodel::ConfigurationHelper> m_helper;
   std::string m_app_name;
   std::string m_session_name;
 

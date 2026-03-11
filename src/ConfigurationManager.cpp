@@ -51,6 +51,7 @@ ConfigurationManager::ConfigurationManager(std::string const& config_spec,
     TLOG() << "Failed to get session " << session_name;
     throw MissingComponent(ERS_HERE, "Session " + session_name);
   }
+  m_helper = std::make_shared<appmodel::ConfigurationHelper>(m_session);
 }
 
 std::vector<ValidationReport>
@@ -68,14 +69,14 @@ ConfigurationManager::initialize(bool throw_on_fatal)
   }
 
   TLOG_DBG(TLVL_APP) << "getting modules for app " << m_app_name;
-  auto smart_daq_app = m_application->cast<appmodel::SmartDaqApplication>();
   auto daq_app = m_application->cast<confmodel::DaqApplication>();
-  if(!daq_app && !smart_daq_app) {
+  if(daq_app == nullptr) {
     throw(NotADaqApplication(ERS_HERE, m_application->UID()));    
   }
 
-  if (smart_daq_app) {
-    smart_daq_app->generate_modules(m_session);
+  auto smart_daq_app = m_application->cast<appmodel::SmartDaqApplication>();
+  if (smart_daq_app != nullptr) {
+    smart_daq_app->generate_modules(m_helper);
   }
  
   m_modules = m_application->get_modules();
