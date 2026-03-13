@@ -42,6 +42,7 @@ ConfigurationManager::ConfigurationManager(std::string const& config_spec,
   : m_confdb(new conffwk::Configuration(config_spec))
   , m_app_name(app_name)
   , m_session_name(session_name)
+  , m_config_spec(config_spec)
 {
   TLOG() << "configSpec <" << config_spec << "> session name " << session_name << " application name " << app_name;
 
@@ -137,4 +138,19 @@ ConfigurationManager::get_action_plan(std::string cmd) const
     return m_action_plans.at(cmd);
   }
   return nullptr;
+}
+
+void
+ConfigurationManager::load_deferred_db(const std::string& include_name)
+{
+  auto pos = m_config_spec.find_last_of(":");
+  pos =  (pos == std::string::npos) ? 0 : pos + 1;
+  auto dbfile = m_config_spec.substr(pos);
+
+  try {
+    m_confdb->add_include(dbfile, include_name);
+  }
+  catch (const dunedaq::conffwk::Generic& except) {
+    throw(FailedInclude(ERS_HERE, include_name, except));
+  }
 }

@@ -33,7 +33,7 @@ namespace dunedaq {
 // Disable coverage collection LCOV_EXCL_START
 ERS_DECLARE_ISSUE(appfwk,
                   NotADaqApplication,
-                  "Application " << app << " is neither a DaqApplication nor a SmartDaqApplication ",
+                  "Application " << app << " is not a DaqApplication",
                   ((std::string)app))
 
 ERS_DECLARE_ISSUE(appfwk, MissingComponent, "No such component: " << what, ((std::string)what))
@@ -42,6 +42,10 @@ ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanValidationFailed,
                   "Action plan validation failed: " << cmd << ", module " << module << ": " << message,
                   ((std::string)cmd)((std::string)module)((std::string)message))
+
+ERS_DECLARE_ISSUE(appfwk, FailedInclude, "Failed to include deferred database file: " << filename,
+                  ((std::string)filename))
+
 // Re-enable coverage collection LCOV_EXCL_STOP
 
 namespace appfwk {
@@ -95,11 +99,14 @@ public:
 
   std::string get_app_name() const { return m_app_name; }
 
+  void load_deferred_db(const std::string& dbname);
+
 private:
   std::shared_ptr<conffwk::Configuration> m_confdb;
   std::shared_ptr<appmodel::ConfigurationHelper> m_helper;
   std::string m_app_name;
   std::string m_session_name;
+  std::string m_config_spec;
 
   const confmodel::Session* m_session;
   const confmodel::DaqApplication* m_application;
