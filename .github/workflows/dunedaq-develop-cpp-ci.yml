@@ -1,7 +1,5 @@
-name: build-develop
+name: Single-Package CI Build and Linting
 
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
 on:
   push:
     branches: 
@@ -21,8 +19,15 @@ on:
     - cron: "0 9 * * *"
 
   workflow_dispatch:
+    inputs:
+      caller_event_name:
+        type: string
+        default: 'schedule'
+        description: "Enter 'pull_request' (without quotes) to compare linting results to previous linting results."
 
 jobs:
   build_develop_dispatch:
     name: Build against the development release
     uses: DUNE-DAQ/.github/.github/workflows/dunedaq-develop-cpp-ci.yml@develop
+    with:
+      caller_event_name: ${{ github.event.inputs.caller_event_name || github.event_name }}
