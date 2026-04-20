@@ -27,7 +27,6 @@ find_package(oksdalgen REQUIRED)
 daq_add_dal_library(appfwk.schema.xml TEST NAMESPACE dunedaq::appfwk::dal
   DALDIR dal DEP_PKGS confmodel)
 
-#daq_codegen( cmd.jsonnet DEP_PKGS rcif cmdlib TEMPLATES Structs.hpp.j2 Nljs.hpp.j2 )
 daq_protobuf_codegen( opmon/*.proto )
 
 ##############################################################################
