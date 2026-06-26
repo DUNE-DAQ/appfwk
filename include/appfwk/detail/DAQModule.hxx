@@ -45,6 +45,7 @@ make_module(std::string const& plugin_name, std::string const& instance_name)
   try {
     mod_ptr = bpf.makePlugin<std::shared_ptr<DAQModule>>(plugin_name, instance_name);
   } catch (const cet::exception& cexpt) {
+    ers::error(DAQModuleCreationFailed(ERS_HERE, plugin_name, instance_name, cexpt));
     throw DAQModuleCreationFailed(ERS_HERE, plugin_name, instance_name, cexpt);
   }
   return mod_ptr;
