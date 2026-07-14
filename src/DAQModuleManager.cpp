@@ -12,12 +12,16 @@
 #include "appfwk/cmd/Nljs.hpp"
 
 #include "cmdlib/cmd/Nljs.hpp"
+#include "appmodel/DelayManagerConf.hpp"
+#include "appmodel/DelaySpec.hpp"
 #include "confmodel/DaqModulesGroup.hpp"
 #include "confmodel/DaqModulesGroupById.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
 #include "confmodel/Session.hpp"
+#include "appmodel/SmartDaqApplication.hpp"
 #include "iomanager/IOManager.hpp"
 #include "logging/Logging.hpp"
+#include "utilities/DelayManager.hpp"
 
 #include <future>
 #include <map>
@@ -50,6 +54,20 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   init_modules(m_configuration_mgr->get_modules(), opm);
 
   validate_action_plans();
+
+  // 09-Jul-2026, KAB, ELF: added the initialization of the DelayManager
+  std::string app_name = m_configuration_mgr->get_app_name();
+  auto mdal = m_configuration_mgr->get_dal<appmodel::SmartDaqApplication>(app_name);
+  if (mdal) {
+    auto delay_mgr_conf = mdal->get_delay_manager_conf();
+    if (delay_mgr_conf) {
+      std::map<std::string, uint32_t> delay_map;
+      for (auto& delay_spec : delay_mgr_conf->get_delays()) {
+        delay_map[delay_spec->get_delay_name()] = delay_spec->get_delay_usec();
+      }
+      utilities::DelayManager::get()->configure(delay_map);
+    }
+  }
 
   this->m_initialized = true;
 }
