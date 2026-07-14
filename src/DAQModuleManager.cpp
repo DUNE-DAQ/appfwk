@@ -84,33 +84,33 @@ DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
   if (!m_modules_by_type.count(mod_class) || m_modules_by_type[mod_class].size() == 0) {
     if (is_optional) {
       ValidationReport report(ValidationReport::Severity::Ignored,
-                           app,
-                           mod_class,
-                           cmd,
-                           "No modules of class " + mod_class + " in application (optional step)");
+                              app,
+                              mod_class,
+                              cmd,
+                              "No modules of class " + mod_class + " in application (optional step)");
 
       return report;
     }
     if (mod_id == "") {
       ValidationReport report(ValidationReport::Severity::Warning,
-                           app,
-                           mod_class,
-                           cmd,
-                           "No modules of class " + mod_class + " in application!");
-      ers::warning(ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
+                              app,
+                              mod_class,
+                              cmd,
+                              "No modules of class " + mod_class + " in application!");
+      ers::warning(
+        ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
       return report;
     } else {
       ValidationReport report(ValidationReport::Severity::Fatal,
-                           app,
-                           mod_class,
-                           cmd,
-                           "No modules of class " + mod_class + " in application!");
+                              app,
+                              mod_class,
+                              cmd,
+                              "No modules of class " + mod_class + " in application!");
       if (throw_on_fatal)
-        throw ActionPlanValidationFailed(
-          ERS_HERE, report.get_command(), report.get_module(), report.get_message());
+        throw ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message());
       else
-        ers::error(ActionPlanValidationFailed(
-          ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
+        ers::error(
+          ActionPlanValidationFailed(ERS_HERE, report.get_command(), report.get_module(), report.get_message()));
       return report;
     }
   }
