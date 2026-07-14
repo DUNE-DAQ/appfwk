@@ -55,4 +55,4 @@ test/src/appfwk/fakedataconsumerdaqmodule/Structs.hpp
 .DS_Store
 
 # dbt-clang-format temporary files
-.clang-format
+.clang-format*
