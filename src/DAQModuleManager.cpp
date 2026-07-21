@@ -11,8 +11,8 @@
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 
-#include "appmodel/DelayManagerConf.hpp"
-#include "appmodel/DelaySpec.hpp"
+#include "confmodel/DelayManagerConf.hpp"
+#include "confmodel/DelaySpec.hpp"
 #include "appmodel/SmartDaqApplication.hpp"
 #include "cmdlib/cmd/Nljs.hpp"
 #include "confmodel/DaqModulesGroup.hpp"
