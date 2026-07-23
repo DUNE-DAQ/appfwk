@@ -40,6 +40,7 @@ ConfigurationManager::ConfigurationManager(std::string const& config_spec,
                                            std::string const& app_name,
                                            std::string const& session_name)
   : m_confdb(new conffwk::Configuration(config_spec))
+  , m_config_spec(config_spec)
   , m_app_name(app_name)
   , m_session_name(session_name)
 {
@@ -53,6 +54,102 @@ ConfigurationManager::ConfigurationManager(std::string const& config_spec,
   }
   m_helper = std::make_shared<appmodel::ConfigurationHelper>(m_session);
 }
+
+
+/// Reload OKS configuration -- try to do as little re-initialization
+/// as possible
+void
+ConfigurationManager::reload(const std::string& confspec)
+{
+  TLOG() << "reloading configuration";
+
+  std::set<std::string> modules;
+  for (const auto& mod : m_modules) {
+    modules.insert(mod->full_name());
+    TLOG_DBG(TLVL_MODULE) << "old module " << mod->full_name();
+  }
+
+  // Presumably we do want to allow connections to change but keep a
+  // note of the current ones just to report changes
+  std::set<std::string> old_connections;
+  for (auto con: m_networkconnections) {
+    old_connections.insert(con->full_name());
+    TLOG_DBG(TLVL_QUEUE) << "old net_con " << con->full_name();
+  }
+  for (auto con: m_queues) {
+    old_connections.insert(con->full_name());
+    TLOG_DBG(TLVL_QUEUE) << "old queue " << con->full_name();
+  }
+  m_networkconnections.clear();
+  m_queues.clear();
+
+  if (!confspec.empty()) {
+    m_config_spec = confspec;
+  }
+  m_confdb.reset(new conffwk::Configuration(m_config_spec));
+
+  m_session = m_confdb->get<confmodel::Session>(m_session_name);
+  if (m_session == nullptr) {
+    TLOG() << "Failed to get session " << m_session_name;
+    throw MissingComponent(ERS_HERE, "Session " + m_session_name);
+  }
+  m_helper = std::make_shared<appmodel::ConfigurationHelper>(m_session);
+
+  m_application = m_confdb->get<confmodel::DaqApplication>(m_app_name);
+  if (m_application == nullptr) {
+    TLOG() << "Failed to get app " << m_app_name;
+    throw MissingComponent(ERS_HERE, "Application " + m_app_name);
+  }
+
+  TLOG_DBG(TLVL_APP) << "getting modules for app " << m_app_name;
+  auto smart_daq_app = m_application->cast<appmodel::SmartDaqApplication>();
+  if (smart_daq_app != nullptr) {
+    smart_daq_app->generate_modules(m_helper);
+  }
+ 
+  m_connsvc_config = m_session->get_connectivity_service();
+
+  m_modules = m_application->get_modules();
+  if (modules.size() != m_modules.size()) {
+    throw ModuleListChanged(ERS_HERE, "Application " + m_app_name);
+  }
+
+  std::set<std::string> connectionsAdded;
+  for (auto mod : m_modules) {
+    TLOG_DBG(TLVL_MODULE) << "new module " << mod->full_name();
+    if (!modules.contains(mod->full_name())) {
+      throw ModuleListChanged(ERS_HERE, "Application " + m_app_name);
+    }
+    TLOG_DBG(TLVL_MODULE) << "initialising connections for " << mod->class_name() << " module " << mod->UID();
+    auto connections = mod->get_inputs();
+    auto outputs = mod->get_outputs();
+    connections.insert(connections.end(), outputs.begin(), outputs.end());
+    for (auto con : connections) {
+      auto [c, inserted] = connectionsAdded.insert(con->UID());
+      if (!inserted) {
+        // Already handled this connection, don't add it again
+        continue;
+      }
+      auto queue = m_confdb->cast<confmodel::Queue>(con);
+      if (queue) {
+        if (!old_connections.contains(queue->full_name())) {
+          TLOG_DBG(TLVL_QUEUE) << "Adding new queue " << queue->UID();
+        }
+        m_queues.emplace_back(queue);
+      }
+      auto net_con = m_confdb->cast<confmodel::NetworkConnection>(con);
+      if (net_con) {
+        if (!old_connections.contains(net_con->full_name())) {
+          TLOG_DBG(TLVL_QUEUE) << "Adding new NetworkConnection " << net_con->UID();
+        }
+        m_networkconnections.emplace_back(net_con);
+      }
+    }
+  }
+
+  TLOG() << "configuration reloaded";
+}
+
 
 std::vector<ValidationReport>
 ConfigurationManager::initialize(bool throw_on_fatal)

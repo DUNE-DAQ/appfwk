@@ -54,6 +54,18 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   this->m_initialized = true;
 }
 
+void
+DAQModuleManager::reload(opmonlib::OpMonManager& opm)
+{
+  get_iomanager()->reset();
+  get_iomanager()->configure(m_session_name,
+                             m_configuration_mgr->get_queues(),
+                             m_configuration_mgr->get_networkconnections(),
+                             m_configuration_mgr->get_connectivity_service(),
+                             opm);
+}
+
+
 std::optional<ValidationReport>
 DAQModuleManager::check_mod_has_cmd(const std::string& cmd,
                                     const std::string& mod_class,
