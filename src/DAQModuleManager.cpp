@@ -11,9 +11,9 @@
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 
+#include "confmodel/Application.hpp"
 #include "confmodel/DelayManagerConf.hpp"
 #include "confmodel/DelaySpec.hpp"
-#include "appmodel/SmartDaqApplication.hpp"
 #include "cmdlib/cmd/Nljs.hpp"
 #include "confmodel/DaqModulesGroup.hpp"
 #include "confmodel/DaqModulesGroupById.hpp"
@@ -57,7 +57,7 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
 
   // 09-Jul-2026, KAB, ELF: added the initialization of the DelayManager
   std::string app_name = m_configuration_mgr->get_app_name();
-  auto mdal = m_configuration_mgr->get_dal<appmodel::SmartDaqApplication>(app_name);
+  auto mdal = m_configuration_mgr->get_dal<confmodel::Application>(app_name);
   if (mdal) {
     auto delay_mgr_conf = mdal->get_delay_manager_conf();
     if (delay_mgr_conf) {
