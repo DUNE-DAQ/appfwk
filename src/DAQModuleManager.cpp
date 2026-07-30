@@ -11,13 +11,13 @@
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/cmd/Nljs.hpp"
 
-#include "confmodel/Application.hpp"
-#include "confmodel/DelayManagerConf.hpp"
-#include "confmodel/DelaySpec.hpp"
 #include "cmdlib/cmd/Nljs.hpp"
+#include "confmodel/Application.hpp"
 #include "confmodel/DaqModulesGroup.hpp"
 #include "confmodel/DaqModulesGroupById.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
+#include "confmodel/DelayManagerConf.hpp"
+#include "confmodel/DelaySpec.hpp"
 #include "confmodel/Session.hpp"
 #include "iomanager/IOManager.hpp"
 #include "logging/Logging.hpp"
@@ -55,7 +55,7 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
 
   validate_action_plans();
 
-  // 09-Jul-2026, KAB, ELF: added the initialization of the DelayManager
+  // 30-Jul-2026, KAB, ELF: added the initialization of the DelayManager
   std::string app_name = m_configuration_mgr->get_app_name();
   auto mdal = m_configuration_mgr->get_dal<confmodel::Application>(app_name);
   if (mdal) {
