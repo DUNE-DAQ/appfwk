@@ -70,6 +70,8 @@ Application::run(std::atomic<bool>& end_marker)
   m_cmd_fac->run(end_marker);
 
   m_mod_mgr.cleanup();
+
+  stop_monitoring();
 }
 
 void
