@@ -17,7 +17,7 @@
 #include "confmodel/FSMCommand.hpp"
 #include "confmodel/NetworkConnection.hpp"
 #include "confmodel/Queue.hpp"
-#include "confmodel/ResourceSet.hpp"
+#include "confmodel/ExcludableEntitySet.hpp"
 #include "confmodel/Service.hpp"
 #include "confmodel/Session.hpp"
 
