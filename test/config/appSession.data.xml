@@ -242,7 +242,7 @@
  <attr name="type" type="enum" val="file"/>
 </obj>
 
-<obj class="ProcessingResource" id="cpus">
+<obj class="HostCores" id="cpus">
  <attr name="cpu_cores" type="u16">
   <data val="0"/>
   <data val="1"/>
@@ -338,7 +338,7 @@
 
 <obj class="VirtualHost" id="controller">
  <rel name="uses">
-  <ref class="ProcessingResource" id="cpus"/>
+  <ref class="HostCores" id="cpus"/>
  </rel>
  <rel name="runs_on" class="PhysicalHost" id="localhost"/>
 </obj>

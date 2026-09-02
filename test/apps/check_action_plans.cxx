@@ -104,7 +104,7 @@ main(int argc, char* argv[])
     return 0;
   }
 
-  auto apps = session->enabled_applications();
+  auto apps = session->included_applications();
 
   std::vector<appfwk::ValidationReport> validation_errors;
 
