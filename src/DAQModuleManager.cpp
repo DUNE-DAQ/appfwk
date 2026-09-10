@@ -45,6 +45,7 @@ DAQModuleManager::initialize(std::shared_ptr<ConfigurationManager> cfgMgr, opmon
   get_iomanager()->configure(m_session_name,
                              m_configuration_mgr->get_queues(),
                              m_configuration_mgr->get_networkconnections(),
+                             m_configuration_mgr->get_connection_overrides(),
                              m_configuration_mgr->get_connectivity_service(),
                              opm);
   init_modules(m_configuration_mgr->get_modules(), opm);
