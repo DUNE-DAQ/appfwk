@@ -324,11 +324,11 @@
 
 <obj class="PhysicalHost" id="localhost">
  <rel name="contains">
-  <ref class="ProcessingResource" id="localhost_cpus"/>
+  <ref class="HostCores" id="localhost_cpus"/>
  </rel>
 </obj>
 
-<obj class="ProcessingResource" id="localhost_cpus">
+<obj class="HostCores" id="localhost_cpus">
  <attr name="cpu_cores" type="u16">
   <data val="0"/>
   <data val="1"/>
@@ -339,7 +339,7 @@
 
 <obj class="VirtualHost" id="vlocalhost">
  <rel name="uses">
-  <ref class="ProcessingResource" id="localhost_cpus"/>
+  <ref class="HostCores" id="localhost_cpus"/>
  </rel>
  <rel name="runs_on" class="PhysicalHost" id="localhost"/>
 </obj>
