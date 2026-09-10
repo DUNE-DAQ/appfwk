@@ -63,7 +63,7 @@
 
 <oks-data>
 
-<info name="" type="" num-of-items="45" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231116T105446" last-modified-by="eflumerf" last-modified-on="ironvirt9.mshome.net" last-modification-time="20250716T141655"/>
+<info name="" type="" num-of-items="39" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231116T105446" last-modified-by="eflumerf" last-modified-on="ironvirt9.mshome.net" last-modification-time="20260910T142135"/>
 
 <include>
  <file path="schema/confmodel/dunedaq.schema.xml"/>
@@ -237,11 +237,6 @@
  </attr>
 </obj>
 
-<obj class="OpMonURI" id="local-opmon-uri">
- <attr name="path" type="string" val="./info.json"/>
- <attr name="type" type="enum" val="file"/>
-</obj>
-
 <obj class="HostCores" id="cpus">
  <attr name="cpu_cores" type="u16">
   <data val="0"/>
@@ -249,6 +244,11 @@
   <data val="2"/>
   <data val="3"/>
  </attr>
+</obj>
+
+<obj class="OpMonURI" id="local-opmon-uri">
+ <attr name="path" type="string" val="./info.json"/>
+ <attr name="type" type="enum" val="file"/>
 </obj>
 
 <obj class="RCApplication" id="my-controller">
