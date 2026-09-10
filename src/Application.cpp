@@ -103,6 +103,19 @@ Application::execute(const dataobj_t& cmd_data)
     m_runinfo.set_running(false);
     m_runinfo.set_run_number(0);
     m_runinfo.set_run_time(0);
+  } else if (cmdname == "conf" || cmdname == "reload") { // Does not
+                                                         // belong
+                                                         // here, just
+                                                         // hacked
+                                                         // in for testing!!!
+    std::cout << "rc_cmd.data=" << rc_cmd.data << "\n";
+
+    std::string confspec{""};
+    if (rc_cmd.data.contains("confspec")) {
+      confspec = rc_cmd.data["confspec"];
+    }
+    get_config_manager()->reload(confspec);
+    m_mod_mgr.reload(*dynamic_cast<OpMonManager*>(this));
   }
 
   try {
