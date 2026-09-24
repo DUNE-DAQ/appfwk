@@ -162,10 +162,11 @@ class DAQModule
 public:
   /**
    * @brief CommandData_t is used to pass parameters to commands
-   * 
+   *
    *  CommandData_t is defined as a class to enforce API usage (in case we change implementation in the future)
    */
-  class CommandData_t : public nlohmann::json {};
+  class CommandData_t : public nlohmann::json
+  {};
 
   explicit DAQModule(std::string name)
     : utilities::NamedObject(name)
