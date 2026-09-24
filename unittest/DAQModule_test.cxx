@@ -14,11 +14,11 @@
 #include "boost/test/unit_test.hpp"
 #include "nlohmann/json.hpp"
 
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>
 
-constexpr auto queue_timeout = std::chrono::milliseconds(10);
 using namespace dunedaq::appfwk;
 
 BOOST_AUTO_TEST_SUITE(DAQModule_test)

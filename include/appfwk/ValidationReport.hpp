@@ -11,10 +11,7 @@
 
 #include <string>
 
-namespace dunedaq {
-
-
-namespace appfwk {
+namespace dunedaq::appfwk {
 
 class ValidationReport
 {
@@ -68,7 +65,6 @@ private:
   std::string m_message;
 };
 
-} // namespace appfwk
-} //namespace dunedaq
+} // namespace dunedaq::appfwk
 
 #endif // APPFWK_INCLUDE_APPFWK_VALIDATIONREPORT_HPP_

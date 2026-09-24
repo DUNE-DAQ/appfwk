@@ -88,7 +88,8 @@ main(int argc, char* argv[])
     dbfile = "oksconflibs:" + dbfile;
   }
 
-  logging::Logging::setup("test", "validate_plans");
+  assert(sessionName != "" && "Session name must not be empty");
+  logging::Logging::setup(sessionName, "validate_plans");
 
   conffwk::Configuration* confdb = nullptr;
   try {
@@ -124,11 +125,10 @@ main(int argc, char* argv[])
     mmgr.set_config_mgr(cfgMgr);
     mmgr.construct_modules(modules);
 
-    
     TLOG() << app->UID() << ": Validating Action Plans";
     auto ap_reports = mmgr.validate_action_plans(false);
-    validation_errors.insert(validation_errors.end(),
-                             std::make_move_iterator(ap_reports.begin()), std::make_move_iterator(ap_reports.end()));
+    validation_errors.insert(
+      validation_errors.end(), std::make_move_iterator(ap_reports.begin()), std::make_move_iterator(ap_reports.end()));
   }
 
   std::cout << std::endl << std::endl << "Summary:" << std::endl; // NOLINT
@@ -167,7 +167,7 @@ main(int argc, char* argv[])
       std::cout << report.get_module() << module_space; // NOLINT
       std::string severity_space(longest_severity - report.severity_string().size() + minimum_space, ' ');
       std::cout << report.severity_string() << severity_space; // NOLINT
-      std::cout << report.get_message() << clear << std::endl;       // NOLINT
+      std::cout << report.get_message() << clear << std::endl; // NOLINT
     }
   } else {
     std::cout << "No validation errors encountered!" << std::endl; // NOLINT
