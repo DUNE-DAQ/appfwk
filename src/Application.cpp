@@ -139,13 +139,14 @@ Application::check_state_for_cmd(const dataobj_t& cmd_data) const
 }
 
 void
-Application::publish_app_info() {
-  
+Application::publish_app_info()
+{
+
   opmon::AppInfo ai;
   ai.set_state(get_state());
   ai.set_busy(m_busy.load());
   ai.set_error(m_error.load());
-  
+
   char hostname[256]; // NOLINT
   auto res = gethostname(hostname, 256);
   if (res < 0)
@@ -161,8 +162,6 @@ Application::publish_app_info() {
   }
 
   publish(decltype(m_runinfo)(m_runinfo));
-
 }
 
-  
 } // namespace dunedaq::appfwk
