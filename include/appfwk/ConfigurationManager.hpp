@@ -69,6 +69,12 @@ public:
     initialize();
     return m_networkconnections;
   }
+  const std::vector<const confmodel::ConnectionOverride*>& get_connection_overrides()
+  {
+    initialize();
+    return m_application->get_connection_overrides();
+  }
+
   const std::vector<const confmodel::DaqModule*>& get_modules()
   {
     initialize();
