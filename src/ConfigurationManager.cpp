@@ -69,17 +69,17 @@ ConfigurationManager::initialize(bool throw_on_fatal)
 
   TLOG_DBG(TLVL_APP) << "getting modules for app " << m_app_name;
   auto daq_app = m_application->cast<confmodel::DaqApplication>();
-  if(daq_app == nullptr) {
-    throw(NotADaqApplication(ERS_HERE, m_application->UID()));    
+  if (daq_app == nullptr) {
+    throw(NotADaqApplication(ERS_HERE, m_application->UID()));
   }
 
   auto smart_daq_app = m_application->cast<appmodel::SmartDaqApplication>();
   if (smart_daq_app != nullptr) {
     smart_daq_app->generate_modules(m_helper);
   }
- 
+
   m_modules = m_application->get_modules();
-   
+
   for (auto& plan : m_application->get_action_plans()) {
     auto cmd = plan->get_command()->get_cmd();
     TLOG_DBG(TLVL_ACTION_PLAN) << "Registering action plan " << plan->UID() << " for cmd " << cmd;

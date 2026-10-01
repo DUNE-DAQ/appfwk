@@ -13,7 +13,6 @@
 
 namespace dunedaq {
 
-
 namespace appfwk {
 
 class ValidationReport
@@ -69,6 +68,6 @@ private:
 };
 
 } // namespace appfwk
-} //namespace dunedaq
+} // namespace dunedaq
 
 #endif // APPFWK_INCLUDE_APPFWK_VALIDATIONREPORT_HPP_
