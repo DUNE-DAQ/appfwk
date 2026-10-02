@@ -24,10 +24,15 @@ on:
         type: string
         default: 'schedule'
         description: "Enter 'pull_request' (without quotes) to compare linting results to previous linting results."
+      target_branch:
+        type: string
+        default: ''
+        description: "Branch this change targets (e.g. develop, patch/*, etc.). Affects the release image and whether matching feature branches are cloned. Leave blank to use the current branch."
 
 jobs:
   build_develop_dispatch:
     name: Build against the development release
-    uses: DUNE-DAQ/.github/.github/workflows/dunedaq-develop-cpp-ci.yml@develop
+    uses: DUNE-DAQ/.github/.github/workflows/dunedaq-develop-cpp-ci.yml@amogan/issue27_correlated_branches
     with:
-      caller_event_name: ${{ github.event.inputs.caller_event_name || github.event_name }}
+      caller_event_name: ${{ inputs.caller_event_name || github.event_name }}
+      target_branch: ${{ inputs.target_branch || '' }}
