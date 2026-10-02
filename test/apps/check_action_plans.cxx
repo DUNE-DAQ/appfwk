@@ -88,7 +88,8 @@ main(int argc, char* argv[])
     dbfile = "oksconflibs:" + dbfile;
   }
 
-  logging::Logging::setup("test", "validate_plans");
+  assert(sessionName != "" && "Session name must not be empty");
+  logging::Logging::setup(sessionName, "validate_plans");
 
   conffwk::Configuration* confdb = nullptr;
   try {
