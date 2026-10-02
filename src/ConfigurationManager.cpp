@@ -20,8 +20,10 @@
 #include "confmodel/Service.hpp"
 #include "confmodel/Session.hpp"
 
+#include <memory>
 #include <set>
 #include <string>
+#include <vector>
 
 using namespace dunedaq::appfwk;
 
