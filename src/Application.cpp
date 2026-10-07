@@ -85,6 +85,21 @@ Application::execute(const dataobj_t& cmd_data)
 
   m_busy.store(true);
 
+  // here we should check from the command payload if the command requires the reload of the configuration
+  if (rc_cmd.data.contains("reload_configuration")) 
+  {
+    auto reload_conf = rc_cmd.data["reload_configuration"].get<bool>();
+    if (reload_conf) {
+      std::string confspec = "";
+      if (rc_cmd.data.contains("confspec")) {
+        confspec = rc_cmd.data["confspec"];
+      }
+      get_config_manager()->reload(confspec);
+      m_mod_mgr.reload(*dynamic_cast<OpMonManager*>(this));
+    }
+  }
+
+
   if (cmdname == "start") {
     auto cmd_obj = rc_cmd.data.get<cmd::CmdObj>();
 
