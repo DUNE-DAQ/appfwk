@@ -79,6 +79,7 @@ public:
   void initialize(std::shared_ptr<ConfigurationManager> mgr, opmonlib::OpMonManager&);
   bool initialized() const { return m_initialized; }
   void cleanup();
+  void reload(opmonlib::OpMonManager&);
 
   // Execute a properly structured command
   void execute(const std::string& cmd, const DAQModule::CommandData_t& cmd_data);

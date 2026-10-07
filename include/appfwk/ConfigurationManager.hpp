@@ -38,6 +38,8 @@ ERS_DECLARE_ISSUE(appfwk,
 
 ERS_DECLARE_ISSUE(appfwk, MissingComponent, "No such component: " << what, ((std::string)what))
 
+ERS_DECLARE_ISSUE(appfwk, ModuleListChanged, "List of modules has changed since init: " << what, ((std::string)what))
+
 ERS_DECLARE_ISSUE(appfwk,
                   ActionPlanValidationFailed,
                   "Action plan validation failed: " << cmd << ", module " << module << ": " << message,
@@ -51,6 +53,8 @@ class ConfigurationManager
 public:
   ConfigurationManager(std::string const& config_spec, std::string const& app_name, std::string const& session_name);
   std::vector<ValidationReport> initialize(bool throw_on_fatal = true);
+
+  void reload(const std::string& confspec);
 
   const confmodel::Session* get_session() const { return m_session; }
   const confmodel::Application* get_application()
@@ -98,6 +102,7 @@ public:
 private:
   std::shared_ptr<conffwk::Configuration> m_confdb;
   std::shared_ptr<appmodel::ConfigurationHelper> m_helper;
+  std::string m_config_spec;
   std::string m_app_name;
   std::string m_session_name;
 
