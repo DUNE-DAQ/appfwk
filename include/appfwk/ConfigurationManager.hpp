@@ -48,13 +48,14 @@ ERS_DECLARE_ISSUE(appfwk,
 
 namespace appfwk {
 
+class Application;
+
 class ConfigurationManager
 {
+  friend class Application;
 public:
   ConfigurationManager(std::string const& config_spec, std::string const& app_name, std::string const& session_name);
   std::vector<ValidationReport> initialize(bool throw_on_fatal = true);
-
-  void reload(const std::string& confspec);
 
   const confmodel::Session* get_session() const { return m_session; }
   const confmodel::Application* get_application()
@@ -98,6 +99,9 @@ public:
   }
 
   std::string get_app_name() const { return m_app_name; }
+
+protected:
+  void reload(const std::string& confspec);
 
 private:
   std::shared_ptr<conffwk::Configuration> m_confdb;
