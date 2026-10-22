@@ -124,9 +124,14 @@ BOOST_AUTO_TEST_CASE(Commands)
 
 BOOST_AUTO_TEST_CASE(MakeModule)
 {
-  BOOST_REQUIRE_EXCEPTION(make_module("not_a_real_plugin_name", "error_test"),
-                          DAQModuleCreationFailed,
-                          [&](DAQModuleCreationFailed) { return true; });
+  BOOST_REQUIRE_EXCEPTION(
+    make_module("not_a_valid_plugin_name", "error_test"), DAQModuleCreationFailed, [&](DAQModuleCreationFailed e) {
+      return e.cause()->message().find("contains an illegal underscore") != std::string::npos;
+    });
+  BOOST_REQUIRE_EXCEPTION(
+    make_module("not-a-real-plugin-name", "error_test"), DAQModuleCreationFailed, [&](DAQModuleCreationFailed e) {
+      return e.cause()->message().find("does not correspond to any library") != std::string::npos;
+    });
 }
 
 BOOST_AUTO_TEST_CASE(RegisterCommand)
