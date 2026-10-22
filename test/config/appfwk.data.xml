@@ -84,7 +84,7 @@
 
 <obj class="ActionPlan" id="bad_action">
  <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
- <rel name="command" class="FSMCommand" id="bad_action"/>
+ <rel name="command" class="FSMtransition" id="bad_action"/>
  <rel name="steps">
   <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
@@ -92,7 +92,7 @@
 
 <obj class="ActionPlan" id="bad_stuff">
  <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
- <rel name="command" class="FSMCommand" id="bad_stuff"/>
+ <rel name="command" class="FSMtransition" id="bad_stuff"/>
  <rel name="steps">
   <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
@@ -100,7 +100,7 @@
 
 <obj class="ActionPlan" id="bad_stuff_conflict">
  <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
- <rel name="command" class="FSMCommand" id="bad_stuff"/>
+ <rel name="command" class="FSMtransition" id="bad_stuff"/>
  <rel name="steps">
   <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
@@ -108,7 +108,7 @@
 
 <obj class="ActionPlan" id="stuff">
  <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
- <rel name="command" class="FSMCommand" id="stuff"/>
+ <rel name="command" class="FSMtransition" id="stuff"/>
  <rel name="steps">
   <ref class="DaqModulesGroupByType" id="dummymodules_type_group"/>
  </rel>
@@ -116,7 +116,7 @@
 
 <obj class="ActionPlan" id="stuff_byid">
  <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
- <rel name="command" class="FSMCommand" id="stuff"/>
+ <rel name="command" class="FSMtransition" id="stuff"/>
  <rel name="steps">
   <ref class="DaqModulesGroupById" id="dummymodules_id_group"/>
  </rel>
@@ -124,7 +124,7 @@
 
 <obj class="ActionPlan" id="stuff_byid_optional">
  <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
- <rel name="command" class="FSMCommand" id="stuff"/>
+ <rel name="command" class="FSMtransition" id="stuff"/>
  <rel name="steps">
   <ref class="DaqModulesGroupById" id="dummymodules_id_group_optional"/>
  </rel>
@@ -132,7 +132,7 @@
 
 <obj class="ActionPlan" id="stuff_optional">
  <attr name="execution_policy" type="enum" val="modules-in-parallel"/>
- <rel name="command" class="FSMCommand" id="stuff"/>
+ <rel name="command" class="FSMtransition" id="stuff"/>
  <rel name="steps">
   <ref class="DaqModulesGroupByType" id="dummymodules_type_group_optional"/>
  </rel>
@@ -302,17 +302,17 @@
 <obj class="ExtraModule" id="extra_module_0">
 </obj>
 
-<obj class="FSMCommand" id="bad_action">
+<obj class="FSMtransition" id="bad_action">
  <attr name="cmd" type="string" val="bad_action"/>
  <attr name="optional" type="bool" val="0"/>
 </obj>
 
-<obj class="FSMCommand" id="bad_stuff">
+<obj class="FSMtransition" id="bad_stuff">
  <attr name="cmd" type="string" val="bad_stuff"/>
  <attr name="optional" type="bool" val="0"/>
 </obj>
 
-<obj class="FSMCommand" id="stuff">
+<obj class="FSMtransition" id="stuff">
  <attr name="cmd" type="string" val="stuff"/>
  <attr name="optional" type="bool" val="0"/>
 </obj>
