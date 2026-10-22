@@ -63,7 +63,7 @@
 
 <oks-data>
 
-<info name="" type="" num-of-items="45" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231116T105446" last-modified-by="eflumerf" last-modified-on="ironvirt9.mshome.net" last-modification-time="20250716T141655"/>
+<info name="" type="" num-of-items="31" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231116T105446" last-modified-by="mroda" last-modified-on="mroda-xpsp" last-modification-time="20261022T134259"/>
 
 <include>
  <file path="schema/confmodel/dunedaq.schema.xml"/>
@@ -75,6 +75,7 @@
  <comment creation-time="20231117T105205" created-by="gjc" created-on="thinkpad" author="gjc" text="ff"/>
  <comment creation-time="20231117T120703" created-by="gjc" created-on="thinkpad" author="gjc" text="n"/>
  <comment creation-time="20231117T121356" created-by="gjc" created-on="thinkpad" author="gjc" text="rename"/>
+ <comment creation-time="20261022T133948" created-by="mroda" created-on="mroda-xpsp" author="mroda" text="fix due to new schema"/>
 </comments>
 
 
@@ -83,6 +84,12 @@
  <attr name="clock_speed_hz" type="u32" val="62500000"/>
  <attr name="op_env" type="string" val="swtest"/>
  <attr name="offline_data_stream" type="string" val="cosmics"/>
+</obj>
+
+<obj class="FSMPreTransition" id="start">
+ <attr name="mandatory" type="string">
+  <data val="user-provided-run-number"/>
+ </attr>
 </obj>
 
 <obj class="FSMaction" id="dummy-if">
@@ -116,12 +123,10 @@
   <ref class="FSMsequence" id="start_run"/>
   <ref class="FSMsequence" id="stop_run"/>
  </rel>
- <rel name="pre_transitions">
-  <ref class="FSMxTransition" id="start"/>
- </rel>
 </obj>
 
 <obj class="FSMsequence" id="shutdown">
+ <attr name="name" type="string" val="shutdown"/>
  <rel name="sequence">
   <ref class="FSMtransition" id="disable_triggers"/>
   <ref class="FSMtransition" id="drain_dataflow"/>
@@ -132,6 +137,7 @@
 </obj>
 
 <obj class="FSMsequence" id="start_run">
+ <attr name="name" type="string" val="start_run"/>
  <rel name="sequence">
   <ref class="FSMtransition" id="conf"/>
   <ref class="FSMtransition" id="start"/>
@@ -140,6 +146,7 @@
 </obj>
 
 <obj class="FSMsequence" id="stop_run">
+ <attr name="name" type="string" val="stop_run"/>
  <rel name="sequence">
   <ref class="FSMtransition" id="disable_triggers"/>
   <ref class="FSMtransition" id="drain_dataflow"/>
@@ -151,55 +158,56 @@
 <obj class="FSMtransition" id="conf">
  <attr name="source" type="string" val="initial"/>
  <attr name="dest" type="string" val="configured"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="disable_triggers">
  <attr name="source" type="string" val="running"/>
  <attr name="dest" type="string" val="ready"/>
+ <attr name="cmd" type="string" val="disable_triggers"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="drain_dataflow">
  <attr name="source" type="string" val="ready"/>
  <attr name="dest" type="string" val="dataflow_drained"/>
+ <attr name="cmd" type="string" val="drain_dataflow"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="enable_triggers">
  <attr name="source" type="string" val="ready"/>
  <attr name="dest" type="string" val="running"/>
+ <attr name="cmd" type="string" val="enable_triggers"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="scrap">
  <attr name="source" type="string" val="configured"/>
  <attr name="dest" type="string" val="initial"/>
+ <attr name="cmd" type="string" val="scrap"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="start">
  <attr name="source" type="string" val="configured"/>
  <attr name="dest" type="string" val="ready"/>
+ <attr name="cmd" type="string" val="start"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="stop">
  <attr name="source" type="string" val="trigger_sources_stopped"/>
  <attr name="dest" type="string" val="configured"/>
+ <attr name="cmd" type="string" val="stop"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="stop_trigger_sources">
  <attr name="source" type="string" val="dataflow_drained"/>
  <attr name="dest" type="string" val="trigger_sources_stopped"/>
-</obj>
-
-<obj class="FSMPreTransition" id="start">
- <attr name="order" type="string">
-  <data val="user-provided-run-number"/>
- </attr>
- <attr name="mandatory" type="string">
-  <data val="user-provided-run-number"/>
- </attr>
-</obj>
-
-<obj class="OpMonURI" id="local-opmon-uri">
- <attr name="path" type="string" val="./info.json"/>
- <attr name="type" type="enum" val="file"/>
+ <attr name="cmd" type="string" val="stop_trigger_sources"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="HostCores" id="cpus">
@@ -209,6 +217,11 @@
   <data val="2"/>
   <data val="3"/>
  </attr>
+</obj>
+
+<obj class="OpMonURI" id="local-opmon-uri">
+ <attr name="path" type="string" val="./info.json"/>
+ <attr name="type" type="enum" val="file"/>
 </obj>
 
 <obj class="RCApplication" id="my-controller">

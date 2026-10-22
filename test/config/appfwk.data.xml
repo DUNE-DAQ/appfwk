@@ -63,7 +63,7 @@
 
 <oks-data>
 
-<info name="" type="" num-of-items="32" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231110T143339" last-modified-by="eflumerf" last-modified-on="ironvirt9.mshome.net" last-modification-time="20250722T162554"/>
+<info name="" type="" num-of-items="32" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231110T143339" last-modified-by="mroda" last-modified-on="mroda-xpsp" last-modification-time="20261022T133444"/>
 
 <include>
  <file path="schema/confmodel/dunedaq.schema.xml"/>
@@ -79,6 +79,7 @@
  <comment creation-time="20240327T150434" created-by="eflumerf" created-on="ironvirt9.mshome.net" author="eflumerf" text="Add plan and step"/>
  <comment creation-time="20240327T151851" created-by="eflumerf" created-on="ironvirt9.mshome.net" author="eflumerf" text="Add stuff command to TestApp"/>
  <comment creation-time="20240327T161636" created-by="eflumerf" created-on="ironvirt9.mshome.net" author="eflumerf" text="Reformat"/>
+ <comment creation-time="20261022T133444" created-by="mroda" created-on="mroda-xpsp" author="mroda" text="fix for new schema"/>
 </comments>
 
 
@@ -303,18 +304,33 @@
 </obj>
 
 <obj class="FSMtransition" id="bad_action">
+ <attr name="source" type="string" val="ANY"/>
+ <attr name="dest" type="string" val="ANY"/>
  <attr name="cmd" type="string" val="bad_action"/>
- <attr name="optional" type="bool" val="0"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="bad_stuff">
+ <attr name="source" type="string" val="ANY"/>
+ <attr name="dest" type="string" val="ANY"/>
  <attr name="cmd" type="string" val="bad_stuff"/>
- <attr name="optional" type="bool" val="0"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
 </obj>
 
 <obj class="FSMtransition" id="stuff">
+ <attr name="source" type="string" val="ANY"/>
+ <attr name="dest" type="string" val="ANY"/>
  <attr name="cmd" type="string" val="stuff"/>
- <attr name="optional" type="bool" val="0"/>
+ <attr name="reload_configuration" type="bool" val="0"/>
+</obj>
+
+<obj class="HostCores" id="localhost_cpus">
+ <attr name="cpu_cores" type="u16">
+  <data val="0"/>
+  <data val="1"/>
+  <data val="2"/>
+  <data val="3"/>
+ </attr>
 </obj>
 
 <obj class="OpMonConf" id="slow-all-monitoring">
@@ -326,15 +342,6 @@
  <rel name="contains">
   <ref class="HostCores" id="localhost_cpus"/>
  </rel>
-</obj>
-
-<obj class="HostCores" id="localhost_cpus">
- <attr name="cpu_cores" type="u16">
-  <data val="0"/>
-  <data val="1"/>
-  <data val="2"/>
-  <data val="3"/>
- </attr>
 </obj>
 
 <obj class="VirtualHost" id="vlocalhost">
