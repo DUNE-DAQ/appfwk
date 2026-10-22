@@ -14,7 +14,7 @@
 #include "confmodel/DaqApplication.hpp"
 #include "confmodel/DaqModule.hpp"
 #include "confmodel/DaqModulesGroupByType.hpp"
-#include "confmodel/FSMCommand.hpp"
+#include "confmodel/FSMtransition.hpp"
 #include "confmodel/NetworkConnection.hpp"
 #include "confmodel/Queue.hpp"
 #include "confmodel/ExcludableEntitySet.hpp"
