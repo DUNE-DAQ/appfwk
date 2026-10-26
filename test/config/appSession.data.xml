@@ -63,7 +63,7 @@
 
 <oks-data>
 
-<info name="" type="" num-of-items="31" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231116T105446" last-modified-by="mroda" last-modified-on="mroda-xpsp" last-modification-time="20261022T134259"/>
+<info name="" type="" num-of-items="31" oks-format="data" oks-version="862f2957270" created-by="gjc" created-on="thinkpad" creation-time="20231116T105446" last-modified-by="mroda" last-modified-on="mroda-xpsp" last-modification-time="20261026T113740"/>
 
 <include>
  <file path="schema/confmodel/dunedaq.schema.xml"/>
@@ -76,6 +76,7 @@
  <comment creation-time="20231117T120703" created-by="gjc" created-on="thinkpad" author="gjc" text="n"/>
  <comment creation-time="20231117T121356" created-by="gjc" created-on="thinkpad" author="gjc" text="rename"/>
  <comment creation-time="20261022T133948" created-by="mroda" created-on="mroda-xpsp" author="mroda" text="fix due to new schema"/>
+ <comment creation-time="20261026T113740" created-by="mroda" created-on="mroda-xpsp" author="mroda" text="fix transitions"/>
 </comments>
 
 
@@ -90,6 +91,9 @@
  <attr name="mandatory" type="string">
   <data val="user-provided-run-number"/>
  </attr>
+ <rel name="actions">
+  <ref class="FSMaction" id="dummy-if"/>
+ </rel>
 </obj>
 
 <obj class="FSMaction" id="dummy-if">
@@ -194,6 +198,7 @@
  <attr name="dest" type="string" val="ready"/>
  <attr name="cmd" type="string" val="start"/>
  <attr name="reload_configuration" type="bool" val="0"/>
+ <rel name="pre_transition" class="FSMPreTransition" id="start"/>
 </obj>
 
 <obj class="FSMtransition" id="stop">
