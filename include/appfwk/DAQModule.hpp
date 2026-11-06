@@ -18,6 +18,7 @@
 
 #include "appfwk/ConfigurationManager.hpp"
 
+
 #include "logging/Logging.hpp" // NOTE: if ISSUES ARE DECLARED BEFORE include logging/Logging.hpp, TLOG_DEBUG<<issue wont work.
 #include "opmonlib/MonitorableObject.hpp"
 #include "utilities/NamedObject.hpp"
@@ -78,6 +79,16 @@ ERS_DECLARE_ISSUE_BASE(appfwk,
                        DAQModuleInitFailed,
                        appfwk::GeneralDAQModuleIssue,
                        " init failed.",
+                       ((std::string)name),
+                       ERS_EMPTY)
+
+ /**
+ * @brief Configuration access failed
+ */
+ERS_DECLARE_ISSUE_BASE(appfwk,
+                       ConfigurationAccessFailed,
+                       appfwk::GeneralDAQModuleIssue,
+                       "Access to configuration failed. ConfigurationManager pointer is null.",
                        ((std::string)name),
                        ERS_EMPTY)
 
@@ -181,7 +192,9 @@ public:
    *
    * Initialisation of the module. Abstract method to be overridden by derived classes.
    */
-  virtual void init(std::shared_ptr<ConfigurationManager> mcfg) = 0;
+  virtual void init(std::shared_ptr<ConfigurationManager> mcfg) {
+       m_configuration_manager = mcfg;
+  }
 
   /**
    * @brief Execute a command in this DAQModule
@@ -215,10 +228,19 @@ protected:
   DAQModule& operator=(DAQModule const&) = delete;
   DAQModule& operator=(DAQModule&&) = delete;
 
+  ConfigurationManager & get_configuration_manager() const { 
+    if ( !m_configuration_manager ) {
+      throw ConfigurationAccessFailed(ERS_HERE, get_name());
+    }
+    return *m_configuration_manager; 
+  }
+
 private:
   using CommandMap_t = std::map<std::string, std::function<void(const CommandData_t&)>>;
   CommandMap_t m_commands;
   std::atomic<bool> m_command_registration_allowed{ true };
+
+  std::shared_ptr<ConfigurationManager> m_configuration_manager = nullptr;
 };
 
 std::shared_ptr<DAQModule>
