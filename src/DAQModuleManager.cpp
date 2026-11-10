@@ -453,7 +453,9 @@ DAQModuleManager::execute(const std::string& cmd, const DAQModule::CommandData_t
 
   // Shutdown IOManager at scrap
   if (cmd == "scrap") {
-    get_iomanager()->shutdown();
+    // TODO: Eric Flumerfelt <eflumerf@fnal.gov> Nov-10-2026: We need to clarify which connections should be valid from
+    // init..terminate, and which are only from conf..scrap. For now, it may be best to not reset the IOManager here.
+    // get_iomanager()->shutdown();
   }
 }
 
