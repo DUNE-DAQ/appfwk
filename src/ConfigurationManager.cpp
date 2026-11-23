@@ -63,7 +63,9 @@ ConfigurationManager::ConfigurationManager(std::string const& config_spec,
 void
 ConfigurationManager::reload(const std::string& confspec)
 {
-  TLOG() << "reloading configuration";
+
+  TLOG() << "Start reloading configuration";
+  
 
   std::set<std::string> modules;
   for (const auto& mod : m_modules) {
@@ -87,7 +89,12 @@ ConfigurationManager::reload(const std::string& confspec)
 
   if (!confspec.empty()) {
     m_config_spec = confspec;
+    TLOG() << "Using new configuration file: " << m_config_spec;
   }
+  else {
+    TLOG() << "Using old configuration file: " << m_config_spec;
+  } // if confspec is not empty
+  
   m_confdb.reset(new conffwk::Configuration(m_config_spec));
 
   m_session = m_confdb->get<confmodel::Session>(m_session_name);

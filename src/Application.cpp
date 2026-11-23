@@ -83,9 +83,14 @@ Application::execute(const dataobj_t& cmd_data)
     throw InvalidStateForCommand(ERS_HERE, cmdname, get_state(), m_error.load(), m_busy.load());
   }
 
+  TLOG() << "Received valid command: " << cmdname;
+  
   m_busy.store(true);
 
   // here we should check from the command payload if the command requires the reload of the configuration
+
+  TLOG() << "Command payload: " << rc_cmd.data;
+  
   if (rc_cmd.data.contains("reload_configuration")) 
   {
     auto reload_conf = rc_cmd.data["reload_configuration"].get<bool>();
