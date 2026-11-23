@@ -106,7 +106,7 @@ protected:
 private:
   std::shared_ptr<conffwk::Configuration> m_confdb;
   std::shared_ptr<appmodel::ConfigurationHelper> m_helper;
-  std::string m_config_spec;
+  std::string m_config_spec;  // this is the fully formed string to pass to OKS, i.e. it needs to start with "oksconflibs:"
   std::string m_app_name;
   std::string m_session_name;
 

@@ -90,20 +90,29 @@ Application::execute(const dataobj_t& cmd_data)
   // here we should check from the command payload if the command requires the reload of the configuration
 
   TLOG() << "Command payload: " << rc_cmd.data;
-  
-  if (rc_cmd.data.contains("reload_configuration")) 
-  {
-    auto reload_conf = rc_cmd.data["reload_configuration"].get<bool>();
-    if (reload_conf) {
-      std::string confspec = "";
-      if (rc_cmd.data.contains("confspec")) {
-        confspec = rc_cmd.data["confspec"];
-      }
-      get_config_manager()->reload(confspec);
-      m_mod_mgr.reload(*dynamic_cast<OpMonManager*>(this));
-    }
-  }
 
+  auto cmd_obj = rc_cmd.data.get<cmd::CmdObj>();
+
+  // The payload is sent into an array called modules because of an old design that is v4 where each module had its own payload
+  // So the right way to access the payload is to loop over the modules
+  // we do it only once and we break
+  
+  for (const auto& addressed : cmd_obj.modules) {
+    dataobj_t payload = addressed.data;
+
+    if (payload.contains("reload_configuration")) {
+      auto reload_conf = payload["reload_configuration"].get<bool>();
+      if (reload_conf) {
+	std::string confspec = "";
+	if (payload.contains("confspec")) {
+	  confspec = payload["confspec"];
+	}
+	get_config_manager()->reload(confspec);
+	m_mod_mgr.reload(*dynamic_cast<OpMonManager*>(this));
+      }
+    }
+    break;
+  } // loop over moduless
 
   if (cmdname == "start") {
     auto cmd_obj = rc_cmd.data.get<cmd::CmdObj>();

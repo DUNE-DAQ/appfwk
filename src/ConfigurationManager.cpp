@@ -88,7 +88,11 @@ ConfigurationManager::reload(const std::string& confspec)
   m_queues.clear();
 
   if (!confspec.empty()) {
-    m_config_spec = confspec;
+    if ( confspec.find("oksconflibs:") != 0 ) {
+      m_config_spec = "oksconflibs:" + confspec;
+    } else {
+      m_config_spec = confspec;
+    }
     TLOG() << "Using new configuration file: " << m_config_spec;
   }
   else {
